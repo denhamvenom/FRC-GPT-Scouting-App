@@ -1,0 +1,61 @@
+# docs/project_summary.txt
+## North-Star Goal  
+Build a **local FastAPI + React scouting assistant** that cleans data, generates pick lists, and supports live alliance selection — all from Google Sheets, The Blue Alliance, and GPT-4o.
+
+---
+
+## Core Modules & Windows
+
+| Module | Purpose |
+|--------|---------|
+| **Setup** | Select season → authenticate Sheets → choose event (TBA pull) → *Dynamic Schema-Learning* button. |
+| **Schema-Learning** | GPT scans sheet headers, maps to generic tags (`team_num`, `auto_score`, etc.), shows wizard for user corrections, saves `schema_<season>.json`. |
+| **Data Cleanup** | End-of-day verifier. 1) **Missing-Match Check**. 2) **Anomaly Detector** (±2 σ). Flags create To-Do list. |
+| **Virtual Scout** | UI to fill gaps: average data, manual entry, or GPT-assisted estimate. |
+| **Pick-List Strategy** | User writes bullet goals for 1st / 2nd (/ 3rd) picks, blacklist teams. GPT can auto-suggest strategy based on stats. |
+| **Pick-List Generator** | Combines Scouting Tab, SuperScouting Tab, strategy bullets → outputs ranked pick lists (CSV offline copy) with one-sentence GPT rationales. |
+| **Live Draft Board** | Real-time alliance selection input; filters remaining teams; GPT offers updated recommendation when net is online. |
+| **Live Strat View** (v2) | For each upcoming match, show strengths/weaknesses + GPT Q&A box. |
+
+---
+
+## MVP vs V2
+
+| Must-Have (v1) | Nice-to-Have (v2) |
+|---------------|-------------------|
+| Setup + Schema wizard | OAuth flow for multiple users |
+| Data Cleanup verifier | Auto-fetch YouTube match links |
+| Pick-List strategy + generator | Voice-command Q&A |
+| Live Draft Board | Mobile React Native shell |
+
+---
+
+## Tech Decisions & Practices
+
+* **FastAPI async** + `httpx.AsyncClient` for TBA & GPT.  
+* **React tabs**: Setup | Cleanup | Strategy | Pick List | Live Draft.  
+* **Threads/Executor** for heavy pandas work; UI stays responsive.  
+* **Cost Logger**: middleware records tokens × cost to `usage_log.csv`.  
+* **Offline Mode**: JSON cache for TBA + Sheets; pick lists saved locally.  
+* **CI**: GitHub Actions runs `ruff`, `black`, `mypy`, `pytest`, React tests.  
+
+---
+
+## Folder Skeleton
+
+
+---
+
+## Development Phases
+
+1. **Bootstrap** – health endpoint + React fetch.  
+2. **Google Auth & Schema Wizard**.  
+3. **TBA sync service**.  
+4. **Data Cleanup logic + To-Do view**.  
+5. **Pick-List generator + CSV export**.  
+6. **Live Draft Board**.  
+7. **Polish, tests, CI.**
+
+---
+
+*(Last updated 2025-04-25)*  

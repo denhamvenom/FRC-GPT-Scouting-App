@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Critical Fields Styles - Add to src/index.css */
+
+.critical-field-container {
+    background-color: #ebf5ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.375rem;
+  }
+  
+  .critical-field-title {
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .critical-field-description {
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+  }
+  
+  .critical-field-item {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .critical-field-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .critical-field-hint {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+  }
+  
+  .mapped-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .mapped-badge-success {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+  
+  .mapped-badge-error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  /* Highlight rows in the table that are critical fields */
+  .critical-field-row {
+    background-color: #f0f9ff;
+  }
+  
+  .critical-field-row td {
+    font-weight: 500;
+  }

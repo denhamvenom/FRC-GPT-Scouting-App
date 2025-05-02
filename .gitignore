@@ -1,0 +1,30 @@
+# 🔒 Secrets and environment variables
+secrets/
+.env
+.env.*
+*.json
+
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+backend/.venv/
+backend/.pytest_cache/
+
+# ⚛️ Node / React
+node_modules/
+dist/
+frontend/.vite/
+
+# 💻 IDEs / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ✅ Optional: Coverage, builds
+coverage/
+build/
+htmlcov/
