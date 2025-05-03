@@ -28,17 +28,37 @@ def load_superscout_config() -> tuple:
         schema_path = os.path.join(DATA_DIR, "schema_superscout_2025.json")
         with open(schema_path, "r", encoding="utf-8") as f:
             field_mapping = json.load(f)
+            print(f"Loaded superscouting schema with {len(field_mapping)} mappings")
     except FileNotFoundError:
         print(f"Warning: SuperScouting schema not found at: {schema_path}")
         field_mapping = {}
     
     try:
-        # Load robot groups configuration
-        groups_path = os.path.join(DATA_DIR, "robot_groups_2025.json")
-        with open(groups_path, "r", encoding="utf-8") as f:
-            robot_groups = json.load(f)
+        # Try both possible file names for robot groups
+        robot_groups = {}
+        for filename in ["robot_groups_2025.json", "field_selections_2025.json"]:
+            groups_path = os.path.join(DATA_DIR, filename)
+            if os.path.exists(groups_path):
+                with open(groups_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    # Check if the file is the field_selections format
+                    if "robot_groups" in data:
+                        robot_groups = data["robot_groups"]
+                        print(f"Loaded robot groups from {filename} with {sum(len(g) for g in robot_groups.values())} total fields")
+                        break
+                    else:
+                        robot_groups = data
+                        print(f"Loaded robot groups from {filename} with {sum(len(g) for g in robot_groups.values())} total fields")
+                        break
     except FileNotFoundError:
-        print(f"Warning: Robot groups not found at: {groups_path}")
+        print(f"Warning: Robot groups not found in data directory")
+        robot_groups = {
+            "robot_1": [],
+            "robot_2": [],
+            "robot_3": []
+        }
+    except Exception as e:
+        print(f"Error loading robot groups: {e}")
         robot_groups = {
             "robot_1": [],
             "robot_2": [],
