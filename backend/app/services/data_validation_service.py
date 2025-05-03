@@ -2,7 +2,7 @@
 
 import json
 import numpy as np
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime
 
 
@@ -84,11 +84,30 @@ def validate_event_completeness(unified_dataset_path: str) -> Dict:
     missing_scouting = expected_match_records - scouting_records
     missing_superscouting = expected_team_numbers - superscouted_teams
 
+    # Find ignored matches
+    ignored_matches = []
+    for team_number, team_data in teams_data.items():
+        team_number_int = None
+        try:
+            team_number_int = int(team_number)
+        except ValueError:
+            continue
+            
+        for match in team_data.get("ignored_matches", []):
+            ignored_matches.append({
+                "team_number": team_number_int,
+                "match_number": match.get("match_number"),
+                "reason": match.get("reason"),
+                "reason_category": match.get("reason_category"),
+                "timestamp": match.get("timestamp")
+            })
+
     status = "complete" if not missing_scouting and not missing_superscouting else "partial"
 
     return {
         "missing_scouting": [{"match_number": m[0], "team_number": m[1]} for m in sorted(missing_scouting)],
         "missing_superscouting": [{"team_number": team} for team in sorted(missing_superscouting)],
+        "ignored_matches": ignored_matches,
         "status": status,
         "scouting_records_count": len(scouting_records),
         "expected_match_records_count": len(expected_match_records)
@@ -272,18 +291,21 @@ def validate_event_with_outliers(unified_dataset_path: str, z_score_threshold: f
     # Determine overall status
     missing_scouting = completeness_results["missing_scouting"]
     missing_superscouting = completeness_results["missing_superscouting"]
+    ignored_matches = completeness_results["ignored_matches"]
     has_issues = missing_scouting or missing_superscouting or outliers_list
     status = "complete" if not has_issues else "issues_found"
     
     return {
         "missing_scouting": missing_scouting,
         "missing_superscouting": missing_superscouting,
+        "ignored_matches": ignored_matches,  # Include ignored matches
         "outliers": outliers_list,
         "status": status,
         "summary": {
             "total_missing_matches": len(missing_scouting),
             "total_missing_superscouting": len(missing_superscouting),
             "total_outliers": len(outliers_list),
+            "total_ignored_matches": len(ignored_matches),  # Add ignored count
             "has_issues": has_issues,
             "scouting_records_count": completeness_results.get("scouting_records_count", 0),
             "expected_match_records_count": completeness_results.get("expected_match_records_count", 0)
@@ -467,4 +489,414 @@ def apply_correction(unified_dataset_path: str, team_number: int, match_number: 
         "message": "Corrections applied successfully",
         "team_number": team_number,
         "match_number": match_number
+    }
+
+
+def ignore_match(unified_dataset_path: str, team_number: int, match_number: int, 
+                reason_category: str, reason_text: str = "") -> Dict[str, Any]:
+    """
+    Mark a match as intentionally ignored with a reason.
+    
+    Args:
+        unified_dataset_path: Path to the unified dataset file
+        team_number: The team number
+        match_number: The match number to ignore
+        reason_category: Category of ignore reason (not_operational, not_present, other)
+        reason_text: Optional detailed explanation (required if reason_category is 'other')
+        
+    Returns:
+        Dict with status and information about the operation
+    """
+    dataset = load_unified_dataset(unified_dataset_path)
+    teams_data = dataset.get("teams", {})
+    
+    # Validate inputs
+    if reason_category not in ["not_operational", "not_present", "other"]:
+        return {"status": "error", "message": "Invalid reason category"}
+        
+    if reason_category == "other" and not reason_text:
+        return {"status": "error", "message": "Reason text is required when category is 'other'"}
+    
+    # Check if team exists
+    if str(team_number) not in teams_data:
+        return {"status": "error", "message": "Team not found"}
+    
+    team_data = teams_data[str(team_number)]
+    
+    # Initialize ignored_matches list if it doesn't exist
+    if "ignored_matches" not in team_data:
+        team_data["ignored_matches"] = []
+    
+    # Check if this match is already ignored
+    for ignored in team_data["ignored_matches"]:
+        if int(ignored.get("match_number", 0)) == int(match_number):
+            return {"status": "error", "message": "Match already ignored"}
+    
+    # Add to ignored matches
+    team_data["ignored_matches"].append({
+        "match_number": int(match_number),
+        "reason_category": reason_category,
+        "reason": reason_text,
+        "timestamp": datetime.now().isoformat()
+    })
+    
+    # Save the updated dataset
+    with open(unified_dataset_path, "w", encoding="utf-8") as f:
+        json.dump(dataset, f, indent=2)
+    
+    return {
+        "status": "success",
+        "message": "Match ignored successfully",
+        "team_number": team_number,
+        "match_number": match_number
+    }
+
+
+def create_virtual_scout(unified_dataset_path: str, team_number: int, match_number: int) -> Dict[str, Any]:
+    """
+    Create a virtual scout entry for a team's missing match based on:
+    1. Team's average performance in other matches
+    2. Adjustment based on alliance performance in this match from TBA data
+    
+    Args:
+        unified_dataset_path: Path to the unified dataset file
+        team_number: The team number to create virtual scout for
+        match_number: The match number to create virtual scout for
+        
+    Returns:
+        Dict with status and information about the operation
+    """
+    dataset = load_unified_dataset(unified_dataset_path)
+    teams_data = dataset.get("teams", {})
+    
+    # Check if team exists
+    if str(team_number) not in teams_data:
+        return {"status": "error", "message": "Team not found"}
+    
+    team_data = teams_data[str(team_number)]
+    scouting_data = team_data.get("scouting_data", [])
+    
+    # Check if match already exists
+    for match in scouting_data:
+        match_num = match.get("match_number") or match.get("qual_number")
+        if match_num is not None and int(match_num) == int(match_number):
+            return {"status": "error", "message": "Match already exists for this team"}
+    
+    # Get team's average metrics
+    team_averages = get_team_averages(unified_dataset_path, team_number)
+    if not team_averages:
+        return {"status": "error", "message": "Not enough data to calculate team averages"}
+    
+    # Find match data in expected_matches to get alliance color and alliance score
+    expected_matches = dataset.get("expected_matches", [])
+    match_data = None
+    alliance_color = None
+    
+    for entry in expected_matches:
+        if (entry.get("match_number") == match_number and 
+            entry.get("team_number") == team_number):
+            match_data = entry
+            alliance_color = entry.get("alliance_color")
+            break
+    
+    if not match_data or not alliance_color:
+        return {"status": "error", "message": "Match data not found in expected matches"}
+    
+    # If TBA match data is available, use it to adjust averages
+    tba_match_score = None
+    tba_matches = dataset.get("tba_matches", [])
+    
+    for tba_match in tba_matches:
+        if tba_match.get("match_number") == match_number:
+            tba_match_score = tba_match.get("alliances", {}).get(alliance_color, {}).get("score")
+            break
+    
+    # Create virtual scout entry with team averages
+    virtual_scout = {
+        "team_number": team_number,
+        "match_number": match_number,
+        "qual_number": match_number,
+        "alliance_color": alliance_color,
+        "is_virtual_scout": True,
+        "virtual_scout_timestamp": datetime.now().isoformat()
+    }
+    
+    # Copy team averages into the virtual scout
+    for metric, avg_value in team_averages.items():
+        virtual_scout[metric] = avg_value
+        
+    # If we have TBA match score, adjust values proportionally
+    if tba_match_score is not None:
+        # Calculate average alliance score from team's other matches
+        team_alliance_scores = []
+        for match in scouting_data:
+            if match.get("alliance_color") == alliance_color:
+                match_num = match.get("match_number") or match.get("qual_number")
+                for tba_match in tba_matches:
+                    if tba_match.get("match_number") == match_num:
+                        score = tba_match.get("alliances", {}).get(alliance_color, {}).get("score")
+                        if score is not None:
+                            team_alliance_scores.append(score)
+                        break
+        
+        # If we have alliance scores from other matches, adjust metrics
+        if team_alliance_scores:
+            avg_alliance_score = sum(team_alliance_scores) / len(team_alliance_scores)
+            if avg_alliance_score > 0:  # Avoid division by zero
+                score_ratio = tba_match_score / avg_alliance_score
+                
+                # Apply adjustment factor to all numeric metrics
+                for metric, value in virtual_scout.items():
+                    if isinstance(value, (int, float)) and metric not in [
+                        "team_number", "match_number", "qual_number"
+                    ]:
+                        virtual_scout[metric] = value * score_ratio
+                        
+                        # Round appropriately
+                        if isinstance(value, int):
+                            virtual_scout[metric] = int(round(virtual_scout[metric]))
+                        else:
+                            virtual_scout[metric] = round(virtual_scout[metric], 2)
+    
+    # Add virtual scout to team's scouting data
+    scouting_data.append(virtual_scout)
+    
+    # Save the updated dataset
+    with open(unified_dataset_path, "w", encoding="utf-8") as f:
+        json.dump(dataset, f, indent=2)
+    
+    return {
+        "status": "success",
+        "message": "Virtual scout created successfully",
+        "team_number": team_number,
+        "match_number": match_number,
+        "virtual_scout": virtual_scout
+    }
+
+def preview_virtual_scout(unified_dataset_path: str, team_number: int, match_number: int) -> Dict[str, Any]:
+    """
+    Generate a preview of what a virtual scout entry would look like, without saving it.
+    
+    Args:
+        unified_dataset_path: Path to the unified dataset file
+        team_number: The team number to create virtual scout for
+        match_number: The match number to create virtual scout for
+        
+    Returns:
+        Dict with status and preview data
+    """
+    dataset = load_unified_dataset(unified_dataset_path)
+    teams_data = dataset.get("teams", {})
+    
+    # Check if team exists
+    if str(team_number) not in teams_data:
+        return {"status": "error", "message": "Team not found"}
+    
+    team_data = teams_data[str(team_number)]
+    scouting_data = team_data.get("scouting_data", [])
+    
+    # Check if match already exists
+    for match in scouting_data:
+        match_num = match.get("match_number") or match.get("qual_number")
+        if match_num is not None and int(match_num) == int(match_number):
+            return {"status": "error", "message": "Match already exists for this team"}
+    
+    # Get team's average metrics
+    team_averages = get_team_averages(unified_dataset_path, team_number)
+    if not team_averages:
+        return {"status": "error", "message": "Not enough data to calculate team averages"}
+    
+    # Find match data in expected_matches to get alliance color and alliance score
+    expected_matches = dataset.get("expected_matches", [])
+    match_data = None
+    alliance_color = None
+    
+    for entry in expected_matches:
+        if (entry.get("match_number") == match_number and 
+            entry.get("team_number") == team_number):
+            match_data = entry
+            alliance_color = entry.get("alliance_color")
+            break
+    
+    if not match_data or not alliance_color:
+        return {"status": "error", "message": "Match data not found in expected matches"}
+    
+    # If TBA match data is available, use it to adjust averages
+    tba_match_score = None
+    tba_matches = dataset.get("tba_matches", [])
+    
+    for tba_match in tba_matches:
+        if tba_match.get("match_number") == match_number:
+            tba_match_score = tba_match.get("alliances", {}).get(alliance_color, {}).get("score")
+            break
+    
+    # Create virtual scout preview with team averages
+    virtual_scout = {
+        "team_number": team_number,
+        "match_number": match_number,
+        "qual_number": match_number,
+        "alliance_color": alliance_color,
+        "is_virtual_scout": True
+    }
+    
+    # Copy team averages into the virtual scout
+    for metric, avg_value in team_averages.items():
+        virtual_scout[metric] = avg_value
+        
+    # If we have TBA match score, adjust values proportionally
+    if tba_match_score is not None:
+        # Calculate average alliance score from team's other matches
+        team_alliance_scores = []
+        for match in scouting_data:
+            if match.get("alliance_color") == alliance_color:
+                match_num = match.get("match_number") or match.get("qual_number")
+                for tba_match in tba_matches:
+                    if tba_match.get("match_number") == match_num:
+                        score = tba_match.get("alliances", {}).get(alliance_color, {}).get("score")
+                        if score is not None:
+                            team_alliance_scores.append(score)
+                        break
+        
+        # If we have alliance scores from other matches, adjust metrics
+        if team_alliance_scores:
+            avg_alliance_score = sum(team_alliance_scores) / len(team_alliance_scores)
+            if avg_alliance_score > 0:  # Avoid division by zero
+                score_ratio = tba_match_score / avg_alliance_score
+                
+                # Apply adjustment factor to all numeric metrics
+                for metric, value in virtual_scout.items():
+                    if isinstance(value, (int, float)) and metric not in [
+                        "team_number", "match_number", "qual_number"
+                    ]:
+                        virtual_scout[metric] = value * score_ratio
+                        
+                        # Round appropriately
+                        if isinstance(value, int):
+                            virtual_scout[metric] = int(round(virtual_scout[metric]))
+                        else:
+                            virtual_scout[metric] = round(virtual_scout[metric], 2)
+    
+    return {
+        "status": "success",
+        "message": "Virtual scout preview generated",
+        "virtual_scout_preview": virtual_scout,
+        "adjustment_info": {
+            "has_tba_match_data": tba_match_score is not None,
+            "tba_match_score": tba_match_score,
+            "average_alliance_score": avg_alliance_score if 'avg_alliance_score' in locals() else None,
+            "adjustment_ratio": score_ratio if 'score_ratio' in locals() else None
+        }
+    }
+
+
+def add_to_todo_list(unified_dataset_path: str, team_number: int, match_number: int) -> Dict[str, Any]:
+    """
+    Add a team-match combination to the to-do list for manual scouting.
+    
+    Args:
+        unified_dataset_path: Path to the unified dataset file
+        team_number: The team number
+        match_number: The match number
+        
+    Returns:
+        Dict with status and information about the operation
+    """
+    dataset = load_unified_dataset(unified_dataset_path)
+    
+    # Initialize to-do list if it doesn't exist
+    if "todo_list" not in dataset:
+        dataset["todo_list"] = []
+    
+    # Check if entry already exists in to-do list
+    for entry in dataset["todo_list"]:
+        if entry.get("team_number") == team_number and entry.get("match_number") == match_number:
+            return {"status": "error", "message": "Entry already in to-do list"}
+    
+    # Add to to-do list
+    dataset["todo_list"].append({
+        "team_number": team_number,
+        "match_number": match_number,
+        "added_timestamp": datetime.now().isoformat(),
+        "status": "pending"  # pending, completed, cancelled
+    })
+    
+    # Save the updated dataset
+    with open(unified_dataset_path, "w", encoding="utf-8") as f:
+        json.dump(dataset, f, indent=2)
+    
+    return {
+        "status": "success",
+        "message": "Added to to-do list successfully",
+        "team_number": team_number,
+        "match_number": match_number
+    }
+
+
+def get_todo_list(unified_dataset_path: str) -> Dict[str, Any]:
+    """
+    Get the current to-do list from the unified dataset.
+    
+    Args:
+        unified_dataset_path: Path to the unified dataset file
+        
+    Returns:
+        Dict with status and to-do list entries
+    """
+    dataset = load_unified_dataset(unified_dataset_path)
+    
+    # Return empty list if to-do list doesn't exist
+    if "todo_list" not in dataset:
+        return {"status": "success", "todo_list": []}
+    
+    return {
+        "status": "success",
+        "todo_list": dataset["todo_list"]
+    }
+
+
+def update_todo_status(unified_dataset_path: str, team_number: int, match_number: int, 
+                      new_status: str) -> Dict[str, Any]:
+    """
+    Update the status of a to-do list entry.
+    
+    Args:
+        unified_dataset_path: Path to the unified dataset file
+        team_number: The team number
+        match_number: The match number
+        new_status: New status (pending, completed, cancelled)
+        
+    Returns:
+        Dict with status and information about the operation
+    """
+    if new_status not in ["pending", "completed", "cancelled"]:
+        return {"status": "error", "message": "Invalid status"}
+    
+    dataset = load_unified_dataset(unified_dataset_path)
+    
+    # Check if to-do list exists
+    if "todo_list" not in dataset:
+        return {"status": "error", "message": "To-do list not found"}
+    
+   # Find and update entry
+    entry_found = False
+    for entry in dataset["todo_list"]:
+        if entry.get("team_number") == team_number and entry.get("match_number") == match_number:
+            entry["status"] = new_status
+            entry["updated_timestamp"] = datetime.now().isoformat()
+            entry_found = True
+            break
+    
+    if not entry_found:
+        return {"status": "error", "message": "Entry not found in to-do list"}
+    
+    # Save the updated dataset
+    with open(unified_dataset_path, "w", encoding="utf-8") as f:
+        json.dump(dataset, f, indent=2)
+    
+    return {
+        "status": "success",
+        "message": "To-do list entry updated successfully",
+        "team_number": team_number,
+        "match_number": match_number,
+        "new_status": new_status
     }

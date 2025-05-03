@@ -20,15 +20,33 @@ interface ValidationIssue {
   }>;
 }
 
+interface IgnoredMatch {
+  team_number: number;
+  match_number: number;
+  reason_category: string;
+  reason: string;
+  timestamp: string;
+}
+
+interface TodoItem {
+  team_number: number;
+  match_number: number;
+  added_timestamp: string;
+  updated_timestamp?: string;
+  status: 'pending' | 'completed' | 'cancelled';
+}
+
 interface ValidationResult {
   missing_scouting: TeamMatch[];
   missing_superscouting: { team_number: number }[];
+  ignored_matches: IgnoredMatch[];
   outliers: ValidationIssue[];
   status: string;
   summary: {
     total_missing_matches: number;
     total_missing_superscouting: number;
     total_outliers: number;
+    total_ignored_matches: number;
     has_issues: boolean;
   };
 }
@@ -46,13 +64,20 @@ function Validation() {
   const [datasetPath, setDatasetPath] = useState<string>('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'missing' | 'outliers'>('missing');
+  const [activeTab, setActiveTab] = useState<'missing' | 'outliers' | 'todo'>('missing');
   const [selectedIssue, setSelectedIssue] = useState<TeamMatch | ValidationIssue | null>(null);
   const [suggestions, setSuggestions] = useState<CorrectionSuggestion[]>([]);
   const [corrections, setCorrections] = useState<{ [key: string]: number }>({});
   const [correctionReason, setCorrectionReason] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [todoList, setTodoList] = useState<TodoItem[]>([]);
+  const [virtualScoutPreview, setVirtualScoutPreview] = useState<any>(null);
+  
+  // State for handling missing data resolution
+  const [actionMode, setActionMode] = useState<'none' | 'watch-video' | 'virtual-scout' | 'ignore-match'>('none');
+  const [ignoreReason, setIgnoreReason] = useState<'not_operational' | 'not_present' | 'other'>('not_operational');
+  const [customReason, setCustomReason] = useState<string>('');
 
   // Check for existing datasets
   useEffect(() => {
@@ -64,6 +89,7 @@ function Validation() {
         if (data.status === 'exists' && data.path) {
           setDatasetPath(data.path);
           fetchValidationData(data.path);
+          fetchTodoList(data.path);
         }
       } catch (err) {
         console.error('Error checking datasets:', err);
@@ -94,12 +120,70 @@ function Validation() {
       setLoading(false);
     }
   };
+  
+  const fetchTodoList = async (path: string) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/validate/todo-list?unified_dataset_path=${encodeURIComponent(path)}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch to-do list');
+      }
+      
+      const data = await response.json();
+      if (data.status === 'success') {
+        setTodoList(data.todo_list || []);
+      }
+    } catch (err) {
+      console.error('Error fetching to-do list:', err);
+    }
+  };
+  
+  const fetchVirtualScoutPreview = async () => {
+    if (!selectedIssue) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8000/api/validate/preview-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch virtual scout preview');
+      }
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setVirtualScoutPreview(data.virtual_scout_preview);
+      } else {
+        setError(data.message || 'Error generating virtual scout preview');
+      }
+    } catch (err) {
+      console.error('Error fetching virtual scout preview:', err);
+      setError('Error generating virtual scout preview');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleActionModeChange = (mode: 'none' | 'watch-video' | 'virtual-scout' | 'ignore-match') => {
+    setActionMode(mode);
+    
+    // Clear any previous preview
+    setVirtualScoutPreview(null);
+    
+    // If virtual scout is selected, fetch the preview
+    if (mode === 'virtual-scout') {
+      fetchVirtualScoutPreview();
+    }
+  };
 
   const handleSelectIssue = async (issue: TeamMatch | ValidationIssue) => {
     setSelectedIssue(issue);
     setSuggestions([]);
     setCorrections({});
     setCorrectionReason('');
+    setActionMode('none');
+    setCustomReason('');
+    setVirtualScoutPreview(null);
     
     // If this is an outlier, fetch suggestions
     if ('issues' in issue) {
@@ -174,6 +258,102 @@ function Validation() {
       setLoading(false);
     }
   };
+  // Handle missing data resolution
+  const handleMissingDataAction = async () => {
+    if (!selectedIssue) return;
+    
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      let response;
+      
+      switch (actionMode) {
+        case 'watch-video':
+          response = await fetch(`http://localhost:8000/api/validate/add-to-todo?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`, {
+            method: 'POST'
+          });
+          break;
+        
+        case 'virtual-scout':
+          response = await fetch(`http://localhost:8000/api/validate/create-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`, {
+            method: 'POST'
+          });
+          break;
+        
+        case 'ignore-match':
+          response = await fetch(`http://localhost:8000/api/validate/ignore-match?unified_dataset_path=${encodeURIComponent(datasetPath)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              team_number: selectedIssue.team_number,
+              match_number: selectedIssue.match_number,
+              reason_category: ignoreReason,
+              reason_text: ignoreReason === 'other' ? customReason : ''
+            })
+          });
+          break;
+          
+        default:
+          setError('No action selected');
+          setLoading(false);
+          return;
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Failed to ${actionMode === 'watch-video' ? 'add to to-do list' : actionMode === 'virtual-scout' ? 'create virtual scout' : 'ignore match'}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setSuccessMessage(data.message || 'Action completed successfully');
+        // Refresh validation data and todo list
+        await fetchValidationData(datasetPath);
+        await fetchTodoList(datasetPath);
+        // Clear selection
+        setSelectedIssue(null);
+        setActionMode('none');
+      } else {
+        setError(data.message || 'Error performing action');
+      }
+    } catch (err) {
+      console.error('Error handling missing data action:', err);
+      setError('Error performing action');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Update to-do list item status
+  const updateTodoStatus = async (item: TodoItem, newStatus: 'pending' | 'completed' | 'cancelled') => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/validate/update-todo-status?unified_dataset_path=${encodeURIComponent(datasetPath)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          team_number: item.team_number,
+          match_number: item.match_number,
+          status: newStatus
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update to-do status');
+      }
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        await fetchTodoList(datasetPath);
+        await fetchValidationData(datasetPath);
+      }
+    } catch (err) {
+      console.error('Error updating to-do status:', err);
+      setError('Error updating to-do status');
+    }
+  };
 
   if (loading && !validationResult) {
     return <div className="flex justify-center items-center h-64">
@@ -201,7 +381,7 @@ function Validation() {
         <>
           <div className="bg-white rounded-lg shadow-md p-4 mb-6">
             <h2 className="text-xl font-bold mb-3">Validation Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className={`p-4 rounded-lg ${validationResult.summary.total_missing_matches > 0 ? 'bg-red-100' : 'bg-green-100'}`}>
                 <span className="text-3xl font-bold block">{validationResult.summary.total_missing_matches}</span>
                 <span className="text-gray-700">Missing Match Records</span>
@@ -213,6 +393,10 @@ function Validation() {
               <div className={`p-4 rounded-lg ${validationResult.summary.total_outliers > 0 ? 'bg-yellow-100' : 'bg-green-100'}`}>
                 <span className="text-3xl font-bold block">{validationResult.summary.total_outliers}</span>
                 <span className="text-gray-700">Statistical Outliers</span>
+              </div>
+              <div className={`p-4 rounded-lg bg-blue-100`}>
+                <span className="text-3xl font-bold block">{validationResult.summary.total_ignored_matches || 0}</span>
+                <span className="text-gray-700">Ignored Matches</span>
               </div>
             </div>
             
@@ -242,6 +426,12 @@ function Validation() {
                     onClick={() => setActiveTab('outliers')}
                   >
                     Outliers
+                  </button>
+                  <button 
+                    className={`flex-1 py-3 px-4 font-medium ${activeTab === 'todo' ? 'bg-blue-100 text-blue-800' : 'bg-white text-gray-600'}`}
+                    onClick={() => setActiveTab('todo')}
+                  >
+                    To-Do List
                   </button>
                 </div>
                 
@@ -295,6 +485,70 @@ function Validation() {
                     ) : (
                       <div className="p-4 text-center text-gray-500">
                         No statistical outliers found! 🎉
+                      </div>
+                    )
+                  )}
+                  
+                  {activeTab === 'todo' && (
+                    todoList.length > 0 ? (
+                      <div>
+                        <h3 className="font-medium mb-2 text-blue-800">Matches to Re-Scout</h3>
+                        <ul className="divide-y">
+                          {todoList.map((item, idx) => (
+                            <li
+                              key={`todo-${idx}`}
+                              className="py-3 px-3"
+                            >
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <div className="font-medium">Team {item.team_number}</div>
+                                  <div className="text-sm text-gray-600">Match {item.match_number}</div>
+                                  <div className={`text-xs mt-1 px-2 py-0.5 inline-block rounded-full ${
+                                    item.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                    item.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                    'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                    {item.status === 'completed' ? 'Completed' :
+                                     item.status === 'cancelled' ? 'Cancelled' : 'Pending'}
+                                  </div>
+                                </div>
+                                <div className="flex space-x-2">
+                                  {item.status === 'pending' && (
+                                    <>
+                                      <button
+                                        onClick={() => updateTodoStatus(item, 'completed')}
+                                        className="p-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                        title="Mark as completed"
+                                      >
+                                        ✓
+                                      </button>
+                                      <button
+                                        onClick={() => updateTodoStatus(item, 'cancelled')}
+                                        className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        title="Cancel task"
+                                      >
+                                        ✕
+                                      </button>
+                                    </>
+                                  )}
+                                  {item.status !== 'pending' && (
+                                    <button
+                                      onClick={() => updateTodoStatus(item, 'pending')}
+                                      className="p-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                      title="Reset to pending"
+                                    >
+                                      ↺
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        No items in the to-do list.
                       </div>
                     )
                   )}
@@ -409,29 +663,186 @@ function Validation() {
                         </div>
                       </>
                     ) : (
-                      // Missing data details
+                      // Missing data details with new action options
                       <>
                         <div className="bg-red-50 p-4 rounded border border-red-200 mb-6">
                           <h3 className="font-medium text-red-800 mb-2">Missing Match Data</h3>
                           <p>There is no scouting data for Team {selectedIssue.team_number} in Match {selectedIssue.match_number}.</p>
                         </div>
                         
-                        <div className="bg-yellow-50 p-4 rounded border border-yellow-200 mb-6">
-                          <h3 className="font-medium text-yellow-800 mb-2">Possible Actions:</h3>
-                          <ul className="list-disc list-inside">
-                            <li>Find the original scout and have them record the data</li>
-                            <li>Watch match video and record the data manually</li>
-                            <li>Create a "virtual scout" based on team averages (coming soon)</li>
-                          </ul>
-                        </div>
+                        <div className="mb-6">
+                          <h3 className="font-medium mb-3">Choose an Action:</h3>
+                          
+                          <div className="space-y-3">
+                            <div 
+                              className={`p-3 rounded border cursor-pointer ${actionMode === 'watch-video' ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'}`}
+                              onClick={() => handleActionModeChange('watch-video')}
+                            >
+                              <div className="flex items-center">
+                                <input 
+                                  type="radio" 
+                                  checked={actionMode === 'watch-video'} 
+                                  onChange={() => handleActionModeChange('watch-video')} 
+                                  className="mr-2"
+                                />
+                                <div>
+                                  <h4 className="font-medium">Watch Match Video and Rescout</h4>
+                                  <p className="text-sm text-gray-600">This match will be added to a to-do list for manual scouting later.</p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div 
+                              className={`p-3 rounded border cursor-pointer ${actionMode === 'virtual-scout' ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'}`}
+                              onClick={() => handleActionModeChange('virtual-scout')}
+                            >
+                              <div className="flex items-start">
+                                <input 
+                                  type="radio" 
+                                  checked={actionMode === 'virtual-scout'} 
+                                  onChange={() => handleActionModeChange('virtual-scout')} 
+                                  className="mr-2 mt-1"
+                                />
+                                <div>
+                                  <h4 className="font-medium">Create Virtual Scout Data</h4>
+                                  <p className="text-sm text-gray-600">Generate scouting data based on team averages and Blue Alliance match data.</p>
+                                  
+                                  {actionMode === 'virtual-scout' && (
+                                    <div className="mt-4">
+                                      {virtualScoutPreview ? (
+                                        <div className="border rounded p-3 bg-white">
+                                          <h5 className="font-medium text-blue-800 mb-2">Virtual Scout Data Preview:</h5>
+                                          <div className="max-h-64 overflow-y-auto">
+                                            <table className="w-full text-sm">
+                                              <thead className="bg-gray-50">
+                                                <tr>
+                                                  <th className="p-2 text-left">Metric</th>
+                                                  <th className="p-2 text-left">Value</th>
+                                                  <th className="p-2 text-left">Source</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {Object.entries(virtualScoutPreview)
+                                                  .filter(([key, _]) => !['team_number', 'match_number', 'qual_number', 'is_virtual_scout', 'virtual_scout_timestamp'].includes(key))
+                                                  .map(([key, value], idx) => (
+                                                    <tr key={key} className={idx % 2 === 0 ? 'bg-gray-50' : ''}>
+                                                      <td className="p-2 font-medium">{key}</td>
+                                                      <td className="p-2">{typeof value === 'number' ? 
+                                                        Number.isInteger(value) ? value : value.toFixed(2) : 
+                                                        String(value)}</td>
+                                                      <td className="p-2 text-xs text-gray-500">
+                                                        {typeof value === 'number' ? 'Team average with match adjustment' : 'Static value'}
+                                                      </td>
+                                                    </tr>
+                                                  ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                          <p className="text-xs text-gray-500 mt-2">
+                                            Values are calculated from team's average performance across other matches, 
+                                            adjusted based on the alliance performance in this match.
+                                          </p>
+                                        </div>
+                                      ) : (
+                                        <div className="flex justify-center items-center h-12">
+                                          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
+                                          <span className="ml-2 text-sm text-blue-600">Generating preview...</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div 
+                              className={`p-3 rounded border cursor-pointer ${actionMode === 'ignore-match' ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'}`}
+                              onClick={() => handleActionModeChange('ignore-match')}
+                            >
+                              <div className="flex items-start">
+                                <input 
+                                  type="radio" 
+                                  checked={actionMode === 'ignore-match'} 
+                                  onChange={() => handleActionModeChange('ignore-match')} 
+                                  className="mr-2 mt-1"
+                                />
+                                <div>
+                                  <h4 className="font-medium">Ignore Match with Reason</h4>
+                                  <p className="text-sm text-gray-600 mb-2">Mark this match as intentionally skipped.</p>
+                                  
+                                  {actionMode === 'ignore-match' && (
+                                    <div className="pl-2 border-l-2 border-gray-200 mt-3">
+                                      <div className="mb-2">
+                                        <label className="flex items-center">
+                                          <input 
+                                            type="radio" 
+                                            name="ignoreReason" 
+                                            checked={ignoreReason === 'not_operational'} 
+                                            onChange={() => setIgnoreReason('not_operational')} 
+                                            className="mr-2"
+                                          />
+                                          <span>Robot was not operational in the match</span>
+                                        </label>
+                                      </div>
+                                      
+                                      <div className="mb-2">
+                                        <label className="flex items-center">
+                                          <input 
+                                            type="radio" 
+                                            name="ignoreReason" 
+                                            checked={ignoreReason === 'not_present'} 
+                                            onChange={() => setIgnoreReason('not_present')} 
+                                            className="mr-2"
+                                          />
+                                          <span>Robot was not present in the match</span>
+                                        </label>
+                                      </div>
+                                      
+                                      <div className="mb-2">
+                                        <label className="flex items-center">
+                                          <input 
+                                            type="radio" 
+                                            name="ignoreReason" 
+                                            checked={ignoreReason === 'other'} 
+                                            onChange={() => setIgnoreReason('other')} 
+                                            className="mr-2"
+                                          />
+                                          <span>Other reason</span>
+                                        </label>
+                                        
+                                        {ignoreReason === 'other' && (
+                                          <textarea
+                                            value={customReason}
+                                            onChange={(e) => setCustomReason(e.target.value)}
+                                            placeholder="Please specify the reason..."
+                                            className="w-full p-2 border rounded mt-2 text-sm"
+                                            rows={3}
+                                          />
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         
-                        <div className="flex justify-end">
-                          <button
-                            onClick={() => setSelectedIssue(null)}
-                            className="px-4 py-2 text-gray-600 border rounded hover:bg-gray-100"
-                          >
-                            Close
-                          </button>
+                          <div className="flex justify-end mt-6">
+                            <button
+                              onClick={() => setSelectedIssue(null)}
+                              className="px-4 py-2 text-gray-600 border rounded mr-2 hover:bg-gray-100"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleMissingDataAction}
+                              disabled={actionMode === 'none' || (actionMode === 'ignore-match' && ignoreReason === 'other' && !customReason) || loading}
+                              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
+                            >
+                              {loading ? 'Processing...' : actionMode === 'watch-video' ? 'Add to To-Do List' : 
+                              actionMode === 'virtual-scout' ? 'Create Virtual Scout' : 'Ignore Match'}
+                            </button>
+                          </div>
                         </div>
                       </>
                     )}
