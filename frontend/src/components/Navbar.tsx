@@ -56,14 +56,14 @@ function Navbar() {
               </Link>
               
               <Link
-                to="/schema"
+                to="/field-selection"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/schema") 
-                    ? "bg-blue-900 text-white" 
-                    : "text-gray-200 hover:bg-blue-700"
-                }`}
+                 isActive("/field-selection") 
+                ? "bg-blue-900 text-white" 
+                : "text-gray-200 hover:bg-blue-700"
+              }`}
               >
-                Schema
+                Field Selection
               </Link>
               
               <Link
@@ -76,16 +76,16 @@ function Navbar() {
               >
                 Validation
               </Link>
-
+              
               <Link
-                to="/field-selection"
+                to="/picklist"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
-                 isActive("/field-selection") 
-                ? "bg-blue-900 text-white" 
-                : "text-gray-200 hover:bg-blue-700"
-            }`}
+                  isActive("/picklist") 
+                    ? "bg-blue-900 text-white" 
+                    : "text-gray-200 hover:bg-blue-700"
+                }`}
               >
-              Field Selection
+                Picklist
               </Link>
             </div>
           </div>
