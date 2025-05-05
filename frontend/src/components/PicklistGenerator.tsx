@@ -26,7 +26,7 @@ interface PicklistResult {
   status: string;
   picklist: Team[];
   analysis: PicklistAnalysis;
-  message?: string; // Added optional message property
+  message?: string;
 }
 
 interface PicklistGeneratorProps {
@@ -68,16 +68,31 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     setError(null);
     
     try {
+      // Send the priorities as plain JSON objects without any methods or class structures
+      const simplePriorities = [];
+      for (const priority of priorities) {
+        simplePriorities.push({
+          id: priority.id,
+          weight: priority.weight,
+          reason: priority.reason || null
+        });
+      }
+      
+      // Create a request object with all primitive values
+      const requestBody = JSON.stringify({
+        unified_dataset_path: datasetPath,
+        your_team_number: yourTeamNumber,
+        pick_position: pickPosition,
+        priorities: simplePriorities,
+        exclude_teams: excludeTeams || []
+      });
+      
+      console.log('Sending request:', requestBody);
+      
       const response = await fetch('http://localhost:8000/api/picklist/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          unified_dataset_path: datasetPath,
-          your_team_number: yourTeamNumber,
-          pick_position: pickPosition,
-          priorities: priorities,
-          exclude_teams: excludeTeams
-        })
+        body: requestBody
       });
       
       if (!response.ok) {

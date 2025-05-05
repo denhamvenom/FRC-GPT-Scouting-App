@@ -1,6 +1,7 @@
 // frontend/src/pages/PicklistNew.tsx
 
 import React, { useState, useEffect } from 'react';
+import PicklistGenerator from '../components/PicklistGenerator';
 
 // Type definitions
 interface Team {
@@ -40,6 +41,7 @@ interface ParsedStrategy {
 const PicklistNew: React.FC = () => {
   // State for dataset path
   const [datasetPath, setDatasetPath] = useState<string>('');
+  const [yourTeamNumber, setYourTeamNumber] = useState<number>(0);
   
   // State for metrics and priorities
   const [universalMetrics, setUniversalMetrics] = useState<Metric[]>([]);
@@ -60,6 +62,7 @@ const PicklistNew: React.FC = () => {
   // State for team rankings
   const [teamRankings, setTeamRankings] = useState<Team[]>([]);
   const [isGeneratingRankings, setIsGeneratingRankings] = useState<boolean>(false);
+  const [shouldShowGenerator, setShouldShowGenerator] = useState<boolean>(false);
   
   // State for active tab
   const [activeTab, setActiveTab] = useState<'first' | 'second' | 'third'>('first');
@@ -69,6 +72,9 @@ const PicklistNew: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
+  // State for tracking excluded teams
+  const [excludedTeams, setExcludedTeams] = useState<number[]>([]);
+
   // Fetch dataset path on load
   useEffect(() => {
     const checkDatasets = async () => {
@@ -122,6 +128,8 @@ const PicklistNew: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  
   // Handle strategy prompt submission
   const handlePromptSubmit = async () => {
     if (!strategyPrompt.trim()) {
@@ -276,127 +284,142 @@ const PicklistNew: React.FC = () => {
       thirdPickPriorities;
       
     if (index === priorities.length - 1) return; // Already at the bottom
+    
     if (pickType === 'first') {
-        const newPriorities = [...firstPickPriorities];
-        const temp = newPriorities[index];
-        newPriorities[index] = newPriorities[index + 1];
-        newPriorities[index + 1] = temp;
-        setFirstPickPriorities(newPriorities);
-      } else if (pickType === 'second') {
-        const newPriorities = [...secondPickPriorities];
-        const temp = newPriorities[index];
-        newPriorities[index] = newPriorities[index + 1];
-        newPriorities[index + 1] = temp;
-        setSecondPickPriorities(newPriorities);
-      } else if (pickType === 'third') {
-        const newPriorities = [...thirdPickPriorities];
-        const temp = newPriorities[index];
-        newPriorities[index] = newPriorities[index + 1];
-        newPriorities[index + 1] = temp;
-        setThirdPickPriorities(newPriorities);
-      }
-    };
-  
-    // Generate team rankings
-    const generateRankings = async () => {
-      const currentPriorities = 
-        activeTab === 'first' ? firstPickPriorities :
-        activeTab === 'second' ? secondPickPriorities :
-        thirdPickPriorities;
-        
-      if (currentPriorities.length === 0) {
-        setError('Please add at least one priority before generating rankings');
-        return;
-      }
-      
-      setIsGeneratingRankings(true);
-      setError(null);
-      
-      try {
-        const response = await fetch('http://localhost:8000/api/picklist/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            unified_dataset_path: datasetPath,
-            priorities: currentPriorities
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to generate team rankings');
-        }
-        
-        const data = await response.json();
-        
-        if (data.status === 'success' && data.team_rankings) {
-          setTeamRankings(data.team_rankings);
-          setSuccessMessage('Team rankings generated successfully');
-        } else {
-          setError(data.message || 'Error generating team rankings');
-        }
-      } catch (err) {
-        console.error('Error generating team rankings:', err);
-        setError('Error generating team rankings');
-      } finally {
-        setIsGeneratingRankings(false);
-      }
-    };
-  
-    // Find metric label by ID
-    const getMetricLabel = (metricId: string): string => {
-      // Check all metric lists
-      const allMetrics = [...universalMetrics, ...gameMetrics, ...suggestedMetrics];
-      const metric = allMetrics.find(m => m.id === metricId);
-      return metric ? metric.label : metricId;
-    };
-  
-    // Get active priorities based on current tab
-    const getActivePriorities = (): MetricWeight[] => {
-      if (activeTab === 'first') return firstPickPriorities;
-      if (activeTab === 'second') return secondPickPriorities;
-      return thirdPickPriorities;
-    };
-  
-    if (isLoading && !universalMetrics.length) {
-      return <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>;
+      const newPriorities = [...firstPickPriorities];
+      const temp = newPriorities[index];
+      newPriorities[index] = newPriorities[index + 1];
+      newPriorities[index + 1] = temp;
+      setFirstPickPriorities(newPriorities);
+    } else if (pickType === 'second') {
+      const newPriorities = [...secondPickPriorities];
+      const temp = newPriorities[index];
+      newPriorities[index] = newPriorities[index + 1];
+      newPriorities[index + 1] = temp;
+      setSecondPickPriorities(newPriorities);
+    } else if (pickType === 'third') {
+      const newPriorities = [...thirdPickPriorities];
+      const temp = newPriorities[index];
+      newPriorities[index] = newPriorities[index + 1];
+      newPriorities[index + 1] = temp;
+      setThirdPickPriorities(newPriorities);
     }
+  };
+  // Generate team rankings - modified to use the new approach
+  // Generate team rankings - modified to use the new approach
+const generateRankings = () => {
+    const currentPriorities = 
+      activeTab === 'first' ? firstPickPriorities :
+      activeTab === 'second' ? secondPickPriorities :
+      thirdPickPriorities;
+        
+    if (currentPriorities.length === 0) {
+      setError('Please add at least one priority before generating rankings');
+      return;
+    }
+    
+    if (!yourTeamNumber) {
+      setError('Please enter your team number before generating rankings');
+      return;
+    }
+    
+    // Clear previous errors
+    setError(null);
+    
+    // Update excluded teams based on pick position
+    updateExcludedTeams();
+    
+    // Show picklist generator component
+    setShouldShowGenerator(true);
+  };
   
-    return (
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">Picklist Builder</h1>
-        
-        {error && (
-          <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
-            {error}
-          </div>
-        )}
-        
-        {successMessage && (
-          <div className="p-3 mb-4 bg-green-100 text-green-700 rounded">
-            {successMessage}
-          </div>
-        )}
-        
-        {!datasetPath ? (
-          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-300 mb-6">
-            <h2 className="text-xl font-bold text-yellow-800 mb-2">No Dataset Found</h2>
-            <p className="text-yellow-700 mb-2">
-              Please build a unified dataset first before using the picklist builder.
-            </p>
-            <a 
-              href="/workflow"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
-            >
-              Go to Workflow
-            </a>
-          </div>
-        ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  // Update excluded teams based on pick position
+  const updateExcludedTeams = () => {
+    // In a real implementation, you would track which teams were already picked
+    // For this example, we'll just use an empty array
+    const excluded: number[] = [];
+    setExcludedTeams(excluded);
+  };
+
+  // Handle picklist generation result
+  const handlePicklistGenerated = (result: any) => {
+    if (result.status === 'success' && result.picklist) {
+      setTeamRankings(result.picklist);
+      setSuccessMessage('Team rankings generated successfully');
+    } else if (result.message) {
+      setError(result.message);
+    }
+  };
+
+  // Find metric label by ID
+  const getMetricLabel = (metricId: string): string => {
+    // Check all metric lists
+    const allMetrics = [...universalMetrics, ...gameMetrics, ...suggestedMetrics];
+    const metric = allMetrics.find(m => m.id === metricId);
+    return metric ? metric.label : metricId;
+  };
+
+  // Get active priorities based on current tab
+  const getActivePriorities = (): MetricWeight[] => {
+    if (activeTab === 'first') return firstPickPriorities;
+    if (activeTab === 'second') return secondPickPriorities;
+    return thirdPickPriorities;
+  };
+
+  if (isLoading && !universalMetrics.length) {
+    return <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Picklist Builder</h1>
+      
+      {error && (
+        <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+      
+      {successMessage && (
+        <div className="p-3 mb-4 bg-green-100 text-green-700 rounded">
+          {successMessage}
+        </div>
+      )}
+      
+      {!datasetPath ? (
+        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-300 mb-6">
+          <h2 className="text-xl font-bold text-yellow-800 mb-2">No Dataset Found</h2>
+          <p className="text-yellow-700 mb-2">
+            Please build a unified dataset first before using the picklist builder.
+          </p>
+          <a 
+            href="/workflow"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
+          >
+            Go to Workflow
+          </a>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Available Metrics */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h2 className="text-xl font-bold mb-4">Your Team Information</h2>
+            <div className="mb-4">
+                <label className="block font-medium mb-2">Your Team Number</label>
+                <input
+                type="number"
+                value={yourTeamNumber || ''}
+                onChange={(e) => setYourTeamNumber(parseInt(e.target.value) || 0)}
+                placeholder="Enter your team number"
+                className="w-full p-2 border rounded"
+                />
+                <p className="text-xs text-gray-500 mt-1">Required for generating rankings</p>
+            </div>
+            </div>
+                        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
               <h2 className="text-xl font-bold mb-4">Strategy Description</h2>
               <p className="text-gray-600 mb-4">
                 Describe what you're looking for in a robot partner using natural language.
@@ -414,7 +437,6 @@ const PicklistNew: React.FC = () => {
               >
                 {isParsingStrategy ? 'Processing...' : 'Parse Strategy'}
               </button>
-              
               {parsedPriorities && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
                   <h3 className="font-semibold text-blue-800 mb-2">Strategy Interpretation</h3>
@@ -633,79 +655,29 @@ const PicklistNew: React.FC = () => {
                 </button>
               </div>
             </div>
-            
-            {/* Team Rankings Section */}
+            {/* Team Rankings Section - Now with PicklistGenerator integration */}
             <div className="bg-white rounded-lg shadow-md p-4">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Team Rankings</h2>
               </div>
               
-              {teamRankings.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="border px-4 py-2 text-left">Rank</th>
-                        <th className="border px-4 py-2 text-left">Team</th>
-                        <th className="border px-4 py-2 text-left">Score</th>
-                        <th className="border px-4 py-2 text-left">Key Metrics</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {teamRankings.map((team, index) => (
-                        <tr key={team.team_number} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                          <td className="border px-4 py-2 font-bold">{index + 1}</td>
-                          <td className="border px-4 py-2">
-                            <div className="font-medium">{team.team_number}</div>
-                            <div className="text-sm text-gray-600">{team.nickname}</div>
-                          </td>
-                          <td className="border px-4 py-2 font-mono">
-                            {team.score?.toFixed(2) || '0.00'}
-                          </td>
-                          <td className="border px-4 py-2">
-                            {team.metrics_contribution && team.metrics_contribution.length > 0 ? (
-                              <div className="grid grid-cols-2 gap-1">
-                                {team.metrics_contribution.map((metric, mIdx) => (
-                                  <div key={mIdx} className="text-xs bg-blue-50 p-1 rounded">
-                                    <span className="font-medium">{getMetricLabel(metric.id)}:</span> {metric.value.toFixed(2)}
-                                    <span className="text-blue-600"> ({metric.weighted_value.toFixed(2)})</span>
-                                    
-                                    {metric.metrics_used && metric.metrics_used.length > 0 && (
-                                      <div className="text-xs text-gray-500 mt-0.5">
-                                        Using: {metric.metrics_used.slice(0, 2).join(', ')}
-                                        {metric.metrics_used.length > 2 && '...'}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <span className="text-gray-500">No metrics data</span>
-                            )}
-                            <div className="text-xs text-gray-500 mt-1">
-                              From {team.match_count || 0} matches
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              {shouldShowGenerator ? (
+                // Use the PicklistGenerator component when rankings should be shown
+                <PicklistGenerator
+                  datasetPath={datasetPath}
+                  yourTeamNumber={yourTeamNumber}
+                  pickPosition={activeTab}
+                  priorities={getActivePriorities()}
+                  excludeTeams={excludedTeams}
+                  onPicklistGenerated={handlePicklistGenerated}
+                />
               ) : (
+                // Show placeholder when rankings are not yet generated
                 <div className="p-4 text-center text-gray-500">
-                  {isGeneratingRankings ? (
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
-                      <span className="ml-2">Generating rankings...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <p>Team rankings will appear here after clicking "Generate Rankings".</p>
-                      <p className="text-sm mt-2">
-                        First, set your priorities in the section above.
-                      </p>
-                    </>
-                  )}
+                  <p>Team rankings will appear here after clicking "Generate Rankings".</p>
+                  <p className="text-sm mt-2">
+                    First, set your priorities in the section above.
+                  </p>
                 </div>
               )}
             </div>

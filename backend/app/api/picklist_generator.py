@@ -52,11 +52,21 @@ async def generate_picklist(request: PicklistRequest):
         # Initialize the service
         generator_service = PicklistGeneratorService(request.unified_dataset_path)
         
-        # Generate the picklist
+        # Convert priorities to plain dictionaries to avoid serialization issues
+        priorities = [
+            {
+                "id": p.id,
+                "weight": float(p.weight),
+                "reason": p.reason
+            } 
+            for p in request.priorities
+        ]
+        
+        # Generate the picklist with plain dictionaries
         result = await generator_service.generate_picklist(
             your_team_number=request.your_team_number,
             pick_position=request.pick_position,
-            priorities=request.priorities,
+            priorities=priorities,  # Use the plain dict version
             exclude_teams=request.exclude_teams
         )
         
