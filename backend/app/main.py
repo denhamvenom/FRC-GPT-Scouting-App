@@ -22,6 +22,7 @@ from app.api import prompt_builder_router
 from app.api import unified_dataset  # Make sure this import is here
 from app.api import field_selection  # Import the new field selection router
 from app.api import picklist_analysis
+from app.api import picklist_generator
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
@@ -48,6 +49,7 @@ app.include_router(prompt_builder_router.router, prefix="/api")
 app.include_router(unified_dataset.router, prefix="/api/unified")
 app.include_router(field_selection.router)  # Add the field selection router
 app.include_router(picklist_analysis.router, prefix="/api")
+app.include_router(picklist_generator.router) 
 
 @app.get("/")
 async def root():
