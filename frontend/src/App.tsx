@@ -6,6 +6,7 @@ import Setup from "./pages/Setup";
 import FieldSelection from "./pages/FieldSelection";
 import Workflow from "./pages/Workflow";
 import Validation from "./pages/Validation";
+import PicklistNew from "./pages/PicklistNew"; // Import the new picklist
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -20,7 +21,8 @@ function App() {
             <Route path="/field-selection" element={<FieldSelection />} />
             <Route path="/workflow" element={<Workflow />} />
             <Route path="/validation" element={<Validation />} />
-          </Routes>
+            <Route path="/picklist" element={<PicklistNew />} /> {/* Update to use the new component */}
+            </Routes>
         </main>
       </div>
     </Router>
