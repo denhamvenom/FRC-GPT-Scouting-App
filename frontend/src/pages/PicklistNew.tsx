@@ -8,6 +8,13 @@ interface Team {
   nickname: string;
   stats: Record<string, number>;
   score?: number;
+  metrics_contribution?: Array<{
+    id: string;
+    value: number;
+    weighted_value: number;
+    metrics_used?: string[];
+  }>;
+  match_count?: number;
 }
 
 interface Metric {
@@ -22,6 +29,12 @@ interface Metric {
 interface MetricWeight {
   id: string;
   weight: number;
+  reason?: string;
+}
+
+interface ParsedStrategy {
+  interpretation: string;
+  parsed_metrics: MetricWeight[];
 }
 
 const PicklistNew: React.FC = () => {
@@ -41,7 +54,12 @@ const PicklistNew: React.FC = () => {
   
   // State for natural language prompt
   const [strategyPrompt, setStrategyPrompt] = useState<string>('');
-  const [parsedPriorities, setParsedPriorities] = useState<any>(null);
+  const [parsedPriorities, setParsedPriorities] = useState<ParsedStrategy | null>(null);
+  const [isParsingStrategy, setIsParsingStrategy] = useState<boolean>(false);
+  
+  // State for team rankings
+  const [teamRankings, setTeamRankings] = useState<Team[]>([]);
+  const [isGeneratingRankings, setIsGeneratingRankings] = useState<boolean>(false);
   
   // State for active tab
   const [activeTab, setActiveTab] = useState<'first' | 'second' | 'third'>('first');
@@ -49,7 +67,7 @@ const PicklistNew: React.FC = () => {
   // State for loading, error, success
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccessMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // Fetch dataset path on load
   useEffect(() => {
@@ -60,10 +78,7 @@ const PicklistNew: React.FC = () => {
         
         if (data.status === 'exists' && data.path) {
           setDatasetPath(data.path);
-          // For now, mock some data for testing
-          mockMetricsData();
-          // Later, uncomment this to fetch from API
-          // await fetchPicklistAnalysis(data.path);
+          await fetchPicklistAnalysis(data.path);
         }
       } catch (err) {
         console.error('Error checking datasets:', err);
@@ -73,30 +88,6 @@ const PicklistNew: React.FC = () => {
     
     checkDatasets();
   }, []);
-
-  // Mock data for testing purposes
-  const mockMetricsData = () => {
-    setUniversalMetrics([
-      { id: "reliability", label: "Reliability / Consistency", category: "universal" },
-      { id: "driver_skill", label: "Driver Skill", category: "universal" },
-      { id: "defense", label: "Defensive Capability", category: "universal" },
-      { id: "cycle_time", label: "Cycle Time", category: "universal" }
-    ]);
-    
-    setGameMetrics([
-      { id: "auto_l1_scoring", label: "Auto L1 Scoring", category: "auto" },
-      { id: "auto_l4_scoring", label: "Auto L4 Scoring", category: "auto" },
-      { id: "teleop_l1_scoring", label: "Teleop L1 Scoring", category: "teleop" },
-      { id: "teleop_l4_scoring", label: "Teleop L4 Scoring", category: "teleop" },
-      { id: "endgame_climb", label: "Endgame Climb", category: "endgame" }
-    ]);
-    
-    setSuggestedMetrics([
-      { id: "auto_l4_scoring", label: "Auto L4 Scoring", category: "auto", importance_score: 4.5 },
-      { id: "teleop_l4_scoring", label: "Teleop L4 Scoring", category: "teleop", importance_score: 3.8 },
-      { id: "defense", label: "Defensive Capability", category: "universal", importance_score: 2.6 }
-    ]);
-  };
 
   // Fetch picklist analysis data
   const fetchPicklistAnalysis = async (path: string) => {
@@ -131,7 +122,6 @@ const PicklistNew: React.FC = () => {
       setIsLoading(false);
     }
   };
-
   // Handle strategy prompt submission
   const handlePromptSubmit = async () => {
     if (!strategyPrompt.trim()) {
@@ -139,57 +129,64 @@ const PicklistNew: React.FC = () => {
       return;
     }
     
-    setIsLoading(true);
+    setIsParsingStrategy(true);
     setError(null);
     
     try {
-      // For now, mock the response
-      setParsedPriorities({
-        interpretation: "Looking for a robot with strong L4 scoring and auto capabilities.",
-        parsed_metrics: [
-          { id: "auto_l4_scoring", weight: 2.0 },
-          { id: "teleop_l4_scoring", weight: 1.5 },
-          { id: "reliability", weight: 1.0 }
-        ]
+      const response = await fetch('http://localhost:8000/api/picklist/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unified_dataset_path: datasetPath,
+          strategy_prompt: strategyPrompt
+        })
       });
       
-      // Apply the mocked parsed metrics to the current tab
-      const currentTab = activeTab;
-      let currentPriorities: MetricWeight[];
-      let setCurrentPriorities: React.Dispatch<React.SetStateAction<MetricWeight[]>>;
-      
-      if (currentTab === 'first') {
-        currentPriorities = firstPickPriorities;
-        setCurrentPriorities = setFirstPickPriorities;
-      } else if (currentTab === 'second') {
-        currentPriorities = secondPickPriorities;
-        setCurrentPriorities = setSecondPickPriorities;
-      } else {
-        currentPriorities = thirdPickPriorities;
-        setCurrentPriorities = setThirdPickPriorities;
+      if (!response.ok) {
+        throw new Error('Failed to parse strategy');
       }
       
-      // Add the parsed metrics to current priorities (avoiding duplicates)
-      const newPriorities = [...currentPriorities];
-      const parsedMetrics = [
-        { id: "auto_l4_scoring", weight: 2.0 },
-        { id: "teleop_l4_scoring", weight: 1.5 },
-        { id: "reliability", weight: 1.0 }
-      ];
+      const data = await response.json();
       
-      parsedMetrics.forEach(metric => {
-        if (!newPriorities.some(p => p.id === metric.id)) {
-          newPriorities.push(metric);
+      if (data.status === 'success' && data.parsed_priorities) {
+        setParsedPriorities(data.parsed_priorities);
+        
+        // Apply the parsed metrics to the current tab
+        const currentTab = activeTab;
+        let setCurrentPriorities: React.Dispatch<React.SetStateAction<MetricWeight[]>>;
+        
+        if (currentTab === 'first') {
+          setCurrentPriorities = setFirstPickPriorities;
+        } else if (currentTab === 'second') {
+          setCurrentPriorities = setSecondPickPriorities;
+        } else {
+          setCurrentPriorities = setThirdPickPriorities;
         }
-      });
-      
-      setCurrentPriorities(newPriorities);
-      setSuccessMessage('Strategy parsed and applied to priorities');
+        
+        // Add the parsed metrics to current priorities (avoiding duplicates)
+        setCurrentPriorities(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newPriorities = [...prev];
+          
+          for (const metric of data.parsed_priorities.parsed_metrics) {
+            if (!existingIds.has(metric.id)) {
+              newPriorities.push(metric);
+              existingIds.add(metric.id);
+            }
+          }
+          
+          return newPriorities;
+        });
+        
+        setSuccessMessage('Strategy parsed and applied to priorities');
+      } else {
+        setError(data.message || 'Error parsing strategy description');
+      }
     } catch (err) {
       console.error('Error parsing strategy prompt:', err);
       setError('Error parsing strategy description');
     } finally {
-      setIsLoading(false);
+      setIsParsingStrategy(false);
     }
   };
 
@@ -279,74 +276,124 @@ const PicklistNew: React.FC = () => {
       thirdPickPriorities;
       
     if (index === priorities.length - 1) return; // Already at the bottom
-    
     if (pickType === 'first') {
-      const newPriorities = [...firstPickPriorities];
-      const temp = newPriorities[index];
-      newPriorities[index] = newPriorities[index + 1];
-      newPriorities[index + 1] = temp;
-      setFirstPickPriorities(newPriorities);
-    } else if (pickType === 'second') {
-      const newPriorities = [...secondPickPriorities];
-      const temp = newPriorities[index];
-      newPriorities[index] = newPriorities[index + 1];
-      newPriorities[index + 1] = temp;
-      setSecondPickPriorities(newPriorities);
-    } else if (pickType === 'third') {
-      const newPriorities = [...thirdPickPriorities];
-      const temp = newPriorities[index];
-      newPriorities[index] = newPriorities[index + 1];
-      newPriorities[index + 1] = temp;
-      setThirdPickPriorities(newPriorities);
+        const newPriorities = [...firstPickPriorities];
+        const temp = newPriorities[index];
+        newPriorities[index] = newPriorities[index + 1];
+        newPriorities[index + 1] = temp;
+        setFirstPickPriorities(newPriorities);
+      } else if (pickType === 'second') {
+        const newPriorities = [...secondPickPriorities];
+        const temp = newPriorities[index];
+        newPriorities[index] = newPriorities[index + 1];
+        newPriorities[index + 1] = temp;
+        setSecondPickPriorities(newPriorities);
+      } else if (pickType === 'third') {
+        const newPriorities = [...thirdPickPriorities];
+        const temp = newPriorities[index];
+        newPriorities[index] = newPriorities[index + 1];
+        newPriorities[index + 1] = temp;
+        setThirdPickPriorities(newPriorities);
+      }
+    };
+  
+    // Generate team rankings
+    const generateRankings = async () => {
+      const currentPriorities = 
+        activeTab === 'first' ? firstPickPriorities :
+        activeTab === 'second' ? secondPickPriorities :
+        thirdPickPriorities;
+        
+      if (currentPriorities.length === 0) {
+        setError('Please add at least one priority before generating rankings');
+        return;
+      }
+      
+      setIsGeneratingRankings(true);
+      setError(null);
+      
+      try {
+        const response = await fetch('http://localhost:8000/api/picklist/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            unified_dataset_path: datasetPath,
+            priorities: currentPriorities
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to generate team rankings');
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.team_rankings) {
+          setTeamRankings(data.team_rankings);
+          setSuccessMessage('Team rankings generated successfully');
+        } else {
+          setError(data.message || 'Error generating team rankings');
+        }
+      } catch (err) {
+        console.error('Error generating team rankings:', err);
+        setError('Error generating team rankings');
+      } finally {
+        setIsGeneratingRankings(false);
+      }
+    };
+  
+    // Find metric label by ID
+    const getMetricLabel = (metricId: string): string => {
+      // Check all metric lists
+      const allMetrics = [...universalMetrics, ...gameMetrics, ...suggestedMetrics];
+      const metric = allMetrics.find(m => m.id === metricId);
+      return metric ? metric.label : metricId;
+    };
+  
+    // Get active priorities based on current tab
+    const getActivePriorities = (): MetricWeight[] => {
+      if (activeTab === 'first') return firstPickPriorities;
+      if (activeTab === 'second') return secondPickPriorities;
+      return thirdPickPriorities;
+    };
+  
+    if (isLoading && !universalMetrics.length) {
+      return <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>;
     }
-  };
-
-  // Find metric label by ID
-  const getMetricLabel = (metricId: string): string => {
-    // Check all metric lists
-    const allMetrics = [...universalMetrics, ...gameMetrics, ...suggestedMetrics];
-    const metric = allMetrics.find(m => m.id === metricId);
-    return metric ? metric.label : metricId;
-  };
-
-  // Get active priorities based on current tab
-  const getActivePriorities = (): MetricWeight[] => {
-    if (activeTab === 'first') return firstPickPriorities;
-    if (activeTab === 'second') return secondPickPriorities;
-    return thirdPickPriorities;
-  };
-
-  return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Picklist Builder</h1>
-      
-      {error && (
-        <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-      
-      {success && (
-        <div className="p-3 mb-4 bg-green-100 text-green-700 rounded">
-          {success}
-        </div>
-      )}
-      
-      {!datasetPath ? (
-        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-300 mb-6">
-          <h2 className="text-xl font-bold text-yellow-800 mb-2">No Dataset Found</h2>
-          <p className="text-yellow-700 mb-2">
-            Please build a unified dataset first before using the picklist builder.
-          </p>
-          <a 
-            href="/workflow"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
-          >
-            Go to Workflow
-          </a>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-6">Picklist Builder</h1>
+        
+        {error && (
+          <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="p-3 mb-4 bg-green-100 text-green-700 rounded">
+            {successMessage}
+          </div>
+        )}
+        
+        {!datasetPath ? (
+          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-300 mb-6">
+            <h2 className="text-xl font-bold text-yellow-800 mb-2">No Dataset Found</h2>
+            <p className="text-yellow-700 mb-2">
+              Please build a unified dataset first before using the picklist builder.
+            </p>
+            <a 
+              href="/workflow"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
+            >
+              Go to Workflow
+            </a>
+          </div>
+        ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Available Metrics */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-4 mb-6">
@@ -362,16 +409,30 @@ const PicklistNew: React.FC = () => {
               />
               <button
                 onClick={handlePromptSubmit}
-                disabled={isLoading || !strategyPrompt.trim()}
+                disabled={isParsingStrategy || !strategyPrompt.trim()}
                 className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
               >
-                {isLoading ? 'Processing...' : 'Parse Strategy'}
+                {isParsingStrategy ? 'Processing...' : 'Parse Strategy'}
               </button>
               
               {parsedPriorities && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
                   <h3 className="font-semibold text-blue-800 mb-2">Strategy Interpretation</h3>
-                  <p className="text-sm text-blue-700">{parsedPriorities.interpretation || 'Strategy analyzed successfully'}</p>
+                  <p className="text-sm text-blue-700 mb-3">{parsedPriorities.interpretation}</p>
+                  
+                  {parsedPriorities.parsed_metrics.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-800 mb-1">Identified Metrics:</h4>
+                      <ul className="text-xs space-y-1">
+                        {parsedPriorities.parsed_metrics.map((metric, idx) => (
+                          <li key={idx} className="flex justify-between">
+                            <span>{getMetricLabel(metric.id)}</span>
+                            <span className="text-blue-600">Weight: {metric.weight.toFixed(1)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -444,7 +505,6 @@ const PicklistNew: React.FC = () => {
               )}
             </div>
           </div>
-          
           {/* Right Columns - Priority Lists and Team Rankings */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-4 mb-6">
@@ -505,6 +565,9 @@ const PicklistNew: React.FC = () => {
                         <div className="mr-3 font-medium">{index + 1}.</div>
                         <div className="flex-1">
                           <div className="font-medium">{getMetricLabel(priority.id)}</div>
+                          {priority.reason && (
+                            <div className="text-xs text-gray-500">{priority.reason}</div>
+                          )}
                         </div>
                         
                         <div className="flex items-center space-x-2">
@@ -562,28 +625,89 @@ const PicklistNew: React.FC = () => {
               
               <div className="mt-6 flex justify-end">
                 <button
-                  onClick={() => {
-                    // This would call the picklist generation endpoint
-                    alert('Generate Picklist functionality coming in next update');
-                  }}
-                  disabled={getActivePriorities().length === 0 || isLoading}
+                  onClick={generateRankings}
+                  disabled={getActivePriorities().length === 0 || isGeneratingRankings}
                   className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300"
                 >
-                  Generate Picklist
+                  {isGeneratingRankings ? 'Generating...' : 'Generate Rankings'}
                 </button>
               </div>
             </div>
             
-            {/* Team Rankings Section (Placeholder for now) */}
+            {/* Team Rankings Section */}
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h2 className="text-xl font-bold mb-4">Team Rankings</h2>
-              <p className="text-gray-600 text-center py-8">
-                Team rankings will appear here after generating the picklist.
-                <br />
-                <span className="text-sm">
-                  First, set your priorities in the section above and click "Generate Picklist".
-                </span>
-              </p>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Team Rankings</h2>
+              </div>
+              
+              {teamRankings.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="border px-4 py-2 text-left">Rank</th>
+                        <th className="border px-4 py-2 text-left">Team</th>
+                        <th className="border px-4 py-2 text-left">Score</th>
+                        <th className="border px-4 py-2 text-left">Key Metrics</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teamRankings.map((team, index) => (
+                        <tr key={team.team_number} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
+                          <td className="border px-4 py-2 font-bold">{index + 1}</td>
+                          <td className="border px-4 py-2">
+                            <div className="font-medium">{team.team_number}</div>
+                            <div className="text-sm text-gray-600">{team.nickname}</div>
+                          </td>
+                          <td className="border px-4 py-2 font-mono">
+                            {team.score?.toFixed(2) || '0.00'}
+                          </td>
+                          <td className="border px-4 py-2">
+                            {team.metrics_contribution && team.metrics_contribution.length > 0 ? (
+                              <div className="grid grid-cols-2 gap-1">
+                                {team.metrics_contribution.map((metric, mIdx) => (
+                                  <div key={mIdx} className="text-xs bg-blue-50 p-1 rounded">
+                                    <span className="font-medium">{getMetricLabel(metric.id)}:</span> {metric.value.toFixed(2)}
+                                    <span className="text-blue-600"> ({metric.weighted_value.toFixed(2)})</span>
+                                    
+                                    {metric.metrics_used && metric.metrics_used.length > 0 && (
+                                      <div className="text-xs text-gray-500 mt-0.5">
+                                        Using: {metric.metrics_used.slice(0, 2).join(', ')}
+                                        {metric.metrics_used.length > 2 && '...'}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-500">No metrics data</span>
+                            )}
+                            <div className="text-xs text-gray-500 mt-1">
+                              From {team.match_count || 0} matches
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  {isGeneratingRankings ? (
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+                      <span className="ml-2">Generating rankings...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <p>Team rankings will appear here after clicking "Generate Rankings".</p>
+                      <p className="text-sm mt-2">
+                        First, set your priorities in the section above.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -2,11 +2,13 @@
 
 import random
 from typing import Optional, Dict, Any, List
+import os
+import json
 from fastapi import UploadFile
 
 from app.services.statbotics_client import get_team_epa
 from app.services.tba_client import get_event_teams
-from app.services.manual_parser_service import extract_manual_text, analyze_game_manual_in_chunks, analyze_game_overview
+from app.services.manual_parser_service import extract_manual_text, analyze_game_manual_in_chunks, analyze_game_overview, extract_game_relevant_sections
 from app.services.global_cache import cache
 
 async def start_learning_setup(year: int, manual_url: Optional[str] = None, manual_file: Optional[UploadFile] = None) -> Dict[str, Any]:
@@ -53,6 +55,20 @@ async def start_learning_setup(year: int, manual_url: Optional[str] = None, manu
                 # Cache the manual text
                 cache["manual_text"] = manual_text
                 manual_info["text_length"] = len(manual_text)
+                
+                # Extract game-relevant sections - NEW STEP
+                relevant_sections = await extract_game_relevant_sections(manual_text, year)
+                manual_info["game_name"] = relevant_sections.get("game_name")
+                manual_info["sections_extracted"] = True
+                
+                # Save manual info (including URL) to a file
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                data_dir = os.path.join(base_dir, "data")
+                os.makedirs(data_dir, exist_ok=True)
+                manual_info_path = os.path.join(data_dir, f"manual_info_{year}.json")
+                
+                with open(manual_info_path, "w", encoding="utf-8") as f:
+                    json.dump({"url": manual_url, "game_name": relevant_sections.get("game_name")}, f, indent=2)
                 
                 # Analyze the manual with GPT in chunks to avoid rate limits
                 game_analysis = await analyze_game_manual_in_chunks(manual_text, year)

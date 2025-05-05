@@ -11,6 +11,7 @@ router = APIRouter()
 class MetricPriority(BaseModel):
     id: str
     weight: float = 1.0
+    reason: Optional[str] = None
 
 class PicklistAnalysisRequest(BaseModel):
     unified_dataset_path: str
@@ -39,12 +40,12 @@ async def analyze_picklist_data(request: PicklistAnalysisRequest):
         # If strategy prompt is provided, parse it into priorities using GPT
         parsed_priorities = None
         if request.strategy_prompt:
-            # This would call GPT service to parse the prompt
-            # For now, return placeholder
-            parsed_priorities = {
-                "prompt": request.strategy_prompt,
-                "parsed_metrics": []  # Will be filled by GPT parsing
-            }
+            parsed_priorities = analysis_service.parse_strategy_prompt(request.strategy_prompt)
+        
+        # Generate team rankings if priorities are provided
+        team_rankings = None
+        if request.priorities:
+            team_rankings = analysis_service.rank_teams(request.priorities)
         
         # Generate statistics for all metrics
         metrics_stats = analysis_service.calculate_metrics_statistics()
@@ -55,7 +56,8 @@ async def analyze_picklist_data(request: PicklistAnalysisRequest):
             "universal_metrics": analysis_service.universal_metrics,
             "suggested_metrics": suggested_metrics,
             "metrics_stats": metrics_stats,
-            "parsed_priorities": parsed_priorities
+            "parsed_priorities": parsed_priorities,
+            "team_rankings": team_rankings
         }
         
     except Exception as e:

@@ -4,6 +4,7 @@ import os
 import fitz  # PyMuPDF
 from typing import Dict, List, Optional, Any
 import io
+import json
 from fastapi import UploadFile
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
@@ -80,10 +81,121 @@ async def extract_manual_text(manual_file: Optional[UploadFile] = None, manual_u
     
     return text
 
+async def extract_game_relevant_sections(manual_text: str, year: int) -> Dict[str, Any]:
+    """
+    Extract only the game-relevant sections from the manual text.
+    Focuses on gameplay, scoring, and field elements.
+    
+    Args:
+        manual_text: Full text of the game manual
+        year: FRC season year
+        
+    Returns:
+        Dict with extracted sections and metadata
+    """
+    # Define keywords for relevant sections
+    game_keywords = [
+        "game overview", "game description", "gameplay", "match play",
+        "scoring", "points", "auto", "autonomous", "teleop", "driver",
+        "endgame", "field elements", "game pieces", "alliance", "ranking"
+    ]
+    
+    # Build a prompt to extract relevant sections
+    prompt = f"""
+You are analyzing an FRC (FIRST Robotics Competition) game manual for the {year} season.
+Extract ONLY the most strategically relevant sections related to:
+
+1. Game overview
+2. Scoring mechanisms
+3. Field elements
+4. Auto, teleop, and endgame phases
+5. Ranking point criteria
+
+Focus on information that would be relevant for scouting and alliance selection.
+Exclude sections about robot construction rules, safety, event rules, or glossaries.
+
+For each extract, include the section title and content. Keep your total response under 2000 tokens.
+Format your response as structured JSON:
+
+{{
+  "game_name": "name of the game",
+  "sections": [
+    {{
+      "title": "section title",
+      "content": "extracted content"
+    }}
+  ]
+}}
+"""
+    
+    try:
+        # Call the OpenAI API
+        response = await client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "user", "content": prompt + "\n\nManual text:\n" + manual_text[:50000]}],
+            temperature=0.0,
+            response_format={"type": "json_object"},
+            max_tokens=2000
+        )
+        
+        # Parse the response
+        extracted_data = json.loads(response.choices[0].message.content)
+        
+        # Create a condensed version of all relevant sections for context
+        relevant_sections = ""
+        for section in extracted_data.get("sections", []):
+            relevant_sections += f"{section['title']}:\n{section['content']}\n\n"
+        
+        # Add the relevant sections to the result
+        result = {
+            "game_name": extracted_data.get("game_name", f"FRC {year} Game"),
+            "relevant_sections": relevant_sections
+        }
+        
+        # Save the extracted data to a file
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(base_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        
+        manual_text_path = os.path.join(data_dir, f"manual_text_{year}.json")
+        with open(manual_text_path, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+        
+        return result
+        
+    except Exception as e:
+        print(f"Error extracting game sections from manual: {e}")
+        return {"game_name": f"FRC {year} Game", "relevant_sections": ""}
+
+async def analyze_game_manual_in_chunks(manual_text: str, year: int) -> Dict[str, Any]:
+    """
+    Analyze the game manual using GPT, processing in smaller chunks to avoid rate limits.
+    
+    Args:
+        manual_text: Extracted text from the game manual
+        year: FRC season year
+        
+    Returns:
+        Dict containing extracted game information
+    """
+    # Try to extract relevant sections first
+    try:
+        game_info = await extract_game_relevant_sections(manual_text, year)
+        if game_info and "game_name" in game_info:
+            # We already have the game info from the relevant sections
+            return {
+                "game_name": game_info.get("game_name"),
+                "scouting_variables": await extract_scouting_variables(game_info.get("relevant_sections", ""), year)
+            }
+    except Exception as e:
+        print(f"Error extracting relevant sections: {e}")
+    
+    # Fallback to basic overview if section extraction fails
+    return await analyze_game_overview(year)
+
 async def analyze_game_overview(year: int) -> Dict[str, Any]:
     """
-    Process a small sample or overview of the game without requiring the full manual
-    Uses the more efficient GPT-4.1-nano model to reduce token usage.
+    Process a small sample or overview of the game without requiring the full manual.
     
     Args:
         year: FRC season year
@@ -91,7 +203,7 @@ async def analyze_game_overview(year: int) -> Dict[str, Any]:
     Returns:
         Dict containing basic game information
     """
-    # Instead of processing the entire manual, we'll have GPT generate basic info based on the year
+    # Create a prompt to get basic game info
     prompt = f"""
 You are an expert on FIRST Robotics Competition (FRC) games. For the {year} season, provide a basic overview of:
 1. The game name
@@ -105,182 +217,101 @@ Output structured JSON only, following this format:
   "game_name": "string",
   "field_elements": ["string", "string"],
   "scoring_actions": ["string", "string"],
-  "scouting_variables": ["string", "string"]
-}}
-"""
-
-    response = await client.chat.completions.create(
-        model="gpt-4.1-nano",  # Using nano model here too
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0,
-        timeout=30  # Shorter timeout for this simpler request
-    )
-    
-    extracted_info = response.choices[0].message.content
-    
-    # Parse the JSON response - handle potential JSON formatting issues
-    try:
-        import json
-        # Clean up the response if needed
-        if "```json" in extracted_info:
-            extracted_info = extracted_info.split("```json")[1].split("```")[0].strip()
-        elif "```" in extracted_info:
-            extracted_info = extracted_info.split("```")[1].split("```")[0].strip()
-            
-        result = json.loads(extracted_info)
-        
-        # Save to cache for reference
-        cache["game_analysis"] = result
-        
-        return result
-    except Exception as e:
-        print(f"Error parsing GPT response: {e}")
-        print(f"Raw response: {extracted_info}")
-        # Return a simplified structure if parsing fails
-        return {
-            "error": "Failed to parse GPT output",
-            "raw_response": extracted_info
-        }
-
-async def analyze_game_manual_in_chunks(manual_text: str, year: int) -> Dict[str, Any]:
-    """
-    Analyze the game manual using GPT, processing in smaller chunks to avoid rate limits.
-    Uses the more efficient GPT-4.1-nano model to reduce token usage.
-    
-    Args:
-        manual_text: Extracted text from the game manual
-        year: FRC season year
-        
-    Returns:
-        Dict containing extracted game information
-    """
-    # First, let's extract the table of contents or initial part for overall structure
-    intro_text = manual_text[:8000]  # First 8K chars
-    
-    # Step 1: Get the basic game structure and scouting variables
-    prompt_intro = f"""
-You are analyzing a FIRST Robotics Competition (FRC) game manual for the {year} season.
-Based on the introduction section provided, identify:
-
-1. Game name
-2. Match structure (auto, teleop duration, etc.)
-3. Basic scoring elements
-4. Key sections that would contain detailed scoring actions
-
-Output JSON only:
-{{
-  "game_name": "string",
-  "match_structure": {{ "auto_duration": "string", "teleop_duration": "string" }},
-  "key_scoring_elements": ["string"],
-  "important_sections": ["string"]
-}}
-
-Manual Introduction:
-{intro_text}
-"""
-
-    # Get basic game info - using GPT-4.1-nano for efficiency
-    try:
-        intro_response = await client.chat.completions.create(
-            model="gpt-4.1-nano",  # Using nano model instead of gpt-4o
-            messages=[{"role": "user", "content": prompt_intro}],
-            temperature=0,
-            timeout=30
-        )
-        
-        intro_info = intro_response.choices[0].message.content
-        
-        import json
-        if "```json" in intro_info:
-            intro_info = intro_info.split("```json")[1].split("```")[0].strip()
-        elif "```" in intro_info:
-            intro_info = intro_info.split("```")[1].split("```")[0].strip()
-            
-        game_info = json.loads(intro_info)
-    except Exception as e:
-        print(f"Error processing game intro: {e}")
-        # Fall back to basic analysis
-        return await analyze_game_overview(year)
-    
-    # Step 2: Extract scouting variables from just the scoring sections
-    # Look for sections about scoring, points, ranking, etc.
-    relevant_keywords = ["scoring", "points", "ranking", "auto", "autonomous", "teleop", "endgame"]
-    
-    # Split manual into paragraphs
-    paragraphs = manual_text.split("\n\n")
-    
-    # Filter to paragraphs likely about scoring (sample a subset to stay under limits)
-    scoring_paragraphs = []
-    for para in paragraphs:
-        if any(keyword in para.lower() for keyword in relevant_keywords):
-            scoring_paragraphs.append(para)
-            # We can process more text with the nano model, but still keep it reasonable
-            if len("\n\n".join(scoring_paragraphs)) > 30000:
-                break
-    
-    scoring_text = "\n\n".join(scoring_paragraphs[:75])  # Take first 75 matches or fewer
-    
-    prompt_variables = f"""
-Based on these scoring-related sections from a FIRST Robotics Competition manual for {year}, 
-identify the optimal scouting variables a team would want to track.
-
-Group them by category and use snake_case format:
-
-Output JSON only:
-{{
   "scouting_variables": {{
-    "team_info": ["team_number", "match_number", "alliance_color"],
     "auto_phase": ["auto_variable_1", "auto_variable_2"],
     "teleop_phase": ["teleop_variable_1", "teleop_variable_2"],
     "endgame": ["endgame_variable_1"],
-    "penalties": ["penalty_variable_1"],
-    "strategy_notes": ["subjective_variable_1"]
+    "strategy": ["strategy_variable_1"]
   }}
 }}
-
-Scoring Sections:
-{scoring_text}
 """
 
     try:
-        # Again using nano model
-        variables_response = await client.chat.completions.create(
-            model="gpt-4.1-nano",
-            messages=[{"role": "user", "content": prompt_variables}],
+        response = await client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "user", "content": prompt}],
             temperature=0,
-            timeout=30
+            response_format={"type": "json_object"},
+            max_tokens=1000
         )
         
-        variables_info = variables_response.choices[0].message.content
+        # Parse the response
+        extracted_info = json.loads(response.choices[0].message.content)
         
-        if "```json" in variables_info:
-            variables_info = variables_info.split("```json")[1].split("```")[0].strip()
-        elif "```" in variables_info:
-            variables_info = variables_info.split("```")[1].split("```")[0].strip()
-            
-        variables_data = json.loads(variables_info)
+        # Save to cache for reference
+        cache["game_analysis"] = extracted_info
+        
+        return extracted_info
     except Exception as e:
-        print(f"Error processing scouting variables: {e}")
-        variables_data = {
+        print(f"Error analyzing game overview: {e}")
+        # Return minimal structure if analysis fails
+        return {
+            "game_name": f"FRC {year} Game",
+            "field_elements": [],
+            "scoring_actions": [],
             "scouting_variables": {
-                "team_info": ["team_number", "match_number", "alliance_color"],
                 "auto_phase": ["auto_score"],
                 "teleop_phase": ["teleop_score"],
                 "endgame": ["endgame_score"],
-                "penalties": ["fouls"],
-                "strategy_notes": ["comments"]
+                "strategy": ["comments"]
             }
         }
+
+async def extract_scouting_variables(game_text: str, year: int) -> Dict[str, List[str]]:
+    """
+    Extract recommended scouting variables from game text.
     
-    # Combine all results
-    combined_result = {
-        "game_name": game_info.get("game_name", f"FRC {year} Game"),
-        "match_structure": game_info.get("match_structure", {}),
-        "field_elements": game_info.get("key_scoring_elements", []),
-        "scouting_variables": variables_data.get("scouting_variables", {})
-    }
-    
-    # Save to cache for reference
-    cache["game_analysis"] = combined_result
-    
-    return combined_result
+    Args:
+        game_text: Text describing the game (ideally from relevant sections)
+        year: FRC season year
+        
+    Returns:
+        Dict with category keys and lists of variables as values
+    """
+    prompt = f"""
+Based on this description of the {year} FRC game, suggest optimal scouting variables
+that teams should track. Group these variables by category and use snake_case format.
+
+Return ONLY a JSON object with this structure:
+{{
+  "auto_phase": ["auto_variable_1", "auto_variable_2"],
+  "teleop_phase": ["teleop_variable_1", "teleop_variable_2"],
+  "endgame": ["endgame_variable_1"],
+  "strategy": ["strategy_variable_1"]
+}}
+
+Include standard variables like team_number and match_number in each appropriate phase.
+Focus only on quantifiable metrics and observations that would be useful for alliance selection.
+
+Game Description:
+{game_text}
+"""
+
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            response_format={"type": "json_object"},
+            max_tokens=1000
+        )
+        
+        # Parse the response
+        variables_data = json.loads(response.choices[0].message.content)
+        
+        # Ensure we have at least empty lists for each category
+        default_categories = ["auto_phase", "teleop_phase", "endgame", "strategy"]
+        for category in default_categories:
+            if category not in variables_data:
+                variables_data[category] = []
+        
+        return variables_data
+    except Exception as e:
+        print(f"Error extracting scouting variables: {e}")
+        # Return basic structure if extraction fails
+        return {
+            "auto_phase": ["auto_score"],
+            "teleop_phase": ["teleop_score"],
+            "endgame": ["endgame_score"],
+            "strategy": ["comments"]
+        }
