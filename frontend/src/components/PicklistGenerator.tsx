@@ -36,6 +36,7 @@ interface PicklistGeneratorProps {
   priorities: MetricPriority[];
   excludeTeams?: number[];
   onPicklistGenerated?: (result: PicklistResult) => void;
+  initialPicklist?: Team[]; // Add prop for initial picklist data
 }
 
 const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
@@ -44,9 +45,10 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   pickPosition,
   priorities,
   excludeTeams = [],
-  onPicklistGenerated
+  onPicklistGenerated,
+  initialPicklist = []
 }) => {
-  const [picklist, setPicklist] = useState<Team[]>([]);
+  const [picklist, setPicklist] = useState<Team[]>(initialPicklist);
   const [analysis, setAnalysis] = useState<PicklistAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,8 +56,13 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
   
   useEffect(() => {
-    // Generate picklist when component mounts or when inputs change
-    generatePicklist();
+    // If we have an initial picklist, use it
+    if (initialPicklist && initialPicklist.length > 0) {
+      setPicklist(initialPicklist);
+    } else {
+      // Otherwise generate a new picklist
+      generatePicklist();
+    }
   }, [datasetPath, yourTeamNumber, pickPosition, JSON.stringify(priorities), JSON.stringify(excludeTeams)]);
   
   const generatePicklist = async () => {

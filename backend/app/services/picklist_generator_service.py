@@ -240,6 +240,20 @@ class PicklistGeneratorService:
             # Parse and validate the response
             result = json.loads(response.choices[0].message.content)
             
+            # Deduplicate the picklist to ensure each team appears only once
+            if "picklist" in result and isinstance(result["picklist"], list):
+                seen_teams = set()
+                deduplicated_picklist = []
+                
+                for team in result["picklist"]:
+                    team_number = team.get("team_number")
+                    if team_number not in seen_teams:
+                        seen_teams.add(team_number)
+                        deduplicated_picklist.append(team)
+                
+                # Replace the original picklist with the deduplicated one
+                result["picklist"] = deduplicated_picklist
+            
             # Cache the result
             self._picklist_cache[cache_key] = result
             

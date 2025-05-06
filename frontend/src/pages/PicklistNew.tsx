@@ -59,8 +59,10 @@ const PicklistNew: React.FC = () => {
   const [parsedPriorities, setParsedPriorities] = useState<ParsedStrategy | null>(null);
   const [isParsingStrategy, setIsParsingStrategy] = useState<boolean>(false);
   
-  // State for team rankings
-  const [teamRankings, setTeamRankings] = useState<Team[]>([]);
+  // State for team rankings - separate for each pick position
+  const [firstPickRankings, setFirstPickRankings] = useState<Team[]>([]);
+  const [secondPickRankings, setSecondPickRankings] = useState<Team[]>([]);
+  const [thirdPickRankings, setThirdPickRankings] = useState<Team[]>([]);
   const [isGeneratingRankings, setIsGeneratingRankings] = useState<boolean>(false);
   const [shouldShowGenerator, setShouldShowGenerator] = useState<boolean>(false);
   
@@ -178,7 +180,20 @@ const PicklistNew: React.FC = () => {
           
           for (const metric of data.parsed_priorities.parsed_metrics) {
             if (!existingIds.has(metric.id)) {
-              newPriorities.push(metric);
+              // Map custom weight to closest predefined weight option (0.5, 1.0, 1.5, 2.0, 3.0)
+              const validWeights = [0.5, 1.0, 1.5, 2.0, 3.0];
+              const rawWeight = metric.weight || 1.0;
+              
+              // Find closest valid weight
+              const closestWeight = validWeights.reduce((prev, curr) => 
+                Math.abs(curr - rawWeight) < Math.abs(prev - rawWeight) ? curr : prev
+              );
+              
+              newPriorities.push({
+                id: metric.id,
+                weight: closestWeight,
+                reason: metric.reason
+              });
               existingIds.add(metric.id);
             }
           }
@@ -344,7 +359,15 @@ const generateRankings = () => {
   // Handle picklist generation result
   const handlePicklistGenerated = (result: any) => {
     if (result.status === 'success' && result.picklist) {
-      setTeamRankings(result.picklist);
+      // Store rankings in the appropriate state based on active tab
+      if (activeTab === 'first') {
+        setFirstPickRankings(result.picklist);
+      } else if (activeTab === 'second') {
+        setSecondPickRankings(result.picklist);
+      } else if (activeTab === 'third') {
+        setThirdPickRankings(result.picklist);
+      }
+      
       setSuccessMessage('Team rankings generated successfully');
     } else if (result.message) {
       setError(result.message);
@@ -367,15 +390,24 @@ const generateRankings = () => {
   };
 
   const handleTabChange = (tab: 'first' | 'second' | 'third') => {
-    // Only reset if changing to a different tab
+    // Only change tab if different from current
     if (tab !== activeTab) {
       setActiveTab(tab);
-      setShouldShowGenerator(false); // Hide the generator when changing tabs
       
-      // Reset any existing picklist results
-      setTeamRankings([]);
-      setSuccessMessage(null);
+      // Don't reset rankings and component state when switching tabs
+      // This ensures picklists persist when switching between tabs
+      
+      // Clear any error or success messages when switching tabs
       setError(null);
+      setSuccessMessage(null);
+      
+      // Set shouldShowGenerator based on whether rankings exist for this tab
+      const hasRankings = 
+        tab === 'first' && firstPickPriorities.length > 0 || 
+        tab === 'second' && secondPickPriorities.length > 0 || 
+        tab === 'third' && thirdPickPriorities.length > 0;
+      
+      setShouldShowGenerator(hasRankings);
     }
   };
 
@@ -684,6 +716,12 @@ const generateRankings = () => {
                   priorities={getActivePriorities()}
                   excludeTeams={excludedTeams}
                   onPicklistGenerated={handlePicklistGenerated}
+                  key={`picklist-${activeTab}`} // Add key to ensure component refreshes properly
+                  initialPicklist={
+                    activeTab === 'first' ? firstPickRankings :
+                    activeTab === 'second' ? secondPickRankings :
+                    thirdPickRankings
+                  }
                 />
               ) : (
                 // Show placeholder when rankings are not yet generated
