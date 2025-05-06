@@ -72,12 +72,14 @@ async def generate_picklist(request: PicklistRequest):
         
         if result.get("status") == "error":
             raise HTTPException(status_code=500, detail=result.get("message", "Error generating picklist"))
-            
+        
         return result
+    
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating picklist: {str(e)}")
 
+    
 @router.post("/update")
 async def update_picklist(request: UpdatePicklistRequest):
     """

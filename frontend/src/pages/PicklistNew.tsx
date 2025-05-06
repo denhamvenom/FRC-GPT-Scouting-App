@@ -366,6 +366,19 @@ const generateRankings = () => {
     return thirdPickPriorities;
   };
 
+  const handleTabChange = (tab: 'first' | 'second' | 'third') => {
+    // Only reset if changing to a different tab
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+      setShouldShowGenerator(false); // Hide the generator when changing tabs
+      
+      // Reset any existing picklist results
+      setTeamRankings([]);
+      setSuccessMessage(null);
+      setError(null);
+    }
+  };
+
   if (isLoading && !universalMetrics.length) {
     return <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -531,36 +544,37 @@ const generateRankings = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-4 mb-6">
               <div className="flex border-b mb-4">
-                <button
-                  onClick={() => setActiveTab('first')}
-                  className={`py-2 px-4 font-medium ${
-                    activeTab === 'first'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  First Pick
-                </button>
-                <button
-                  onClick={() => setActiveTab('second')}
-                  className={`py-2 px-4 font-medium ${
-                    activeTab === 'second'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Second Pick
-                </button>
-                <button
-                  onClick={() => setActiveTab('third')}
-                  className={`py-2 px-4 font-medium ${
-                    activeTab === 'third'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Third Pick
-                </button>
+              <button
+                    onClick={() => handleTabChange('first')}
+                    className={`py-2 px-4 font-medium ${
+                        activeTab === 'first'
+                        ? 'text-blue-600 border-b-2 border-blue-600'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                    >
+                    First Pick
+                    </button>
+                    <button
+                        onClick={() => handleTabChange('second')}
+                        className={`py-2 px-4 font-medium ${
+                            activeTab === 'second'
+                            ? 'text-blue-600 border-b-2 border-blue-600'
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                        >
+                        Second Pick
+                        </button>
+
+                        <button
+                        onClick={() => handleTabChange('third')}
+                        className={`py-2 px-4 font-medium ${
+                            activeTab === 'third'
+                            ? 'text-blue-600 border-b-2 border-blue-600'
+                            : 'text-gray-500 hover:text-gray-700'
+                        }`}
+                        >
+                        Third Pick
+                        </button>
               </div>
               
               <div className="min-h-[200px] border-2 border-dashed rounded-lg p-4">
