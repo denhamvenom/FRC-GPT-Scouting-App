@@ -4,6 +4,7 @@ import json
 import os
 from typing import Dict, Any
 from statbotics import Statbotics
+from app.services.cache_service import cached
 
 # Initialize Statbotics client
 sb = Statbotics()
@@ -34,6 +35,7 @@ def get_nested_value(data: Dict, path: str) -> Any:
         data = data.get(key, {})
     return data if data != {} else None
 
+@cached(max_age_seconds=3600*24)  # Cache for 24 hours
 def get_team_epa(team_key: int, year: int) -> Dict[str, Any]:
     """
     Pulls EPA and match-relevant breakdown for a team in a given year.

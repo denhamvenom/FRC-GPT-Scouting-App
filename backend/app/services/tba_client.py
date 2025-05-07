@@ -4,6 +4,7 @@ import os
 import httpx
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
+from app.services.cache_service import cached
 
 # Load environment variables
 ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
@@ -16,6 +17,7 @@ HEADERS = {
     "X-TBA-Auth-Key": TBA_API_KEY
 }
 
+@cached(max_age_seconds=3600*24)  # Cache for 24 hours
 async def get_event_teams(event_key: str) -> List[Dict[str, Any]]:
     """
     Pulls simple team listings at an event.
@@ -26,6 +28,7 @@ async def get_event_teams(event_key: str) -> List[Dict[str, Any]]:
         response.raise_for_status()
         return response.json()
 
+@cached(max_age_seconds=3600*8)  # Cache for 8 hours
 async def get_event_matches(event_key: str) -> List[Dict[str, Any]]:
     """
     Pulls simple match listings at an event.
@@ -36,6 +39,7 @@ async def get_event_matches(event_key: str) -> List[Dict[str, Any]]:
         response.raise_for_status()
         return response.json()
 
+@cached(max_age_seconds=3600*4)  # Cache for 4 hours
 async def get_event_rankings(event_key: str) -> Optional[Dict[str, Any]]:
     """
     Pulls event rankings (qual RP, tie-breakers, etc.).

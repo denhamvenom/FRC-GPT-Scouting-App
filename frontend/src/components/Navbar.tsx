@@ -78,6 +78,17 @@ function Navbar() {
               </Link>
               
               <Link
+                to="/build-dataset"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive("/build-dataset") 
+                    ? "bg-blue-900 text-white" 
+                    : "text-gray-200 hover:bg-blue-700"
+                }`}
+              >
+                Build Dataset
+              </Link>
+              
+              <Link
                 to="/picklist"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
                   isActive("/picklist") 

@@ -9,6 +9,7 @@ import FieldSelection from "./pages/FieldSelection";
 import Workflow from "./pages/Workflow";
 import Validation from "./pages/Validation";
 import PicklistNew from "./pages/PicklistNew"; // New component
+import UnifiedDatasetBuilder from "./pages/UnifiedDatasetBuilder"; // New component for dataset building
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
             <Route path="/workflow" element={<Workflow />} />
             <Route path="/validation" element={<Validation />} />
             <Route path="/picklist" element={<PicklistNew />} />
+            <Route path="/build-dataset" element={<UnifiedDatasetBuilder />} />
           </Routes>
         </main>
       </div>

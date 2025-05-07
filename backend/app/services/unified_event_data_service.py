@@ -2,11 +2,15 @@
 
 import os
 import json
+import uuid
 from typing import List, Dict, Any, Optional
+import asyncio
+from app.services.progress_tracker import ProgressTracker
 
 from app.services.schema_loader import load_schemas
 from app.services.scouting_parser import parse_scouting_row
-from app.services.superscout_parser import parse_superscout_row
+# Use the enhanced parser that preserves field categories
+from app.services.superscout_parser_enhanced import parse_superscout_row
 from app.services.tba_client import get_event_teams, get_event_matches, get_event_rankings
 from app.services.statbotics_client import get_team_epa
 from app.services.sheets_service import get_sheet_values
@@ -53,7 +57,8 @@ async def build_unified_dataset(
     year: int, 
     force_rebuild: bool = False,
     scouting_tab: str = "Scouting", 
-    superscout_tab: str = "SuperScouting"
+    superscout_tab: str = "SuperScouting",
+    operation_id: Optional[str] = None
 ) -> str:
     """
     Build a unified dataset combining scouting data, TBA data, and Statbotics data.
@@ -64,27 +69,49 @@ async def build_unified_dataset(
         force_rebuild: Whether to rebuild even if dataset already exists
         scouting_tab: Name of the scouting tab in Google Sheets
         superscout_tab: Name of the superscouting tab in Google Sheets
+        operation_id: Optional unique identifier for progress tracking
         
     Returns:
         str: Path to the unified dataset JSON file
     """
+    # Initialize progress tracking if operation_id is provided
+    tracker = None
+    if operation_id:
+        tracker = ProgressTracker.create_tracker(operation_id)
+        tracker.update(1, f"Building unified dataset for {event_key} ({year})", "Initializing")
+    
     print(f"\U0001F535 Loading schemas for {year}")
     load_schemas(year)
+    if tracker:
+        tracker.update(5, "Loaded schemas", "Load schemas")
     
     # Check if dataset already exists and if we should rebuild
     output_path = get_unified_dataset_path(event_key)
     if os.path.exists(output_path) and not force_rebuild:
         print(f"\u2705 Using existing unified dataset: {output_path}")
+        if tracker:
+            tracker.complete(f"Using existing unified dataset: {output_path}")
         return output_path
 
     # 1. Parse Match Scouting Data
     print("\U0001F535 Fetching Match Scouting data...")
+    if tracker:
+        tracker.update(10, "Fetching match scouting data", "Fetch scouting data")
+    
     scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ")
     headers = scouting_raw[0] if scouting_raw else []
     scouting_rows = scouting_raw[1:] if scouting_raw else []
-
+    
+    if tracker:
+        tracker.update(15, f"Processing {len(scouting_rows)} scouting records", "Process scouting data")
+    
     scouting_parsed = []
-    for row in scouting_rows:
+    for i, row in enumerate(scouting_rows):
+        # Update progress every 10 rows to avoid too many updates
+        if tracker and i % 10 == 0 and scouting_rows:
+            progress_pct = 15 + (5 * i / len(scouting_rows))
+            tracker.update(progress_pct, f"Processed {i}/{len(scouting_rows)} scouting records", "Process scouting data")
+            
         parsed = parse_scouting_row(row, headers)
         if parsed:
             # Ensure match_number is present and is an integer
@@ -107,15 +134,29 @@ async def build_unified_dataset(
                     pass  # Keep as is if conversion fails
                     
             scouting_parsed.append(parsed)
+    
+    if tracker:
+        tracker.update(20, f"Completed processing {len(scouting_parsed)} scouting records", "Process scouting data")
 
     # 2. Parse SuperScouting Data
     print("\U0001F535 Fetching SuperScouting data...")
+    if tracker:
+        tracker.update(25, "Fetching superscouting data", "Fetch superscouting data")
+    
     superscouting_raw = await get_sheet_values(f"{superscout_tab}!A1:ZZ")
     superscouting_headers = superscouting_raw[0] if superscouting_raw else []
     superscouting_rows = superscouting_raw[1:] if superscouting_raw else []
 
+    if tracker:
+        tracker.update(30, f"Processing {len(superscouting_rows)} superscouting records", "Process superscouting data")
+    
     superscouting_parsed = []
-    for row in superscouting_rows:
+    for i, row in enumerate(superscouting_rows):
+        # Update progress every 10 rows to avoid too many updates
+        if tracker and i % 10 == 0 and superscouting_rows:
+            progress_pct = 30 + (5 * i / len(superscouting_rows))
+            tracker.update(progress_pct, f"Processed {i}/{len(superscouting_rows)} superscouting records", "Process superscouting data")
+            
         parsed_robots = parse_superscout_row(row, superscouting_headers)
         
         # Each row can generate multiple robot entries due to robot grouping
@@ -138,12 +179,24 @@ async def build_unified_dataset(
                 
                 # Add to parsed data
                 superscouting_parsed.append(robot_data)
+    
+    if tracker:
+        tracker.update(35, f"Completed processing {len(superscouting_parsed)} superscouting records", "Process superscouting data")
 
     # 3. Pull TBA Data
     print("\U0001F535 Fetching TBA Teams, Matches, Rankings...")
-    event_teams = await get_event_teams(event_key)
-    event_matches = await get_event_matches(event_key)
-    event_rankings = await get_event_rankings(event_key)
+    if tracker:
+        tracker.update(40, "Fetching data from The Blue Alliance", "Fetch TBA data")
+    
+    # Use asyncio.gather to fetch data concurrently
+    event_teams, event_matches, event_rankings = await asyncio.gather(
+        get_event_teams(event_key),
+        get_event_matches(event_key),
+        get_event_rankings(event_key)
+    )
+    
+    if tracker:
+        tracker.update(50, f"Retrieved data for {len(event_teams)} teams and {len(event_matches)} matches", "Process TBA data")
 
     # 3.5 Build Expected Match List
     expected_matches = []
@@ -166,60 +219,92 @@ async def build_unified_dataset(
     
     # Debug info about expected matches
     print(f"\U0001F535 Built {len(expected_matches)} expected match-team combinations")
+    if tracker:
+        tracker.update(55, f"Built {len(expected_matches)} expected match-team combinations", "Process match schedule")
 
     # 4. Pull Statbotics Data for each team
     print("\U0001F535 Fetching Statbotics EPA data...")
+    if tracker:
+        tracker.update(60, f"Fetching Statbotics EPA data for {len(event_teams)} teams", "Fetch Statbotics data")
+        
     statbotics_data = {}
     
-    for team in event_teams:
-        team_number = team.get("team_number")
-        try:
-            team_stats = get_team_epa(team_number, year)
-            if team_stats:
-                statbotics_data[team_number] = team_stats
-        except Exception as e:
-            print(f"Error fetching Statbotics data for team {team_number}: {e}")
+    # Process teams in smaller batches to show progress
+    batch_size = max(1, len(event_teams) // 10)  # Split into ~10 progress updates
+    for i in range(0, len(event_teams), batch_size):
+        batch = event_teams[i:i+batch_size]
+        
+        if tracker:
+            progress_pct = 60 + (10 * i / len(event_teams))
+            tracker.update(progress_pct, f"Fetching team stats {i}/{len(event_teams)}", "Fetch Statbotics data")
+        
+        for team in batch:
+            team_number = team.get("team_number")
+            try:
+                team_stats = get_team_epa(team_number, year)
+                if team_stats:
+                    statbotics_data[team_number] = team_stats
+            except Exception as e:
+                print(f"Error fetching Statbotics data for team {team_number}: {e}")
+    
+    if tracker:
+        tracker.update(70, f"Retrieved Statbotics data for {len(statbotics_data)} teams", "Process Statbotics data")
 
     # 5. Merge all data
     print("\U0001F7E2 Merging datasets...")
+    if tracker:
+        tracker.update(75, "Merging all datasets", "Merge data")
+        
     unified_data = {}
-
-    for team in event_teams:
-        team_number = team.get("team_number")
-        team_key = f"frc{team_number}"
-
-        # Get team's scouting data - ensure we're using string versions of team_number for comparison
-        team_scouting = [
-            r for r in scouting_parsed 
-            if str(r.get("team_number")) == str(team_number)
-        ]
+    
+    # Process teams in smaller batches to show progress
+    batch_size = max(1, len(event_teams) // 5)  # Split into ~5 progress updates
+    for i in range(0, len(event_teams), batch_size):
+        batch = event_teams[i:i+batch_size]
         
-        # Get team's superscouting data
-        team_superscouting = [
-            r for r in superscouting_parsed 
-            if str(r.get("team_number")) == str(team_number)
-        ]
+        if tracker:
+            progress_pct = 75 + (15 * i / len(event_teams))
+            tracker.update(progress_pct, f"Merging team data {i}/{len(event_teams)}", "Merge data")
         
-        # Get team's statbotics data
-        team_statbotics = statbotics_data.get(team_number, {})
-        
-        # Get team's ranking data
-        team_ranking = next(
-            (r for r in event_rankings.get("rankings", []) if r.get("team_key") == team_key), 
-            {}
-        ) if event_rankings else {}
-
-        unified_data[str(team_number)] = {
-            "team_number": team_number,
-            "nickname": team.get("nickname"),
-            "scouting_data": team_scouting,
-            "superscouting_data": team_superscouting,
-            "tba_info": team,
-            "statbotics_info": team_statbotics,
-            "ranking_info": team_ranking
-        }
+        for team in batch:
+            team_number = team.get("team_number")
+            team_key = f"frc{team_number}"
+    
+            # Get team's scouting data - ensure we're using string versions of team_number for comparison
+            team_scouting = [
+                r for r in scouting_parsed 
+                if str(r.get("team_number")) == str(team_number)
+            ]
+            
+            # Get team's superscouting data
+            team_superscouting = [
+                r for r in superscouting_parsed 
+                if str(r.get("team_number")) == str(team_number)
+            ]
+            
+            # Get team's statbotics data
+            team_statbotics = statbotics_data.get(team_number, {})
+            
+            # Get team's ranking data
+            team_ranking = next(
+                (r for r in event_rankings.get("rankings", []) if r.get("team_key") == team_key), 
+                {}
+            ) if event_rankings else {}
+    
+            unified_data[str(team_number)] = {
+                "team_number": team_number,
+                "nickname": team.get("nickname"),
+                "scouting_data": team_scouting,
+                "superscouting_data": team_superscouting,
+                "tba_info": team,
+                "statbotics_info": team_statbotics,
+                "ranking_info": team_ranking
+            }
 
     # 6. Save unified data locally
+    if tracker:
+        tracker.update(90, "Preparing to save unified dataset", "Save data")
+        
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
 
@@ -241,5 +326,8 @@ async def build_unified_dataset(
     print(f"\u2705 Unified dataset saved to: {output_path}")
     print(f"\u2705 Dataset contains {len(expected_matches)} expected match-team combinations")
     print(f"\u2705 Dataset contains {len(unified_data)} teams")
+    
+    if tracker:
+        tracker.complete(f"Unified dataset created with {len(unified_data)} teams and {len(expected_matches)} match-team combinations")
 
     return output_path

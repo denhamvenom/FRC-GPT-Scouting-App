@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+import uuid
 
 from app.services.unified_event_data_service import build_unified_dataset, get_unified_dataset_path
 
@@ -18,18 +19,31 @@ class UnifiedDatasetRequest(BaseModel):
 async def build_dataset(request: UnifiedDatasetRequest):
     """
     Build or update the unified dataset for an event.
+    
+    This is a long-running operation that will return immediately with an operation ID.
+    Progress can be tracked using the /progress/{operation_id} endpoint.
     """
     try:
-        output_path = await build_unified_dataset(
-            event_key=request.event_key,
-            year=request.year,
-            force_rebuild=request.force_rebuild
+        # Generate a unique operation ID
+        operation_id = f"build_dataset_{request.event_key}_{uuid.uuid4().hex[:8]}"
+        
+        # Start the dataset build process in the background
+        import asyncio
+        
+        # Create a task that will run in the background
+        asyncio.create_task(
+            build_unified_dataset(
+                event_key=request.event_key,
+                year=request.year,
+                force_rebuild=request.force_rebuild,
+                operation_id=operation_id
+            )
         )
         
         return {
-            "status": "success",
-            "message": "Unified dataset built successfully",
-            "path": output_path
+            "status": "processing",
+            "message": "Unified dataset build started",
+            "operation_id": operation_id
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

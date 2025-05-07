@@ -372,6 +372,8 @@ function FieldSelection() {
     }
     
     try {
+      setIsLoading(true);
+      
       // Save the schema
       const schema = {
         field_selections: selectedFields,
@@ -391,16 +393,39 @@ function FieldSelection() {
         throw new Error('Failed to save schema');
       }
       
-      // Show success message
-      setSuccessMessage('Field selections saved successfully!');
+      // Show initial success message
+      setSuccessMessage('Field selections saved successfully! Now learning schema mappings...');
       
-      // Navigate to workflow page after a brief delay
-      setTimeout(() => {
-        navigate('/workflow');
-      }, 1500);
+      // Trigger schema mapping for both regular scouting and superscout
+      try {
+        // Learn regular scouting schema
+        await fetch('http://localhost:8000/api/schema/learn');
+        
+        // Learn superscouting schema with data analysis
+        const superResponse = await fetch('http://localhost:8000/api/schema_superscout/learn');
+        const superData = await superResponse.json();
+        
+        if (superResponse.ok && superData.status === 'success') {
+          setSuccessMessage('Field selections and schema mappings saved successfully! Analyzing data content...');
+        }
+        
+        // Navigate to workflow page after a brief delay
+        setTimeout(() => {
+          navigate('/workflow');
+        }, 1500);
+      } catch (schemaErr) {
+        console.error('Error learning schema mappings:', schemaErr);
+        // Still continue to workflow even if schema learning fails
+        // The user can manually trigger schema learning later
+        setSuccessMessage('Field selections saved, but schema learning had issues. Continuing to workflow.');
+        setTimeout(() => {
+          navigate('/workflow');
+        }, 2000);
+      }
     } catch (err) {
       console.error('Error saving schema:', err);
       setError('Error saving field selections');
+      setIsLoading(false);
     }
   };
 
