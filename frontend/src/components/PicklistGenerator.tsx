@@ -1,7 +1,6 @@
 // frontend/src/components/PicklistGenerator.tsx
 
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface Team {
   team_number: number;
@@ -54,6 +53,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   useEffect(() => {
     // If we have an initial picklist, use it
@@ -176,21 +176,33 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     }
   };
   
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) {
-      return; // Dropped outside the list
+  // Handle team position change
+  const handlePositionChange = (teamIndex: number, newPosition: number) => {
+    // Validate the new position
+    if (newPosition < 1 || newPosition > picklist.length) {
+      setError(`Position must be between 1 and ${picklist.length}`);
+      setTimeout(() => setError(null), 3000);
+      return;
     }
     
-    if (result.destination.index === result.source.index) {
-      return; // Dropped in the same position
-    }
+    // Convert from 1-based UI position to 0-based array index
+    const newIndex = newPosition - 1;
     
-    // Reorder the list
+    // Create a copy of the current picklist
     const newPicklist = [...picklist];
-    const [removed] = newPicklist.splice(result.source.index, 1);
-    newPicklist.splice(result.destination.index, 0, removed);
     
+    // Remove the team from its current position
+    const [teamToMove] = newPicklist.splice(teamIndex, 1);
+    
+    // Insert the team at the new position
+    newPicklist.splice(newIndex, 0, teamToMove);
+    
+    // Update the picklist
     setPicklist(newPicklist);
+    
+    // Show feedback that rankings changed
+    setSuccessMessage('Team position updated');
+    setTimeout(() => setSuccessMessage(null), 2000);
   };
   
   if (isLoading && !picklist.length) {
@@ -257,6 +269,12 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         </div>
       )}
       
+      {successMessage && (
+        <div className="p-3 mb-4 bg-green-100 text-green-700 rounded">
+          {successMessage}
+        </div>
+      )}
+      
       {showAnalysis && analysis && (
         <div className="mb-6 bg-purple-50 p-4 rounded-lg border border-purple-200">
           <h3 className="font-bold text-purple-800 mb-2">GPT Analysis</h3>
@@ -282,42 +300,38 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       
       <div className="overflow-hidden">
         {isEditing ? (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="picklist">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="space-y-2"
-                >
-                  {picklist.map((team, index) => (
-                    <Draggable key={team.team_number.toString()} draggableId={team.team_number.toString()} index={index}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="p-3 bg-white rounded border border-gray-300 shadow-sm flex items-center"
-                        >
-                          <div className="mr-3 text-lg font-bold text-gray-500">{index + 1}</div>
-                          <div className="flex-1">
-                            <div className="font-medium">Team {team.team_number}: {team.nickname}</div>
-                            <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
-                          </div>
-                          <div className="text-gray-400 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+          <div className="space-y-3">
+            <p className="text-sm text-blue-600 italic mb-2">
+              Edit team positions by changing their rank numbers, then click "Save Changes" when done.
+            </p>
+            
+            {picklist.map((team, index) => (
+              <div 
+                key={team.team_number} 
+                className="p-3 bg-white rounded border border-gray-300 shadow-sm flex items-center hover:bg-blue-50 transition-colors duration-150"
+              >
+                <div className="mr-3 flex items-center">
+                  <input
+                    type="number"
+                    min="1"
+                    max={picklist.length}
+                    value={index + 1}
+                    onChange={(e) => handlePositionChange(index, parseInt(e.target.value) || 1)}
+                    className="w-12 p-1 border border-gray-300 rounded text-center font-bold text-blue-600"
+                  />
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                <div className="flex-1">
+                  <div className="font-medium">Team {team.team_number}: {team.nickname}</div>
+                  <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
+                </div>
+                <div className="text-gray-400 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                  </svg>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="space-y-2">
             {picklist.map((team, index) => (

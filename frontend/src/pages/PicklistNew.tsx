@@ -39,8 +39,9 @@ interface ParsedStrategy {
 }
 
 const PicklistNew: React.FC = () => {
-  // State for dataset path
+  // State for dataset path and data
   const [datasetPath, setDatasetPath] = useState<string>('');
+  const [dataset, setDataset] = useState<any>(null);
   const [yourTeamNumber, setYourTeamNumber] = useState<number>(0);
   
   // State for metrics and priorities
@@ -77,7 +78,7 @@ const PicklistNew: React.FC = () => {
   // State for tracking excluded teams
   const [excludedTeams, setExcludedTeams] = useState<number[]>([]);
 
-  // Fetch dataset path on load
+  // Fetch dataset path and load dataset on load
   useEffect(() => {
     const checkDatasets = async () => {
       try {
@@ -86,6 +87,18 @@ const PicklistNew: React.FC = () => {
         
         if (data.status === 'exists' && data.path) {
           setDatasetPath(data.path);
+          
+          // Load full dataset to get team rankings
+          try {
+            const response = await fetch(`http://localhost:8000/api/unified/dataset?path=${encodeURIComponent(data.path)}`);
+            if (response.ok) {
+              const fullDataset = await response.json();
+              setDataset(fullDataset);
+            }
+          } catch (err) {
+            console.error('Error loading full dataset:', err);
+          }
+          
           await fetchPicklistAnalysis(data.path);
         }
       } catch (err) {
@@ -344,15 +357,40 @@ const generateRankings = () => {
     // Update excluded teams based on pick position
     updateExcludedTeams();
     
-    // Show picklist generator component
-    setShouldShowGenerator(true);
+    // Small delay to ensure excluded teams are updated before generating
+    setTimeout(() => {
+      // Show picklist generator component
+      setShouldShowGenerator(true);
+    }, 100);
   };
   
   // Update excluded teams based on pick position
   const updateExcludedTeams = () => {
-    // In a real implementation, you would track which teams were already picked
-    // For this example, we'll just use an empty array
-    const excluded: number[] = [];
+    let excluded: number[] = [];
+    
+    // For second pick, exclude top 8 ranked teams (assume they've been picked)
+    if (activeTab === 'second') {
+      try {
+        // Get the top 8 teams by rank from the dataset
+        const topTeams = Object.entries(dataset?.teams || {})
+          .map(([teamNumberStr, teamData]: [string, any]) => {
+            const teamNumber = parseInt(teamNumberStr);
+            const rank = teamData.ranking_info?.rank || 999; // Default high rank if not found
+            return { teamNumber, rank };
+          })
+          .sort((a, b) => a.rank - b.rank) // Sort by rank (ascending)
+          .slice(0, 8) // Get top 8
+          .map(team => team.teamNumber); // Extract just the team numbers
+        
+        excluded = topTeams;
+      } catch (error) {
+        console.error("Error getting top 8 teams:", error);
+      }
+    }
+    
+    // For third pick, could add more teams to exclude
+    // if (activeTab === 'third') { ... }
+    
     setExcludedTeams(excluded);
   };
 
@@ -704,7 +742,7 @@ const generateRankings = () => {
             {/* Team Rankings Section - Now with PicklistGenerator integration */}
             <div className="bg-white rounded-lg shadow-md p-4">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Team Rankings</h2>
+                <h2 className="text-xl font-bold">Picklist</h2>
               </div>
               
               {shouldShowGenerator ? (
@@ -726,7 +764,7 @@ const generateRankings = () => {
               ) : (
                 // Show placeholder when rankings are not yet generated
                 <div className="p-4 text-center text-gray-500">
-                  <p>Team rankings will appear here after clicking "Generate Rankings".</p>
+                  <p>Your picklist will appear here after clicking "Generate Rankings".</p>
                   <p className="text-sm mt-2">
                     First, set your priorities in the section above.
                   </p>
