@@ -111,6 +111,71 @@ class PicklistAnalysisService:
         except Exception as e:
             print(f"Error loading manual info: {e}")
             return {}
+            
+    def identify_superscout_metrics(self) -> List[Dict[str, str]]:
+        """
+        Identify available superscouting metrics from the dataset.
+        Returns list of metric objects with id, label, and category.
+        """
+        superscout_metrics = []
+        
+        # Check if teams have superscouting data
+        if not self.teams_data:
+            return []
+            
+        # Get a sample of teams to analyze superscouting data structure
+        # This increases chances of finding all available metrics
+        sample_teams = []
+        for team_key, team_data in self.teams_data.items():
+            if team_data.get("superscouting_data"):
+                sample_teams.append(team_data)
+                if len(sample_teams) >= 5:  # Sample up to 5 teams
+                    break
+        
+        if not sample_teams:
+            return []  # No superscouting data found
+            
+        # Track metrics we've already added
+        added_metrics = set()
+        
+        # Process superscouting entries from sample teams
+        for team_data in sample_teams:
+            for entry in team_data.get("superscouting_data", []):
+                # Skip empty entries
+                if not entry:
+                    continue
+                    
+                # Identify all metrics from the entry
+                for field, value in entry.items():
+                    # Skip certain fields
+                    if field in ["team_number", "match_number", "qual_number", "field_types", "robot_group"]:
+                        continue
+                    
+                    # Skip metrics we've already added
+                    if field in added_metrics:
+                        continue
+                        
+                    # Format metric id and label
+                    metric_id = field
+                    label = " ".join(w.capitalize() for w in field.split("_"))
+                    
+                    # Determine category based on field type if available
+                    category = "superscout"
+                    if "field_types" in entry and field in entry["field_types"]:
+                        category = entry["field_types"][field]
+                    
+                    # Create metric object
+                    metric = {"id": metric_id, "label": label, "category": category}
+                    
+                    # Add all metrics - both numeric and text-based
+                    # For text-based metrics, they can be useful for filtering teams
+                    superscout_metrics.append(metric)
+                    added_metrics.add(field)
+        
+        # Sort metrics by category then label
+        superscout_metrics.sort(key=lambda m: (m["category"], m["label"]))
+        
+        return superscout_metrics
     
     def identify_game_specific_metrics(self) -> List[Dict[str, str]]:
         """
@@ -261,6 +326,41 @@ class PicklistAnalysisService:
                         # If we know the match outcome, record the value-win pair
                         if won_match is not None:
                             metric_win_pairs[field].append((value, 1 if won_match else 0))
+            
+            # Now include superscouting numeric data
+            superscouting_data = team_data.get("superscouting_data", [])
+            
+            for entry in superscouting_data:
+                # Get match outcome (win/loss) if available - similar to above
+                alliance_color = entry.get("alliance_color")
+                match_number = entry.get("match_number") or entry.get("qual_number")
+                
+                # Default to None if we can't determine win status
+                won_match = None
+                
+                # Try to find match in TBA matches
+                if match_number and alliance_color:
+                    tba_matches = self.dataset.get("tba_matches", [])
+                    for tba_match in tba_matches:
+                        if tba_match.get("match_number") == match_number:
+                            # Check if this alliance won
+                            alliance_result = tba_match.get("alliances", {}).get(alliance_color, {})
+                            if alliance_result:
+                                # TBA marks the winner with "winner" field
+                                won_match = alliance_result.get("winner", False)
+                            break
+                
+                # Collect values for each numeric superscouting metric
+                for field, value in entry.items():
+                    if isinstance(value, (int, float)) and field not in ["team_number", "match_number", "qual_number", "robot_group"]:
+                        # Prefix with "super_" to avoid collisions with regular metrics
+                        metric_id = field
+                        
+                        metric_values[metric_id].append(value)
+                        
+                        # If we know the match outcome, record the value-win pair
+                        if won_match is not None:
+                            metric_win_pairs[metric_id].append((value, 1 if won_match else 0))
         
         # Calculate statistics for each metric
         stats = {}
@@ -361,7 +461,8 @@ class PicklistAnalysisService:
         """
         # Get all available metrics
         game_metrics = self.identify_game_specific_metrics()
-        all_metrics = self.universal_metrics + game_metrics
+        superscout_metrics = self.identify_superscout_metrics()  # Add superscouting metrics
+        all_metrics = self.universal_metrics + game_metrics + superscout_metrics  # Include them in all metrics
         
         # Get statistics for metrics
         metrics_stats = self.calculate_metrics_statistics()
@@ -377,7 +478,8 @@ class PicklistAnalysisService:
                 "id": metric_id,
                 "name": metric["label"],
                 "category": metric["category"],
-                "stats": {}
+                "stats": {},
+                "source": "superscouting" if metric in superscout_metrics else "regular"  # Add source to distinguish
             }
             
             # Add stats if available
@@ -411,11 +513,15 @@ Your task is to analyze a team's strategy request and identify the most relevant
 Available metrics for this team's scouting data:
 {json.dumps(metric_info, indent=2)}
 
+IMPORTANT: Pay special attention to metrics from "source": "superscouting". These are qualitative observations about teams' mechanisms, strategies, and capabilities, and are often more descriptive of robot abilities than quantitative metrics.
+
 The team is building a picklist and has described their strategy needs as follows:
 "{strategy_prompt}"
 
 Based on this strategy description and the available metrics, identify the most relevant metrics that would
 help the team execute their strategy.
+
+When the strategy mentions specific robot capabilities, mechanisms, or play styles (like "ground intake", "amp scorer", "defense", etc.), PRIORITIZE matching superscouting metrics that directly assess these qualities over generic statistical metrics.
 
 Provide your response in the following JSON format:
 {{
@@ -483,47 +589,82 @@ Only include metrics from the provided list.
             "defense": ["defense", "defensive", "block", "prevent"],
             "scoring": ["score", "scoring", "points", "goal"],
             "reliability": ["consistent", "reliable", "steady", "dependable"],
-            "speed": ["fast", "quick", "rapid", "cycle", "speed"]
+            "speed": ["fast", "quick", "rapid", "cycle", "speed"],
+            # Add more robot mechanism and strategy related keywords for superscouting
+            "intake": ["intake", "pickup", "collect", "grab"],
+            "amp": ["amp", "amplifier", "amplification"],
+            "speaker": ["speaker", "high goal", "upper goal"],
+            "note": ["note", "piece", "game piece"],
+            "trap": ["trap", "trapping"],
+            "ground": ["ground", "floor", "pickup"],
+            "source": ["source", "loading", "human player"]
         }
         
         # Track already added metrics to avoid duplicates
         added_metric_ids = set()
         
-        # First pass: Direct field name matches
-        for metric in all_metrics:
+        # First pass: Prioritize superscouting metrics with direct matches
+        # These are more likely to contain mechanism types and strategic capabilities
+        superscout_metrics = [m for m in all_metrics if "super" in m.get("category", "").lower()]
+        for metric in superscout_metrics:
             metric_id = metric["id"]
-            if metric_id in lower_prompt or metric["label"].lower() in lower_prompt:
-                weight = 2.0  # Higher weight for direct mentions
+            metric_label = metric["label"].lower()
+            
+            # Check for direct mention of metric name
+            if metric_id in lower_prompt or metric_label in lower_prompt:
+                weight = 2.5  # Higher weight for direct superscouting mentions
                 
                 if metric_id not in added_metric_ids:
                     parsed_metrics.append({
                         "id": metric_id,
                         "weight": weight,
-                        "reason": f"Directly mentioned in strategy"
+                        "reason": f"Directly mentioned superscouting metric in strategy"
                     })
                     added_metric_ids.add(metric_id)
-                    # Second pass: Category-based matching
+        
+        # Second pass: Check other metrics with direct name matches
+        for metric in all_metrics:
+            metric_id = metric["id"]
+            if metric_id in added_metric_ids:  # Skip already added metrics
+                continue
+                
+            if metric_id in lower_prompt or metric["label"].lower() in lower_prompt:
+                weight = 2.0  # Standard weight for direct mentions
+                
+                parsed_metrics.append({
+                    "id": metric_id,
+                    "weight": weight,
+                    "reason": f"Directly mentioned in strategy"
+                })
+                added_metric_ids.add(metric_id)
+                
+        # Third pass: Category and keyword-based matching
         for category, terms in keywords.items():
-            if any(term in lower_prompt for term in terms):
-                # Find metrics in this category
+            matching_terms = [term for term in terms if term in lower_prompt]
+            if matching_terms:
+                # Find metrics matching this category
                 matching_metrics = [
                     m for m in all_metrics 
-                    if (category in m["id"].lower() or 
-                        category in m["label"].lower() or 
+                    if (any(term in m["id"].lower() or term in m["label"].lower() for term in matching_terms) or
                         category in m.get("category", "").lower())
                     and m["id"] not in added_metric_ids
                 ]
                 
+                # Prioritize superscouting metrics in matching
+                superscouting_matches = [m for m in matching_metrics if "super" in m.get("category", "").lower()]
+                other_matches = [m for m in matching_metrics if "super" not in m.get("category", "").lower()]
+                sorted_matches = superscouting_matches + other_matches
+                
                 # Determine weight based on emphasis
                 weight = 1.0
-                for term in terms:
+                for term in matching_terms:
                     if f"very {term}" in lower_prompt or f"high {term}" in lower_prompt:
                         weight = 2.0
                     elif f"extremely {term}" in lower_prompt:
                         weight = 3.0
                 
-                # Add top 2 metrics from this category
-                for metric in matching_metrics[:2]:
+                # Add up to 2 metrics from this category
+                for metric in sorted_matches[:2]:
                     parsed_metrics.append({
                         "id": metric["id"],
                         "weight": weight,

@@ -76,3 +76,45 @@ async def check_dataset_status(event_key: str, year: int):
             "status": "not_found",
             "event_key": event_key
         }
+
+@router.get("/dataset")
+async def get_dataset(path: str = None, event_key: str = None):
+    """
+    Get the unified dataset content.
+    
+    This endpoint supports two methods of retrieving a dataset:
+    1. By providing the full path (for backward compatibility)
+    2. By providing the event_key (preferred method)
+    
+    At least one of the parameters must be provided.
+    """
+    import os
+    import json
+    
+    try:
+        # Determine which path to use
+        dataset_path = None
+        
+        if event_key:
+            # Use event key to get the standard path
+            dataset_path = get_unified_dataset_path(event_key)
+        elif path:
+            # Use the provided path directly
+            dataset_path = path
+        else:
+            raise HTTPException(status_code=400, detail="Either 'path' or 'event_key' must be provided")
+        
+        # Check if the file exists
+        if not os.path.exists(dataset_path):
+            raise HTTPException(status_code=404, detail=f"Dataset not found at path: {dataset_path}")
+        
+        # Read and return the dataset
+        with open(dataset_path, "r", encoding="utf-8") as f:
+            dataset = json.load(f)
+            
+        return dataset
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(status_code=500, detail=f"Error reading dataset: {str(e)}")

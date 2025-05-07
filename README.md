@@ -5,8 +5,8 @@ A year‑agnostic, team‑agnostic, data‑agnostic toolkit that automates FRC e
 ## Purpose & Scope
 * **Field Selection** – Select which fields from your scouting spreadsheet to analyze; optionally use game manual for strategic insights
 * **Validation** – Flag missing or outlier match rows and let users rescout virtually, replace with averages, or ignore with reason
-* **Pick‑List Builder** – Create ranked first/second/third‑pick lists from validated data given user‑ranked priorities; allow manual drag‑drop
-* **Alliance‑Selection Assistant** – Live draft tracker that strikes picked teams and re‑ranks remaining candidates
+* **Pick‑List Builder** – Create ranked first/second/third‑pick lists from validated data given user‑ranked priorities; allow manual drag‑drop; includes both scouting and superscouting metrics
+* **Realistic Alliance Selection** – Automatically excludes alliance captains when generating second and third picks; live draft tracker that strikes picked teams and re‑ranks remaining candidates
 
 ## Key Design Decisions
 | Topic | Decision | Rationale |
@@ -67,8 +67,12 @@ frontend/
 | `/api/health/ping` | GET | – | `{status:"ok"}` |
 | `/api/schema/save-selections` | POST JSON | `{ field_selections, manual_url, year }` | Selection save status |
 | `/api/unified/build` | POST JSON | `{ event_key, year, force_rebuild }` | Dataset build status & path |
+| `/api/unified/dataset` | GET | `{ event_key }` or `{ path }` | Complete unified dataset |
+| `/api/unified/status` | GET | `{ event_key, year }` | Dataset existence and status |
 | `/api/validate/enhanced` | GET | `{ unified_dataset_path }` | Validation results with outliers |
 | `/api/validate/apply-correction` | POST JSON | `{ team_number, match_number, corrections }` | Correction status |
+| `/api/picklist/analyze` | POST JSON | `{ unified_dataset_path, [priorities], [strategy_prompt] }` | Available metrics, statistical analysis, team rankings |
+| `/api/picklist/generate` | POST JSON | `{ unified_dataset_path, your_team_number, pick_position, priorities, exclude_teams }` | Ranked picklist with reasoning |
 
 ## Setup and Installation
 
@@ -106,8 +110,13 @@ frontend/
 
 ## Open TODOs / Pain Points
 * Event key selector (currently hard‑coded to `2025arc` in learning prototype)
-* Front‑end pages for Alliance Selection
 * Visualizations for team performance
 * Mobile compatibility improvements
 * OAuth / token management UI for Sheets, TBA, Statbotics, OpenAI
-* Add user-friendly error handling and recovery
+
+## Recent Improvements
+* Added superscouting metrics to picklist generation and analysis
+* Implemented realistic alliance selection logic (excludes alliance captains for 2nd/3rd picks)
+* Enhanced error handling with fallback mechanisms for dataset loading
+* Improved strategy parsing to better interpret natural language descriptions
+* Added detailed debugging and status information for developers

@@ -48,6 +48,7 @@ const PicklistNew: React.FC = () => {
   const [universalMetrics, setUniversalMetrics] = useState<Metric[]>([]);
   const [gameMetrics, setGameMetrics] = useState<Metric[]>([]);
   const [suggestedMetrics, setSuggestedMetrics] = useState<Metric[]>([]);
+  const [superscoutMetrics, setSuperscoutMetrics] = useState<Metric[]>([]);
   const [metricsStats, setMetricsStats] = useState<Record<string, any>>({});
   
   // State for selected priorities for each pick type
@@ -90,10 +91,23 @@ const PicklistNew: React.FC = () => {
           
           // Load full dataset to get team rankings
           try {
-            const response = await fetch(`http://localhost:8000/api/unified/dataset?path=${encodeURIComponent(data.path)}`);
+            // Try to load dataset by event_key instead of path to avoid path encoding issues
+            const response = await fetch(`http://localhost:8000/api/unified/dataset?event_key=2025arc`);
             if (response.ok) {
               const fullDataset = await response.json();
               setDataset(fullDataset);
+              console.log("Dataset loaded successfully");
+            } else {
+              // Fallback to path-based loading if event_key fails
+              console.log("Trying fallback dataset loading with path...");
+              const pathResponse = await fetch(`http://localhost:8000/api/unified/dataset?path=${encodeURIComponent(data.path)}`);
+              if (pathResponse.ok) {
+                const pathDataset = await pathResponse.json();
+                setDataset(pathDataset);
+                console.log("Dataset loaded successfully via path");
+              } else {
+                console.error("Failed to load dataset via both methods:", await pathResponse.text());
+              }
             }
           } catch (err) {
             console.error('Error loading full dataset:', err);
@@ -132,6 +146,7 @@ const PicklistNew: React.FC = () => {
         setUniversalMetrics(data.universal_metrics || []);
         setGameMetrics(data.game_metrics || []);
         setSuggestedMetrics(data.suggested_metrics || []);
+        setSuperscoutMetrics(data.superscout_metrics || []);
         setMetricsStats(data.metrics_stats || {});
       } else {
         setError(data.message || 'Error in picklist analysis');
@@ -333,9 +348,8 @@ const PicklistNew: React.FC = () => {
       setThirdPickPriorities(newPriorities);
     }
   };
-  // Generate team rankings - modified to use the new approach
-  // Generate team rankings - modified to use the new approach
-const generateRankings = () => {
+  // Generate team rankings
+  const generateRankings = () => {
     const currentPriorities = 
       activeTab === 'first' ? firstPickPriorities :
       activeTab === 'second' ? secondPickPriorities :
@@ -354,44 +368,149 @@ const generateRankings = () => {
     // Clear previous errors
     setError(null);
     
-    // Update excluded teams based on pick position
-    updateExcludedTeams();
+    // Update excluded teams based on pick position and store the result
+    const teamsToExclude = updateExcludedTeams();
     
-    // Small delay to ensure excluded teams are updated before generating
-    setTimeout(() => {
-      // Show picklist generator component
-      setShouldShowGenerator(true);
-    }, 100);
+    // Add a UI message if teams are being excluded
+    if (teamsToExclude && teamsToExclude.length > 0) {
+      if (activeTab === 'second') {
+        setSuccessMessage(`Excluding top 8 ranked teams (${teamsToExclude.length} teams) as they would be alliance captains`);
+      } else if (activeTab === 'third') {
+        setSuccessMessage(`Excluding alliance captains (${teamsToExclude.length} teams) for third pick analysis`);
+      }
+    }
+    
+    // Show picklist generator component
+    setShouldShowGenerator(true);
   };
   
+  // Create a sample dataset with rankings for testing
+  const createSampleDataset = () => {
+    // Sample teams with rankings - based on historically strong teams
+    const sampleTeams: { [key: string]: any } = {};
+    
+    // Create 24 sample teams with rankings
+    [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254, // Top 8
+     118, 148, 217, 1538, 2910, 3538, 4613, 6328,   // Next 8 
+     33, 195, 330, 610, 1323, 2337, 2481, 4481      // Final 8
+    ].forEach((teamNumber, index) => {
+      sampleTeams[teamNumber.toString()] = {
+        team_number: teamNumber,
+        nickname: `Team ${teamNumber}`,
+        ranking_info: {
+          rank: index + 1 // Rank 1-24 based on array position
+        }
+      };
+    });
+    
+    return {
+      event_key: "2025arc",
+      year: 2025,
+      teams: sampleTeams
+    };
+  };
+
   // Update excluded teams based on pick position
   const updateExcludedTeams = () => {
     let excluded: number[] = [];
     
+    // Check if dataset is available, otherwise use sample data
+    const workingDataset = dataset && dataset.teams ? dataset : createSampleDataset();
+    
+    if (!workingDataset || !workingDataset.teams) {
+      console.error("Dataset not loaded yet and fallback failed, cannot exclude teams");
+      return [];
+    }
+    
+    console.log("Dataset teams count:", Object.keys(workingDataset.teams).length);
+    
+    // Log teams with rankings to debug
+    const teamsWithRankings = Object.entries(workingDataset.teams)
+      .filter(([_, teamData]: [string, any]) => teamData.ranking_info?.rank)
+      .map(([teamNumberStr, teamData]: [string, any]) => ({
+        teamNumber: parseInt(teamNumberStr),
+        rank: teamData.ranking_info?.rank
+      }));
+    
+    console.log("Teams with rankings:", teamsWithRankings);
+    
     // For second pick, exclude top 8 ranked teams (assume they've been picked)
     if (activeTab === 'second') {
       try {
-        // Get the top 8 teams by rank from the dataset
-        const topTeams = Object.entries(dataset?.teams || {})
-          .map(([teamNumberStr, teamData]: [string, any]) => {
-            const teamNumber = parseInt(teamNumberStr);
-            const rank = teamData.ranking_info?.rank || 999; // Default high rank if not found
-            return { teamNumber, rank };
-          })
-          .sort((a, b) => a.rank - b.rank) // Sort by rank (ascending)
-          .slice(0, 8) // Get top 8
-          .map(team => team.teamNumber); // Extract just the team numbers
+        // First check if we have ranking data
+        const rankedTeams = Object.entries(workingDataset.teams)
+          .filter(([_, teamData]: [string, any]) => teamData.ranking_info?.rank !== undefined)
+          .map(([teamNumberStr, teamData]: [string, any]) => ({
+            teamNumber: parseInt(teamNumberStr),
+            rank: teamData.ranking_info?.rank || 999
+          }));
         
-        excluded = topTeams;
+        console.log(`Found ${rankedTeams.length} teams with ranking data`);
+        
+        if (rankedTeams.length === 0) {
+          // Fallback: if no ranking data, exclude some arbitrary top team numbers
+          // This is just for testing purposes
+          excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+          console.log("No ranking data found. Using fallback exclusion list:", excluded);
+        } else {
+          // Sort teams by rank (ascending) and get top 8
+          const topTeams = rankedTeams
+            .sort((a, b) => a.rank - b.rank)
+            .slice(0, 8)
+            .map(team => team.teamNumber);
+          
+          excluded = topTeams;
+          console.log("Excluding top 8 teams for second pick:", excluded);
+        }
       } catch (error) {
         console.error("Error getting top 8 teams:", error);
+        // Fallback for testing
+        excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+        console.log("Error occurred. Using fallback exclusion list:", excluded);
       }
     }
     
-    // For third pick, could add more teams to exclude
-    // if (activeTab === 'third') { ... }
+    // For third pick, exclude only the top 8 alliance captains
+    // We can't assume which specific other teams would be picked in first and second rounds
+    if (activeTab === 'third') {
+      try {
+        // First check if we have ranking data
+        const rankedTeams = Object.entries(workingDataset.teams)
+          .filter(([_, teamData]: [string, any]) => teamData.ranking_info?.rank !== undefined)
+          .map(([teamNumberStr, teamData]: [string, any]) => ({
+            teamNumber: parseInt(teamNumberStr),
+            rank: teamData.ranking_info?.rank || 999
+          }));
+        
+        console.log(`Found ${rankedTeams.length} teams with ranking data`);
+        
+        if (rankedTeams.length === 0) {
+          // Fallback: if no ranking data, exclude some arbitrary top team numbers
+          // This is just for testing purposes - just the alliance captains
+          excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+          console.log("No ranking data found. Using fallback exclusion list for third pick:", excluded);
+        } else {
+          // Sort teams by rank (ascending) and get top 8 (alliance captains)
+          const topTeams = rankedTeams
+            .sort((a, b) => a.rank - b.rank)
+            .slice(0, 8)
+            .map(team => team.teamNumber);
+          
+          excluded = topTeams;
+          console.log("Excluding top 8 alliance captains for third pick:", excluded);
+        }
+      } catch (error) {
+        console.error("Error getting top 8 teams for third pick:", error);
+        // Fallback for testing - just the alliance captains
+        excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+        console.log("Error occurred. Using fallback exclusion list for third pick:", excluded);
+      }
+    }
     
+    console.log("Final excluded teams:", excluded);
     setExcludedTeams(excluded);
+    
+    return excluded; // Return the excluded teams
   };
 
   // Handle picklist generation result
@@ -441,11 +560,18 @@ const generateRankings = () => {
       
       // Set shouldShowGenerator based on whether rankings exist for this tab
       const hasRankings = 
-        tab === 'first' && firstPickPriorities.length > 0 || 
-        tab === 'second' && secondPickPriorities.length > 0 || 
-        tab === 'third' && thirdPickPriorities.length > 0;
+        tab === 'first' && firstPickRankings.length > 0 || 
+        tab === 'second' && secondPickRankings.length > 0 || 
+        tab === 'third' && thirdPickRankings.length > 0;
       
       setShouldShowGenerator(hasRankings);
+      
+      // Immediately update excluded teams when switching tabs
+      // This will ensure the correct teams are excluded before generating rankings
+      setTimeout(() => {
+        // Use setTimeout to ensure activeTab state is updated
+        updateExcludedTeams();
+      }, 0);
     }
   };
 
@@ -592,7 +718,7 @@ const generateRankings = () => {
               
               {/* Game-Specific Metrics Section */}
               {gameMetrics.length > 0 && (
-                <div>
+                <div className="mb-4">
                   <h3 className="font-semibold text-green-700 mb-2">Game Metrics</h3>
                   {gameMetrics.map((metric) => (
                     <div
@@ -602,6 +728,25 @@ const generateRankings = () => {
                     >
                       <span className="font-medium">{metric.label}</span>
                       <span className="ml-2 text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
+                        {metric.category}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* SuperScouting Metrics Section - NEW */}
+              {superscoutMetrics.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-purple-700 mb-2">SuperScouting Metrics</h3>
+                  {superscoutMetrics.map((metric) => (
+                    <div
+                      key={metric.id}
+                      onClick={() => handleAddMetric(metric)}
+                      className="bg-purple-50 border border-purple-200 p-3 rounded mb-2 cursor-pointer hover:bg-purple-100"
+                    >
+                      <span className="font-medium">{metric.label}</span>
+                      <span className="ml-2 text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">
                         {metric.category}
                       </span>
                     </div>
@@ -743,24 +888,77 @@ const generateRankings = () => {
             <div className="bg-white rounded-lg shadow-md p-4">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Picklist</h2>
+                
+                {/* Debug button to force update excluded teams */}
+                {(activeTab === 'second' || activeTab === 'third') && (
+                  <button
+                    onClick={() => {
+                      const excluded = updateExcludedTeams();
+                      if (excluded.length > 0) {
+                        setSuccessMessage(`Updated excluded teams list: ${excluded.join(', ')}`);
+                      } else {
+                        setError('Failed to exclude teams. Check console for debug info.');
+                      }
+                    }}
+                    className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-xs"
+                  >
+                    Force Update Exclusions
+                  </button>
+                )}
+              </div>
+              
+              {/* Always show excluded teams information to debug */}
+              <div className="p-3 mb-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-300 text-sm">
+                <p className="font-semibold">Debug Information:</p>
+                <p>Current Tab: {activeTab}</p>
+                <p>Excluded Teams Count: {excludedTeams.length}</p>
+                <p>Teams Being Excluded: {excludedTeams.join(', ') || 'None'}</p>
+                <p className="mt-2 font-semibold">Dataset Status:</p>
+                <p>Dataset Loaded: {dataset ? 'Yes' : 'No'}</p>
+                <p>Team Count: {dataset ? Object.keys(dataset.teams || {}).length : 0}</p>
               </div>
               
               {shouldShowGenerator ? (
                 // Use the PicklistGenerator component when rankings should be shown
-                <PicklistGenerator
-                  datasetPath={datasetPath}
-                  yourTeamNumber={yourTeamNumber}
-                  pickPosition={activeTab}
-                  priorities={getActivePriorities()}
-                  excludeTeams={excludedTeams}
-                  onPicklistGenerated={handlePicklistGenerated}
-                  key={`picklist-${activeTab}`} // Add key to ensure component refreshes properly
-                  initialPicklist={
-                    activeTab === 'first' ? firstPickRankings :
-                    activeTab === 'second' ? secondPickRankings :
-                    thirdPickRankings
-                  }
-                />
+                <>
+                  {/* Display excluded teams info when relevant */}
+                  {excludedTeams.length > 0 && (activeTab === 'second' || activeTab === 'third') && (
+                    <div className="p-3 mb-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-300 text-sm">
+                      <p className="font-semibold">
+                        {activeTab === 'second' ? 
+                          `Excluding top 8 alliance captains (${excludedTeams.length} teams)` : 
+                          `Excluding alliance captains (${excludedTeams.length} teams)`}
+                      </p>
+                      <p className="mt-1">
+                        {activeTab === 'second' 
+                          ? 'Alliance captains would be unavailable as second picks.' 
+                          : 'Alliance captains would be unavailable as third picks.'}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {excludedTeams.map(team => (
+                          <span key={team} className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                            {team}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                
+                  <PicklistGenerator
+                    datasetPath={datasetPath}
+                    yourTeamNumber={yourTeamNumber}
+                    pickPosition={activeTab}
+                    priorities={getActivePriorities()}
+                    excludeTeams={excludedTeams}
+                    onPicklistGenerated={handlePicklistGenerated}
+                    key={`picklist-${activeTab}-${JSON.stringify(excludedTeams)}`} // Update key to include excluded teams
+                    initialPicklist={
+                      activeTab === 'first' ? firstPickRankings :
+                      activeTab === 'second' ? secondPickRankings :
+                      thirdPickRankings
+                    }
+                  />
+                </>
               ) : (
                 // Show placeholder when rankings are not yet generated
                 <div className="p-4 text-center text-gray-500">

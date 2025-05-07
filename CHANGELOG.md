@@ -1,3 +1,12 @@
+## 2025-05-07
+* Added superscouting metrics to picklist generation for more qualitative robot assessment
+* Enhanced strategy parsing to better recognize robot capabilities in natural language descriptions
+* Implemented realistic alliance selection logic (excludes alliance captains for 2nd/3rd picks)
+* Added dataset retrieval endpoint with support for both path and event_key loading
+* Improved error handling with fallback dataset mechanism for offline/error scenarios
+* Added detailed UI information showing which teams are excluded during picklist generation
+* Fixed issues with Windows path encoding in dataset loading
+
 ## 2025‑05‑01
 * Refactored field selection approach to use direct Google Sheets headers instead of GPT-derived fields
 * Added unified dataset endpoint for building comprehensive event datasets

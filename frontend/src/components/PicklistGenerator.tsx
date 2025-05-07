@@ -56,6 +56,17 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   useEffect(() => {
+    // Log when dependencies change
+    console.log("PicklistGenerator dependencies changed:", { 
+      pickPosition, 
+      prioritiesCount: priorities.length,
+      excludeTeamsCount: excludeTeams?.length
+    });
+    
+    if (excludeTeams && excludeTeams.length > 0) {
+      console.log("Teams to exclude:", excludeTeams);
+    }
+    
     // If we have an initial picklist, use it
     if (initialPicklist && initialPicklist.length > 0) {
       setPicklist(initialPicklist);
@@ -86,12 +97,16 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       }
       
       // Create a request object with all primitive values
+      // Ensure excludeTeams is always an array and log it
+      const teamsToExclude = excludeTeams || [];
+      console.log(`Excluding ${teamsToExclude.length} teams for ${pickPosition} pick:`, teamsToExclude);
+      
       const requestBody = JSON.stringify({
         unified_dataset_path: datasetPath,
         your_team_number: yourTeamNumber,
         pick_position: pickPosition,
         priorities: simplePriorities,
-        exclude_teams: excludeTeams || []
+        exclude_teams: teamsToExclude
       });
       
       console.log('Sending request:', requestBody);

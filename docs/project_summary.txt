@@ -13,8 +13,8 @@ Build a **local FastAPI + React scouting assistant** that cleans data, generates
 | **Data Cleanup** | End-of-day verifier. 1) **Missing-Match Check**. 2) **Anomaly Detector** (±2 σ). Flags create To-Do list. |
 | **Virtual Scout** | UI to fill gaps: average data, manual entry, or GPT-assisted estimate. |
 | **Pick-List Strategy** | User writes bullet goals for 1st / 2nd (/ 3rd) picks, blacklist teams. GPT can auto-suggest strategy based on stats. |
-| **Pick-List Generator** | Combines Scouting Tab, SuperScouting Tab, strategy bullets → outputs ranked pick lists (CSV offline copy) with one-sentence GPT rationales. |
-| **Live Draft Board** | Real-time alliance selection input; filters remaining teams; GPT offers updated recommendation when net is online. |
+| **Pick-List Generator** | Combines Scouting Tab, SuperScouting Tab, strategy bullets → outputs ranked pick lists with detailed GPT rationales. Includes qualitative superscouting metrics and handles both structured and natural language strategy descriptions. |
+| **Alliance Selection** | Realistic exclusion of alliance captains for 2nd/3rd picks; real-time draft board that filters remaining teams; GPT offers contextual recommendations. |
 | **Live Strat View** (v2) | For each upcoming match, show strengths/weaknesses + GPT Q&A box. |
 
 ---
@@ -58,4 +58,4 @@ Build a **local FastAPI + React scouting assistant** that cleans data, generates
 
 ---
 
-*(Last updated 2025-04-25)*  
+*(Last updated 2025-05-07)*  
