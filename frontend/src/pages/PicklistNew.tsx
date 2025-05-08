@@ -42,7 +42,15 @@ const PicklistNew: React.FC = () => {
   // State for dataset path and data
   const [datasetPath, setDatasetPath] = useState<string>('');
   const [dataset, setDataset] = useState<any>(null);
-  const [yourTeamNumber, setYourTeamNumber] = useState<number>(0);
+  const [yourTeamNumber, setYourTeamNumber] = useState<number>(() => {
+    const saved = localStorage.getItem('yourTeamNumber');
+    return saved ? parseInt(saved) : 0;
+  });
+  
+  // Save team number whenever it changes
+  useEffect(() => {
+    localStorage.setItem('yourTeamNumber', yourTeamNumber.toString());
+  }, [yourTeamNumber]);
   
   // State for metrics and priorities
   const [universalMetrics, setUniversalMetrics] = useState<Metric[]>([]);
@@ -51,33 +59,109 @@ const PicklistNew: React.FC = () => {
   const [superscoutMetrics, setSuperscoutMetrics] = useState<Metric[]>([]);
   const [metricsStats, setMetricsStats] = useState<Record<string, any>>({});
   
-  // State for selected priorities for each pick type
-  const [firstPickPriorities, setFirstPickPriorities] = useState<MetricWeight[]>([]);
-  const [secondPickPriorities, setSecondPickPriorities] = useState<MetricWeight[]>([]);
-  const [thirdPickPriorities, setThirdPickPriorities] = useState<MetricWeight[]>([]);
+  // State for selected priorities for each pick type - with localStorage persistence
+  const [firstPickPriorities, setFirstPickPriorities] = useState<MetricWeight[]>(() => {
+    const saved = localStorage.getItem('firstPickPriorities');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [secondPickPriorities, setSecondPickPriorities] = useState<MetricWeight[]>(() => {
+    const saved = localStorage.getItem('secondPickPriorities');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [thirdPickPriorities, setThirdPickPriorities] = useState<MetricWeight[]>(() => {
+    const saved = localStorage.getItem('thirdPickPriorities');
+    return saved ? JSON.parse(saved) : [];
+  });
   
   // State for natural language prompt
   const [strategyPrompt, setStrategyPrompt] = useState<string>('');
   const [parsedPriorities, setParsedPriorities] = useState<ParsedStrategy | null>(null);
   const [isParsingStrategy, setIsParsingStrategy] = useState<boolean>(false);
   
-  // State for team rankings - separate for each pick position
-  const [firstPickRankings, setFirstPickRankings] = useState<Team[]>([]);
-  const [secondPickRankings, setSecondPickRankings] = useState<Team[]>([]);
-  const [thirdPickRankings, setThirdPickRankings] = useState<Team[]>([]);
+  // State for team rankings - separate for each pick position - with localStorage persistence
+  const [firstPickRankings, setFirstPickRankings] = useState<Team[]>(() => {
+    const saved = localStorage.getItem('firstPickRankings');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [secondPickRankings, setSecondPickRankings] = useState<Team[]>(() => {
+    const saved = localStorage.getItem('secondPickRankings');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [thirdPickRankings, setThirdPickRankings] = useState<Team[]>(() => {
+    const saved = localStorage.getItem('thirdPickRankings');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isGeneratingRankings, setIsGeneratingRankings] = useState<boolean>(false);
-  const [shouldShowGenerator, setShouldShowGenerator] = useState<boolean>(false);
+  // Initialize shouldShowGenerator based on whether rankings exist for the current tab
+  const [shouldShowGenerator, setShouldShowGenerator] = useState<boolean>(() => {
+    // Check localStorage for existing rankings
+    const activeTab = localStorage.getItem('activePicklistTab') as 'first' | 'second' | 'third' || 'first';
+    const firstPickData = localStorage.getItem('firstPickRankings');
+    const secondPickData = localStorage.getItem('secondPickRankings');
+    const thirdPickData = localStorage.getItem('thirdPickRankings');
+    
+    // Return true if the current tab has saved rankings
+    if (activeTab === 'first' && firstPickData && JSON.parse(firstPickData).length > 0) return true;
+    if (activeTab === 'second' && secondPickData && JSON.parse(secondPickData).length > 0) return true;
+    if (activeTab === 'third' && thirdPickData && JSON.parse(thirdPickData).length > 0) return true;
+    
+    return false;
+  });
   
-  // State for active tab
-  const [activeTab, setActiveTab] = useState<'first' | 'second' | 'third'>('first');
+  // State for active tab - with localStorage persistence
+  const [activeTab, setActiveTab] = useState<'first' | 'second' | 'third'>(() => {
+    const saved = localStorage.getItem('activePicklistTab');
+    return (saved as 'first' | 'second' | 'third') || 'first';
+  });
+  
+  // Save active tab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('activePicklistTab', activeTab);
+  }, [activeTab]);
+  
+  // Save priorities to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('firstPickPriorities', JSON.stringify(firstPickPriorities));
+  }, [firstPickPriorities]);
+  
+  useEffect(() => {
+    localStorage.setItem('secondPickPriorities', JSON.stringify(secondPickPriorities));
+  }, [secondPickPriorities]);
+  
+  useEffect(() => {
+    localStorage.setItem('thirdPickPriorities', JSON.stringify(thirdPickPriorities));
+  }, [thirdPickPriorities]);
+  
+  // Save team rankings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('firstPickRankings', JSON.stringify(firstPickRankings));
+  }, [firstPickRankings]);
+  
+  useEffect(() => {
+    localStorage.setItem('secondPickRankings', JSON.stringify(secondPickRankings));
+  }, [secondPickRankings]);
+  
+  useEffect(() => {
+    localStorage.setItem('thirdPickRankings', JSON.stringify(thirdPickRankings));
+  }, [thirdPickRankings]);
   
   // State for loading, error, success
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
+  // State for confirmation popup
+  const [showConfirmClear, setShowConfirmClear] = useState<boolean>(false);
+  
   // State for tracking excluded teams
   const [excludedTeams, setExcludedTeams] = useState<number[]>([]);
+  // State for tracking manually excluded teams - persist in localStorage
+  const [manuallyExcludedTeams, setManuallyExcludedTeams] = useState<number[]>(() => {
+    const savedExclusions = localStorage.getItem('manuallyExcludedTeams');
+    return savedExclusions ? JSON.parse(savedExclusions) : [];
+  });
+  // State for team to be excluded
+  const [teamToExclude, setTeamToExclude] = useState<number | ''>('');
 
   // Fetch dataset path and load dataset on load
   useEffect(() => {
@@ -410,16 +494,93 @@ const PicklistNew: React.FC = () => {
     };
   };
 
+  // Handle excluding a team manually
+  const handleExcludeTeam = (teamNumber: number) => {
+    if (!teamNumber) {
+      setError('Please enter a valid team number to exclude');
+      return;
+    }
+
+    // Check if team is already manually excluded
+    if (manuallyExcludedTeams.includes(teamNumber)) {
+      setError(`Team ${teamNumber} is already excluded`);
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
+    // Add to manually excluded teams
+    const updatedManuallyExcluded = [...manuallyExcludedTeams, teamNumber];
+    setManuallyExcludedTeams(updatedManuallyExcluded);
+    
+    // Save to localStorage
+    localStorage.setItem('manuallyExcludedTeams', JSON.stringify(updatedManuallyExcluded));
+    
+    // Update the excluded teams list to include this newly excluded team
+    updateExcludedTeams(updatedManuallyExcluded);
+    
+    // Show success message
+    setSuccessMessage(`Team ${teamNumber} excluded from all picklists`);
+    setTimeout(() => setSuccessMessage(null), 3000);
+    
+    // Clear the input field
+    setTeamToExclude('');
+    
+    // Regenerate rankings with updated exclusions if we're showing the generator
+    if (shouldShowGenerator) {
+      setShouldShowGenerator(false);
+      setTimeout(() => setShouldShowGenerator(true), 100);
+    }
+  };
+  
+  // Handle removing a team from the excluded list
+  const handleRemoveExcludedTeam = (teamNumber: number) => {
+    const updatedManuallyExcluded = manuallyExcludedTeams.filter(t => t !== teamNumber);
+    setManuallyExcludedTeams(updatedManuallyExcluded);
+    
+    // Save to localStorage
+    localStorage.setItem('manuallyExcludedTeams', JSON.stringify(updatedManuallyExcluded));
+    
+    // Update the excluded teams list
+    updateExcludedTeams(updatedManuallyExcluded);
+    
+    // Show success message
+    setSuccessMessage(`Team ${teamNumber} removed from exclusion list`);
+    setTimeout(() => setSuccessMessage(null), 3000);
+    
+    // Regenerate rankings with updated exclusions if we're showing the generator
+    if (shouldShowGenerator) {
+      setShouldShowGenerator(false);
+      setTimeout(() => setShouldShowGenerator(true), 100);
+    }
+  };
+  
+  // Clear all manual exclusions
+  const handleClearAllExclusions = () => {
+    setManuallyExcludedTeams([]);
+    localStorage.removeItem('manuallyExcludedTeams');
+    updateExcludedTeams([]);
+    
+    // Show success message
+    setSuccessMessage('All manual team exclusions cleared');
+    setTimeout(() => setSuccessMessage(null), 3000);
+    
+    // Regenerate rankings with updated exclusions if we're showing the generator
+    if (shouldShowGenerator) {
+      setShouldShowGenerator(false);
+      setTimeout(() => setShouldShowGenerator(true), 100);
+    }
+  };
+
   // Update excluded teams based on pick position
-  const updateExcludedTeams = () => {
-    let excluded: number[] = [];
+  const updateExcludedTeams = (manualExclusions: number[] = manuallyExcludedTeams) => {
+    let autoExcluded: number[] = [];
     
     // Check if dataset is available, otherwise use sample data
     const workingDataset = dataset && dataset.teams ? dataset : createSampleDataset();
     
     if (!workingDataset || !workingDataset.teams) {
       console.error("Dataset not loaded yet and fallback failed, cannot exclude teams");
-      return [];
+      return manualExclusions;
     }
     
     console.log("Dataset teams count:", Object.keys(workingDataset.teams).length);
@@ -450,8 +611,8 @@ const PicklistNew: React.FC = () => {
         if (rankedTeams.length === 0) {
           // Fallback: if no ranking data, exclude some arbitrary top team numbers
           // This is just for testing purposes
-          excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
-          console.log("No ranking data found. Using fallback exclusion list:", excluded);
+          autoExcluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+          console.log("No ranking data found. Using fallback exclusion list:", autoExcluded);
         } else {
           // Sort teams by rank (ascending) and get top 8
           const topTeams = rankedTeams
@@ -459,14 +620,14 @@ const PicklistNew: React.FC = () => {
             .slice(0, 8)
             .map(team => team.teamNumber);
           
-          excluded = topTeams;
-          console.log("Excluding top 8 teams for second pick:", excluded);
+          autoExcluded = topTeams;
+          console.log("Excluding top 8 teams for second pick:", autoExcluded);
         }
       } catch (error) {
         console.error("Error getting top 8 teams:", error);
         // Fallback for testing
-        excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
-        console.log("Error occurred. Using fallback exclusion list:", excluded);
+        autoExcluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+        console.log("Error occurred. Using fallback exclusion list:", autoExcluded);
       }
     }
     
@@ -487,8 +648,8 @@ const PicklistNew: React.FC = () => {
         if (rankedTeams.length === 0) {
           // Fallback: if no ranking data, exclude some arbitrary top team numbers
           // This is just for testing purposes - just the alliance captains
-          excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
-          console.log("No ranking data found. Using fallback exclusion list for third pick:", excluded);
+          autoExcluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+          console.log("No ranking data found. Using fallback exclusion list for third pick:", autoExcluded);
         } else {
           // Sort teams by rank (ascending) and get top 8 (alliance captains)
           const topTeams = rankedTeams
@@ -496,21 +657,23 @@ const PicklistNew: React.FC = () => {
             .slice(0, 8)
             .map(team => team.teamNumber);
           
-          excluded = topTeams;
-          console.log("Excluding top 8 alliance captains for third pick:", excluded);
+          autoExcluded = topTeams;
+          console.log("Excluding top 8 alliance captains for third pick:", autoExcluded);
         }
       } catch (error) {
         console.error("Error getting top 8 teams for third pick:", error);
         // Fallback for testing - just the alliance captains
-        excluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
-        console.log("Error occurred. Using fallback exclusion list for third pick:", excluded);
+        autoExcluded = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254];
+        console.log("Error occurred. Using fallback exclusion list for third pick:", autoExcluded);
       }
     }
     
-    console.log("Final excluded teams:", excluded);
-    setExcludedTeams(excluded);
+    // Combine automatic exclusions with manual exclusions, removing duplicates
+    const combined = [...new Set([...autoExcluded, ...manualExclusions])];
+    console.log("Final excluded teams:", combined);
+    setExcludedTeams(combined);
     
-    return excluded; // Return the excluded teams
+    return combined; // Return the excluded teams
   };
 
   // Handle picklist generation result
@@ -519,10 +682,13 @@ const PicklistNew: React.FC = () => {
       // Store rankings in the appropriate state based on active tab
       if (activeTab === 'first') {
         setFirstPickRankings(result.picklist);
+        // State update will trigger useEffect to save to localStorage
       } else if (activeTab === 'second') {
         setSecondPickRankings(result.picklist);
+        // State update will trigger useEffect to save to localStorage
       } else if (activeTab === 'third') {
         setThirdPickRankings(result.picklist);
+        // State update will trigger useEffect to save to localStorage
       }
       
       setSuccessMessage('Team rankings generated successfully');
@@ -544,6 +710,53 @@ const PicklistNew: React.FC = () => {
     if (activeTab === 'first') return firstPickPriorities;
     if (activeTab === 'second') return secondPickPriorities;
     return thirdPickPriorities;
+  };
+  
+  // Show confirmation dialog before clearing data
+  const handleClearDataClick = () => {
+    setShowConfirmClear(true);
+  };
+  
+  // Function to clear all saved data after confirmation
+  const handleClearAllData = () => {
+    // Hide the confirmation dialog
+    setShowConfirmClear(false);
+    
+    // Clear picklist rankings
+    setFirstPickRankings([]);
+    setSecondPickRankings([]);
+    setThirdPickRankings([]);
+    
+    // Clear priorities
+    setFirstPickPriorities([]);
+    setSecondPickPriorities([]);
+    setThirdPickPriorities([]);
+    
+    // Clear manually excluded teams
+    setManuallyExcludedTeams([]);
+    
+    // Update localStorage directly for any other saved items
+    localStorage.removeItem('firstPickRankings');
+    localStorage.removeItem('secondPickRankings');
+    localStorage.removeItem('thirdPickRankings');
+    localStorage.removeItem('firstPickPriorities');
+    localStorage.removeItem('secondPickPriorities');
+    localStorage.removeItem('thirdPickPriorities');
+    localStorage.removeItem('manuallyExcludedTeams');
+    
+    // We don't clear team number as that's a user preference
+    
+    // Reset UI state
+    setShouldShowGenerator(false);
+    
+    // Show success message
+    setSuccessMessage('All picklist data has been cleared');
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+  
+  // Cancel the clear operation
+  const handleCancelClear = () => {
+    setShowConfirmClear(false);
   };
 
   const handleTabChange = (tab: 'first' | 'second' | 'third') => {
@@ -583,7 +796,62 @@ const PicklistNew: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Picklist Builder</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Picklist Builder</h1>
+        <button
+          onClick={handleClearDataClick}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center"
+          title="Clear all saved picklist data"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Clear All Data
+        </button>
+      </div>
+      
+      {/* Confirmation Dialog for Clearing Data */}
+      {showConfirmClear && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center text-red-600 mb-4">
+              <svg className="w-6 h-6 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+              <h3 className="text-xl font-bold">Confirm Delete</h3>
+            </div>
+            
+            <p className="mb-4">
+              This will delete <strong>all</strong> of your picklist data including:
+            </p>
+            
+            <ul className="list-disc pl-5 mb-4 text-gray-700">
+              <li>All saved team rankings for all pick positions</li>
+              <li>All selected priority metrics</li>
+              <li>All manually excluded teams</li>
+            </ul>
+            
+            <p className="mb-6 text-gray-700">
+              You will need to regenerate all picklists. This action cannot be undone.
+            </p>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCancelClear}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearAllData}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Delete All Data
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {error && (
         <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
@@ -907,8 +1175,87 @@ const PicklistNew: React.FC = () => {
                 )}
               </div>
               
-              {/* Always show excluded teams information to debug */}
-              <div className="p-3 mb-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-300 text-sm">
+              {/* Team Exclusion UI */}
+              <div className="p-3 mb-4 bg-white rounded-lg border border-gray-300">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-semibold text-gray-800">Exclude Teams</h3>
+                  {manuallyExcludedTeams.length > 0 && (
+                    <button
+                      onClick={handleClearAllExclusions}
+                      className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
+                      title="Clear all manual exclusions"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+                
+                {/* Manual team exclusion form */}
+                <div className="flex mb-4">
+                  <input
+                    type="number"
+                    placeholder="Enter team number to exclude"
+                    className="flex-1 p-2 border rounded-l"
+                    value={teamToExclude}
+                    onChange={(e) => setTeamToExclude(e.target.value === '' ? '' : parseInt(e.target.value))}
+                    min="1"
+                  />
+                  <button
+                    onClick={() => typeof teamToExclude === 'number' && handleExcludeTeam(teamToExclude)}
+                    disabled={teamToExclude === '' || teamToExclude <= 0}
+                    className="px-4 py-2 bg-red-600 text-white rounded-r hover:bg-red-700 disabled:bg-red-300"
+                  >
+                    Exclude
+                  </button>
+                </div>
+                
+                {/* Manually excluded teams list */}
+                {manuallyExcludedTeams.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium mb-2">Manually Excluded Teams:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {manuallyExcludedTeams.map((teamNumber) => (
+                        <div key={teamNumber} className="px-2 py-1 bg-red-100 text-red-800 rounded-lg flex items-center text-sm">
+                          <span>Team {teamNumber}</span>
+                          <button
+                            onClick={() => handleRemoveExcludedTeam(teamNumber)}
+                            className="ml-2 text-red-600 hover:text-red-800"
+                            title="Remove from exclusion list"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Automatically excluded teams info */}
+                {excludedTeams.length > manuallyExcludedTeams.length && (
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Automatically Excluded Teams:</h4>
+                    <div className="text-sm text-gray-600">
+                      {activeTab === 'second' 
+                        ? "Top 8 teams are automatically excluded (assumed to be alliance captains)" 
+                        : activeTab === 'third'
+                          ? "Alliance captains are automatically excluded" 
+                          : "No teams are automatically excluded for first pick"}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {excludedTeams
+                        .filter(teamNumber => !manuallyExcludedTeams.includes(teamNumber))
+                        .map((teamNumber) => (
+                          <div key={teamNumber} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm">
+                            Team {teamNumber}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Debug information, hidden by default */}
+              <div className="p-3 mb-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-300 text-sm" style={{display: 'none'}}>
                 <p className="font-semibold">Debug Information:</p>
                 <p>Current Tab: {activeTab}</p>
                 <p>Excluded Teams Count: {excludedTeams.length}</p>
@@ -951,6 +1298,7 @@ const PicklistNew: React.FC = () => {
                     priorities={getActivePriorities()}
                     excludeTeams={excludedTeams}
                     onPicklistGenerated={handlePicklistGenerated}
+                    onExcludeTeam={handleExcludeTeam}
                     key={`picklist-${activeTab}-${JSON.stringify(excludedTeams)}`} // Update key to include excluded teams
                     initialPicklist={
                       activeTab === 'first' ? firstPickRankings :

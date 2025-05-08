@@ -28,7 +28,9 @@ backend/
 │   │   ├── validate.py        # Validation API
 │   │   ├── unified_dataset.py # Dataset builder
 │   │   ├── schema_selections.py  # Field selections API
-│   │   ├── picklist.py        # Picklist generator
+│   │   ├── picklist_generator.py # Picklist generator
+│   │   ├── picklist_analysis.py  # Picklist metrics analysis
+│   │   ├── debug_logs.py      # Debug logs API
 │   │   └── sheets.py          # Google Sheets integration
 │   ├── services/
 │   │   ├── statbotics_client.py
@@ -36,8 +38,12 @@ backend/
 │   │   ├── learning_setup_service.py
 │   │   ├── data_validation_service.py
 │   │   ├── unified_event_data_service.py
-│   │   ├── picklist_service.py
+│   │   ├── picklist_generator_service.py   # Full picklist generation with GPT chunking
+│   │   ├── picklist_analysis_service.py    # Metrics analysis service
 │   │   ├── sheets_service.py
+│   │   ├── schema_service.py
+│   │   ├── schema_superscout_service.py
+│   │   ├── schema_loader.py
 │   │   └── manual_parser_service.py
 │   ├── config/
 │   │   ├── statbotics_field_map_2025.json
@@ -52,9 +58,14 @@ frontend/
 │   │   ├── Setup.tsx
 │   │   ├── FieldSelection.tsx
 │   │   ├── Workflow.tsx
-│   │   └── Validation.tsx
+│   │   ├── Validation.tsx
+│   │   ├── PicklistNew.tsx       # Picklist generation page
+│   │   ├── UnifiedDatasetBuilder.tsx # Dataset building UI
+│   │   └── DebugLogs.tsx         # Debug logs viewer
 │   ├── components/
-│   │   └── Navbar.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── PicklistGenerator.tsx    # Picklist generation component with pagination
+│   │   └── ProgressTracker.tsx      # Progress tracking component
 │   └── App.tsx
 └── vite.config.ts
 ```
@@ -73,6 +84,7 @@ frontend/
 | `/api/validate/apply-correction` | POST JSON | `{ team_number, match_number, corrections }` | Correction status |
 | `/api/picklist/analyze` | POST JSON | `{ unified_dataset_path, [priorities], [strategy_prompt] }` | Available metrics, statistical analysis, team rankings |
 | `/api/picklist/generate` | POST JSON | `{ unified_dataset_path, your_team_number, pick_position, priorities, exclude_teams }` | Ranked picklist with reasoning |
+| `/api/debug/logs/picklist` | GET | `lines (optional)` | Recent picklist generation logs for debugging |
 
 ## Setup and Installation
 
@@ -115,8 +127,16 @@ frontend/
 * OAuth / token management UI for Sheets, TBA, Statbotics, OpenAI
 
 ## Recent Improvements
-* Added superscouting metrics to picklist generation and analysis
-* Implemented realistic alliance selection logic (excludes alliance captains for 2nd/3rd picks)
-* Enhanced error handling with fallback mechanisms for dataset loading
-* Improved strategy parsing to better interpret natural language descriptions
-* Added detailed debugging and status information for developers
+* **Complete Picklist Approach**: Switched from chunking to one-shot generation to avoid duplication and ensure complete coverage
+* **Enhanced Missing Teams Handling**: Added two-phase ranking with auto-fallback for teams missed by GPT
+* **Smart Handling of Auto-Added Teams**: UI now offers option to get more accurate rankings for auto-added teams
+* **Improved Error Recovery**: Enhanced JSON parsing with robust fallback mechanisms for handling truncated responses
+* **User Experience Enhancements**: Progress tracking with estimated completion time and percentage
+* **Visual Indicators**: Clear badges and explanations for auto-added teams
+* **Performance Optimization**: Optimized tokens (3500 for output) and reduced data size to fit complete picklists
+* **Local Data Persistence**: Added localStorage-based persistence for picklist data, preventing data loss when navigating between pages
+* **Debug Logging System**: Created comprehensive logging for picklist generation with a dedicated debug UI
+* **Pagination Controls**: Added pagination to the picklist view with configurable items per page
+* **Clear Data Confirmation**: Implemented confirmation dialog when clearing saved picklist data
+* **Superscouting Integration**: Added superscouting metrics to picklist generation and analysis
+* **Team Exclusion Logic**: Implemented realistic alliance selection logic (excludes alliance captains for 2nd/3rd picks)

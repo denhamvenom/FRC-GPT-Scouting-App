@@ -98,6 +98,17 @@ function Navbar() {
               >
                 Picklist
               </Link>
+              
+              <Link
+                to="/debug/logs"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive("/debug/logs") 
+                    ? "bg-blue-900 text-white" 
+                    : "text-gray-200 hover:bg-blue-700"
+                }`}
+              >
+                Debug Logs
+              </Link>
             </div>
           </div>
         </div>

@@ -21,10 +21,27 @@ interface PicklistAnalysis {
   final_recommendations: string;
 }
 
+interface Performance {
+  total_time: number;
+  team_count: number;
+  avg_time_per_team: number;
+  missing_teams: number;
+  duplicate_teams: number;
+}
+
 interface PicklistResult {
   status: string;
   picklist: Team[];
   analysis: PicklistAnalysis;
+  missing_team_numbers?: number[];
+  performance?: Performance;
+  message?: string;
+}
+
+interface MissingTeamsResult {
+  status: string;
+  missing_team_rankings: Team[];
+  performance?: Performance;
   message?: string;
 }
 
@@ -36,7 +53,100 @@ interface PicklistGeneratorProps {
   excludeTeams?: number[];
   onPicklistGenerated?: (result: PicklistResult) => void;
   initialPicklist?: Team[]; // Add prop for initial picklist data
+  onExcludeTeam?: (teamNumber: number) => void; // Callback for excluding a team
 }
+
+// Progress indicator component
+const ProgressIndicator: React.FC<{ estimatedTime: number; teamCount: number }> = ({ estimatedTime, teamCount }) => {
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const [progress, setProgress] = useState<number>(0);
+  
+  // Set up timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedTime(prev => {
+        const newTime = prev + 0.1;
+        // Update progress
+        setProgress(Math.min((newTime / estimatedTime) * 100, 99));
+        return newTime;
+      });
+    }, 100); // Update every 100ms
+    
+    return () => clearInterval(timer);
+  }, [estimatedTime]);
+  
+  return (
+    <div className="flex flex-col items-center w-full max-w-lg mx-auto my-8 px-4">
+      <div className="text-center mb-4 space-y-2">
+        <h3 className="text-xl font-semibold text-blue-600">
+          Generating Picklist for {teamCount} Teams
+        </h3>
+        <p className="text-gray-600">
+          Estimated time: ~{Math.round(estimatedTime)} seconds
+        </p>
+        <p className="text-gray-600">
+          Time elapsed: {elapsedTime.toFixed(1)} seconds
+        </p>
+      </div>
+      
+      <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+        <div 
+          className="bg-blue-600 h-4 rounded-full transition-all duration-100 ease-out"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
+      
+      <p className="text-sm text-gray-500">
+        {progress < 30 ? 'Starting...' : 
+         progress < 60 ? 'Processing team data...' : 
+         progress < 90 ? 'Generating rankings...' : 
+         'Finalizing picklist...'}
+      </p>
+    </div>
+  );
+};
+
+// Modal for Missing Teams
+const MissingTeamsModal: React.FC<{
+  missingTeamCount: number;
+  onRankMissingTeams: () => void;
+  onSkip: () => void;
+  isLoading: boolean;
+}> = ({ missingTeamCount, onRankMissingTeams, onSkip, isLoading }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+        <h3 className="text-xl font-bold mb-4">Auto-Added Teams Detected</h3>
+        <p className="mb-6">
+          {missingTeamCount} teams have been automatically added with estimated scores. Would you like to get more accurate rankings for these teams?
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onSkip}
+            disabled={isLoading}
+            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 disabled:opacity-50"
+          >
+            Skip
+          </button>
+          <button
+            onClick={onRankMissingTeams}
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                Ranking...
+              </>
+            ) : (
+              'Get Accurate Rankings'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   datasetPath,
@@ -45,15 +155,27 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   priorities,
   excludeTeams = [],
   onPicklistGenerated,
-  initialPicklist = []
+  initialPicklist = [],
+  onExcludeTeam
 }) => {
   const [picklist, setPicklist] = useState<Team[]>(initialPicklist);
   const [analysis, setAnalysis] = useState<PicklistAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [estimatedTime, setEstimatedTime] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [showAnalysis, setShowAnalysis] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  // Missing teams state
+  const [missingTeamNumbers, setMissingTeamNumbers] = useState<number[]>([]);
+  const [showMissingTeamsModal, setShowMissingTeamsModal] = useState<boolean>(false);
+  const [isRankingMissingTeams, setIsRankingMissingTeams] = useState<boolean>(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [teamsPerPage, setTeamsPerPage] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
   
   useEffect(() => {
     // Log when dependencies change
@@ -70,11 +192,46 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     // If we have an initial picklist, use it
     if (initialPicklist && initialPicklist.length > 0) {
       setPicklist(initialPicklist);
+      // Calculate total pages
+      setTotalPages(Math.ceil(initialPicklist.length / teamsPerPage));
     } else {
       // Otherwise generate a new picklist
+      // Only generate if we have the required data
+      if (datasetPath && yourTeamNumber && priorities.length > 0) {
+        generatePicklist();
+      }
+    }
+    
+    // Reset to page 1 when dependencies change
+    setCurrentPage(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [datasetPath, yourTeamNumber, pickPosition]); 
+  
+  // Add a separate effect to handle deep changes to priorities and excludeTeams
+  useEffect(() => {
+    // This effect will only run when priorities or excludeTeams change in a way that affects the actual data
+    // This prevents the problem of JSON.stringify creating a new string on every render
+    console.log("Priorities or exclusions changed significantly");
+    
+    // Only generate if we have an existing picklist (meaning we're updating)
+    // and we have the required data
+    if (picklist.length > 0 && datasetPath && yourTeamNumber && priorities.length > 0) {
       generatePicklist();
     }
-  }, [datasetPath, yourTeamNumber, pickPosition, JSON.stringify(priorities), JSON.stringify(excludeTeams)]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    // Use the length as a proxy for deep changes
+    priorities.length, 
+    excludeTeams?.length,
+    // We need datasetPath and yourTeamNumber for the check inside
+    datasetPath,
+    yourTeamNumber
+  ]);
+  
+  // Update totalPages when teamsPerPage changes
+  useEffect(() => {
+    setTotalPages(Math.ceil(picklist.length / teamsPerPage));
+  }, [picklist.length, teamsPerPage]);
   
   const generatePicklist = async () => {
     if (!datasetPath || !yourTeamNumber || !priorities.length) {
@@ -84,6 +241,11 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     
     setIsLoading(true);
     setError(null);
+    
+    // Calculate estimated time - approximate from team count
+    const teamsToRank = excludeTeams ? 75 - excludeTeams.length : 75;
+    const estimatedSeconds = teamsToRank * 0.9; // ~0.9 seconds per team
+    setEstimatedTime(estimatedSeconds);
     
     try {
       // Send the priorities as plain JSON objects without any methods or class structures
@@ -128,6 +290,27 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         setPicklist(data.picklist);
         setAnalysis(data.analysis);
         
+        // Reset estimated time
+        setEstimatedTime(0);
+        setTotalPages(Math.ceil(data.picklist.length / teamsPerPage));
+        setCurrentPage(1); // Reset to first page
+        
+        // Check for missing teams
+        if (data.missing_team_numbers && data.missing_team_numbers.length > 0) {
+          // Count how many teams are actually auto-added fallbacks in the picklist
+          const autoAddedTeamsCount = data.picklist.filter(team => team.is_fallback).length;
+          
+          if (autoAddedTeamsCount > 0) {
+            setMissingTeamNumbers(data.missing_team_numbers);
+            setShowMissingTeamsModal(true);
+          } else {
+            // If no auto-added teams in the picklist, don't show the modal
+            setMissingTeamNumbers([]);
+          }
+        } else {
+          setMissingTeamNumbers([]);
+        }
+        
         // Call the callback if provided
         if (onPicklistGenerated) {
           onPicklistGenerated(data);
@@ -151,6 +334,11 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     
     setIsLoading(true);
     setError(null);
+    
+    // Calculate estimated time - approximate from team count
+    const teamsToRank = excludeTeams ? 75 - excludeTeams.length : 75;
+    const estimatedSeconds = teamsToRank * 0.9; // ~0.9 seconds per team
+    setEstimatedTime(estimatedSeconds);
     
     try {
       // Convert picklist to user rankings format
@@ -191,6 +379,99 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     }
   };
   
+  // Function to rank missing teams
+  const rankMissingTeams = async () => {
+    if (!datasetPath || !missingTeamNumbers.length) {
+      setError('No missing teams to rank');
+      return;
+    }
+    
+    setIsRankingMissingTeams(true);
+    setError(null);
+    
+    try {
+      // Convert priorities to the format expected by the backend
+      const simplePriorities = [];
+      for (const priority of priorities) {
+        simplePriorities.push({
+          id: priority.id,
+          weight: priority.weight,
+          reason: priority.reason || null
+        });
+      }
+      
+      // Make the API call to rank missing teams
+      const response = await fetch('http://localhost:8000/api/picklist/rank-missing-teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unified_dataset_path: datasetPath,
+          missing_team_numbers: missingTeamNumbers,
+          ranked_teams: picklist,
+          your_team_number: yourTeamNumber,
+          pick_position: pickPosition,
+          priorities: simplePriorities
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to rank missing teams');
+      }
+      
+      const data: MissingTeamsResult = await response.json();
+      
+      if (data.status === 'success' && data.missing_team_rankings) {
+        // Filter out any fallback teams that were re-ranked
+        const rerankedTeamNumbers = data.missing_team_rankings.map(team => team.team_number);
+        const filteredPicklist = picklist.filter(team => 
+          !team.is_fallback || !rerankedTeamNumbers.includes(team.team_number)
+        );
+        
+        // Merge properly ranked missing teams with filtered picklist
+        const updatedPicklist = [...filteredPicklist, ...data.missing_team_rankings];
+        
+        // Sort by score (highest to lowest)
+        updatedPicklist.sort((a, b) => b.score - a.score);
+        
+        // Update state
+        setPicklist(updatedPicklist);
+        setTotalPages(Math.ceil(updatedPicklist.length / teamsPerPage));
+        
+        // Show success message
+        setSuccessMessage(`Successfully replaced ${data.missing_team_rankings.length} auto-added teams with proper rankings!`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+        
+        // Call the callback if provided
+        if (onPicklistGenerated) {
+          onPicklistGenerated({
+            status: 'success',
+            picklist: updatedPicklist,
+            analysis: analysis as PicklistAnalysis
+          });
+        }
+      } else {
+        setError(data.message || 'Error ranking missing teams');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error connecting to server');
+      console.error('Error ranking missing teams:', err);
+    } finally {
+      setIsRankingMissingTeams(false);
+      setShowMissingTeamsModal(false);
+    }
+  };
+  
+  // Handle skipping the missing teams ranking
+  const handleSkipMissingTeams = () => {
+    setShowMissingTeamsModal(false);
+    setMissingTeamNumbers([]);
+    
+    // When skipping, ensure the picklist is properly sorted by score
+    const sortedPicklist = [...picklist].sort((a, b) => b.score - a.score);
+    setPicklist(sortedPicklist);
+  };
+  
   // Handle team position change
   const handlePositionChange = (teamIndex: number, newPosition: number) => {
     // Validate the new position
@@ -215,12 +496,21 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     // Update the picklist
     setPicklist(newPicklist);
     
+    // Recalculate total pages
+    setTotalPages(Math.ceil(newPicklist.length / teamsPerPage));
+    
     // Show feedback that rankings changed
     setSuccessMessage('Team position updated');
     setTimeout(() => setSuccessMessage(null), 2000);
   };
   
   if (isLoading && !picklist.length) {
+    // Show progress indicator if we have an estimated time
+    if (estimatedTime > 0) {
+      return <ProgressIndicator estimatedTime={estimatedTime} teamCount={datasetPath ? 75 : 0} />;
+    }
+    
+    // Fall back to simple spinner if no time estimate
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -231,6 +521,15 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
+      {/* Missing Teams Modal */}
+      {showMissingTeamsModal && (
+        <MissingTeamsModal
+          missingTeamCount={missingTeamNumbers.length}
+          onRankMissingTeams={rankMissingTeams}
+          onSkip={handleSkipMissingTeams}
+          isLoading={isRankingMissingTeams}
+        />
+      )}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">
           {pickPosition.charAt(0).toUpperCase() + pickPosition.slice(1)} Pick Rankings
@@ -313,6 +612,82 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         </div>
       )}
       
+      {/* Pagination Controls */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 py-2 border-b border-t">
+        <div className="mb-2 sm:mb-0">
+          <span className="mr-2">Teams per page:</span>
+          <select
+            value={teamsPerPage}
+            onChange={(e) => {
+              const newTeamsPerPage = parseInt(e.target.value);
+              setTeamsPerPage(newTeamsPerPage);
+              // Adjust current page to keep showing the first team currently visible
+              const firstTeamOnCurrentPage = (currentPage - 1) * teamsPerPage + 1;
+              const newPage = Math.ceil(firstTeamOnCurrentPage / newTeamsPerPage);
+              setCurrentPage(Math.max(1, Math.min(newPage, Math.ceil(picklist.length / newTeamsPerPage))));
+            }}
+            className="border rounded p-1"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        
+        <div className="flex items-center">
+          <button
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className={`px-2 py-1 rounded ${currentPage === 1 ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="First page"
+          >
+            &laquo;
+          </button>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className={`px-3 py-1 rounded ${currentPage === 1 ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="Previous page"
+          >
+            &lsaquo;
+          </button>
+          
+          <span className="mx-2">
+            Page {currentPage} of {totalPages || 1}
+          </span>
+          
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage >= totalPages}
+            className={`px-3 py-1 rounded ${currentPage >= totalPages ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="Next page"
+          >
+            &rsaquo;
+          </button>
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage >= totalPages}
+            className={`px-2 py-1 rounded ${currentPage >= totalPages ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="Last page"
+          >
+            &raquo;
+          </button>
+        </div>
+        
+        <div className="mt-2 sm:mt-0 text-sm text-gray-500">
+          {picklist.length > 0 ? (
+            <span>
+              Showing {Math.min((currentPage - 1) * teamsPerPage + 1, picklist.length)}-
+              {Math.min(currentPage * teamsPerPage, picklist.length)} of {picklist.length} teams
+            </span>
+          ) : (
+            <span>No teams to display</span>
+          )}
+        </div>
+      </div>
+      
       <div className="overflow-hidden">
         {isEditing ? (
           <div className="space-y-3">
@@ -320,48 +695,171 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
               Edit team positions by changing their rank numbers, then click "Save Changes" when done.
             </p>
             
-            {picklist.map((team, index) => (
-              <div 
-                key={team.team_number} 
-                className="p-3 bg-white rounded border border-gray-300 shadow-sm flex items-center hover:bg-blue-50 transition-colors duration-150"
-              >
-                <div className="mr-3 flex items-center">
-                  <input
-                    type="number"
-                    min="1"
-                    max={picklist.length}
-                    value={index + 1}
-                    onChange={(e) => handlePositionChange(index, parseInt(e.target.value) || 1)}
-                    className="w-12 p-1 border border-gray-300 rounded text-center font-bold text-blue-600"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium">Team {team.team_number}: {team.nickname}</div>
-                  <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
-                </div>
-                <div className="text-gray-400 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </div>
-              </div>
-            ))}
+            {/* Get current page of teams */}
+            {picklist
+              .slice((currentPage - 1) * teamsPerPage, currentPage * teamsPerPage)
+              .map((team, pageIndex) => {
+                // Get absolute index in full list
+                const index = (currentPage - 1) * teamsPerPage + pageIndex;
+                
+                return (
+                  <div 
+                    key={team.team_number} 
+                    className="p-3 bg-white rounded border border-gray-300 shadow-sm flex items-center hover:bg-blue-50 transition-colors duration-150"
+                  >
+                    <div className="mr-3 flex items-center">
+                      <input
+                        type="number"
+                        min="1"
+                        max={picklist.length}
+                        value={index + 1}
+                        onChange={(e) => handlePositionChange(index, parseInt(e.target.value) || 1)}
+                        className="w-12 p-1 border border-gray-300 rounded text-center font-bold text-blue-600"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        Team {team.team_number}: {team.nickname}
+                        {team.is_fallback && (
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full" title="This team was automatically added to complete the picklist">
+                            Auto-added
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {onExcludeTeam && (
+                        <button
+                          onClick={() => onExcludeTeam(team.team_number)}
+                          className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                          title="Exclude team from all picklists"
+                        >
+                          Exclude
+                        </button>
+                      )}
+                      <div className="text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         ) : (
           <div className="space-y-2">
-            {picklist.map((team, index) => (
-              <div key={team.team_number} className="p-3 bg-white rounded border flex hover:bg-gray-50">
-                <div className="mr-3 text-lg font-bold text-gray-500">{index + 1}</div>
-                <div>
-                  <div className="font-medium">Team {team.team_number}: {team.nickname}</div>
-                  <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
-                  <div className="text-sm mt-1">{team.reasoning}</div>
-                </div>
-              </div>
-            ))}
+            {/* Get current page of teams */}
+            {picklist
+              .slice((currentPage - 1) * teamsPerPage, currentPage * teamsPerPage)
+              .map((team, pageIndex) => {
+                // Get absolute index in full list
+                const index = (currentPage - 1) * teamsPerPage + pageIndex;
+                
+                return (
+                  <div key={team.team_number} className="p-3 bg-white rounded border flex hover:bg-gray-50">
+                    <div className="mr-3 text-lg font-bold text-gray-500">{index + 1}</div>
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        Team {team.team_number}: {team.nickname}
+                        {team.is_fallback && (
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full" title="This team was automatically added to complete the picklist">
+                            Auto-added
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
+                      <div className={`text-sm mt-1 ${team.is_fallback ? 'italic text-yellow-700' : ''}`}>
+                        {team.reasoning}
+                      </div>
+                      {team.is_fallback && (
+                        <div className="text-xs mt-1 text-red-500">
+                          Note: This team was added automatically because it was missing from the GPT response.
+                        </div>
+                      )}
+                    </div>
+                    {onExcludeTeam && (
+                      <div className="ml-2 flex items-center">
+                        <button
+                          onClick={() => onExcludeTeam(team.team_number)}
+                          className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                          title="Exclude team from all picklists"
+                        >
+                          Exclude
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         )}
       </div>
+      
+      {/* Bottom Pagination for convenience with longer lists */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className={`px-2 py-1 rounded ${currentPage === 1 ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="First page"
+          >
+            &laquo;
+          </button>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className={`px-3 py-1 rounded ${currentPage === 1 ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="Previous page"
+          >
+            &lsaquo;
+          </button>
+          
+          {/* Page number buttons */}
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            // Show pages around current page
+            let pageNum;
+            if (totalPages <= 5) {
+              pageNum = i + 1;
+            } else if (currentPage <= 3) {
+              pageNum = i + 1;
+            } else if (currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + i;
+            } else {
+              pageNum = currentPage - 2 + i;
+            }
+            
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`px-3 py-1 mx-1 rounded ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'}`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage >= totalPages}
+            className={`px-3 py-1 rounded ${currentPage >= totalPages ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="Next page"
+          >
+            &rsaquo;
+          </button>
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage >= totalPages}
+            className={`px-2 py-1 rounded ${currentPage >= totalPages ? 'text-gray-400' : 'text-blue-600 hover:bg-blue-50'}`}
+            title="Last page"
+          >
+            &raquo;
+          </button>
+        </div>
+      )}
     </div>
   );
 };
