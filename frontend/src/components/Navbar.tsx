@@ -100,6 +100,17 @@ function Navbar() {
               </Link>
               
               <Link
+                to="/alliance-selection"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname.startsWith("/alliance-selection") 
+                    ? "bg-blue-900 text-white" 
+                    : "text-gray-200 hover:bg-blue-700"
+                }`}
+              >
+                Alliance Selection
+              </Link>
+              
+              <Link
                 to="/debug/logs"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
                   isActive("/debug/logs") 

@@ -47,10 +47,17 @@ const PicklistView: React.FC = () => {
   // Loading, error states
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isLocking, setIsLocking] = useState<boolean>(false);
+  const [picklists, setPicklists] = useState<any[]>([]);
+  const [hasLockedPicklist, setHasLockedPicklist] = useState<boolean>(false);
+  const [activeAllianceSelection, setActiveAllianceSelection] = useState<number | null>(null);
   
   useEffect(() => {
     // Check for dataset and load metrics
     checkDatasetStatus();
+    // Check for existing locked picklists
+    fetchLockedPicklists();
   }, []);
   
   // Update excluded teams when picklists change
@@ -171,6 +178,112 @@ const PicklistView: React.FC = () => {
     }
   };
   
+  const fetchLockedPicklists = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/alliance/picklists');
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setPicklists(data.picklists || []);
+        
+        // Check if there's a locked picklist for the current event and team
+        const currentPicklist = data.picklists.find((p: any) => 
+          p.team_number === yourTeamNumber && p.event_key === '2025arc'
+        );
+        
+        setHasLockedPicklist(!!currentPicklist);
+        
+        // Check if there's an active alliance selection
+        if (currentPicklist) {
+          // Fetch alliance selections for this picklist
+          const selectionResponse = await fetch(`http://localhost:8000/api/alliance/selection/${currentPicklist.id}`);
+          const selectionData = await selectionResponse.json();
+          
+          if (selectionData.status === 'success' && selectionData.selection) {
+            setActiveAllianceSelection(selectionData.selection.id);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching locked picklists:', err);
+    }
+  };
+  
+  const handleLockPicklist = async () => {
+    // Validate we have first and second picks
+    if (!firstPicklist.length || !secondPicklist.length) {
+      setError('You must generate both first and second pick rankings before locking your picklist.');
+      return;
+    }
+    
+    // Validate team number
+    if (!yourTeamNumber) {
+      setError('You must enter your team number before locking your picklist.');
+      return;
+    }
+    
+    setIsLocking(true);
+    setError(null);
+    
+    try {
+      const requestBody = {
+        team_number: yourTeamNumber,
+        event_key: '2025arc', // Hardcoded for now, could be made dynamic
+        year: 2025,           // Hardcoded for now, could be made dynamic
+        first_pick_data: {
+          teams: firstPicklist,
+          analysis: null,      // Add analysis if available
+          metadata: {
+            priorities: firstPickPriorities
+          }
+        },
+        second_pick_data: {
+          teams: secondPicklist,
+          analysis: null,      // Add analysis if available
+          metadata: {
+            priorities: secondPickPriorities
+          }
+        },
+        third_pick_data: thirdPicklist.length ? {
+          teams: thirdPicklist,
+          analysis: null,      // Add analysis if available
+          metadata: {
+            priorities: thirdPickPriorities
+          }
+        } : null
+      };
+      
+      const response = await fetch('http://localhost:8000/api/alliance/lock-picklist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to lock picklist');
+      }
+      
+      const data = await response.json();
+      
+      // Update state with success message
+      setSuccessMessage('Picklist successfully locked! You can now proceed to the Alliance Selection screen.');
+      setHasLockedPicklist(true);
+      
+      // Refresh the picklists
+      fetchLockedPicklists();
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+      
+    } catch (err: any) {
+      setError(err.message || 'Error locking picklist');
+      console.error('Error locking picklist:', err);
+    } finally {
+      setIsLocking(false);
+    }
+  };
+  
   const handlePicklistGenerated = (position: 'first' | 'second' | 'third', result: any) => {
     if (result.status === 'success') {
       if (position === 'first') {
@@ -214,11 +327,68 @@ const PicklistView: React.FC = () => {
   
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Alliance Selection Picklist</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Alliance Selection Picklist</h1>
+        
+        <div className="flex space-x-4">
+          {/* Show Lock button only if we have first and second picks */}
+          {(firstPicklist.length > 0 && secondPicklist.length > 0) && (
+            <button
+              onClick={handleLockPicklist}
+              disabled={isLocking || hasLockedPicklist}
+              className={`px-4 py-2 rounded font-medium flex items-center ${
+                hasLockedPicklist
+                  ? 'bg-green-600 text-white cursor-default'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {isLocking ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  Locking...
+                </>
+              ) : hasLockedPicklist ? (
+                <>
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  Picklist Locked
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  Lock Picklist
+                </>
+              )}
+            </button>
+          )}
+          
+          {/* Show Alliance Selection button if picklist is locked */}
+          {hasLockedPicklist && (
+            <a
+              href={`/alliance-selection${activeAllianceSelection ? `/${activeAllianceSelection}` : ''}`}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-medium flex items-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+              </svg>
+              Alliance Selection
+            </a>
+          )}
+        </div>
+      </div>
       
       {error && (
         <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
           {error}
+        </div>
+      )}
+      
+      {successMessage && (
+        <div className="p-3 mb-4 bg-green-100 text-green-700 rounded">
+          {successMessage}
         </div>
       )}
       

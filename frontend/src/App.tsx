@@ -11,6 +11,7 @@ import Validation from "./pages/Validation";
 import PicklistNew from "./pages/PicklistNew"; // New component
 import UnifiedDatasetBuilder from "./pages/UnifiedDatasetBuilder"; // New component for dataset building
 import DebugLogs from "./pages/DebugLogs"; // Debug logs viewer
+import AllianceSelection from "./pages/AllianceSelection"; // Alliance selection page
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
             <Route path="/picklist" element={<PicklistNew />} />
             <Route path="/build-dataset" element={<UnifiedDatasetBuilder />} />
             <Route path="/debug/logs" element={<DebugLogs />} />
+            <Route path="/alliance-selection" element={<AllianceSelection />} />
+            <Route path="/alliance-selection/:selectionId" element={<AllianceSelection />} />
           </Routes>
         </main>
       </div>

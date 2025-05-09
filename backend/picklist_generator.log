@@ -10101,3 +10101,1370 @@ YOUR_TEAM_PROFILE = {
 2025-05-09 07:48:24,939 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
 2025-05-09 07:48:24,940 - picklist_generator - INFO - Using cached picklist [Request: 1765222158000]
 2025-05-09 07:48:24,940 - picklist_api - INFO - Successfully generated picklist for request 1765222158000
+2025-05-09 08:08:07,090 - picklist_api - INFO - Received picklist generation request 1765211313312: first pick for team 8044
+2025-05-09 08:08:07,098 - picklist_api - INFO - Request 1765211313312 cache key: 6e5ea216351576cb080b2618deb941f6
+2025-05-09 08:08:07,098 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:08:07,098 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:08:07,100 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:08:07,100 - picklist_generator - INFO - Pick position: first
+2025-05-09 08:08:07,100 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:08:07,100 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 08:08:07,100 - picklist_generator - INFO - Total teams to rank: 67
+2025-05-09 08:08:07,100 - picklist_generator - INFO - Excluded teams: [8044, 1987, 1197, 1756, 4391, 1114, 341, 2481]
+2025-05-09 08:08:07,101 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:08:07,101 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:08:07,101 - picklist_generator - INFO - Using batch processing for 67 teams
+2025-05-09 08:08:07,101 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:08:07,101 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:08:07,101 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:08:07,101 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:08:07,102 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1511, 1629, 1701, 1727, 1732, 1923, 2052]... (and 10 more)
+2025-05-09 08:08:07,102 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:08:19,525 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:08:19,527 - picklist_generator - INFO - Batch 0: Response time: 12.42s (avg: 0.62s per team)
+2025-05-09 08:08:19,528 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[2231,84.66,"Top teleop EPA 56.38"],[2338,84.08,"Strong auto EPA 24.84"],[1732,82.74,"High teleop coral 12.91"],[1701,79.2,"Excellent total game pieces 16.18"],[2052,69.57,"Great winrate 78%"],[...
+2025-05-09 08:08:19,528 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:08:19,528 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[2231, 84.66, "Top teleop EPA 56.38"], [2338, 84.08, "Strong auto EPA 24.84"], [1732, 82.74, "High teleop coral 12.91"]]
+2025-05-09 08:08:19,529 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:08:19,529 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:08:19,529 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:08:19,529 - picklist_generator - INFO -   Reference team 2: 1727 (score: 63.0)
+2025-05-09 08:08:19,530 - picklist_generator - INFO -   Reference team 3: 2341 (score: 26.5)
+2025-05-09 08:08:19,530 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:08:19,530 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:08:19,531 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:08:19,531 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:08:19,531 - picklist_generator - INFO - Batch 1: Reference team numbers: [1727, 2231, 2341]
+2025-05-09 08:08:19,531 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:08:19,531 - picklist_generator - INFO - Batch 1: Team numbers: [4, 386, 1727, 2231, 2341, 2637, 2638, 2834, 2851, 2935]... (and 13 more)
+2025-05-09 08:08:19,532 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:08:29,956 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:08:29,957 - picklist_generator - INFO - Batch 1: Response time: 10.43s (avg: 0.45s per team)
+2025-05-09 08:08:29,958 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[4028,76.28,"High teleop EPA 49.81"],[3940,77.87,"Strong teleop coral 16.01"],[4400,77.0,"Excellent auto EPA 19.82"],[4270,77.47,"Top teleop EPA 53.43"],[3767,72.29,"High teleop coral 13.88"],[3...
+2025-05-09 08:08:29,958 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:08:29,958 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[4028, 76.28, "High teleop EPA 49.81"], [3940, 77.87, "Strong teleop coral 16.01"], [4400, 77.0, "Excellent auto EPA 19.82"]]
+2025-05-09 08:08:29,958 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:08:29,959 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:08:29,959 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:08:29,959 - picklist_generator - INFO -   Reference team 2: 386 (score: 52.4)
+2025-05-09 08:08:29,959 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:08:29,960 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:08:29,960 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:08:29,960 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:08:29,960 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:08:29,960 - picklist_generator - INFO - Batch 2: Reference team numbers: [386, 2231, 3489]
+2025-05-09 08:08:29,960 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:08:29,961 - picklist_generator - INFO - Batch 2: Team numbers: [386, 597, 604, 766, 836, 839, 2231, 3489, 4585, 4788]... (and 13 more)
+2025-05-09 08:08:29,962 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:08:39,205 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:08:39,207 - picklist_generator - INFO - Batch 2: Response time: 9.24s (avg: 0.40s per team)
+2025-05-09 08:08:39,207 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"High auto EPA 20.83"],[5990,87.22,"Strong teleop EPA 64.65"],[6369,87.37,"Excellent endgame EPA 10.96"],[2231,84.66,"Top teleop EPA 56.38"],[5951,72.6,"Great auto EPA 19.22"],[839,72...
+2025-05-09 08:08:39,208 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:08:39,208 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "High auto EPA 20.83"], [5990, 87.22, "Strong teleop EPA 64.65"], [6369, 87.37, "Excellent endgame EPA 10.96"]]
+2025-05-09 08:08:39,208 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:08:39,208 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:08:39,209 - picklist_generator - INFO -   Reference team 1: 604 (score: 90.3)
+2025-05-09 08:08:39,209 - picklist_generator - INFO -   Reference team 2: 4788 (score: 58.4)
+2025-05-09 08:08:39,209 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:08:39,209 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:08:39,209 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:08:39,209 - picklist_generator - INFO - Batch size: 7 teams
+2025-05-09 08:08:39,210 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:08:39,210 - picklist_generator - INFO - Batch 3: Reference team numbers: [604, 4585, 4788]
+2025-05-09 08:08:39,210 - picklist_generator - INFO - Batch 3: Processing 10 teams (including 3 reference teams)
+2025-05-09 08:08:39,210 - picklist_generator - INFO - Batch 3: Team numbers: [604, 987, 4585, 4788, 9126, 9234, 9408, 9459, 9576, 9583]
+2025-05-09 08:08:39,210 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:08:44,138 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:08:44,139 - picklist_generator - INFO - Batch 3: Response time: 4.93s (avg: 0.49s per team)
+2025-05-09 08:08:44,139 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[987,83.46,"Strong auto EPA 22.88"],[9408,69.21,"High teleop EPA 46.49"],[9576,54.86,"Good endgame EPA 8.39"],[9126,42.83,"Solid teleop coral 6.6"],[9459,36.78,"Decent teleop coral 6.3"],[9234,3...
+2025-05-09 08:08:44,140 - picklist_generator - INFO - Batch 3: Response contains 10 teams in ultra-compact format
+2025-05-09 08:08:44,140 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[987, 83.46, "Strong auto EPA 22.88"], [9408, 69.21, "High teleop EPA 46.49"], [9576, 54.86, "Good endgame EPA 8.39"]]
+2025-05-09 08:08:44,140 - picklist_generator - INFO - Batch 3: Successfully processed 10 teams
+2025-05-09 08:08:44,140 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:08:44,140 - picklist_generator - INFO - Reference teams with average scores: {1727: 62.95, 2341: 26.47, 2231: 84.66, 386: 52.42, 3489: 16.38, 604: 90.34, 4788: 58.44, 4585: 10.1}
+2025-05-09 08:08:44,140 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:08:44,141 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:08:44,141 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:08:44,141 - picklist_generator - INFO - Total batch processing time: 37.04s
+2025-05-09 08:08:44,141 - picklist_generator - INFO - Average time per team: 0.55s
+2025-05-09 08:08:44,141 - picklist_generator - INFO - Final picklist length: 67
+2025-05-09 08:08:44,141 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:08:44,142 - picklist_api - INFO - Successfully generated picklist for request 1765211313312
+2025-05-09 08:08:44,143 - picklist_api - INFO - Received picklist generation request 1765222160560: first pick for team 8044
+2025-05-09 08:08:44,151 - picklist_api - INFO - Request 1765222160560 cache key: 6e5ea216351576cb080b2618deb941f6
+2025-05-09 08:08:44,152 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:08:44,152 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:08:44,152 - picklist_generator - INFO - Using cached picklist [Request: 1765222160560]
+2025-05-09 08:08:44,152 - picklist_api - INFO - Successfully generated picklist for request 1765222160560
+2025-05-09 08:28:29,030 - picklist_api - INFO - Received picklist generation request 2954588230416: first pick for team 8044
+2025-05-09 08:28:29,036 - picklist_api - INFO - Request 2954588230416 cache key: 2bd4c39e533f7242d3ee90f30e339653
+2025-05-09 08:28:29,036 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:28:29,036 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:28:29,037 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:28:29,037 - picklist_generator - INFO - Pick position: first
+2025-05-09 08:28:29,037 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:28:29,038 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:28:29,038 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:28:29,039 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 08:28:29,039 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:28:35,615 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:28:35,619 - picklist_generator - INFO - Batch 0: Response time: 6.58s (avg: 0.33s per team)
+2025-05-09 08:28:35,619 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"Top auto 23.39, teleop 54.7"],[2231,84.66,"High teleop 56.38, strong endgame 9.6"],[2338,84.08,"Excellent auto 24.84, teleop 48.69"],[1732,82.74,"Strong teleop 54.92, endgame 11.7"]...
+2025-05-09 08:28:35,619 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:28:35,619 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "Top auto 23.39, teleop 54.7"], [2231, 84.66, "High teleop 56.38, strong endgame 9.6"], [2338, 84.08, "Excellent auto 24.84, teleop 48.69"]]
+2025-05-09 08:28:35,619 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:28:35,621 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:28:35,621 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 08:28:35,621 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 08:28:35,621 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 08:28:35,621 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:28:35,621 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:28:35,621 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:28:35,622 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:28:35,622 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 08:28:35,622 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:28:35,622 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 08:28:35,623 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:29:57,597 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:30:01,758 - picklist_api - INFO - Received picklist generation request 2871535464560: first pick for team 8044
+2025-05-09 08:30:01,771 - picklist_api - INFO - Request 2871535464560 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:30:01,771 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:30:01,772 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:30:01,774 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:30:01,774 - picklist_generator - INFO - Pick position: first
+2025-05-09 08:30:01,774 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:30:01,774 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 08:30:01,775 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 08:30:01,775 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:30:01,775 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:30:01,775 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 08:30:01,775 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:30:01,775 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:30:01,776 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:30:01,776 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:30:01,776 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 08:30:01,777 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:30:09,425 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:30:09,429 - picklist_generator - INFO - Batch 0: Response time: 7.65s (avg: 0.38s per team)
+2025-05-09 08:30:09,429 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"Top auto 23.39 and teleop 54.7"],[2231,84.66,"Strong teleop 56.38 and endgame 9.6"],[2338,84.08,"Excellent auto 24.84 and teleop 48.69"],[1732,82.74,"High teleop 54.92 and endgame 1...
+2025-05-09 08:30:09,430 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:30:09,430 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "Top auto 23.39 and teleop 54.7"], [2231, 84.66, "Strong teleop 56.38 and endgame 9.6"], [2338, 84.08, "Excellent auto 24.84 and teleop 48.69"]]
+2025-05-09 08:30:09,430 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:30:09,431 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:30:09,431 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 08:30:09,431 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 08:30:09,431 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 08:30:09,432 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:30:09,432 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:30:09,432 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:30:09,432 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:30:09,432 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 08:30:09,433 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:30:09,433 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 08:30:09,434 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:30:17,489 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:30:17,490 - picklist_generator - INFO - Batch 1: Response time: 8.06s (avg: 0.35s per team)
+2025-05-09 08:30:17,490 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[2481,99.4,"Top teleop 63.29"],[341,90.6,"Strong teleop 63.47"],[1197,88.4,"Top auto 23.39"],[3940,77.9,"High teleop 51.05"],[3767,72.3,"Excellent teleop 48.36"],[3620,69.6,"Strong auto 22.45"],...
+2025-05-09 08:30:17,490 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:30:17,490 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[2481, 99.4, "Top teleop 63.29"], [341, 90.6, "Strong teleop 63.47"], [1197, 88.4, "Top auto 23.39"]]
+2025-05-09 08:30:17,490 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:30:17,490 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:30:17,490 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 08:30:17,490 - picklist_generator - INFO -   Reference team 2: 2590 (score: 52.2)
+2025-05-09 08:30:17,491 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:30:17,491 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Batch 2: Reference team numbers: [2481, 2590, 3489]
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Batch 2: Team numbers: [597, 604, 2481, 2590, 3489, 4028, 4143, 4146, 4270, 4329]... (and 13 more)
+2025-05-09 08:30:17,491 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:30:24,827 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:30:24,831 - picklist_generator - INFO - Batch 2: Response time: 7.34s (avg: 0.32s per team)
+2025-05-09 08:30:24,832 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Strong auto 24.0"],[5990,87.22,"Top teleop coral 16.37"],[4391,85.37,"High endgame 10.18"],[4028,76.28,"Great teleop EPA 49.81"],[4270,77.47,"Excellent teleop coral 15.05"],[4400,77....
+2025-05-09 08:30:24,832 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:30:24,832 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Strong auto 24.0"], [5990, 87.22, "Top teleop coral 16.37"], [4391, 85.37, "High endgame 10.18"]]
+2025-05-09 08:30:24,832 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:30:24,833 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:30:24,833 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 08:30:24,833 - picklist_generator - INFO -   Reference team 2: 6340 (score: 61.1)
+2025-05-09 08:30:24,834 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:30:24,834 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:30:24,834 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:30:24,834 - picklist_generator - INFO - Batch size: 15 teams
+2025-05-09 08:30:24,834 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:30:24,834 - picklist_generator - INFO - Batch 3: Reference team numbers: [2481, 4585, 6340]
+2025-05-09 08:30:24,834 - picklist_generator - INFO - Batch 3: Processing 18 teams (including 3 reference teams)
+2025-05-09 08:30:24,834 - picklist_generator - INFO - Batch 3: Team numbers: [766, 836, 839, 987, 2481, 4585, 6340, 6369, 6548, 7211]... (and 8 more)
+2025-05-09 08:30:24,835 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:30:28,349 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:30:28,352 - picklist_generator - INFO - Batch 3: Response time: 3.52s (avg: 0.20s per team)
+2025-05-09 08:30:28,352 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[2481,99.4,"Top teleop 63.29"],[987,83.46,"High auto 22.88"],[6369,87.37,"Strong auto 21.78"],[8044,77.01,"Solid teleop 53.58"],[839,72.13,"Good endgame 11.46"],[836,71.8,"Balanced EPA 71.8"],[9...
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Batch 3: Response contains 18 teams in ultra-compact format
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[2481, 99.4, "Top teleop 63.29"], [987, 83.46, "High auto 22.88"], [6369, 87.37, "Strong auto 21.78"]]
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Batch 3: Successfully processed 18 teams
+2025-05-09 08:30:28,353 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Reference teams with average scores: {1197: 88.4, 2106: 65.9, 10466: 30.4, 2481: 99.4, 2590: 52.2, 3489: 16.4, 6340: 61.14, 4585: 10.1}
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:30:28,353 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:30:28,354 - picklist_generator - INFO - Total batch processing time: 26.58s
+2025-05-09 08:30:28,354 - picklist_generator - INFO - Average time per team: 0.35s
+2025-05-09 08:30:28,354 - picklist_generator - INFO - Final picklist length: 75
+2025-05-09 08:30:28,354 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:30:28,354 - picklist_api - INFO - Successfully generated picklist for request 2871535464560
+2025-05-09 08:30:28,356 - picklist_api - INFO - Received picklist generation request 2871536112000: first pick for team 8044
+2025-05-09 08:30:28,362 - picklist_api - INFO - Request 2871536112000 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:30:28,362 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:30:28,363 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:30:28,363 - picklist_generator - INFO - Using cached picklist [Request: 2871536112000]
+2025-05-09 08:30:28,363 - picklist_api - INFO - Successfully generated picklist for request 2871536112000
+2025-05-09 08:31:04,151 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:31:11,969 - picklist_api - INFO - Received picklist generation request 2871536108800: second pick for team 8044
+2025-05-09 08:31:11,976 - picklist_api - INFO - Request 2871536108800 cache key: da96004cf460901a920c95ddcc4f0d4f
+2025-05-09 08:31:11,976 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:31:11,976 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:31:11,977 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:31:11,977 - picklist_generator - INFO - Pick position: second
+2025-05-09 08:31:11,977 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:31:11,977 - picklist_generator - INFO - Priority metrics count: 6
+2025-05-09 08:31:11,977 - picklist_generator - INFO - Total teams to rank: 67
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Excluded teams: [8044, 1987, 1197, 1756, 4391, 1114, 341, 2481]
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Using batch processing for 67 teams
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:31:11,978 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:31:11,978 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1511, 1629, 1701, 1727, 1732, 1923, 2052]... (and 10 more)
+2025-05-09 08:31:11,979 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:31:44,899 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:31:44,903 - picklist_generator - INFO - Batch 0: Response time: 32.92s (avg: 1.65s per team)
+2025-05-09 08:31:44,903 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[2231,84.66,"High teleop EPA 56.38"],[2338,84.08,"Strong auto EPA 24.84"],[1732,82.74,"Excellent teleop coral 12.91"],[1701,79.2,"Top auto coral 2.66"],[2052,69.57,"Consistent endgame EPA 10.25"...
+2025-05-09 08:31:44,904 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:31:44,905 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[2231, 84.66, "High teleop EPA 56.38"], [2338, 84.08, "Strong auto EPA 24.84"], [1732, 82.74, "Excellent teleop coral 12.91"]]
+2025-05-09 08:31:44,906 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:31:44,906 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:31:44,907 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:31:44,907 - picklist_generator - INFO -   Reference team 2: 1727 (score: 63.0)
+2025-05-09 08:31:44,908 - picklist_generator - INFO -   Reference team 3: 2341 (score: 26.5)
+2025-05-09 08:31:44,908 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:31:44,908 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:31:44,908 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:31:44,909 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:31:44,910 - picklist_generator - INFO - Batch 1: Reference team numbers: [1727, 2231, 2341]
+2025-05-09 08:31:44,910 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:31:44,911 - picklist_generator - INFO - Batch 1: Team numbers: [4, 386, 1727, 2231, 2341, 2637, 2638, 2834, 2851, 2935]... (and 13 more)
+2025-05-09 08:31:44,913 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:31:59,222 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:31:59,223 - picklist_generator - INFO - Batch 1: Response time: 14.31s (avg: 0.62s per team)
+2025-05-09 08:31:59,223 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[3940,77.87,"Top teleop EPA 51.05"],[4270,77.47,"Strong teleop EPA 53.43"],[4400,77.0,"High auto EPA 19.82"],[4028,76.28,"Excellent auto EPA 19.48"],[3767,72.29,"High teleop EPA 48.36"],[3620,69...
+2025-05-09 08:31:59,223 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:31:59,223 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[3940, 77.87, "Top teleop EPA 51.05"], [4270, 77.47, "Strong teleop EPA 53.43"], [4400, 77.0, "High auto EPA 19.82"]]
+2025-05-09 08:31:59,224 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:31:59,224 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:31:59,224 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:31:59,224 - picklist_generator - INFO -   Reference team 2: 386 (score: 52.4)
+2025-05-09 08:31:59,224 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:31:59,224 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:31:59,224 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:31:59,224 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:31:59,225 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:31:59,225 - picklist_generator - INFO - Batch 2: Reference team numbers: [386, 2231, 3489]
+2025-05-09 08:31:59,225 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:31:59,225 - picklist_generator - INFO - Batch 2: Team numbers: [386, 597, 604, 766, 836, 839, 2231, 3489, 4585, 4788]... (and 13 more)
+2025-05-09 08:31:59,226 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:32:07,062 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:32:07,063 - picklist_generator - INFO - Batch 2: Response time: 7.84s (avg: 0.34s per team)
+2025-05-09 08:32:07,063 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Strong auto EPA 20.83"],[6369,87.37,"High teleop EPA 54.64"],[5990,87.22,"Excellent teleop coral 16.37"],[2231,84.66,"High teleop EPA 56.38"],[5951,72.6,"Great auto EPA 19.22"],[839,...
+2025-05-09 08:32:07,063 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Strong auto EPA 20.83"], [6369, 87.37, "High teleop EPA 54.64"], [5990, 87.22, "Excellent teleop coral 16.37"]]
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:32:07,064 - picklist_generator - INFO -   Reference team 1: 604 (score: 90.3)
+2025-05-09 08:32:07,064 - picklist_generator - INFO -   Reference team 2: 4788 (score: 58.4)
+2025-05-09 08:32:07,064 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:32:07,064 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch size: 7 teams
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch 3: Reference team numbers: [604, 3489, 4788]
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch 3: Processing 10 teams (including 3 reference teams)
+2025-05-09 08:32:07,064 - picklist_generator - INFO - Batch 3: Team numbers: [604, 987, 3489, 4788, 9126, 9234, 9408, 9459, 9576, 9583]
+2025-05-09 08:32:07,065 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:32:11,498 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:32:11,501 - picklist_generator - INFO - Batch 3: Response time: 4.44s (avg: 0.44s per team)
+2025-05-09 08:32:11,501 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[987,83.5,"High auto EPA 22.88"],[9408,69.2,"Strong teleop EPA 46.49"],[9576,54.9,"Good endgame EPA 8.39"],[9126,42.8,"Decent teleop coral 6.6"],[9459,36.8,"Solid teleop coral 6.3"],[9234,33.7,"...
+2025-05-09 08:32:11,502 - picklist_generator - INFO - Batch 3: Response contains 10 teams in ultra-compact format
+2025-05-09 08:32:11,502 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[987, 83.5, "High auto EPA 22.88"], [9408, 69.2, "Strong teleop EPA 46.49"], [9576, 54.9, "Good endgame EPA 8.39"]]
+2025-05-09 08:32:11,503 - picklist_generator - INFO - Batch 3: Successfully processed 10 teams
+2025-05-09 08:32:11,503 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:32:11,504 - picklist_generator - INFO - Reference teams with average scores: {1727: 62.95, 2341: 26.47, 2231: 84.66, 386: 36.36, 3489: 16.39, 604: 30.0, 4788: 25.0}
+2025-05-09 08:32:11,504 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:32:11,505 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0002 (based on 3 reference teams)
+2025-05-09 08:32:11,505 - picklist_generator - INFO - Batch 3: Normalization factor = 0.9998 (based on 3 reference teams)
+2025-05-09 08:32:11,505 - picklist_generator - INFO - Total batch processing time: 59.53s
+2025-05-09 08:32:11,506 - picklist_generator - INFO - Average time per team: 0.89s
+2025-05-09 08:32:11,506 - picklist_generator - INFO - Final picklist length: 67
+2025-05-09 08:32:11,506 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:32:11,506 - picklist_api - INFO - Successfully generated picklist for request 2871536108800
+2025-05-09 08:32:11,508 - picklist_api - INFO - Received picklist generation request 2871536778800: second pick for team 8044
+2025-05-09 08:32:11,516 - picklist_api - INFO - Request 2871536778800 cache key: da96004cf460901a920c95ddcc4f0d4f
+2025-05-09 08:32:11,516 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:32:11,516 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:32:11,517 - picklist_generator - INFO - Using cached picklist [Request: 2871536778800]
+2025-05-09 08:32:11,517 - picklist_api - INFO - Successfully generated picklist for request 2871536778800
+2025-05-09 08:32:39,456 - picklist_api - INFO - Received picklist generation request 2871535181152: second pick for team 8044
+2025-05-09 08:32:39,468 - picklist_api - INFO - Request 2871535181152 cache key: 95d6585ed9e684873dd236b374764781
+2025-05-09 08:32:39,468 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:32:39,468 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:32:39,470 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:32:39,470 - picklist_generator - INFO - Pick position: second
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Priority metrics count: 6
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Total teams to rank: 66
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Excluded teams: [8044, 1987, 1197, 1756, 4391, 1114, 341, 2481, 5990]
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:32:39,471 - picklist_generator - INFO - Using batch processing for 66 teams
+2025-05-09 08:32:39,472 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:32:39,472 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:32:39,472 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:32:39,472 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:32:39,472 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1511, 1629, 1701, 1727, 1732, 1923, 2052]... (and 10 more)
+2025-05-09 08:32:39,473 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:32:44,966 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:32:44,971 - picklist_generator - INFO - Batch 0: Response time: 5.50s (avg: 0.27s per team)
+2025-05-09 08:32:44,972 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[2338,84.08,"High auto EPA 24.84"],[2231,84.66,"Strong teleop EPA 56.38"],[1732,82.74,"High teleop EPA 54.92"],[1701,79.2,"Excellent auto EPA 21.23"],[2052,69.57,"Consistent teleop EPA 49.16"],[...
+2025-05-09 08:32:44,972 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:32:44,972 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[2338, 84.08, "High auto EPA 24.84"], [2231, 84.66, "Strong teleop EPA 56.38"], [1732, 82.74, "High teleop EPA 54.92"]]
+2025-05-09 08:32:44,973 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:32:44,973 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:32:44,974 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:32:44,974 - picklist_generator - INFO -   Reference team 2: 1727 (score: 63.0)
+2025-05-09 08:32:44,974 - picklist_generator - INFO -   Reference team 3: 2341 (score: 26.5)
+2025-05-09 08:32:44,974 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:32:44,974 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:32:44,974 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:32:44,975 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:32:44,975 - picklist_generator - INFO - Batch 1: Reference team numbers: [1727, 2231, 2341]
+2025-05-09 08:32:44,975 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:32:44,975 - picklist_generator - INFO - Batch 1: Team numbers: [4, 386, 1727, 2231, 2341, 2637, 2638, 2834, 2851, 2935]... (and 13 more)
+2025-05-09 08:32:44,978 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:32:52,051 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:32:52,054 - picklist_generator - INFO - Batch 1: Response time: 7.08s (avg: 0.31s per team)
+2025-05-09 08:32:52,055 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[3940,77.87,"High teleop EPA 51.05"],[4270,77.47,"Strong teleop coral 15.05"],[4400,77.0,"Excellent auto EPA 19.82"],[4028,76.28,"High auto coral 2.51"],[3767,72.29,"Top teleop coral 13.88"],[36...
+2025-05-09 08:32:52,055 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:32:52,056 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[3940, 77.87, "High teleop EPA 51.05"], [4270, 77.47, "Strong teleop coral 15.05"], [4400, 77.0, "Excellent auto EPA 19.82"]]
+2025-05-09 08:32:52,056 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:32:52,057 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:32:52,057 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:32:52,057 - picklist_generator - INFO -   Reference team 2: 386 (score: 52.4)
+2025-05-09 08:32:52,057 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:32:52,058 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:32:52,058 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:32:52,058 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:32:52,058 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:32:52,058 - picklist_generator - INFO - Batch 2: Reference team numbers: [386, 2231, 3489]
+2025-05-09 08:32:52,059 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:32:52,059 - picklist_generator - INFO - Batch 2: Team numbers: [386, 597, 604, 766, 836, 839, 2231, 3489, 4585, 4788]... (and 13 more)
+2025-05-09 08:32:52,060 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:32:58,393 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:32:58,397 - picklist_generator - INFO - Batch 2: Response time: 6.34s (avg: 0.28s per team)
+2025-05-09 08:32:58,397 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"High teleop EPA 61.19"],[6369,87.37,"Strong auto EPA 21.78"],[2231,84.66,"Strong teleop EPA 56.38"],[5951,72.6,"High endgame EPA 9.81"],[839,72.13,"Strong teleop EPA 50.4"],[836,71.8...
+2025-05-09 08:32:58,398 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:32:58,398 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "High teleop EPA 61.19"], [6369, 87.37, "Strong auto EPA 21.78"], [2231, 84.66, "Strong teleop EPA 56.38"]]
+2025-05-09 08:32:58,398 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:32:58,398 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:32:58,398 - picklist_generator - INFO -   Reference team 1: 604 (score: 90.3)
+2025-05-09 08:32:58,398 - picklist_generator - INFO -   Reference team 2: 5516 (score: 56.4)
+2025-05-09 08:32:58,398 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:32:58,399 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:32:58,399 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:32:58,399 - picklist_generator - INFO - Batch size: 6 teams
+2025-05-09 08:32:58,399 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:32:58,399 - picklist_generator - INFO - Batch 3: Reference team numbers: [604, 4585, 5516]
+2025-05-09 08:32:58,399 - picklist_generator - INFO - Batch 3: Processing 9 teams (including 3 reference teams)
+2025-05-09 08:32:58,400 - picklist_generator - INFO - Batch 3: Team numbers: [604, 987, 4585, 5516, 9234, 9408, 9459, 9576, 9583]
+2025-05-09 08:32:58,400 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:33:00,728 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:33:00,730 - picklist_generator - INFO - Batch 3: Response time: 2.33s (avg: 0.26s per team)
+2025-05-09 08:33:00,731 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[987,83.5,"High auto EPA 22.88"],[9408,69.2,"Strong teleop EPA 46.49"],[9576,54.9,"Good endgame EPA 8.39"],[9234,33.7,"Decent teleop coral 4.81"],[9459,36.8,"Solid auto EPA 9.04"],[604,90.3,"Hig...
+2025-05-09 08:33:00,731 - picklist_generator - INFO - Batch 3: Response contains 9 teams in ultra-compact format
+2025-05-09 08:33:00,731 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[987, 83.5, "High auto EPA 22.88"], [9408, 69.2, "Strong teleop EPA 46.49"], [9576, 54.9, "Good endgame EPA 8.39"]]
+2025-05-09 08:33:00,731 - picklist_generator - INFO - Batch 3: Successfully processed 9 teams
+2025-05-09 08:33:00,732 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:33:00,732 - picklist_generator - INFO - Reference teams with average scores: {1727: 62.95, 2231: 84.66, 2341: 26.47, 3489: 16.38, 386: 52.42, 604: 90.3, 5516: 56.4, 4585: 10.1}
+2025-05-09 08:33:00,732 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:33:00,733 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:33:00,733 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:33:00,733 - picklist_generator - INFO - Total batch processing time: 21.26s
+2025-05-09 08:33:00,733 - picklist_generator - INFO - Average time per team: 0.32s
+2025-05-09 08:33:00,733 - picklist_generator - INFO - Final picklist length: 66
+2025-05-09 08:33:00,734 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:33:00,734 - picklist_api - INFO - Successfully generated picklist for request 2871535181152
+2025-05-09 08:33:00,737 - picklist_api - INFO - Received picklist generation request 2871535460560: second pick for team 8044
+2025-05-09 08:33:00,744 - picklist_api - INFO - Request 2871535460560 cache key: 95d6585ed9e684873dd236b374764781
+2025-05-09 08:33:00,744 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:33:00,744 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:33:00,744 - picklist_generator - INFO - Using cached picklist [Request: 2871535460560]
+2025-05-09 08:33:00,745 - picklist_api - INFO - Successfully generated picklist for request 2871535460560
+2025-05-09 08:37:22,767 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:37:30,563 - picklist_api - INFO - Received picklist generation request 2871536764640: third pick for team 8044
+2025-05-09 08:37:30,571 - picklist_api - INFO - Request 2871536764640 cache key: e6c23a64a51f3f6af67cf389330cc99a
+2025-05-09 08:37:30,571 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:37:30,571 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:37:30,572 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Pick position: third
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Priority metrics count: 6
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Total teams to rank: 66
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Excluded teams: [8044, 1987, 1197, 1756, 4391, 1114, 341, 2481, 5990]
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Using batch processing for 66 teams
+2025-05-09 08:37:30,573 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:37:30,574 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:37:30,574 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:37:30,574 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:37:30,574 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1511, 1629, 1701, 1727, 1732, 1923, 2052]... (and 10 more)
+2025-05-09 08:37:30,575 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:37:38,409 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:37:38,411 - picklist_generator - INFO - Batch 0: Response time: 7.84s (avg: 0.39s per team)
+2025-05-09 08:37:38,411 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[2231,84.66,"High teleop EPA 56.38"],[2338,84.08,"Strong auto EPA 24.84"],[1732,82.74,"High teleop coral 12.91"],[1701,79.2,"Excellent auto EPA 21.23"],[2052,69.57,"High teleop EPA 49.16"],[11,6...
+2025-05-09 08:37:38,411 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:37:38,412 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[2231, 84.66, "High teleop EPA 56.38"], [2338, 84.08, "Strong auto EPA 24.84"], [1732, 82.74, "High teleop coral 12.91"]]
+2025-05-09 08:37:38,412 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:37:38,412 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:37:38,412 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:37:38,412 - picklist_generator - INFO -   Reference team 2: 1727 (score: 63.0)
+2025-05-09 08:37:38,412 - picklist_generator - INFO -   Reference team 3: 2341 (score: 26.5)
+2025-05-09 08:37:38,413 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:37:38,413 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:37:38,413 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:37:38,414 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:37:38,414 - picklist_generator - INFO - Batch 1: Reference team numbers: [1727, 2231, 2341]
+2025-05-09 08:37:38,414 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:37:38,414 - picklist_generator - INFO - Batch 1: Team numbers: [4, 386, 1727, 2231, 2341, 2637, 2638, 2834, 2851, 2935]... (and 13 more)
+2025-05-09 08:37:38,415 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:37:45,372 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:37:45,373 - picklist_generator - INFO - Batch 1: Response time: 6.96s (avg: 0.30s per team)
+2025-05-09 08:37:45,374 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[3940,77.87,"Strong teleop EPA 51.05"],[4270,77.47,"High teleop coral 15.05"],[4400,77.0,"Excellent auto EPA 19.82"],[4028,76.28,"High winrate 85.37%"],[3767,72.29,"Great teleop EPA 48.36"],[362...
+2025-05-09 08:37:45,374 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:37:45,374 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[3940, 77.87, "Strong teleop EPA 51.05"], [4270, 77.47, "High teleop coral 15.05"], [4400, 77.0, "Excellent auto EPA 19.82"]]
+2025-05-09 08:37:45,374 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:37:45,375 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:37:45,375 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:37:45,375 - picklist_generator - INFO -   Reference team 2: 386 (score: 52.4)
+2025-05-09 08:37:45,375 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:37:45,375 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:37:45,376 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:37:45,376 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:37:45,376 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:37:45,376 - picklist_generator - INFO - Batch 2: Reference team numbers: [386, 2231, 3489]
+2025-05-09 08:37:45,376 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:37:45,376 - picklist_generator - INFO - Batch 2: Team numbers: [386, 597, 604, 766, 836, 839, 2231, 3489, 4585, 4788]... (and 13 more)
+2025-05-09 08:37:45,377 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:37:50,468 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:37:50,469 - picklist_generator - INFO - Batch 2: Response time: 5.09s (avg: 0.22s per team)
+2025-05-09 08:37:50,470 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Strong overall EPA 90.34"],[6369,87.37,"High teleop EPA 54.64"],[2231,84.66,"High teleop EPA 56.38"],[5951,72.6,"Excellent auto EPA 19.22"],[839,72.13,"Great endgame EPA 11.46"],[836...
+2025-05-09 08:37:50,470 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:37:50,470 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Strong overall EPA 90.34"], [6369, 87.37, "High teleop EPA 54.64"], [2231, 84.66, "High teleop EPA 56.38"]]
+2025-05-09 08:37:50,470 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:37:50,470 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:37:50,470 - picklist_generator - INFO -   Reference team 1: 604 (score: 90.3)
+2025-05-09 08:37:50,470 - picklist_generator - INFO -   Reference team 2: 5516 (score: 56.4)
+2025-05-09 08:37:50,471 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:37:50,471 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:37:50,471 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:37:50,471 - picklist_generator - INFO - Batch size: 6 teams
+2025-05-09 08:37:50,472 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:37:50,472 - picklist_generator - INFO - Batch 3: Reference team numbers: [604, 4585, 5516]
+2025-05-09 08:37:50,472 - picklist_generator - INFO - Batch 3: Processing 9 teams (including 3 reference teams)
+2025-05-09 08:37:50,472 - picklist_generator - INFO - Batch 3: Team numbers: [604, 987, 4585, 5516, 9234, 9408, 9459, 9576, 9583]
+2025-05-09 08:37:50,472 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:37:53,342 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:37:53,343 - picklist_generator - INFO - Batch 3: Response time: 2.87s (avg: 0.32s per team)
+2025-05-09 08:37:53,343 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[987,83.46,"High auto EPA 22.88"],[604,90.34,"Strong overall EPA 90.34"],[9408,69.21,"Solid teleop EPA 46.49"],[9576,54.86,"Good endgame EPA 8.39"],[5516,56.41,"Consistent teleop EPA 33.95"],[94...
+2025-05-09 08:37:53,344 - picklist_generator - INFO - Batch 3: Response contains 9 teams in ultra-compact format
+2025-05-09 08:37:53,344 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[987, 83.46, "High auto EPA 22.88"], [604, 90.34, "Strong overall EPA 90.34"], [9408, 69.21, "Solid teleop EPA 46.49"]]
+2025-05-09 08:37:53,344 - picklist_generator - INFO - Batch 3: Successfully processed 9 teams
+2025-05-09 08:37:53,344 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:37:53,344 - picklist_generator - INFO - Reference teams with average scores: {2231: 84.66, 1727: 62.95, 2341: 26.47, 386: 52.42, 3489: 16.38, 604: 90.34, 5516: 56.41, 4585: 10.1}
+2025-05-09 08:37:53,344 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:37:53,344 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:37:53,345 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:37:53,345 - picklist_generator - INFO - Total batch processing time: 22.77s
+2025-05-09 08:37:53,345 - picklist_generator - INFO - Average time per team: 0.35s
+2025-05-09 08:37:53,345 - picklist_generator - INFO - Final picklist length: 66
+2025-05-09 08:37:53,345 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:37:53,345 - picklist_api - INFO - Successfully generated picklist for request 2871536764640
+2025-05-09 08:37:53,347 - picklist_api - INFO - Received picklist generation request 2871535461360: third pick for team 8044
+2025-05-09 08:37:53,353 - picklist_api - INFO - Request 2871535461360 cache key: e6c23a64a51f3f6af67cf389330cc99a
+2025-05-09 08:37:53,353 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:37:53,353 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:37:53,354 - picklist_generator - INFO - Using cached picklist [Request: 2871535461360]
+2025-05-09 08:37:53,354 - picklist_api - INFO - Successfully generated picklist for request 2871535461360
+2025-05-09 08:41:25,517 - picklist_api - INFO - Received picklist generation request 2871536765280: third pick for team 8044
+2025-05-09 08:41:25,525 - picklist_api - INFO - Request 2871536765280 cache key: 4068240b3a0b3753dc7a1e2a801df84d
+2025-05-09 08:41:25,526 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:41:25,526 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:41:25,527 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:41:25,527 - picklist_generator - INFO - Pick position: third
+2025-05-09 08:41:25,527 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:41:25,527 - picklist_generator - INFO - Priority metrics count: 6
+2025-05-09 08:41:25,527 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:41:25,528 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:41:25,528 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 08:41:25,529 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:41:32,386 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:41:32,390 - picklist_generator - INFO - Batch 0: Response time: 6.86s (avg: 0.34s per team)
+2025-05-09 08:41:32,390 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"High EPA total 88.38"],[2231,84.66,"Strong teleop EPA 56.38"],[2338,84.08,"Excellent auto EPA 24.84"],[1732,82.74,"High teleop EPA 54.92"],[1114,81.42,"Great teleop coral 14.24"],[1...
+2025-05-09 08:41:32,391 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:41:32,391 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "High EPA total 88.38"], [2231, 84.66, "Strong teleop EPA 56.38"], [2338, 84.08, "Excellent auto EPA 24.84"]]
+2025-05-09 08:41:32,391 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:41:32,391 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:41:32,391 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 08:41:32,391 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 08:41:32,392 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 08:41:32,392 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:41:32,392 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:41:32,392 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:41:32,392 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:41:32,392 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 08:41:32,392 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:41:32,393 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 08:41:32,393 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:41:38,833 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:41:38,834 - picklist_generator - INFO - Batch 1: Response time: 6.44s (avg: 0.28s per team)
+2025-05-09 08:41:38,834 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[2481,99.4,"Strong teleop EPA 63.29"],[341,90.6,"High endgame EPA 11.99"],[3940,77.9,"Excellent teleop EPA 51.05"],[3767,72.3,"Solid teleop EPA 48.36"],[3620,69.6,"Great auto EPA 22.45"],[2834,6...
+2025-05-09 08:41:38,834 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:41:38,834 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[2481, 99.4, "Strong teleop EPA 63.29"], [341, 90.6, "High endgame EPA 11.99"], [3940, 77.9, "Excellent teleop EPA 51.05"]]
+2025-05-09 08:41:38,835 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:41:38,835 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:41:38,835 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 08:41:38,835 - picklist_generator - INFO -   Reference team 2: 2590 (score: 52.2)
+2025-05-09 08:41:38,835 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:41:38,835 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:41:38,835 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:41:38,835 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:41:38,835 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:41:38,836 - picklist_generator - INFO - Batch 2: Reference team numbers: [2481, 2590, 3489]
+2025-05-09 08:41:38,836 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:41:38,836 - picklist_generator - INFO - Batch 2: Team numbers: [597, 604, 2481, 2590, 3489, 4028, 4143, 4146, 4270, 4329]... (and 13 more)
+2025-05-09 08:41:38,837 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:41:47,110 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:41:47,111 - picklist_generator - INFO - Batch 2: Response time: 8.27s (avg: 0.36s per team)
+2025-05-09 08:41:47,111 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"High auto EPA 20.83"],[5990,87.22,"Strong teleop EPA 64.65"],[4391,85.37,"High teleop coral 15.76"],[4270,77.47,"Good teleop coral 15.05"],[4400,77.0,"Strong auto EPA 19.82"],[4028,7...
+2025-05-09 08:41:47,112 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:41:47,112 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "High auto EPA 20.83"], [5990, 87.22, "Strong teleop EPA 64.65"], [4391, 85.37, "High teleop coral 15.76"]]
+2025-05-09 08:41:47,112 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:41:47,112 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:41:47,112 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 08:41:47,113 - picklist_generator - INFO -   Reference team 2: 6340 (score: 61.1)
+2025-05-09 08:41:47,113 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:41:47,113 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:41:47,113 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:41:47,113 - picklist_generator - INFO - Batch size: 15 teams
+2025-05-09 08:41:47,113 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:41:47,113 - picklist_generator - INFO - Batch 3: Reference team numbers: [2481, 4585, 6340]
+2025-05-09 08:41:47,113 - picklist_generator - INFO - Batch 3: Processing 18 teams (including 3 reference teams)
+2025-05-09 08:41:47,113 - picklist_generator - INFO - Batch 3: Team numbers: [766, 836, 839, 987, 2481, 4585, 6340, 6369, 6548, 7211]... (and 8 more)
+2025-05-09 08:41:47,114 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:41:51,661 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:41:51,663 - picklist_generator - INFO - Batch 3: Response time: 4.55s (avg: 0.25s per team)
+2025-05-09 08:41:51,663 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[2481,99.4,"Strong teleop EPA 63.29"],[987,83.46,"High auto EPA 22.88"],[6369,87.37,"Excellent auto EPA 21.78"],[8044,77.01,"High teleop EPA 53.58"],[839,72.13,"Strong endgame EPA 11.46"],[836,7...
+2025-05-09 08:41:51,663 - picklist_generator - INFO - Batch 3: Response contains 18 teams in ultra-compact format
+2025-05-09 08:41:51,663 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[2481, 99.4, "Strong teleop EPA 63.29"], [987, 83.46, "High auto EPA 22.88"], [6369, 87.37, "Excellent auto EPA 21.78"]]
+2025-05-09 08:41:51,663 - picklist_generator - INFO - Batch 3: Successfully processed 18 teams
+2025-05-09 08:41:51,664 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:41:51,664 - picklist_generator - INFO - Reference teams with average scores: {2106: 65.9, 1197: 88.4, 10466: 30.4, 2481: 99.4, 2590: 52.2, 3489: 16.4, 6340: 61.14, 4585: 10.1}
+2025-05-09 08:41:51,664 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:41:51,664 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:41:51,664 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:41:51,665 - picklist_generator - INFO - Total batch processing time: 26.14s
+2025-05-09 08:41:51,665 - picklist_generator - INFO - Average time per team: 0.35s
+2025-05-09 08:41:51,665 - picklist_generator - INFO - Final picklist length: 75
+2025-05-09 08:41:51,665 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:41:51,665 - picklist_api - INFO - Successfully generated picklist for request 2871536765280
+2025-05-09 08:41:51,667 - picklist_api - INFO - Received picklist generation request 2871535468160: third pick for team 8044
+2025-05-09 08:41:51,674 - picklist_api - INFO - Request 2871535468160 cache key: 4068240b3a0b3753dc7a1e2a801df84d
+2025-05-09 08:41:51,674 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:41:51,674 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:41:51,674 - picklist_generator - INFO - Using cached picklist [Request: 2871535468160]
+2025-05-09 08:41:51,675 - picklist_api - INFO - Successfully generated picklist for request 2871535468160
+2025-05-09 08:41:51,702 - picklist_api - INFO - Received picklist generation request 2871536769280: third pick for team 8044
+2025-05-09 08:41:51,715 - picklist_api - INFO - Request 2871536769280 cache key: 4068240b3a0b3753dc7a1e2a801df84d
+2025-05-09 08:41:51,715 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:41:51,715 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:41:51,715 - picklist_generator - INFO - Using cached picklist [Request: 2871536769280]
+2025-05-09 08:41:51,715 - picklist_api - INFO - Successfully generated picklist for request 2871536769280
+2025-05-09 08:41:51,718 - picklist_api - INFO - Received picklist generation request 2871535188832: third pick for team 8044
+2025-05-09 08:41:51,727 - picklist_api - INFO - Request 2871535188832 cache key: 4068240b3a0b3753dc7a1e2a801df84d
+2025-05-09 08:41:51,729 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:41:51,730 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:41:51,730 - picklist_generator - INFO - Using cached picklist [Request: 2871535188832]
+2025-05-09 08:41:51,730 - picklist_api - INFO - Successfully generated picklist for request 2871535188832
+2025-05-09 08:42:00,240 - picklist_api - INFO - Received picklist generation request 2871535466800: second pick for team 8044
+2025-05-09 08:42:00,252 - picklist_api - INFO - Request 2871535466800 cache key: 6e3217fbc4c5273aa4f284eb1a4b4b76
+2025-05-09 08:42:00,252 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:42:00,252 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:42:00,255 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:42:00,255 - picklist_generator - INFO - Pick position: second
+2025-05-09 08:42:00,256 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:42:00,256 - picklist_generator - INFO - Priority metrics count: 6
+2025-05-09 08:42:00,256 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 08:42:00,257 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:42:00,257 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:42:00,257 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 08:42:00,257 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:42:00,257 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:42:00,258 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:42:00,258 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:42:00,258 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 08:42:00,259 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:42:06,908 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:42:06,911 - picklist_generator - INFO - Batch 0: Response time: 6.65s (avg: 0.33s per team)
+2025-05-09 08:42:06,911 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"Top auto score 23.39"],[2231,84.66,"High teleop EPA 56.38"],[2338,84.08,"Strong auto coral 3.14"],[1114,81.42,"Excellent teleop coral 14.24"],[1732,82.74,"Great endgame EPA 11.7"],[...
+2025-05-09 08:42:06,912 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:42:06,912 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "Top auto score 23.39"], [2231, 84.66, "High teleop EPA 56.38"], [2338, 84.08, "Strong auto coral 3.14"]]
+2025-05-09 08:42:06,912 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:42:06,913 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:42:06,913 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 08:42:06,914 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 08:42:06,914 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 08:42:06,914 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:42:06,915 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:42:06,915 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:42:06,915 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:42:06,915 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 08:42:06,916 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:42:06,916 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 08:42:06,918 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:42:07,038 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-05-09 08:42:07,039 - openai._base_client - INFO - Retrying request to /chat/completions in 6.936000 seconds
+2025-05-09 08:42:35,162 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:42:35,163 - picklist_generator - INFO - Batch 1: Response time: 28.25s (avg: 1.23s per team)
+2025-05-09 08:42:35,164 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[2481,99.44,"High teleop EPA 63.29"],[341,90.62,"Strong teleop coral 17.73"],[3940,77.87,"Excellent endgame EPA 8.82"],[3767,72.29,"High teleop coral 13.88"],[3620,69.58,"Strong auto EPA 22.45"]...
+2025-05-09 08:42:35,164 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:42:35,164 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[2481, 99.44, "High teleop EPA 63.29"], [341, 90.62, "Strong teleop coral 17.73"], [3940, 77.87, "Excellent endgame EPA 8.82"]]
+2025-05-09 08:42:35,165 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:42:35,165 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:42:35,165 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 08:42:35,165 - picklist_generator - INFO -   Reference team 2: 2590 (score: 52.2)
+2025-05-09 08:42:35,165 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:42:35,165 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:42:35,165 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:42:35,165 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:42:35,165 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:42:35,166 - picklist_generator - INFO - Batch 2: Reference team numbers: [2481, 2590, 3489]
+2025-05-09 08:42:35,166 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:42:35,166 - picklist_generator - INFO - Batch 2: Team numbers: [597, 604, 2481, 2590, 3489, 4028, 4143, 4146, 4270, 4329]... (and 13 more)
+2025-05-09 08:42:35,166 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:42:44,527 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:42:44,533 - picklist_generator - INFO - Batch 2: Response time: 9.37s (avg: 0.41s per team)
+2025-05-09 08:42:44,533 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Top auto EPA 20.83"],[5990,87.22,"High teleop coral 16.37"],[4391,85.37,"Strong endgame EPA 9.88"],[2481,84.44,"High teleop EPA 63.29"],[4270,77.47,"Excellent teleop coral 15.05"],[4...
+2025-05-09 08:42:44,533 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:42:44,533 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Top auto EPA 20.83"], [5990, 87.22, "High teleop coral 16.37"], [4391, 85.37, "Strong endgame EPA 9.88"]]
+2025-05-09 08:42:44,534 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:42:44,534 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:42:44,534 - picklist_generator - INFO -   Reference team 1: 604 (score: 90.3)
+2025-05-09 08:42:44,534 - picklist_generator - INFO -   Reference team 2: 6340 (score: 61.1)
+2025-05-09 08:42:44,534 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:42:44,535 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:42:44,535 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:42:44,535 - picklist_generator - INFO - Batch size: 15 teams
+2025-05-09 08:42:44,535 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:42:44,535 - picklist_generator - INFO - Batch 3: Reference team numbers: [604, 4585, 6340]
+2025-05-09 08:42:44,535 - picklist_generator - INFO - Batch 3: Processing 18 teams (including 3 reference teams)
+2025-05-09 08:42:44,535 - picklist_generator - INFO - Batch 3: Team numbers: [604, 766, 836, 839, 987, 4585, 6340, 6369, 6548, 7211]... (and 8 more)
+2025-05-09 08:42:44,536 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:42:44,594 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-05-09 08:42:44,595 - openai._base_client - INFO - Retrying request to /chat/completions in 6.998000 seconds
+2025-05-09 08:42:57,857 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:42:57,859 - picklist_generator - INFO - Batch 3: Response time: 13.32s (avg: 0.74s per team)
+2025-05-09 08:42:57,860 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[987,83.5,"Top auto EPA 22.88"],[6369,82.4,"Strong teleop EPA 54.64"],[839,72.1,"High endgame EPA 11.46"],[836,71.8,"Good auto EPA 15.95"],[9408,69.2,"Solid teleop EPA 46.49"],[7211,69.7,"Strong...
+2025-05-09 08:42:57,860 - picklist_generator - INFO - Batch 3: Response contains 18 teams in ultra-compact format
+2025-05-09 08:42:57,860 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[987, 83.5, "Top auto EPA 22.88"], [6369, 82.4, "Strong teleop EPA 54.64"], [839, 72.1, "High endgame EPA 11.46"]]
+2025-05-09 08:42:57,860 - picklist_generator - INFO - Batch 3: Successfully processed 18 teams
+2025-05-09 08:42:57,860 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Reference teams with average scores: {2106: 65.88, 1197: 88.38, 10466: 30.42, 2481: 84.44, 2590: 52.23, 3489: 16.38, 604: 90.3, 6340: 61.1, 4585: 10.1}
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Total batch processing time: 57.60s
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Average time per team: 0.77s
+2025-05-09 08:42:57,861 - picklist_generator - INFO - Final picklist length: 75
+2025-05-09 08:42:57,861 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:42:57,862 - picklist_api - INFO - Successfully generated picklist for request 2871535466800
+2025-05-09 08:42:57,863 - picklist_api - INFO - Received picklist generation request 2871536768960: second pick for team 8044
+2025-05-09 08:42:57,871 - picklist_api - INFO - Request 2871536768960 cache key: 6e3217fbc4c5273aa4f284eb1a4b4b76
+2025-05-09 08:42:57,871 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:42:57,872 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:42:57,872 - picklist_generator - INFO - Using cached picklist [Request: 2871536768960]
+2025-05-09 08:42:57,872 - picklist_api - INFO - Successfully generated picklist for request 2871536768960
+2025-05-09 08:42:57,874 - picklist_api - INFO - Received picklist generation request 2871538776368: second pick for team 8044
+2025-05-09 08:42:57,880 - picklist_api - INFO - Request 2871538776368 cache key: 95d6585ed9e684873dd236b374764781
+2025-05-09 08:42:57,880 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:42:57,880 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:42:57,880 - picklist_generator - INFO - Using cached picklist [Request: 2871538776368]
+2025-05-09 08:42:57,880 - picklist_api - INFO - Successfully generated picklist for request 2871538776368
+2025-05-09 08:42:57,882 - picklist_api - INFO - Received picklist generation request 2871535300320: first pick for team 8044
+2025-05-09 08:42:57,888 - picklist_api - INFO - Request 2871535300320 cache key: 9b91ea2419cd55a68acfad5dbb7a56c8
+2025-05-09 08:42:57,888 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:42:57,888 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:42:57,889 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 08:42:57,889 - picklist_generator - INFO - Pick position: first
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Your team: 8044
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Total teams to rank: 66
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Excluded teams: [8044, 1987, 1197, 1756, 4391, 1114, 341, 2481, 5990]
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Using batch processing for 66 teams
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 08:42:57,890 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 08:42:57,890 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1511, 1629, 1701, 1727, 1732, 1923, 2052]... (and 10 more)
+2025-05-09 08:42:57,891 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 08:42:57,952 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-05-09 08:42:57,952 - openai._base_client - INFO - Retrying request to /chat/completions in 12.044000 seconds
+2025-05-09 08:43:16,391 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:43:16,404 - picklist_generator - INFO - Batch 0: Response time: 18.51s (avg: 0.93s per team)
+2025-05-09 08:43:16,405 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[2231,84.66,"Top teleop EPA 56.38"],[2338,84.08,"High auto EPA 24.84"],[1732,82.74,"Strong teleop coral 12.91"],[1701,79.2,"Excellent auto EPA 21.23"],[2052,69.57,"Great endgame EPA 10.25"],[11,...
+2025-05-09 08:43:16,405 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 08:43:16,405 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[2231, 84.66, "Top teleop EPA 56.38"], [2338, 84.08, "High auto EPA 24.84"], [1732, 82.74, "Strong teleop coral 12.91"]]
+2025-05-09 08:43:16,406 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 08:43:16,406 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:43:16,406 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:43:16,406 - picklist_generator - INFO -   Reference team 2: 1727 (score: 63.0)
+2025-05-09 08:43:16,407 - picklist_generator - INFO -   Reference team 3: 2341 (score: 26.5)
+2025-05-09 08:43:16,407 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:43:16,407 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 08:43:16,407 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:43:16,407 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 08:43:16,407 - picklist_generator - INFO - Batch 1: Reference team numbers: [1727, 2231, 2341]
+2025-05-09 08:43:16,407 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:43:16,407 - picklist_generator - INFO - Batch 1: Team numbers: [4, 386, 1727, 2231, 2341, 2637, 2638, 2834, 2851, 2935]... (and 13 more)
+2025-05-09 08:43:16,408 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 08:43:16,494 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-05-09 08:43:16,495 - openai._base_client - INFO - Retrying request to /chat/completions in 13.166000 seconds
+2025-05-09 08:43:40,813 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:43:40,814 - picklist_generator - INFO - Batch 1: Response time: 24.41s (avg: 1.06s per team)
+2025-05-09 08:43:40,814 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[3940,77.87,"Top teleop coral 16.01"],[4270,77.47,"Strong teleop EPA 53.43"],[4400,77.0,"High auto EPA 19.82"],[4028,76.28,"Excellent winrate 85.37%"],[3767,72.29,"Great teleop coral 13.88"],[36...
+2025-05-09 08:43:40,814 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 08:43:40,814 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[3940, 77.87, "Top teleop coral 16.01"], [4270, 77.47, "Strong teleop EPA 53.43"], [4400, 77.0, "High auto EPA 19.82"]]
+2025-05-09 08:43:40,814 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 08:43:40,814 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:43:40,815 - picklist_generator - INFO -   Reference team 1: 2231 (score: 84.7)
+2025-05-09 08:43:40,815 - picklist_generator - INFO -   Reference team 2: 386 (score: 52.4)
+2025-05-09 08:43:40,815 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 08:43:40,815 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:43:40,815 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 08:43:40,815 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 08:43:40,815 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 08:43:40,815 - picklist_generator - INFO - Batch 2: Reference team numbers: [386, 2231, 3489]
+2025-05-09 08:43:40,815 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 08:43:40,816 - picklist_generator - INFO - Batch 2: Team numbers: [386, 597, 604, 766, 836, 839, 2231, 3489, 4585, 4788]... (and 13 more)
+2025-05-09 08:43:40,816 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 08:43:40,898 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-05-09 08:43:40,898 - openai._base_client - INFO - Retrying request to /chat/completions in 8.740000 seconds
+2025-05-09 08:43:57,835 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:43:57,836 - picklist_generator - INFO - Batch 2: Response time: 17.02s (avg: 0.74s per team)
+2025-05-09 08:43:57,836 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Top teleop coral 15.61"],[6369,87.37,"Strong auto EPA 21.78"],[2231,84.66,"Top teleop EPA 56.38"],[5951,72.6,"High auto coral 2.46"],[839,72.13,"Strong teleop coral 13.33"],[836,71.8...
+2025-05-09 08:43:57,836 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 08:43:57,836 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Top teleop coral 15.61"], [6369, 87.37, "Strong auto EPA 21.78"], [2231, 84.66, "Top teleop EPA 56.38"]]
+2025-05-09 08:43:57,836 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 08:43:57,837 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 08:43:57,837 - picklist_generator - INFO -   Reference team 1: 604 (score: 90.3)
+2025-05-09 08:43:57,837 - picklist_generator - INFO -   Reference team 2: 5516 (score: 56.4)
+2025-05-09 08:43:57,837 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 08:43:57,837 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 08:43:57,837 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 08:43:57,837 - picklist_generator - INFO - Batch size: 6 teams
+2025-05-09 08:43:57,838 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 08:43:57,838 - picklist_generator - INFO - Batch 3: Reference team numbers: [604, 4585, 5516]
+2025-05-09 08:43:57,838 - picklist_generator - INFO - Batch 3: Processing 9 teams (including 3 reference teams)
+2025-05-09 08:43:57,838 - picklist_generator - INFO - Batch 3: Team numbers: [604, 987, 4585, 5516, 9234, 9408, 9459, 9576, 9583]
+2025-05-09 08:43:57,838 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 08:43:57,899 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-05-09 08:43:57,900 - openai._base_client - INFO - Retrying request to /chat/completions in 5.694000 seconds
+2025-05-09 08:44:08,848 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 08:44:08,850 - picklist_generator - INFO - Batch 3: Response time: 11.01s (avg: 1.22s per team)
+2025-05-09 08:44:08,850 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[987,83.46,"Top teleop coral 13.33"],[9408,69.21,"Strong teleop coral 9.65"],[9576,54.86,"Good endgame EPA 8.39"],[9459,36.78,"Solid teleop coral 6.3"],[9234,33.66,"Decent teleop coral 4.81"],[5...
+2025-05-09 08:44:08,851 - picklist_generator - INFO - Batch 3: Response contains 9 teams in ultra-compact format
+2025-05-09 08:44:08,851 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[987, 83.46, "Top teleop coral 13.33"], [9408, 69.21, "Strong teleop coral 9.65"], [9576, 54.86, "Good endgame EPA 8.39"]]
+2025-05-09 08:44:08,852 - picklist_generator - INFO - Batch 3: Successfully processed 9 teams
+2025-05-09 08:44:08,852 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 08:44:08,852 - picklist_generator - INFO - Reference teams with average scores: {1727: 62.95, 2231: 84.66, 2341: 26.47, 386: 52.42, 3489: 16.38, 5516: 56.41, 604: 90.34, 4585: 10.1}
+2025-05-09 08:44:08,853 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:44:08,853 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:44:08,853 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 08:44:08,853 - picklist_generator - INFO - Total batch processing time: 70.96s
+2025-05-09 08:44:08,854 - picklist_generator - INFO - Average time per team: 1.08s
+2025-05-09 08:44:08,854 - picklist_generator - INFO - Final picklist length: 66
+2025-05-09 08:44:08,854 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 08:44:08,855 - picklist_api - INFO - Successfully generated picklist for request 2871535300320
+2025-05-09 08:44:08,857 - picklist_api - INFO - Received picklist generation request 2871535464880: second pick for team 8044
+2025-05-09 08:44:08,863 - picklist_api - INFO - Request 2871535464880 cache key: 95d6585ed9e684873dd236b374764781
+2025-05-09 08:44:08,863 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:44:08,864 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:44:08,864 - picklist_generator - INFO - Using cached picklist [Request: 2871535464880]
+2025-05-09 08:44:08,864 - picklist_api - INFO - Successfully generated picklist for request 2871535464880
+2025-05-09 08:44:08,866 - picklist_api - INFO - Received picklist generation request 2871535302800: first pick for team 8044
+2025-05-09 08:44:08,871 - picklist_api - INFO - Request 2871535302800 cache key: 9b91ea2419cd55a68acfad5dbb7a56c8
+2025-05-09 08:44:08,872 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:44:08,872 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:44:08,872 - picklist_generator - INFO - Using cached picklist [Request: 2871535302800]
+2025-05-09 08:44:08,872 - picklist_api - INFO - Successfully generated picklist for request 2871535302800
+2025-05-09 08:44:09,235 - picklist_api - INFO - Received picklist generation request 2871535294480: first pick for team 8044
+2025-05-09 08:44:09,242 - picklist_api - INFO - Request 2871535294480 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:44:09,242 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:44:09,242 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:44:09,242 - picklist_generator - INFO - Using cached picklist [Request: 2871535294480]
+2025-05-09 08:44:09,243 - picklist_api - INFO - Successfully generated picklist for request 2871535294480
+2025-05-09 08:44:09,244 - picklist_api - INFO - Received picklist generation request 2871535467280: first pick for team 8044
+2025-05-09 08:44:09,253 - picklist_api - INFO - Request 2871535467280 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:44:09,253 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:44:09,253 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:44:09,253 - picklist_generator - INFO - Using cached picklist [Request: 2871535467280]
+2025-05-09 08:44:09,253 - picklist_api - INFO - Successfully generated picklist for request 2871535467280
+2025-05-09 08:44:09,320 - picklist_api - INFO - Received picklist generation request 2871535301120: first pick for team 8044
+2025-05-09 08:44:09,328 - picklist_api - INFO - Request 2871535301120 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:44:09,328 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:44:09,328 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:44:09,328 - picklist_generator - INFO - Using cached picklist [Request: 2871535301120]
+2025-05-09 08:44:09,328 - picklist_api - INFO - Successfully generated picklist for request 2871535301120
+2025-05-09 08:44:09,331 - picklist_api - INFO - Received picklist generation request 2871538765408: first pick for team 8044
+2025-05-09 08:44:09,338 - picklist_api - INFO - Request 2871538765408 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:44:09,338 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:44:09,338 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:44:09,339 - picklist_generator - INFO - Using cached picklist [Request: 2871538765408]
+2025-05-09 08:44:09,339 - picklist_api - INFO - Successfully generated picklist for request 2871538765408
+2025-05-09 08:46:03,863 - picklist_api - INFO - Received picklist generation request 2871535189952: first pick for team 8044
+2025-05-09 08:46:03,870 - picklist_api - INFO - Request 2871535189952 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:46:03,870 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:46:03,871 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:46:03,871 - picklist_generator - INFO - Using cached picklist [Request: 2871535189952]
+2025-05-09 08:46:03,871 - picklist_api - INFO - Successfully generated picklist for request 2871535189952
+2025-05-09 08:46:03,873 - picklist_api - INFO - Received picklist generation request 2871535468400: first pick for team 8044
+2025-05-09 08:46:03,878 - picklist_api - INFO - Request 2871535468400 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:46:03,880 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:46:03,880 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:46:03,880 - picklist_generator - INFO - Using cached picklist [Request: 2871535468400]
+2025-05-09 08:46:03,880 - picklist_api - INFO - Successfully generated picklist for request 2871535468400
+2025-05-09 08:54:23,248 - picklist_api - INFO - Received picklist generation request 2871537023760: first pick for team 8044
+2025-05-09 08:54:23,255 - picklist_api - INFO - Request 2871537023760 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:54:23,255 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:54:23,256 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:54:23,256 - picklist_generator - INFO - Using cached picklist [Request: 2871537023760]
+2025-05-09 08:54:23,256 - picklist_api - INFO - Successfully generated picklist for request 2871537023760
+2025-05-09 08:54:23,323 - picklist_api - INFO - Received picklist generation request 2871535459360: first pick for team 8044
+2025-05-09 08:54:23,331 - picklist_api - INFO - Request 2871535459360 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:54:23,331 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:54:23,331 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:54:23,331 - picklist_generator - INFO - Using cached picklist [Request: 2871535459360]
+2025-05-09 08:54:23,331 - picklist_api - INFO - Successfully generated picklist for request 2871535459360
+2025-05-09 08:54:23,407 - picklist_api - INFO - Received picklist generation request 2871536771120: first pick for team 8044
+2025-05-09 08:54:23,414 - picklist_api - INFO - Request 2871536771120 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:54:23,415 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:54:23,415 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:54:23,415 - picklist_generator - INFO - Using cached picklist [Request: 2871536771120]
+2025-05-09 08:54:23,415 - picklist_api - INFO - Successfully generated picklist for request 2871536771120
+2025-05-09 08:54:23,418 - picklist_api - INFO - Received picklist generation request 2871537021040: first pick for team 8044
+2025-05-09 08:54:23,425 - picklist_api - INFO - Request 2871537021040 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 08:54:23,425 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 08:54:23,425 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 08:54:23,425 - picklist_generator - INFO - Using cached picklist [Request: 2871537021040]
+2025-05-09 08:54:23,425 - picklist_api - INFO - Successfully generated picklist for request 2871537021040
+2025-05-09 09:51:24,956 - picklist_api - INFO - Received picklist generation request 1817498982736: first pick for team 8044
+2025-05-09 09:51:24,964 - picklist_api - INFO - Request 1817498982736 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 09:51:24,965 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 09:51:24,965 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 09:51:24,966 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 09:51:24,966 - picklist_generator - INFO - Pick position: first
+2025-05-09 09:51:24,966 - picklist_generator - INFO - Your team: 8044
+2025-05-09 09:51:24,966 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 09:51:24,966 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 09:51:24,966 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 09:51:24,966 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 09:51:24,967 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 09:51:24,967 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 09:51:24,967 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 09:51:24,967 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 09:51:24,967 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 09:51:24,967 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 09:51:24,968 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 09:51:33,208 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 09:51:33,218 - picklist_generator - INFO - Batch 0: Response time: 8.25s (avg: 0.41s per team)
+2025-05-09 09:51:33,218 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"Top auto 23.39, high teleop 54.7"],[2231,84.66,"Strong teleop 56.38, good endgame 9.6"],[2338,84.08,"Excellent auto 24.84, solid teleop 48.69"],[1732,82.74,"High teleop 54.92, stron...
+2025-05-09 09:51:33,219 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 09:51:33,219 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "Top auto 23.39, high teleop 54.7"], [2231, 84.66, "Strong teleop 56.38, good endgame 9.6"], [2338, 84.08, "Excellent auto 24.84, solid teleop 48.69"]]
+2025-05-09 09:51:33,219 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 09:51:33,219 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 09:51:33,219 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 09:51:33,219 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 09:51:33,219 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 09:51:33,219 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 09:51:33,219 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 09:51:33,219 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 09:51:33,220 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 09:51:33,220 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 09:51:33,220 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 09:51:33,220 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 09:51:33,220 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 09:56:05,478 - picklist_api - INFO - Received picklist generation request 1801727785344: first pick for team 8044
+2025-05-09 09:56:05,493 - picklist_api - INFO - Request 1801727785344 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 09:56:05,493 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 09:56:05,493 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 09:56:05,495 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 09:56:05,496 - picklist_generator - INFO - Pick position: first
+2025-05-09 09:56:05,496 - picklist_generator - INFO - Your team: 8044
+2025-05-09 09:56:05,496 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 09:56:05,496 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 09:56:05,496 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 09:56:05,496 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 09:56:05,498 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 09:56:05,498 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 09:56:05,498 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 09:56:05,498 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 09:56:05,498 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 09:56:05,498 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 09:56:05,499 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 09:56:13,352 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 09:56:13,358 - picklist_generator - INFO - Batch 0: Response time: 7.86s (avg: 0.39s per team)
+2025-05-09 09:56:13,358 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"Top auto 23.39, strong teleop 54.7"],[2231,84.66,"High teleop 56.38, consistent endgame 9.6"],[2338,84.08,"Excellent auto 24.84, strong endgame 10.55"],[1732,82.74,"Strong teleop 54...
+2025-05-09 09:56:13,358 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 09:56:13,359 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "Top auto 23.39, strong teleop 54.7"], [2231, 84.66, "High teleop 56.38, consistent endgame 9.6"], [2338, 84.08, "Excellent auto 24.84, strong endgame 10.55"]]
+2025-05-09 09:56:13,359 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 09:56:13,359 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 09:56:13,359 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 09:56:13,359 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 09:56:13,359 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 09:56:13,360 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 09:56:13,360 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 09:56:13,360 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 09:56:13,360 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 09:56:13,360 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 09:56:13,360 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 09:56:13,361 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 09:56:13,361 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 09:56:21,274 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 09:56:21,276 - picklist_generator - INFO - Batch 1: Response time: 7.91s (avg: 0.34s per team)
+2025-05-09 09:56:21,276 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[2481,99.4,"Top teleop coral 19.94"],[341,90.6,"Strong teleop coral 17.73"],[1197,88.4,"Top auto 23.39, strong teleop 54.7"],[3940,77.9,"High teleop coral 16.01"],[3767,72.3,"Excellent teleop co...
+2025-05-09 09:56:21,277 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 09:56:21,277 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[2481, 99.4, "Top teleop coral 19.94"], [341, 90.6, "Strong teleop coral 17.73"], [1197, 88.4, "Top auto 23.39, strong teleop 54.7"]]
+2025-05-09 09:56:21,277 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 09:56:21,277 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 09:56:21,278 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 09:56:21,278 - picklist_generator - INFO -   Reference team 2: 2590 (score: 52.2)
+2025-05-09 09:56:21,279 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 09:56:21,279 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 09:56:21,279 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 09:56:21,279 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 09:56:21,279 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 09:56:21,279 - picklist_generator - INFO - Batch 2: Reference team numbers: [2481, 2590, 3489]
+2025-05-09 09:56:21,279 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 09:56:21,280 - picklist_generator - INFO - Batch 2: Team numbers: [597, 604, 2481, 2590, 3489, 4028, 4143, 4146, 4270, 4329]... (and 13 more)
+2025-05-09 09:56:21,280 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 09:56:29,880 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 09:56:29,883 - picklist_generator - INFO - Batch 2: Response time: 8.60s (avg: 0.37s per team)
+2025-05-09 09:56:29,883 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"High EPA total 90.34"],[5990,87.22,"Top teleop coral 16.37"],[4391,85.37,"Strong teleop coral 15.76"],[4028,76.28,"Great teleop coral 11.16"],[4400,77.0,"Excellent auto coral 2.44"],...
+2025-05-09 09:56:29,884 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 09:56:29,884 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "High EPA total 90.34"], [5990, 87.22, "Top teleop coral 16.37"], [4391, 85.37, "Strong teleop coral 15.76"]]
+2025-05-09 09:56:29,884 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 09:56:29,885 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 09:56:29,885 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 09:56:29,885 - picklist_generator - INFO -   Reference team 2: 6340 (score: 61.1)
+2025-05-09 09:56:29,885 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 09:56:29,885 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 09:56:29,885 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 09:56:29,886 - picklist_generator - INFO - Batch size: 15 teams
+2025-05-09 09:56:29,886 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 09:56:29,886 - picklist_generator - INFO - Batch 3: Reference team numbers: [2481, 4585, 6340]
+2025-05-09 09:56:29,886 - picklist_generator - INFO - Batch 3: Processing 18 teams (including 3 reference teams)
+2025-05-09 09:56:29,886 - picklist_generator - INFO - Batch 3: Team numbers: [766, 836, 839, 987, 2481, 4585, 6340, 6369, 6548, 7211]... (and 8 more)
+2025-05-09 09:56:29,887 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 09:56:37,480 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 09:56:37,487 - picklist_generator - INFO - Batch 3: Response time: 7.60s (avg: 0.42s per team)
+2025-05-09 09:56:37,487 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[2481,99.4,"Top teleop coral 19.94"],[987,83.46,"Strong auto EPA 22.88"],[6369,87.37,"High teleop coral 15.87"],[8044,77.01,"Solid teleop EPA 53.58"],[839,72.13,"Good endgame EPA 11.46"],[836,71...
+2025-05-09 09:56:37,487 - picklist_generator - INFO - Batch 3: Response contains 18 teams in ultra-compact format
+2025-05-09 09:56:37,488 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[2481, 99.4, "Top teleop coral 19.94"], [987, 83.46, "Strong auto EPA 22.88"], [6369, 87.37, "High teleop coral 15.87"]]
+2025-05-09 09:56:37,488 - picklist_generator - INFO - Batch 3: Successfully processed 18 teams
+2025-05-09 09:56:37,488 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Reference teams with average scores: {1197: 88.4, 2106: 65.9, 10466: 30.4, 2481: 99.4, 2590: 52.2, 3489: 16.4, 6340: 61.14, 4585: 10.1}
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Total batch processing time: 31.99s
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Average time per team: 0.43s
+2025-05-09 09:56:37,489 - picklist_generator - INFO - Final picklist length: 75
+2025-05-09 09:56:37,490 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 09:56:37,490 - picklist_api - INFO - Successfully generated picklist for request 1801727785344
+2025-05-09 09:56:37,535 - picklist_api - INFO - Received picklist generation request 1799759334928: first pick for team 8044
+2025-05-09 09:56:37,540 - picklist_api - INFO - Request 1799759334928 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 09:56:37,541 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 09:56:37,541 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 09:56:37,541 - picklist_generator - INFO - Using cached picklist [Request: 1799759334928]
+2025-05-09 09:56:37,541 - picklist_api - INFO - Successfully generated picklist for request 1799759334928
+2025-05-09 09:56:37,641 - picklist_api - INFO - Received picklist generation request 1799761625488: first pick for team 8044
+2025-05-09 09:56:37,648 - picklist_api - INFO - Request 1799761625488 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 09:56:37,648 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 09:56:37,648 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 09:56:37,648 - picklist_generator - INFO - Using cached picklist [Request: 1799761625488]
+2025-05-09 09:56:37,648 - picklist_api - INFO - Successfully generated picklist for request 1799761625488
+2025-05-09 09:56:37,650 - picklist_api - INFO - Received picklist generation request 1799761629648: first pick for team 8044
+2025-05-09 09:56:37,656 - picklist_api - INFO - Request 1799761629648 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 09:56:37,656 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 09:56:37,656 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 09:56:37,656 - picklist_generator - INFO - Using cached picklist [Request: 1799761629648]
+2025-05-09 09:56:37,657 - picklist_api - INFO - Successfully generated picklist for request 1799761629648
+2025-05-09 10:12:22,100 - picklist_api - INFO - Received picklist generation request 1799761634528: first pick for team 8044
+2025-05-09 10:12:22,108 - picklist_api - INFO - Request 1799761634528 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:12:22,108 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:12:22,108 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:12:22,108 - picklist_generator - INFO - Using cached picklist [Request: 1799761634528]
+2025-05-09 10:12:22,108 - picklist_api - INFO - Successfully generated picklist for request 1799761634528
+2025-05-09 10:12:22,110 - picklist_api - INFO - Received picklist generation request 1801735951040: first pick for team 8044
+2025-05-09 10:12:22,117 - picklist_api - INFO - Request 1801735951040 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:12:22,118 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:12:22,118 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:12:22,118 - picklist_generator - INFO - Using cached picklist [Request: 1801735951040]
+2025-05-09 10:12:22,119 - picklist_api - INFO - Successfully generated picklist for request 1801735951040
+2025-05-09 10:12:22,149 - picklist_api - INFO - Received picklist generation request 1801735951040: first pick for team 8044
+2025-05-09 10:12:22,155 - picklist_api - INFO - Request 1801735951040 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:12:22,155 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:12:22,155 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:12:22,156 - picklist_generator - INFO - Using cached picklist [Request: 1801735951040]
+2025-05-09 10:12:22,156 - picklist_api - INFO - Successfully generated picklist for request 1801735951040
+2025-05-09 10:12:22,157 - picklist_api - INFO - Received picklist generation request 1799761632128: first pick for team 8044
+2025-05-09 10:12:22,166 - picklist_api - INFO - Request 1799761632128 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:12:22,166 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:12:22,166 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:12:22,166 - picklist_generator - INFO - Using cached picklist [Request: 1799761632128]
+2025-05-09 10:12:22,166 - picklist_api - INFO - Successfully generated picklist for request 1799761632128
+2025-05-09 10:31:24,373 - picklist_api - INFO - Received picklist generation request 2640533173776: first pick for team 8044
+2025-05-09 10:31:24,380 - picklist_api - INFO - Request 2640533173776 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:31:24,380 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:31:24,380 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:31:24,382 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Pick position: first
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Your team: 8044
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 10:31:24,382 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 10:31:24,382 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 10:31:24,383 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 10:31:31,084 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 10:31:31,086 - picklist_generator - INFO - Batch 0: Response time: 6.70s (avg: 0.34s per team)
+2025-05-09 10:31:31,086 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"Top auto 23.39, teleop 54.7"],[2231,84.66,"Strong teleop 56.38, auto 18.68"],[2338,84.08,"High auto 24.84, teleop 48.69"],[1732,82.74,"Excellent teleop 54.92, endgame 11.7"],[1114,8...
+2025-05-09 10:31:31,086 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 10:31:31,086 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "Top auto 23.39, teleop 54.7"], [2231, 84.66, "Strong teleop 56.38, auto 18.68"], [2338, 84.08, "High auto 24.84, teleop 48.69"]]
+2025-05-09 10:31:31,086 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 10:31:31,087 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 10:31:31,087 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 10:31:31,087 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 10:31:31,087 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 10:31:31,087 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 10:31:31,087 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 10:31:31,087 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 10:31:31,087 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 10:31:31,087 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 10:31:31,087 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 10:31:31,088 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 10:31:31,088 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 10:31:43,152 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 10:31:43,153 - picklist_generator - INFO - Batch 1: Response time: 12.07s (avg: 0.52s per team)
+2025-05-09 10:31:43,153 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[2481,99.4,"Top teleop 63.29, auto 24.95"],[341,90.6,"Strong teleop 63.47, endgame 11.99"],[1197,88.4,"Top auto 23.39, teleop 54.7"],[3940,77.9,"High teleop 51.05, endgame 8.82"],[3767,72.3,"Gre...
+2025-05-09 10:31:43,153 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 10:31:43,154 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[2481, 99.4, "Top teleop 63.29, auto 24.95"], [341, 90.6, "Strong teleop 63.47, endgame 11.99"], [1197, 88.4, "Top auto 23.39, teleop 54.7"]]
+2025-05-09 10:31:43,154 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 10:31:43,154 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 10:31:43,154 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 10:31:43,154 - picklist_generator - INFO -   Reference team 2: 2590 (score: 52.2)
+2025-05-09 10:31:43,154 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 10:31:43,156 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 10:31:43,156 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 10:31:43,156 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 10:31:43,156 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 10:31:43,156 - picklist_generator - INFO - Batch 2: Reference team numbers: [2481, 2590, 3489]
+2025-05-09 10:31:43,156 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 10:31:43,156 - picklist_generator - INFO - Batch 2: Team numbers: [597, 604, 2481, 2590, 3489, 4028, 4143, 4146, 4270, 4329]... (and 13 more)
+2025-05-09 10:31:43,157 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 10:31:54,254 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 10:31:54,257 - picklist_generator - INFO - Batch 2: Response time: 11.10s (avg: 0.48s per team)
+2025-05-09 10:31:54,257 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Strong auto 24.0, teleop 7.2"],[5990,87.22,"High teleop coral 16.37"],[4391,85.37,"Excellent endgame 10.18"],[4028,76.28,"High EPA teleop 49.81"],[4270,77.47,"Strong teleop coral 15....
+2025-05-09 10:31:54,257 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 10:31:54,257 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Strong auto 24.0, teleop 7.2"], [5990, 87.22, "High teleop coral 16.37"], [4391, 85.37, "Excellent endgame 10.18"]]
+2025-05-09 10:31:54,258 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 10:31:54,258 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 10:31:54,258 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 10:31:54,258 - picklist_generator - INFO -   Reference team 2: 6340 (score: 61.1)
+2025-05-09 10:31:54,258 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 10:31:54,258 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 10:31:54,259 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 10:31:54,259 - picklist_generator - INFO - Batch size: 15 teams
+2025-05-09 10:31:54,259 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 10:31:54,259 - picklist_generator - INFO - Batch 3: Reference team numbers: [2481, 4585, 6340]
+2025-05-09 10:31:54,259 - picklist_generator - INFO - Batch 3: Processing 18 teams (including 3 reference teams)
+2025-05-09 10:31:54,259 - picklist_generator - INFO - Batch 3: Team numbers: [766, 836, 839, 987, 2481, 4585, 6340, 6369, 6548, 7211]... (and 8 more)
+2025-05-09 10:31:54,259 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 10:32:00,483 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 10:32:00,484 - picklist_generator - INFO - Batch 3: Response time: 6.23s (avg: 0.35s per team)
+2025-05-09 10:32:00,484 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[2481,99.4,"Top teleop 63.29,auto 24.95"],[987,83.5,"Strong auto 22.88,teleop 52.27"],[6369,87.4,"High auto 21.78,teleop 54.64"],[8044,77.0,"Balanced EPA 77.01,teleop 53.58"],[839,72.1,"Good tel...
+2025-05-09 10:32:00,485 - picklist_generator - INFO - Batch 3: Response contains 18 teams in ultra-compact format
+2025-05-09 10:32:00,485 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[2481, 99.4, "Top teleop 63.29,auto 24.95"], [987, 83.5, "Strong auto 22.88,teleop 52.27"], [6369, 87.4, "High auto 21.78,teleop 54.64"]]
+2025-05-09 10:32:00,485 - picklist_generator - INFO - Batch 3: Successfully processed 18 teams
+2025-05-09 10:32:00,485 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 10:32:00,485 - picklist_generator - INFO - Reference teams with average scores: {1197: 88.4, 2106: 65.9, 10466: 30.4, 2481: 99.4, 2590: 52.2, 3489: 16.4, 6340: 61.1, 4585: 10.1}
+2025-05-09 10:32:00,485 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 10:32:00,487 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 10:32:00,487 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 10:32:00,487 - picklist_generator - INFO - Total batch processing time: 36.11s
+2025-05-09 10:32:00,487 - picklist_generator - INFO - Average time per team: 0.48s
+2025-05-09 10:32:00,487 - picklist_generator - INFO - Final picklist length: 75
+2025-05-09 10:32:00,487 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 10:32:00,488 - picklist_api - INFO - Successfully generated picklist for request 2640533173776
+2025-05-09 10:32:00,489 - picklist_api - INFO - Received picklist generation request 2640534239616: first pick for team 8044
+2025-05-09 10:32:00,496 - picklist_api - INFO - Request 2640534239616 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:32:00,496 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:32:00,496 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:32:00,496 - picklist_generator - INFO - Using cached picklist [Request: 2640534239616]
+2025-05-09 10:32:00,496 - picklist_api - INFO - Successfully generated picklist for request 2640534239616
+2025-05-09 10:32:00,498 - picklist_api - INFO - Received picklist generation request 2640536037296: first pick for team 8044
+2025-05-09 10:32:00,503 - picklist_api - INFO - Request 2640536037296 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:32:00,503 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:32:00,505 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:32:00,505 - picklist_generator - INFO - Using cached picklist [Request: 2640536037296]
+2025-05-09 10:32:00,505 - picklist_api - INFO - Successfully generated picklist for request 2640536037296
+2025-05-09 10:32:00,506 - picklist_api - INFO - Received picklist generation request 2640533470608: first pick for team 8044
+2025-05-09 10:32:00,511 - picklist_api - INFO - Request 2640533470608 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:32:00,511 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:32:00,511 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:32:00,511 - picklist_generator - INFO - Using cached picklist [Request: 2640533470608]
+2025-05-09 10:32:00,512 - picklist_api - INFO - Successfully generated picklist for request 2640533470608
+2025-05-09 10:32:00,513 - picklist_api - INFO - Received picklist generation request 2640534240256: first pick for team 8044
+2025-05-09 10:32:00,520 - picklist_api - INFO - Request 2640534240256 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 10:32:00,520 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 10:32:00,520 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 10:32:00,520 - picklist_generator - INFO - Using cached picklist [Request: 2640534240256]
+2025-05-09 10:32:00,520 - picklist_api - INFO - Successfully generated picklist for request 2640534240256
+2025-05-09 11:55:59,862 - picklist_api - INFO - Received picklist generation request 1917076669456: first pick for team 8044
+2025-05-09 11:55:59,869 - picklist_api - INFO - Request 1917076669456 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:55:59,869 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:55:59,870 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:55:59,871 - picklist_generator - INFO - ====== STARTING PICKLIST GENERATION ======
+2025-05-09 11:55:59,871 - picklist_generator - INFO - Pick position: first
+2025-05-09 11:55:59,871 - picklist_generator - INFO - Your team: 8044
+2025-05-09 11:55:59,871 - picklist_generator - INFO - Priority metrics count: 8
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Total teams to rank: 75
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Using BATCH PROCESSING with batch_size=20, reference_teams_count=3
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Reference team selection strategy: top_middle_bottom
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Using batch processing for 75 teams
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Split teams into 4 batches
+2025-05-09 11:55:59,872 - picklist_generator - INFO - 
+----- Processing Batch 1/4 -----
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Batch 0: Processing 20 teams (including 0 reference teams)
+2025-05-09 11:55:59,872 - picklist_generator - INFO - Batch 0: Team numbers: [11, 117, 1076, 1114, 1197, 1511, 1629, 1701, 1727, 1732]... (and 10 more)
+2025-05-09 11:55:59,873 - picklist_generator - INFO - Batch 0: Starting API call...
+2025-05-09 11:56:06,914 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 11:56:06,919 - picklist_generator - INFO - Batch 0: Response time: 7.05s (avg: 0.35s per team)
+2025-05-09 11:56:06,919 - picklist_generator - INFO - Batch 0: Response sample: {"p":[[1197,88.38,"High auto EPA 23.39"],[2231,84.66,"Strong teleop EPA 56.38"],[2338,84.08,"Top auto coral 3.14"],[1114,81.42,"Excellent teleop coral 14.24"],[1732,82.74,"Great teleop EPA 54.92"],[17...
+2025-05-09 11:56:06,919 - picklist_generator - INFO - Batch 0: Response contains 20 teams in ultra-compact format
+2025-05-09 11:56:06,919 - picklist_generator - INFO - Batch 0: First few teams (ultra-compact): [[1197, 88.38, "High auto EPA 23.39"], [2231, 84.66, "Strong teleop EPA 56.38"], [2338, 84.08, "Top auto coral 3.14"]]
+2025-05-09 11:56:06,920 - picklist_generator - INFO - Batch 0: Successfully processed 20 teams
+2025-05-09 11:56:06,920 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 11:56:06,920 - picklist_generator - INFO -   Reference team 1: 1197 (score: 88.4)
+2025-05-09 11:56:06,920 - picklist_generator - INFO -   Reference team 2: 2106 (score: 65.9)
+2025-05-09 11:56:06,920 - picklist_generator - INFO -   Reference team 3: 10466 (score: 30.4)
+2025-05-09 11:56:06,921 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 11:56:06,921 - picklist_generator - INFO - 
+----- Processing Batch 2/4 -----
+2025-05-09 11:56:06,921 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 11:56:06,921 - picklist_generator - INFO - Batch 1: Added 3 reference teams to the batch
+2025-05-09 11:56:06,921 - picklist_generator - INFO - Batch 1: Reference team numbers: [1197, 2106, 10466]
+2025-05-09 11:56:06,922 - picklist_generator - INFO - Batch 1: Processing 23 teams (including 3 reference teams)
+2025-05-09 11:56:06,922 - picklist_generator - INFO - Batch 1: Team numbers: [4, 341, 386, 1197, 2106, 2341, 2342, 2481, 2590, 2601]... (and 13 more)
+2025-05-09 11:56:06,922 - picklist_generator - INFO - Batch 1: Starting API call...
+2025-05-09 11:56:13,405 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 11:56:13,406 - picklist_generator - INFO - Batch 1: Response time: 6.48s (avg: 0.28s per team)
+2025-05-09 11:56:13,406 - picklist_generator - INFO - Batch 1: Response sample: {"p":[[2481,99.44,"Excellent teleop EPA 63.29"],[341,90.62,"Strong teleop EPA 63.47"],[1197,88.38,"High auto EPA 23.39"],[3940,77.87,"Great teleop EPA 51.05"],[3767,72.29,"Strong teleop EPA 48.36"],[3...
+2025-05-09 11:56:13,406 - picklist_generator - INFO - Batch 1: Response contains 23 teams in ultra-compact format
+2025-05-09 11:56:13,406 - picklist_generator - INFO - Batch 1: First few teams (ultra-compact): [[2481, 99.44, "Excellent teleop EPA 63.29"], [341, 90.62, "Strong teleop EPA 63.47"], [1197, 88.38, "High auto EPA 23.39"]]
+2025-05-09 11:56:13,406 - picklist_generator - INFO - Batch 1: Successfully processed 23 teams
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 11:56:13,407 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 11:56:13,407 - picklist_generator - INFO -   Reference team 2: 2590 (score: 52.2)
+2025-05-09 11:56:13,407 - picklist_generator - INFO -   Reference team 3: 3489 (score: 16.4)
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 11:56:13,407 - picklist_generator - INFO - 
+----- Processing Batch 3/4 -----
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Batch size: 20 teams
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Batch 2: Added 3 reference teams to the batch
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Batch 2: Reference team numbers: [2481, 2590, 3489]
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Batch 2: Processing 23 teams (including 3 reference teams)
+2025-05-09 11:56:13,407 - picklist_generator - INFO - Batch 2: Team numbers: [597, 604, 2481, 2590, 3489, 4028, 4143, 4146, 4270, 4329]... (and 13 more)
+2025-05-09 11:56:13,408 - picklist_generator - INFO - Batch 2: Starting API call...
+2025-05-09 11:56:21,492 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 11:56:21,493 - picklist_generator - INFO - Batch 2: Response time: 8.08s (avg: 0.35s per team)
+2025-05-09 11:56:21,493 - picklist_generator - INFO - Batch 2: Response sample: {"p":[[604,90.34,"Strong teleop EPA 61.19"],[5990,87.22,"High teleop coral 16.37"],[4391,85.37,"Excellent endgame EPA 9.88"],[4028,76.28,"Great teleop coral 11.16"],[4400,77.0,"High auto EPA 19.82"],[...
+2025-05-09 11:56:21,493 - picklist_generator - INFO - Batch 2: Response contains 23 teams in ultra-compact format
+2025-05-09 11:56:21,493 - picklist_generator - INFO - Batch 2: First few teams (ultra-compact): [[604, 90.34, "Strong teleop EPA 61.19"], [5990, 87.22, "High teleop coral 16.37"], [4391, 85.37, "Excellent endgame EPA 9.88"]]
+2025-05-09 11:56:21,494 - picklist_generator - INFO - Batch 2: Successfully processed 23 teams
+2025-05-09 11:56:21,494 - picklist_generator - INFO - Selected 3 reference teams using 'top_middle_bottom' strategy
+2025-05-09 11:56:21,494 - picklist_generator - INFO -   Reference team 1: 2481 (score: 99.4)
+2025-05-09 11:56:21,494 - picklist_generator - INFO -   Reference team 2: 6340 (score: 61.1)
+2025-05-09 11:56:21,494 - picklist_generator - INFO -   Reference team 3: 4585 (score: 10.1)
+2025-05-09 11:56:21,494 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-05-09 11:56:21,495 - picklist_generator - INFO - 
+----- Processing Batch 4/4 -----
+2025-05-09 11:56:21,495 - picklist_generator - INFO - Batch size: 15 teams
+2025-05-09 11:56:21,495 - picklist_generator - INFO - Batch 3: Added 3 reference teams to the batch
+2025-05-09 11:56:21,495 - picklist_generator - INFO - Batch 3: Reference team numbers: [2481, 4585, 6340]
+2025-05-09 11:56:21,495 - picklist_generator - INFO - Batch 3: Processing 18 teams (including 3 reference teams)
+2025-05-09 11:56:21,495 - picklist_generator - INFO - Batch 3: Team numbers: [766, 836, 839, 987, 2481, 4585, 6340, 6369, 6548, 7211]... (and 8 more)
+2025-05-09 11:56:21,496 - picklist_generator - INFO - Batch 3: Starting API call...
+2025-05-09 11:56:28,125 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-09 11:56:28,127 - picklist_generator - INFO - Batch 3: Response time: 6.63s (avg: 0.37s per team)
+2025-05-09 11:56:28,127 - picklist_generator - INFO - Batch 3: Response sample: {"p":[[2481,99.44,"Excellent teleop EPA 63.29"],[987,83.46,"High auto EPA 22.88"],[6369,87.37,"Strong teleop coral 15.87"],[8044,77.01,"Good teleop EPA 53.58"],[839,72.13,"Solid endgame EPA 11.46"],[8...
+2025-05-09 11:56:28,127 - picklist_generator - INFO - Batch 3: Response contains 18 teams in ultra-compact format
+2025-05-09 11:56:28,127 - picklist_generator - INFO - Batch 3: First few teams (ultra-compact): [[2481, 99.44, "Excellent teleop EPA 63.29"], [987, 83.46, "High auto EPA 22.88"], [6369, 87.37, "Strong teleop coral 15.87"]]
+2025-05-09 11:56:28,127 - picklist_generator - INFO - Batch 3: Successfully processed 18 teams
+2025-05-09 11:56:28,128 - picklist_generator - INFO - 
+----- Combining Results from All Batches -----
+2025-05-09 11:56:28,128 - picklist_generator - INFO - Reference teams with average scores: {1197: 88.38, 2106: 65.88, 10466: 30.42, 3489: 16.38, 2590: 52.23, 2481: 99.44, 6340: 61.14, 4585: 10.1}
+2025-05-09 11:56:28,128 - picklist_generator - INFO - Batch 1: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 11:56:28,128 - picklist_generator - INFO - Batch 2: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 11:56:28,129 - picklist_generator - INFO - Batch 3: Normalization factor = 1.0000 (based on 3 reference teams)
+2025-05-09 11:56:28,129 - picklist_generator - INFO - Total batch processing time: 28.26s
+2025-05-09 11:56:28,129 - picklist_generator - INFO - Average time per team: 0.38s
+2025-05-09 11:56:28,129 - picklist_generator - INFO - Final picklist length: 75
+2025-05-09 11:56:28,130 - picklist_generator - INFO - ====== BATCH PROCESSING COMPLETE ======
+2025-05-09 11:56:28,130 - picklist_api - INFO - Successfully generated picklist for request 1917076669456
+2025-05-09 11:56:28,132 - picklist_api - INFO - Received picklist generation request 1917078091920: first pick for team 8044
+2025-05-09 11:56:28,142 - picklist_api - INFO - Request 1917078091920 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:56:28,142 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:56:28,142 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:56:28,143 - picklist_generator - INFO - Using cached picklist [Request: 1917078091920]
+2025-05-09 11:56:28,143 - picklist_api - INFO - Successfully generated picklist for request 1917078091920
+2025-05-09 11:56:28,532 - picklist_api - INFO - Received picklist generation request 1917078568016: first pick for team 8044
+2025-05-09 11:56:28,538 - picklist_api - INFO - Request 1917078568016 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:56:28,539 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:56:28,539 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:56:28,539 - picklist_generator - INFO - Using cached picklist [Request: 1917078568016]
+2025-05-09 11:56:28,539 - picklist_api - INFO - Successfully generated picklist for request 1917078568016
+2025-05-09 11:56:28,540 - picklist_api - INFO - Received picklist generation request 1917076678016: first pick for team 8044
+2025-05-09 11:56:28,546 - picklist_api - INFO - Request 1917076678016 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:56:28,547 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:56:28,547 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:56:28,547 - picklist_generator - INFO - Using cached picklist [Request: 1917076678016]
+2025-05-09 11:56:28,547 - picklist_api - INFO - Successfully generated picklist for request 1917076678016
+2025-05-09 11:59:20,836 - picklist_api - INFO - Received picklist generation request 1917078553536: first pick for team 8044
+2025-05-09 11:59:20,844 - picklist_api - INFO - Request 1917078553536 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:59:20,844 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:59:20,844 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:59:20,844 - picklist_generator - INFO - Using cached picklist [Request: 1917078553536]
+2025-05-09 11:59:20,844 - picklist_api - INFO - Successfully generated picklist for request 1917078553536
+2025-05-09 11:59:20,846 - picklist_api - INFO - Received picklist generation request 1917076840496: first pick for team 8044
+2025-05-09 11:59:20,851 - picklist_api - INFO - Request 1917076840496 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:59:20,851 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:59:20,851 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:59:20,851 - picklist_generator - INFO - Using cached picklist [Request: 1917076840496]
+2025-05-09 11:59:20,851 - picklist_api - INFO - Successfully generated picklist for request 1917076840496
+2025-05-09 11:59:20,956 - picklist_api - INFO - Received picklist generation request 1917078552656: first pick for team 8044
+2025-05-09 11:59:20,963 - picklist_api - INFO - Request 1917078552656 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:59:20,963 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:59:20,964 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:59:20,964 - picklist_generator - INFO - Using cached picklist [Request: 1917078552656]
+2025-05-09 11:59:20,964 - picklist_api - INFO - Successfully generated picklist for request 1917078552656
+2025-05-09 11:59:20,967 - picklist_api - INFO - Received picklist generation request 1917076669216: first pick for team 8044
+2025-05-09 11:59:20,975 - picklist_api - INFO - Request 1917076669216 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:59:20,975 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:59:20,976 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:59:20,976 - picklist_generator - INFO - Using cached picklist [Request: 1917076669216]
+2025-05-09 11:59:20,976 - picklist_api - INFO - Successfully generated picklist for request 1917076669216
+2025-05-09 11:59:46,508 - picklist_api - INFO - Received picklist generation request 1917078091360: first pick for team 8044
+2025-05-09 11:59:46,516 - picklist_api - INFO - Request 1917078091360 cache key: b6a11090a20bd2febc9f0fa81231c084
+2025-05-09 11:59:46,516 - picklist_api - INFO - Using batching with batch_size=20, reference_teams_count=3
+2025-05-09 11:59:46,516 - picklist_api - INFO - Reference selection strategy: top_middle_bottom
+2025-05-09 11:59:46,516 - picklist_generator - INFO - Using cached picklist [Request: 1917078091360]
+2025-05-09 11:59:46,517 - picklist_api - INFO - Successfully generated picklist for request 1917078091360
+2025-05-09 16:28:12,237 - root - ERROR - Error reading picklist logs: 'charmap' codec can't decode byte 0x8f in position 4610: character maps to <undefined>
+2025-05-09 16:28:12,276 - root - ERROR - Error reading picklist logs: 'charmap' codec can't decode byte 0x8f in position 4610: character maps to <undefined>

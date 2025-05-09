@@ -6,7 +6,7 @@ A year‑agnostic, team‑agnostic, data‑agnostic toolkit that automates FRC e
 * **Field Selection** – Select which fields from your scouting spreadsheet to analyze; optionally use game manual for strategic insights
 * **Validation** – Flag missing or outlier match rows and let users rescout virtually, replace with averages, or ignore with reason
 * **Pick‑List Builder** – Create ranked first/second/third‑pick lists from validated data given user‑ranked priorities; allow manual drag‑drop; includes both scouting and superscouting metrics
-* **Realistic Alliance Selection** – Automatically excludes alliance captains when generating second and third picks; live draft tracker that strikes picked teams and re‑ranks remaining candidates
+* **Realistic Alliance Selection** – Automatically excludes alliance captains when generating second and third picks; live draft tracker that strikes picked teams and re‑ranks remaining candidates; allows teams that declined to become captains (per FRC rules)
 
 ## Key Design Decisions
 | Topic | Decision | Rationale |
@@ -24,14 +24,18 @@ backend/
 ├── app/
 │   ├── api/
 │   │   ├── health.py
-│   │   ├── setup.py           # Learning module
-│   │   ├── validate.py        # Validation API
-│   │   ├── unified_dataset.py # Dataset builder
-│   │   ├── schema_selections.py  # Field selections API
-│   │   ├── picklist_generator.py # Picklist generator
-│   │   ├── picklist_analysis.py  # Picklist metrics analysis
-│   │   ├── debug_logs.py      # Debug logs API
-│   │   └── sheets.py          # Google Sheets integration
+│   │   ├── setup.py               # Learning module
+│   │   ├── validate.py            # Validation API
+│   │   ├── unified_dataset.py     # Dataset builder
+│   │   ├── schema_selections.py   # Field selections API
+│   │   ├── picklist_generator.py  # Picklist generator
+│   │   ├── picklist_analysis.py   # Picklist metrics analysis
+│   │   ├── alliance_selection.py  # Alliance selection API
+│   │   ├── debug_logs.py          # Debug logs API
+│   │   └── sheets.py              # Google Sheets integration
+│   ├── database/
+│   │   ├── db.py                  # SQLAlchemy DB configuration
+│   │   └── models.py              # Database models for Alliance Selection
 │   ├── services/
 │   │   ├── statbotics_client.py
 │   │   ├── tba_client.py
@@ -59,13 +63,14 @@ frontend/
 │   │   ├── FieldSelection.tsx
 │   │   ├── Workflow.tsx
 │   │   ├── Validation.tsx
-│   │   ├── PicklistNew.tsx       # Picklist generation page
+│   │   ├── PicklistNew.tsx           # Picklist generation page
+│   │   ├── AllianceSelection.tsx     # Live alliance selection page
 │   │   ├── UnifiedDatasetBuilder.tsx # Dataset building UI
-│   │   └── DebugLogs.tsx         # Debug logs viewer
+│   │   └── DebugLogs.tsx             # Debug logs viewer
 │   ├── components/
 │   │   ├── Navbar.tsx
-│   │   ├── PicklistGenerator.tsx    # Picklist generation component with pagination
-│   │   └── ProgressTracker.tsx      # Progress tracking component
+│   │   ├── PicklistGenerator.tsx     # Picklist generation component with pagination
+│   │   └── ProgressTracker.tsx       # Progress tracking component
 │   └── App.tsx
 └── vite.config.ts
 ```
@@ -84,6 +89,11 @@ frontend/
 | `/api/validate/apply-correction` | POST JSON | `{ team_number, match_number, corrections }` | Correction status |
 | `/api/picklist/analyze` | POST JSON | `{ unified_dataset_path, [priorities], [strategy_prompt] }` | Available metrics, statistical analysis, team rankings |
 | `/api/picklist/generate` | POST JSON | `{ unified_dataset_path, your_team_number, pick_position, priorities, exclude_teams }` | Ranked picklist with reasoning |
+| `/api/alliance/lock-picklist` | POST JSON | `{ team_number, event_key, year, first_pick_data, second_pick_data, third_pick_data }` | Locks a picklist for alliance selection |
+| `/api/alliance/picklist/{picklist_id}` | DELETE | - | Unlocks a previously locked picklist |
+| `/api/alliance/selection/create` | POST JSON | `{ picklist_id, event_key, year, team_list }` | Creates a new alliance selection process |
+| `/api/alliance/selection/{selection_id}` | GET | - | Current state of an alliance selection |
+| `/api/alliance/selection/team-action` | POST JSON | `{ selection_id, team_number, action, alliance_number }` | Records team actions during selection |
 | `/api/debug/logs/picklist` | GET | `lines (optional)` | Recent picklist generation logs for debugging |
 
 ## Setup and Installation
@@ -127,6 +137,14 @@ frontend/
 * OAuth / token management UI for Sheets, TBA, Statbotics, OpenAI
 
 ## Recent Improvements
+* **Live Alliance Selection**: Implemented full alliance selection page with real-time team grid and alliance board
+* **Picklist Locking**: Added ability to lock and unlock picklists, preventing edits after finalization
+* **Database Persistence**: Added SQLAlchemy models for storing locked picklists and alliance selections
+* **FRC Rules Compliance**: Designed alliance selection UI to follow official FRC rules (teams that decline can become captains)
+* **Round-Based Alliance Selection**: Support for complete 3-round alliance selection including backup robots
+* **Team Status Tracking**: Visual indicators for team status (captain, picked, declined) during alliance selection
+* **Optimized Navigation**: Fixed navigation between Alliance Selection and Picklist to prevent auto-regeneration
+* **Enhanced Picklist Generator**: Modified to respect "locked" state and prevent edits to locked picklists
 * **Complete Picklist Approach**: Switched from chunking to one-shot generation to avoid duplication and ensure complete coverage
 * **Enhanced Missing Teams Handling**: Added two-phase ranking with auto-fallback for teams missed by GPT
 * **Smart Handling of Auto-Added Teams**: UI now offers option to get more accurate rankings for auto-added teams

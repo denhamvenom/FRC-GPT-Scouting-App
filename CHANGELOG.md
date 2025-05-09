@@ -1,3 +1,14 @@
+## 2025-05-09
+* Implemented Live Alliance Selection feature with database persistence
+* Added Lock/Unlock functionality for picklists to prevent edits after finalization
+* Created team grid display for Alliance Selection sorted by picklist ranking
+* Added Alliance Board display showing current alliance selections
+* Implemented proper handling of Round 3 backup picks for World Championship events
+* Added team status tracking (captain, picked, declined) in alliance selection
+* Ensured teams that declined can still be selected as captains (per FRC rules)
+* Fixed navigation between Alliance Selection and Picklist to prevent auto-regeneration
+* Added SQLAlchemy models and API endpoints for alliance selection tracking
+
 ## 2025-05-07
 * Added superscouting metrics to picklist generation for more qualitative robot assessment
 * Enhanced strategy parsing to better recognize robot capabilities in natural language descriptions

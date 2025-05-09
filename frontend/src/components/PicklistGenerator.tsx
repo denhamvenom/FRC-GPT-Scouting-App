@@ -68,6 +68,7 @@ interface PicklistGeneratorProps {
   onPicklistGenerated?: (result: PicklistResult) => void;
   initialPicklist?: Team[]; // Add prop for initial picklist data
   onExcludeTeam?: (teamNumber: number) => void; // Callback for excluding a team
+  isLocked?: boolean; // Flag indicating if the picklist is locked and should be read-only
 }
 
 // Progress indicator component for estimated time (non-batch processing)
@@ -213,7 +214,8 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   excludeTeams = [],
   onPicklistGenerated,
   initialPicklist = [],
-  onExcludeTeam
+  onExcludeTeam,
+  isLocked = false
 }) => {
   const [picklist, setPicklist] = useState<Team[]>(initialPicklist);
   const [analysis, setAnalysis] = useState<PicklistAnalysis | null>(null);
@@ -257,13 +259,20 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       setPicklist(initialPicklist);
       // Calculate total pages
       setTotalPages(Math.ceil(initialPicklist.length / teamsPerPage));
-    } else {
-      // Otherwise generate a new picklist
-      // Only generate if we have the required data
-      if (datasetPath && yourTeamNumber && priorities.length > 0) {
-        generatePicklist();
-      }
     }
+    
+    /* 
+     * IMPORTANT NOTE ON AUTOMATIC REGENERATION:
+     * We deliberately removed the automatic generatePicklist() call that was here previously.
+     * This prevents unwanted regeneration when navigating between pages (especially when
+     * returning from Alliance Selection back to Picklist).
+     * 
+     * Rankings will ONLY be generated when the user explicitly clicks the "Generate Rankings" button.
+     * This ensures the user experience is predictable and prevents unexpected API calls.
+     * 
+     * This change was made on 2025-05-09 to improve navigation between the
+     * Picklist and Alliance Selection pages.
+     */
     
     // Reset to page 1 when dependencies change
     setCurrentPage(1);
@@ -276,11 +285,10 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     // This prevents the problem of JSON.stringify creating a new string on every render
     console.log("Priorities or exclusions changed significantly");
     
-    // Only generate if we have an existing picklist (meaning we're updating)
-    // and we have the required data
-    if (picklist.length > 0 && datasetPath && yourTeamNumber && priorities.length > 0) {
-      generatePicklist();
-    }
+    // We've removed the automatic regeneration here too
+    // The user must explicitly click "Generate Rankings" to trigger regeneration
+    // This prevents unexpected regeneration when navigating between tabs
+    
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // Use the length as a proxy for deep changes
@@ -819,25 +827,29 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
             </>
           ) : (
             <>
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Edit Rankings
-              </button>
+              {!isLocked && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Edit Rankings
+                </button>
+              )}
               <button
                 onClick={() => setShowAnalysis(!showAnalysis)}
                 className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
               >
                 {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
               </button>
-              <button
-                onClick={generatePicklist}
-                disabled={isLoading}
-                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300"
-              >
-                {isLoading ? 'Regenerating...' : 'Regenerate'}
-              </button>
+              {!isLocked && (
+                <button
+                  onClick={generatePicklist}
+                  disabled={isLoading}
+                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300"
+                >
+                  {isLoading ? 'Regenerating...' : 'Regenerate'}
+                </button>
+              )}
             </>
           )}
         </div>
@@ -995,7 +1007,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
                       <div className="text-sm text-gray-600">Score: {team.score.toFixed(2)}</div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      {onExcludeTeam && (
+                      {onExcludeTeam && !isLocked && (
                         <button
                           onClick={() => onExcludeTeam(team.team_number)}
                           className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
@@ -1045,7 +1057,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
                         </div>
                       )}
                     </div>
-                    {onExcludeTeam && (
+                    {onExcludeTeam && !isLocked && (
                       <div className="ml-2 flex items-center">
                         <button
                           onClick={() => onExcludeTeam(team.team_number)}
