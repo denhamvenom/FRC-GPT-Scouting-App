@@ -5,7 +5,7 @@ import os
 import time
 import logging
 import asyncio
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -32,6 +32,9 @@ class PicklistGeneratorService:
     metrics and alliance strategy priorities.
     """
     
+    # Class-level cache to share across instances
+    _picklist_cache = {}
+    
     def __init__(self, unified_dataset_path: str):
         """
         Initialize the picklist generator with the unified dataset.
@@ -47,9 +50,6 @@ class PicklistGeneratorService:
         
         # Load manual text for game context if available
         self.game_context = self._load_game_context()
-        
-        # Internal cache to avoid duplicate GPT calls
-        self._picklist_cache = {}
     
     def _load_dataset(self) -> Dict[str, Any]:
         """Load the unified dataset from the JSON file."""
@@ -203,17 +203,28 @@ class PicklistGeneratorService:
         priorities: List[Dict[str, Any]],
         exclude_teams: Optional[List[int]] = None,
         request_id: Optional[int] = None,
-        cache_key: Optional[str] = None
+        cache_key: Optional[str] = None,
+        batch_size: int = 20,
+        reference_teams_count: int = 3,
+        reference_selection: str = "top_middle_bottom",
+        use_batching: bool = False
     ) -> Dict[str, Any]:
         """
-        Generate a complete picklist with all teams ranked at once.
-        Uses a one-shot approach to rank all teams in a single API call.
+        Generate a complete picklist with team rankings.
+        Can use either a one-shot approach or batch processing for more consistent results.
         
         Args:
             your_team_number: Your team's number for alliance compatibility
             pick_position: 'first', 'second', or 'third'
             priorities: List of metric IDs and weights to prioritize
             exclude_teams: Optional list of team numbers to exclude (e.g., already picked)
+            request_id: Optional ID for request tracking in logs
+            cache_key: Optional cache key for result caching
+            batch_size: Number of teams in each batch when using batching (default: 20)
+            reference_teams_count: Number of reference teams to include when batching (default: 3)
+            reference_selection: Strategy for selecting reference teams
+                                ("even_distribution", "percentile", or "top_middle_bottom")
+            use_batching: Whether to use batch processing instead of one-shot generation
             
         Returns:
             Dict with generated picklist and explanations
@@ -229,8 +240,8 @@ class PicklistGeneratorService:
         # Add a timestamp to check for active in-progress generations
         current_time = time.time()
         
-        if cache_key in self._picklist_cache:
-            cached_result = self._picklist_cache[cache_key]
+        if cache_key in PicklistGeneratorService._picklist_cache:
+            cached_result = PicklistGeneratorService._picklist_cache[cache_key]
             
             # Check if this is an in-progress generation (indicated by a timestamp value)
             if isinstance(cached_result, float):
@@ -243,9 +254,9 @@ class PicklistGeneratorService:
                         await asyncio.sleep(5)  # Wait 5 seconds between checks
                         
                         # Check if the result is now available
-                        if cache_key in self._picklist_cache and not isinstance(self._picklist_cache[cache_key], float):
+                        if cache_key in PicklistGeneratorService._picklist_cache and not isinstance(PicklistGeneratorService._picklist_cache[cache_key], float):
                             logger.info(f"Successfully retrieved result from parallel generation{request_info}")
-                            return self._picklist_cache[cache_key]
+                            return PicklistGeneratorService._picklist_cache[cache_key]
                     
                     # If we get here, the other process took too long or failed
                     logger.warning(f"Timeout waiting for parallel generation, proceeding with new generation{request_info}")
@@ -253,14 +264,14 @@ class PicklistGeneratorService:
                 else:
                     # The previous generation is stale, remove it and continue
                     logger.warning(f"Found stale in-progress picklist generation, starting fresh{request_info}")
-                    del self._picklist_cache[cache_key]
+                    del PicklistGeneratorService._picklist_cache[cache_key]
             else:
                 # We have a valid cached result
                 logger.info(f"Using cached picklist{request_info}")
                 return cached_result
                 
         # Mark this cache key as "in progress" by storing the current timestamp
-        self._picklist_cache[cache_key] = current_time
+        PicklistGeneratorService._picklist_cache[cache_key] = current_time
         
         # Get your team data
         your_team = self._get_team_by_number(your_team_number)
@@ -287,47 +298,194 @@ class PicklistGeneratorService:
             if exclude_teams:
                 logger.info(f"Excluded teams: {exclude_teams}")
             
-            # Initialize variables for one-shot approach
+            # Log the processing mode selected
+            if use_batching:
+                logger.info(f"Using BATCH PROCESSING with batch_size={batch_size}, reference_teams_count={reference_teams_count}")
+                logger.info(f"Reference team selection strategy: {reference_selection}")
+            else:
+                logger.info("Using ONE-SHOT PROCESSING (processing all teams at once)")
+            
             start_time = time.time()
-            estimated_time = len(teams_data) * 0.9  # ~0.9 seconds per team estimate
-            logger.info(f"Estimated completion time: {estimated_time:.1f} seconds")
             
-            # Create prompts optimized for one-shot completion
-            system_prompt = self._create_system_prompt(pick_position, len(teams_data))
+            # Validate reference selection strategy if batching is enabled
+            if use_batching:
+                valid_strategies = ["even_distribution", "percentile", "top_middle_bottom"]
+                if reference_selection not in valid_strategies:
+                    logger.warning(f"Invalid reference selection strategy: {reference_selection}. Using 'top_middle_bottom' instead.")
+                    reference_selection = "top_middle_bottom"
             
-            # Get sorted list of team numbers for verification
-            team_numbers = sorted([team["team_number"] for team in teams_data])
-            logger.info(f"Teams to rank: {len(team_numbers)}")
-            logger.info(f"Team numbers: {team_numbers[:10]}... (and {len(team_numbers) - 10} more)")
-            
-            user_prompt = self._create_user_prompt(
-                your_team_number, 
-                pick_position, 
-                priorities, 
-                teams_data,
-                team_numbers
-            )
-            
-            # Log prompts (truncated for readability but showing structure)
-            truncated_system = system_prompt[:500] + "..." if len(system_prompt) > 500 else system_prompt
-            logger.info(f"SYSTEM PROMPT (truncated):\n{truncated_system}")
-            
-            # Log just the structure of the user prompt, not the full team data which would be too large
-            user_prompt_structure = "\n".join(user_prompt.split("\n")[:10]) + "\n...[Team data truncated]..."
-            logger.info(f"USER PROMPT (structure):\n{user_prompt_structure}")
-            
-            # Initialize messages
-            messages = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ]
-            
-            # Make a single API call to rank all teams at once
-            logger.info(f"--- Requesting complete picklist for {len(team_numbers)} teams ---")
-            request_start_time = time.time()
-            
-            # Call GPT with optimized settings for one-shot generation
-            logger.info("Starting API call...")
+            # Choose between batch processing and one-shot processing
+            if use_batching and len(teams_data) > batch_size:
+                # Use batch processing for large team counts
+                logger.info(f"Using batch processing for {len(teams_data)} teams")
+                
+                # Create batches of teams
+                team_batches = []
+                for i in range(0, len(teams_data), batch_size):
+                    team_batches.append(teams_data[i:i+batch_size])
+                
+                logger.info(f"Split teams into {len(team_batches)} batches")
+                
+                # Process each batch and collect results
+                batch_results = []
+                combined_picklist = []
+                reference_teams = []
+                total_batches = len(team_batches)
+                
+                # Update the cache with batch processing info
+                if cache_key:
+                    PicklistGeneratorService._picklist_cache[cache_key] = {
+                        "status": "in_progress",
+                        "batch_processing": {
+                            "total_batches": total_batches,
+                            "current_batch": 0,
+                            "progress_percentage": 0,
+                            "processing_complete": False
+                        }
+                    }
+                
+                for batch_index, batch_teams in enumerate(team_batches):
+                    logger.info(f"\n----- Processing Batch {batch_index+1}/{len(team_batches)} -----")
+                    logger.info(f"Batch size: {len(batch_teams)} teams")
+                    
+                    # Process this batch, including reference teams from previous batches
+                    batch_result = await self._process_team_batch(
+                        teams_data=batch_teams,
+                        reference_teams=reference_teams,
+                        your_team_number=your_team_number,
+                        pick_position=pick_position,
+                        priorities=priorities,
+                        batch_index=batch_index,
+                        request_id=request_id,
+                        cache_key=cache_key
+                    )
+                    
+                    # Update the cache with progress information
+                    if cache_key:
+                        current_batch = batch_index + 1
+                        progress_percentage = int((current_batch / total_batches) * 100)
+                        # Only update if there's an in-progress object (not a timestamp)
+                        if cache_key in PicklistGeneratorService._picklist_cache and isinstance(PicklistGeneratorService._picklist_cache[cache_key], dict):
+                            PicklistGeneratorService._picklist_cache[cache_key]["batch_processing"] = {
+                                "total_batches": total_batches,
+                                "current_batch": current_batch,
+                                "progress_percentage": progress_percentage,
+                                "processing_complete": False
+                            }
+                    
+                    # Check for errors in batch processing
+                    if batch_result.get("status") == "error":
+                        logger.error(f"Error in batch {batch_index}: {batch_result.get('message')}")
+                        return {
+                            "status": "error",
+                            "message": f"Error in batch {batch_index}: {batch_result.get('message')}"
+                        }
+                    
+                    # Add successful batch to results
+                    batch_results.append(batch_result)
+                    
+                    # Update reference teams for the next batch from this batch's results
+                    if batch_index < len(team_batches) - 1:  # Don't need reference teams after the last batch
+                        # Select reference teams from the current batch results
+                        batch_picklist = batch_result.get("picklist", [])
+                        reference_teams = self._select_reference_teams(
+                            ranked_teams=batch_picklist,
+                            reference_teams_count=reference_teams_count,
+                            reference_selection=reference_selection
+                        )
+                        logger.info(f"Selected {len(reference_teams)} reference teams for next batch")
+                
+                # Combine results from all batches
+                logger.info("\n----- Combining Results from All Batches -----")
+                picklist = self._combine_batch_results(batch_results, reference_teams_count)
+                
+                # Log completion for batch processing
+                total_time = time.time() - start_time
+                logger.info(f"Total batch processing time: {total_time:.2f}s")
+                logger.info(f"Average time per team: {(total_time / len(teams_data)):.2f}s")
+                logger.info(f"Final picklist length: {len(picklist)}")
+                
+                # Create minimal analysis since we removed it from the schema
+                analysis = {
+                    "draft_reasoning": "Analysis not included to optimize token usage",
+                    "evaluation": "Analysis not included to optimize token usage",
+                    "final_recommendations": "Analysis not included to optimize token usage"
+                }
+                
+                # Assemble final result
+                result = {
+                    "status": "success",
+                    "picklist": picklist,
+                    "analysis": analysis,
+                    "missing_team_numbers": [],  # All teams should be included through batching
+                    "performance": {
+                        "total_time": total_time,
+                        "team_count": len(teams_data),
+                        "avg_time_per_team": total_time / len(teams_data) if teams_data else 0,
+                        "batch_count": len(team_batches),
+                        "batch_size": batch_size,
+                        "reference_teams_count": reference_teams_count,
+                        "reference_selection": reference_selection
+                    },
+                    "batched": True,
+                    "batch_processing": {
+                        "total_batches": len(team_batches),
+                        "current_batch": len(team_batches),  # Indicates processing is complete
+                        "progress_percentage": 100,  # 100% complete
+                        "processing_complete": True
+                    }
+                }
+                
+                # Cache the result
+                self._picklist_cache[cache_key] = result
+                
+                logger.info(f"====== BATCH PROCESSING COMPLETE ======")
+                return result
+                
+            else:
+                # Use one-shot approach for smaller team counts or when batching is disabled
+                logger.info(f"Using one-shot approach for {len(teams_data)} teams")
+                
+                # Initialize variables for one-shot approach
+                estimated_time = len(teams_data) * 0.9  # ~0.9 seconds per team estimate
+                logger.info(f"Estimated completion time: {estimated_time:.1f} seconds")
+                
+                # Create prompts optimized for one-shot completion
+                system_prompt = self._create_system_prompt(pick_position, len(teams_data))
+                
+                # Get sorted list of team numbers for verification
+                team_numbers = sorted([team["team_number"] for team in teams_data])
+                logger.info(f"Teams to rank: {len(team_numbers)}")
+                logger.info(f"Team numbers: {team_numbers[:10]}... (and {len(team_numbers) - 10} more)")
+                
+                user_prompt = self._create_user_prompt(
+                    your_team_number, 
+                    pick_position, 
+                    priorities, 
+                    teams_data,
+                    team_numbers
+                )
+                
+                # Log prompts (truncated for readability but showing structure)
+                truncated_system = system_prompt[:500] + "..." if len(system_prompt) > 500 else system_prompt
+                logger.info(f"SYSTEM PROMPT (truncated):\n{truncated_system}")
+                
+                # Log just the structure of the user prompt, not the full team data which would be too large
+                user_prompt_structure = "\n".join(user_prompt.split("\n")[:10]) + "\n...[Team data truncated]..."
+                logger.info(f"USER PROMPT (structure):\n{user_prompt_structure}")
+                
+                # Initialize messages
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ]
+                
+                # Make a single API call to rank all teams at once
+                logger.info(f"--- Requesting complete picklist for {len(team_numbers)} teams ---")
+                request_start_time = time.time()
+                
+                # Call GPT with optimized settings for one-shot generation
+                logger.info("Starting API call...")
             
             # Use exponential backoff for rate limit handling
             max_retries = 3
@@ -815,6 +973,13 @@ class PicklistGeneratorService:
                     "avg_time_per_team": request_time / len(team_numbers) if team_numbers else 0,
                     "missing_teams": len(missing_team_numbers),
                     "duplicate_teams": len(duplicates)
+                },
+                "batched": False,
+                "batch_processing": {
+                    "total_batches": 1,
+                    "current_batch": 1,  # Indicates processing is complete
+                    "progress_percentage": 100,  # 100% complete
+                    "processing_complete": True
                 }
             }
             
@@ -1639,6 +1804,552 @@ End of prompt.
 """
         return prompt
     
+    def _select_reference_teams(
+        self, 
+        ranked_teams: List[Dict[str, Any]], 
+        reference_teams_count: int, 
+        reference_selection: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Select reference teams from already ranked teams using specified strategy.
+        
+        Args:
+            ranked_teams: List of already ranked teams
+            reference_teams_count: Number of reference teams to select
+            reference_selection: Strategy for selecting reference teams
+                                 ('even_distribution', 'percentile', or 'top_middle_bottom')
+            
+        Returns:
+            List of selected reference teams
+        """
+        if not ranked_teams or reference_teams_count <= 0:
+            return []
+            
+        # Limit reference count to the available teams
+        reference_teams_count = min(reference_teams_count, len(ranked_teams))
+        
+        # Sort teams by score to ensure consistent selection
+        sorted_teams = sorted(ranked_teams, key=lambda x: x.get("score", 0), reverse=True)
+        
+        if reference_selection == "top_middle_bottom":
+            # Always select top, middle, and bottom teams
+            selected_indices = []
+            
+            # Always include the top team
+            if len(sorted_teams) > 0:
+                selected_indices.append(0)
+                
+            # Include the middle team if we have at least 3 teams
+            if len(sorted_teams) >= 3:
+                selected_indices.append(len(sorted_teams) // 2)
+                
+            # Include the bottom team if we have at least 2 teams
+            if len(sorted_teams) >= 2:
+                selected_indices.append(len(sorted_teams) - 1)
+                
+            # Add more teams evenly distributed if needed
+            if reference_teams_count > len(selected_indices):
+                # Calculate how many additional teams we need
+                additional_needed = reference_teams_count - len(selected_indices)
+                
+                # Create evenly spaced indices for the remaining slots
+                remaining_indices = list(range(len(sorted_teams)))
+                # Remove already selected indices
+                for idx in selected_indices:
+                    if idx in remaining_indices:
+                        remaining_indices.remove(idx)
+                        
+                # Select additional teams with even spacing
+                step = len(remaining_indices) / (additional_needed + 1)
+                for i in range(1, additional_needed + 1):
+                    idx = min(len(remaining_indices) - 1, int(i * step) - 1)
+                    if idx >= 0 and idx < len(remaining_indices):
+                        selected_indices.append(remaining_indices[idx])
+            
+            # Get the teams at the selected indices
+            reference_teams = [sorted_teams[i] for i in sorted(selected_indices) if i < len(sorted_teams)]
+            
+        elif reference_selection == "percentile":
+            # Select teams at specific percentiles
+            reference_teams = []
+            
+            # Calculate percentile step
+            if reference_teams_count > 1:
+                step = 100 / (reference_teams_count - 1)
+            else:
+                step = 50  # Just take the median if only one team requested
+                
+            # Select teams at each percentile
+            for i in range(reference_teams_count):
+                percentile = min(100, i * step)
+                index = int((len(sorted_teams) - 1) * (percentile / 100))
+                reference_teams.append(sorted_teams[index])
+                
+        else:  # Default to "even_distribution"
+            # Select teams with even spacing from top to bottom
+            step = len(sorted_teams) / (reference_teams_count)
+            reference_teams = []
+            
+            for i in range(reference_teams_count):
+                index = min(len(sorted_teams) - 1, int(i * step))
+                reference_teams.append(sorted_teams[index])
+        
+        logger.info(f"Selected {len(reference_teams)} reference teams using '{reference_selection}' strategy")
+        for i, team in enumerate(reference_teams):
+            logger.info(f"  Reference team {i+1}: {team['team_number']} (score: {team.get('score', 0):.1f})")
+            
+        return reference_teams
+    
+    def get_batch_processing_status(self, cache_key: str) -> Dict[str, Any]:
+        """
+        Get the current status of a batch processing job.
+        
+        Args:
+            cache_key: The cache key for the job
+            
+        Returns:
+            Dict with batch processing status information
+        """
+        # Check if this is an in-progress job
+        if cache_key in self._picklist_cache:
+            cached_data = self._picklist_cache[cache_key]
+            
+            # If it's a timestamp, it's in progress but no batches have completed yet
+            if isinstance(cached_data, float):
+                return {
+                    "status": "in_progress",
+                    "batch_processing": {
+                        "total_batches": 0,  # Unknown at this point
+                        "current_batch": 0,
+                        "progress_percentage": 0,
+                        "processing_complete": False
+                    }
+                }
+            # If it's a dictionary with batch_processing info, return the status
+            elif isinstance(cached_data, dict) and "batch_processing" in cached_data:
+                return {
+                    "status": "in_progress" if not cached_data["batch_processing"].get("processing_complete") else "success",
+                    "batch_processing": cached_data["batch_processing"]
+                }
+            # Otherwise, it's a completed non-batch job
+            else:
+                return {
+                    "status": "success",
+                    "batch_processing": {
+                        "total_batches": 1,
+                        "current_batch": 1,
+                        "progress_percentage": 100,
+                        "processing_complete": True
+                    }
+                }
+        
+        # Not found in cache
+        return {
+            "status": "not_found",
+            "batch_processing": {
+                "total_batches": 0,
+                "current_batch": 0,
+                "progress_percentage": 0,
+                "processing_complete": False
+            }
+        }
+        
+    async def _process_team_batch(
+        self,
+        teams_data: List[Dict[str, Any]],
+        reference_teams: List[Dict[str, Any]],
+        your_team_number: int,
+        pick_position: str,
+        priorities: List[Dict[str, Any]],
+        batch_index: int,
+        request_id: Optional[int] = None,
+        cache_key: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Process a single batch of teams, including reference teams.
+        
+        Args:
+            teams_data: Team data for this batch
+            reference_teams: Reference teams from previous batches for consistent scoring
+            your_team_number: Your team's number for alliance compatibility
+            pick_position: 'first', 'second', or 'third'
+            priorities: List of metric IDs and weights to prioritize
+            batch_index: Index of the current batch (for logging)
+            request_id: Optional request ID for logging
+            
+        Returns:
+            Dict with batch results containing ranked teams
+        """
+        try:
+            # Combine batch teams and reference teams
+            combined_teams = teams_data.copy()
+            
+            # Add reference teams if this isn't the first batch
+            reference_team_numbers = set()
+            if batch_index > 0 and reference_teams:
+                # Track which teams are reference teams
+                for team in reference_teams:
+                    reference_team_numbers.add(team["team_number"])
+                    
+                # Add reference teams to the batch
+                combined_teams.extend(reference_teams)
+                
+                logger.info(f"Batch {batch_index}: Added {len(reference_teams)} reference teams to the batch")
+                logger.info(f"Batch {batch_index}: Reference team numbers: {sorted(list(reference_team_numbers))}")
+            
+            # Get list of team numbers in this batch
+            batch_team_numbers = sorted([team["team_number"] for team in combined_teams])
+            
+            logger.info(f"Batch {batch_index}: Processing {len(combined_teams)} teams (including {len(reference_teams)} reference teams)")
+            logger.info(f"Batch {batch_index}: Team numbers: {batch_team_numbers[:10]}... (and {len(batch_team_numbers) - 10} more)" if len(batch_team_numbers) > 10 else f"Batch {batch_index}: Team numbers: {batch_team_numbers}")
+            
+            # Create prompt for this batch
+            system_prompt = self._create_system_prompt(pick_position, len(combined_teams))
+            
+            # Create a modified user prompt with reference team context
+            user_prompt = self._create_user_prompt_with_reference_teams(
+                your_team_number, 
+                pick_position, 
+                priorities, 
+                combined_teams,
+                batch_team_numbers,
+                reference_team_numbers
+            )
+            
+            # Initialize messages
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+            
+            # Log start of API call
+            request_start_time = time.time()
+            logger.info(f"Batch {batch_index}: Starting API call...")
+            
+            # Use exponential backoff for rate limit handling
+            max_retries = 3
+            initial_delay = 1.0  # Start with a 1-second delay
+            retry_count = 0
+            
+            while retry_count <= max_retries:
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=messages,
+                        temperature=0.2,  # Lower temperature for more consistent results
+                        response_format={"type": "json_object"},
+                        max_tokens=4000  # Increased to prevent truncation with the compact schema
+                    )
+                    # Success - break out of the retry loop
+                    break
+                except Exception as e:
+                    # Check if it's a rate limit error (typically a 429 status code)
+                    is_rate_limit = "429" in str(e)
+                    
+                    if is_rate_limit and retry_count < max_retries:
+                        # Calculate exponential backoff delay
+                        retry_count += 1
+                        delay = initial_delay * (2 ** retry_count)  # Exponential backoff
+                        
+                        logger.warning(f"Batch {batch_index}: Rate limit hit. Retrying in {delay:.2f} seconds... (Attempt {retry_count}/{max_retries})")
+                        time.sleep(delay)
+                    else:
+                        # Either not a rate limit error or we've exceeded max retries
+                        logger.error(f"Batch {batch_index}: API call failed: {str(e)}")
+                        raise  # Re-raise the exception
+            
+            # Log timing and response metadata
+            request_time = time.time() - request_start_time
+            logger.info(f"Batch {batch_index}: Response time: {request_time:.2f}s (avg: {request_time/len(combined_teams):.2f}s per team)")
+            
+            # Parse the response
+            response_content = response.choices[0].message.content
+            
+            # Log a sample of the response (first 200 chars)
+            response_sample = response_content[:200] + "..." if len(response_content) > 200 else response_content
+            logger.info(f"Batch {batch_index}: Response sample: {response_sample}")
+            
+            # Parse the JSON response - reuse existing parsing code
+            response_data = json.loads(response_content)
+            
+            # Check for overflow condition in ultra-compact format
+            if response_data.get("s") == "overflow" or response_data.get("status") == "overflow":
+                logger.warning(f"Batch {batch_index}: GPT returned overflow status - token limit reached")
+                return {
+                    "status": "error",
+                    "message": f"Batch {batch_index}: The amount of team data exceeded the token limit."
+                }
+            
+            # Handle ultra-compact format {"p":[[team,score,"reason"]...],"s":"ok"}
+            picklist = []
+            
+            if "p" in response_data and isinstance(response_data["p"], list):
+                logger.info(f"Batch {batch_index}: Response contains {len(response_data['p'])} teams in ultra-compact format")
+                
+                # Log first few teams for debugging
+                teams_sample = response_data["p"][:3]
+                logger.info(f"Batch {batch_index}: First few teams (ultra-compact): {json.dumps(teams_sample)}")
+                
+                # Convert ultra-compact format to standard format
+                seen_teams = set()  # Track teams we've already added
+                
+                for team_entry in response_data["p"]:
+                    if len(team_entry) >= 3:  # Ensure we have at least [team, score, reason]
+                        team_number = int(team_entry[0])
+                        
+                        # Skip if we've seen this team already
+                        if team_number in seen_teams:
+                            logger.info(f"Batch {batch_index}: Skipping duplicate team {team_number} in response")
+                            continue
+                            
+                        seen_teams.add(team_number)
+                        score = float(team_entry[1])
+                        reason = team_entry[2]
+                        
+                        # Get team nickname from dataset if available
+                        team_data = next((t for t in combined_teams if t["team_number"] == team_number), None)
+                        nickname = team_data.get("nickname", f"Team {team_number}") if team_data else f"Team {team_number}"
+                        
+                        # Mark reference teams
+                        is_reference = team_number in reference_team_numbers
+                        
+                        picklist.append({
+                            "team_number": team_number,
+                            "nickname": nickname,
+                            "score": score,
+                            "reasoning": reason,
+                            "is_reference": is_reference
+                        })
+                        
+            elif "picklist" in response_data and isinstance(response_data["picklist"], list):
+                logger.info(f"Batch {batch_index}: Response contains {len(response_data['picklist'])} teams in regular format")
+                
+                # Extract the picklist and convert from compact to full format if needed
+                raw_picklist = response_data.get("picklist", [])
+                
+                # Convert compact format {"team":123, "score":45.6, "reason":"text"} 
+                # to standard format {"team_number":123, "nickname":"Team 123", "score":45.6, "reasoning":"text"}
+                for team_entry in raw_picklist:
+                    # Check if using new compact format (has "team" instead of "team_number")
+                    if "team" in team_entry and "team_number" not in team_entry:
+                        team_number = team_entry["team"]
+                        # Get team nickname from dataset if available
+                        team_data = next((t for t in combined_teams if t["team_number"] == team_number), None)
+                        nickname = team_data.get("nickname", f"Team {team_number}") if team_data else f"Team {team_number}"
+                        
+                        # Mark reference teams
+                        is_reference = team_number in reference_team_numbers
+                        
+                        picklist.append({
+                            "team_number": team_number,
+                            "nickname": nickname,
+                            "score": team_entry.get("score", 0.0),
+                            "reasoning": team_entry.get("reason", "No reasoning provided"),
+                            "is_reference": is_reference
+                        })
+                    else:
+                        # Already in standard format - add reference flag
+                        team_number = team_entry.get("team_number")
+                        is_reference = team_number in reference_team_numbers
+                        team_entry["is_reference"] = is_reference
+                        picklist.append(team_entry)
+            else:
+                logger.warning(f"Batch {batch_index}: Response has no valid picklist")
+            
+            # Log batch completion
+            logger.info(f"Batch {batch_index}: Successfully processed {len(picklist)} teams")
+            
+            return {
+                "status": "success",
+                "batch_index": batch_index,
+                "picklist": picklist,
+                "request_time": request_time
+            }
+            
+        except Exception as e:
+            logger.error(f"Batch {batch_index}: Error processing batch: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "batch_index": batch_index,
+                "message": f"Error processing batch {batch_index}: {str(e)}"
+            }
+    
+    def _create_user_prompt_with_reference_teams(
+        self, 
+        your_team_number: int, 
+        pick_position: str, 
+        priorities: List[Dict[str, Any]],
+        teams_data: List[Dict[str, Any]],
+        team_numbers: List[int],
+        reference_team_numbers: Set[int] = None
+    ) -> str:
+        """
+        Create a user prompt for GPT with team data and reference team indicators.
+        
+        Args:
+            your_team_number: Your team's number
+            pick_position: 'first', 'second', or 'third'
+            priorities: List of metric priorities with weights
+            teams_data: Prepared team data for context
+            team_numbers: List of team numbers to verify inclusion
+            reference_team_numbers: Set of team numbers that are reference teams
+            
+        Returns:
+            User prompt string
+        """
+        # Find your team's data
+        your_team_info = next((team for team in teams_data if team["team_number"] == your_team_number), None)
+        
+        reference_info = ""
+        if reference_team_numbers and len(reference_team_numbers) > 0:
+            reference_info = f"""
+REFERENCE_TEAM_NUMBERS = {json.dumps(sorted(list(reference_team_numbers)))}
+
+IMPORTANT: The teams in REFERENCE_TEAM_NUMBERS are reference teams from previous batches.
+Your scoring should be CONSISTENT with these reference teams. Use them as anchors to
+calibrate your scoring and maintain a similar scale for the new teams in this batch.
+"""
+        
+        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info, indent=2) if your_team_info else "{}"} 
+PRIORITY_METRICS  = {json.dumps(priorities, indent=2)}
+GAME_CONTEXT      = {json.dumps(self.game_context) if self.game_context else "null"}
+TEAM_NUMBERS_LIST = {json.dumps(team_numbers)}
+{reference_info}
+Instructions:
+1. You MUST rank ALL {len(teams_data)} unique teams listed in TEAM_NUMBERS_LIST.
+2. Each team MUST appear EXACTLY ONCE in your output. DO NOT REPEAT TEAMS!
+3. Use metrics from AVAILABLE_TEAMS to evaluate each team's performance.
+4. Assess alliance synergy with Team {your_team_number}.
+5. Sort teams from best→worst based on weighted metrics.
+6. Verify your output contains EACH team from TEAM_NUMBERS_LIST EXACTLY ONCE.
+7. Return a single JSON object with the "p" array containing ALL {len(teams_data)} teams.
+
+⚠️ CRITICAL REQUIREMENTS:
+- NO DUPLICATES: Verify each team number appears only once
+- COMPLETENESS: Include ALL {len(teams_data)} teams from TEAM_NUMBERS_LIST
+- FORMAT: Follow the ultra-compact schema from the system prompt
+- BREVITY: Keep reasons ≤ 12 words each
+
+AVAILABLE_TEAMS   = {json.dumps(teams_data, indent=2)}
+
+End of prompt.
+"""
+        return prompt
+    
+    def _combine_batch_results(
+        self,
+        batch_results: List[Dict[str, Any]],
+        reference_teams_count: int
+    ) -> List[Dict[str, Any]]:
+        """
+        Combine results from multiple batches into a single ranked list.
+        
+        Args:
+            batch_results: List of successful batch processing results
+            reference_teams_count: Number of reference teams used (for normalization)
+            
+        Returns:
+            Combined and normalized picklist
+        """
+        if not batch_results:
+            return []
+            
+        # Extract all teams from all batches
+        all_teams = []
+        reference_scores = {}  # Map of team_number to list of scores across batches
+        
+        # First pass: collect reference teams and their scores across batches
+        for batch in batch_results:
+            batch_picklist = batch.get("picklist", [])
+            
+            for team in batch_picklist:
+                if team.get("is_reference", False):
+                    team_number = team["team_number"]
+                    if team_number not in reference_scores:
+                        reference_scores[team_number] = []
+                    reference_scores[team_number].append(team["score"])
+        
+        # Calculate average score for each reference team
+        reference_avg_scores = {}
+        for team_number, scores in reference_scores.items():
+            reference_avg_scores[team_number] = sum(scores) / len(scores)
+            
+        logger.info(f"Reference teams with average scores: {reference_avg_scores}")
+        
+        # Calculate normalization factors for each batch
+        batch_normalization_factors = []
+        
+        for batch_index, batch in enumerate(batch_results):
+            batch_picklist = batch.get("picklist", [])
+            
+            # Skip empty batches
+            if not batch_picklist:
+                batch_normalization_factors.append(1.0)  # No normalization needed
+                continue
+                
+            # Find reference teams in this batch
+            batch_reference_teams = [(team["team_number"], team["score"]) 
+                                   for team in batch_picklist 
+                                   if team.get("is_reference", False) and team["team_number"] in reference_avg_scores]
+            
+            # Skip normalization for the first batch
+            if batch_index == 0 or not batch_reference_teams:
+                batch_normalization_factors.append(1.0)  # No normalization needed
+                continue
+            
+            # Calculate normalization factor based on reference team scores
+            normalization_sum = 0
+            normalization_count = 0
+            
+            for team_number, batch_score in batch_reference_teams:
+                avg_score = reference_avg_scores[team_number]
+                # Avoid division by zero
+                if batch_score != 0:
+                    normalization_sum += avg_score / batch_score
+                    normalization_count += 1
+            
+            # Calculate the average normalization factor
+            normalization_factor = normalization_sum / normalization_count if normalization_count > 0 else 1.0
+            
+            # Log the normalization details
+            logger.info(f"Batch {batch_index}: Normalization factor = {normalization_factor:.4f} (based on {normalization_count} reference teams)")
+            batch_normalization_factors.append(normalization_factor)
+        
+        # Second pass: add all teams with normalized scores
+        for batch_index, batch in enumerate(batch_results):
+            batch_picklist = batch.get("picklist", [])
+            normalization_factor = batch_normalization_factors[batch_index]
+            
+            for team in batch_picklist:
+                # Skip reference teams (except from first batch)
+                if team.get("is_reference", False) and batch_index > 0:
+                    continue
+                    
+                # Apply normalization to the score
+                if normalization_factor != 1.0:
+                    original_score = team["score"]
+                    team["score"] = original_score * normalization_factor
+                    team["original_score"] = original_score  # Keep track of the original score
+                
+                # Remove the reference flag
+                if "is_reference" in team:
+                    del team["is_reference"]
+                
+                all_teams.append(team)
+        
+        # Remove any potential duplicates (keeping the one from the earliest batch)
+        unique_teams = {}
+        for team in all_teams:
+            team_number = team["team_number"]
+            if team_number not in unique_teams:
+                unique_teams[team_number] = team
+                
+        # Convert to list and sort by score (descending)
+        combined_picklist = list(unique_teams.values())
+        combined_picklist.sort(key=lambda x: x.get("score", 0), reverse=True)
+        
+        return combined_picklist
+        
     def merge_and_update_picklist(
         self,
         picklist: List[Dict[str, Any]],

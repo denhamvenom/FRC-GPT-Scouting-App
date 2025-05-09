@@ -21,12 +21,23 @@ interface PicklistAnalysis {
   final_recommendations: string;
 }
 
+interface BatchProcessing {
+  total_batches: number;
+  current_batch: number;
+  progress_percentage: number;
+  processing_complete: boolean;
+}
+
 interface Performance {
   total_time: number;
   team_count: number;
   avg_time_per_team: number;
-  missing_teams: number;
-  duplicate_teams: number;
+  missing_teams?: number;
+  duplicate_teams?: number;
+  batch_count?: number;
+  batch_size?: number;
+  reference_teams_count?: number;
+  reference_selection?: string;
 }
 
 interface PicklistResult {
@@ -36,6 +47,9 @@ interface PicklistResult {
   missing_team_numbers?: number[];
   performance?: Performance;
   message?: string;
+  batched?: boolean;
+  batch_processing?: BatchProcessing;
+  cache_key?: string;
 }
 
 interface MissingTeamsResult {
@@ -56,7 +70,7 @@ interface PicklistGeneratorProps {
   onExcludeTeam?: (teamNumber: number) => void; // Callback for excluding a team
 }
 
-// Progress indicator component
+// Progress indicator component for estimated time (non-batch processing)
 const ProgressIndicator: React.FC<{ estimatedTime: number; teamCount: number }> = ({ estimatedTime, teamCount }) => {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
@@ -101,6 +115,49 @@ const ProgressIndicator: React.FC<{ estimatedTime: number; teamCount: number }> 
          progress < 60 ? 'Processing team data...' : 
          progress < 90 ? 'Generating rankings...' : 
          'Finalizing picklist...'}
+      </p>
+    </div>
+  );
+};
+
+// Batch progress component
+const BatchProgressIndicator: React.FC<{ 
+  batchInfo: BatchProcessing; 
+  teamCount: number; 
+  elapsedTime: number;
+}> = ({ batchInfo, teamCount, elapsedTime }) => {
+  return (
+    <div className="flex flex-col items-center w-full max-w-lg mx-auto my-8 px-4">
+      <div className="text-center mb-4 space-y-2">
+        <h3 className="text-xl font-semibold text-blue-600">
+          Generating Picklist in Batches
+        </h3>
+        <p className="text-gray-600">
+          Processing teams in batches for higher quality rankings (updates every 5 seconds)
+        </p>
+        <p className="text-gray-600">
+          Time elapsed: {elapsedTime.toFixed(1)} seconds
+        </p>
+      </div>
+      
+      <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+        <div 
+          className="bg-blue-600 h-4 rounded-full transition-all duration-100 ease-out"
+          style={{ width: `${batchInfo.progress_percentage}%` }}
+        ></div>
+      </div>
+      
+      <div className="flex justify-between w-full text-sm text-gray-600 mt-1 mb-3">
+        <span>Processing batch {batchInfo.current_batch} of {batchInfo.total_batches}</span>
+        <span>{batchInfo.progress_percentage}% complete</span>
+      </div>
+      
+      <p className="text-sm text-gray-500">
+        {batchInfo.progress_percentage === 0 ? 'Starting batch processing...' : 
+         batchInfo.progress_percentage < 30 ? 'Processing first batches...' : 
+         batchInfo.progress_percentage < 70 ? 'Ranking teams with reference teams...' : 
+         batchInfo.progress_percentage < 95 ? 'Processing final batches...' : 
+         'Combining results...'}
       </p>
     </div>
   );
@@ -177,6 +234,12 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [teamsPerPage, setTeamsPerPage] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
   
+  // Batch processing state
+  const [batchProcessingActive, setBatchProcessingActive] = useState<boolean>(false);
+  const [batchProcessingInfo, setBatchProcessingInfo] = useState<BatchProcessing | null>(null);
+  const [pollingCacheKey, setPollingCacheKey] = useState<string | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  
   useEffect(() => {
     // Log when dependencies change
     console.log("PicklistGenerator dependencies changed:", { 
@@ -233,6 +296,143 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     setTotalPages(Math.ceil(picklist.length / teamsPerPage));
   }, [picklist.length, teamsPerPage]);
   
+  // Elapsed time counter for batch processing
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    
+    if (batchProcessingActive) {
+      // Start a timer that updates every 100ms
+      timer = setInterval(() => {
+        setElapsedTime(prev => prev + 0.1);
+      }, 100);
+    } else {
+      // Reset elapsed time when batch processing stops
+      setElapsedTime(0);
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [batchProcessingActive]);
+  
+  // Polling effect for batch processing status
+  useEffect(() => {
+    let pollingInterval: NodeJS.Timeout | null = null;
+    
+    if (batchProcessingActive && pollingCacheKey) {
+      // Poll every 5 seconds to reduce OPTIONS requests
+      pollingInterval = setInterval(async () => {
+        try {
+          const response = await fetch('http://localhost:8000/api/picklist/generate/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cache_key: pollingCacheKey })
+          });
+          
+          if (!response.ok) {
+            console.error('Error polling batch status:', response.status);
+            return;
+          }
+          
+          const data = await response.json();
+          
+          // Update batch processing info
+          if (data.batch_processing) {
+            setBatchProcessingInfo(data.batch_processing);
+            
+            // If processing is complete, stop polling and process the final result
+            if (data.batch_processing.processing_complete) {
+              setBatchProcessingActive(false);
+              clearInterval(pollingInterval);
+              
+              // Process the picklist data if it's included with the completion response
+              if (data.picklist) {
+                console.log('Processing completed picklist data:', data);
+                
+                // Process the picklist data
+                setPicklist(data.picklist);
+                if (data.analysis) setAnalysis(data.analysis);
+                
+                // Reset batch processing state
+                setBatchProcessingInfo(null);
+                setPollingCacheKey(null);
+                
+                // Reset to page 1
+                setCurrentPage(1);
+                setTotalPages(Math.ceil(data.picklist.length / teamsPerPage));
+                
+                // Call the callback if provided
+                if (onPicklistGenerated) {
+                  onPicklistGenerated(data);
+                }
+              } else {
+                // Fall back to fetching the result explicitly if picklist data isn't included
+                fetchCompletedPicklist();
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Error polling batch status:', err);
+        }
+      }, 5000); // Increased from 2000ms to 5000ms to reduce OPTIONS requests
+    }
+    
+    return () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+    };
+  }, [batchProcessingActive, pollingCacheKey]);
+  
+  // Function to fetch the completed picklist
+  const fetchCompletedPicklist = async () => {
+    if (!pollingCacheKey) return;
+    
+    try {
+      // Fetch the completed picklist using the cache key
+      const response = await fetch('http://localhost:8000/api/picklist/generate/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cache_key: pollingCacheKey })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch completed picklist');
+      }
+      
+      const data = await response.json();
+      
+      // If we have a complete result with picklist data, process it
+      if (data.status === 'success' && data.picklist) {
+        // Process the picklist data
+        setPicklist(data.picklist);
+        if (data.analysis) setAnalysis(data.analysis);
+        
+        // Reset batch processing state
+        setBatchProcessingActive(false);
+        setBatchProcessingInfo(null);
+        setPollingCacheKey(null);
+        
+        // Reset to page 1
+        setCurrentPage(1);
+        setTotalPages(Math.ceil(data.picklist.length / teamsPerPage));
+        
+        // Call the callback if provided
+        if (onPicklistGenerated) {
+          onPicklistGenerated(data);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching completed picklist:', err);
+      setError('Failed to fetch the completed picklist');
+      
+      // Reset batch processing state
+      setBatchProcessingActive(false);
+      setBatchProcessingInfo(null);
+      setPollingCacheKey(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const generatePicklist = async () => {
     if (!datasetPath || !yourTeamNumber || !priorities.length) {
       setError('Missing required inputs for picklist generation');
@@ -241,6 +441,11 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     
     setIsLoading(true);
     setError(null);
+    
+    // Reset batch processing state
+    setBatchProcessingActive(false);
+    setBatchProcessingInfo(null);
+    setPollingCacheKey(null);
     
     // Calculate estimated time - approximate from team count
     const teamsToRank = excludeTeams ? 75 - excludeTeams.length : 75;
@@ -263,12 +468,17 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       const teamsToExclude = excludeTeams || [];
       console.log(`Excluding ${teamsToExclude.length} teams for ${pickPosition} pick:`, teamsToExclude);
       
+      // Create request body with batching parameters
       const requestBody = JSON.stringify({
         unified_dataset_path: datasetPath,
         your_team_number: yourTeamNumber,
         pick_position: pickPosition,
         priorities: simplePriorities,
-        exclude_teams: teamsToExclude
+        exclude_teams: teamsToExclude,
+        use_batching: true,  // Enable batch processing by default
+        batch_size: 20,
+        reference_teams_count: 3,
+        reference_selection: "top_middle_bottom"
       });
       
       console.log('Sending request:', requestBody);
@@ -286,7 +496,41 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       
       const data: PicklistResult = await response.json();
       
+      // Check if this is a batched result
+      if (data.status === 'success' && data.batched) {
+        console.log('Batch processing initiated', data);
+        
+        // If we have a cache key, start polling for updates
+        if (data.cache_key) {
+          // Start batch processing monitoring
+          setBatchProcessingActive(true);
+          setPollingCacheKey(data.cache_key);
+          
+          // Set initial batch processing info if available
+          if (data.batch_processing) {
+            setBatchProcessingInfo(data.batch_processing);
+          } else {
+            // Default initial values
+            setBatchProcessingInfo({
+              total_batches: 0,
+              current_batch: 0,
+              progress_percentage: 0,
+              processing_complete: false
+            });
+          }
+          
+          // Don't set picklist until batch processing is complete
+          return;
+        }
+      }
+      
+      // For non-batched results or immediate completion, process normally
       if (data.status === 'success') {
+        // Reset batch processing state
+        setBatchProcessingActive(false);
+        setBatchProcessingInfo(null);
+        setPollingCacheKey(null);
+        
         setPicklist(data.picklist);
         setAnalysis(data.analysis);
         
@@ -321,6 +565,11 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     } catch (err: any) {
       setError(err.message || 'Error connecting to server');
       console.error('Error generating picklist:', err);
+      
+      // Reset batch processing state on error
+      setBatchProcessingActive(false);
+      setBatchProcessingInfo(null);
+      setPollingCacheKey(null);
     } finally {
       setIsLoading(false);
     }
@@ -504,8 +753,20 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     setTimeout(() => setSuccessMessage(null), 2000);
   };
   
-  if (isLoading && !picklist.length) {
-    // Show progress indicator if we have an estimated time
+  // Decide which loading/progress indicator to show
+  if ((isLoading && !picklist.length) || batchProcessingActive) {
+    // If batch processing is active, show the batch progress indicator
+    if (batchProcessingActive && batchProcessingInfo) {
+      return (
+        <BatchProgressIndicator 
+          batchInfo={batchProcessingInfo} 
+          teamCount={datasetPath ? 75 : 0} 
+          elapsedTime={elapsedTime} 
+        />
+      );
+    }
+    
+    // Show estimated time progress indicator for non-batch processing
     if (estimatedTime > 0) {
       return <ProgressIndicator estimatedTime={estimatedTime} teamCount={datasetPath ? 75 : 0} />;
     }
@@ -517,6 +778,11 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         <span className="ml-3 text-blue-600">Generating picklist...</span>
       </div>
     );
+  }
+  
+  // Don't show the picklist if batch processing is active
+  if (batchProcessingActive) {
+    return null;
   }
   
   return (

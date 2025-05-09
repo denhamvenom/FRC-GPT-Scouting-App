@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException, Body
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional, Set
+from typing import List, Dict, Any, Optional, Set, Union
 
 from app.services.picklist_generator_service import PicklistGeneratorService
 
@@ -19,6 +19,10 @@ class PicklistRequest(BaseModel):
     pick_position: str = Field(..., description="Options: 'first', 'second', or 'third'")
     priorities: List[MetricPriority]
     exclude_teams: Optional[List[int]] = None
+    batch_size: int = Field(20, ge=5, le=100, description="Number of teams in each batch (default: 20)")
+    reference_teams_count: int = Field(3, ge=1, le=10, description="Number of reference teams to include (default: 3)")
+    reference_selection: str = Field("top_middle_bottom", description="Strategy for selecting reference teams", enum=["even_distribution", "percentile", "top_middle_bottom"])
+    use_batching: bool = Field(True, description="Whether to use batch processing instead of one-shot generation")
 
 class UserRanking(BaseModel):
     team_number: int
@@ -37,6 +41,90 @@ class RankMissingTeamsRequest(BaseModel):
     your_team_number: int
     pick_position: str = Field(..., description="Options: 'first', 'second', or 'third'")
     priorities: List[MetricPriority]
+
+@router.post("/generate/status")
+async def get_picklist_generation_status(request: Dict[str, str] = Body(...)):
+    """
+    Get the status of a picklist generation job.
+    
+    Args:
+        request: A dictionary containing the cache_key
+        
+    Returns:
+        Status information for the job
+    """
+    try:
+        cache_key = request.get("cache_key")
+        if not cache_key:
+            raise HTTPException(status_code=400, detail="cache_key is required")
+            
+        # For status checks, we don't need to initialize with a real dataset path
+        # so just create a service instance without loading the dataset
+        from app.services.picklist_generator_service import PicklistGeneratorService
+        
+        class StatusCheckService:
+            def __init__(self):
+                self._picklist_cache = {}
+                
+            def get_batch_processing_status(self, cache_key):
+                # Use the same logic as the original service but without loading any dataset
+                if cache_key in PicklistGeneratorService._picklist_cache:
+                    cached_data = PicklistGeneratorService._picklist_cache[cache_key]
+                    
+                    # If it's a timestamp, it's in progress but no batches have completed yet
+                    if isinstance(cached_data, float):
+                        return {
+                            "status": "in_progress",
+                            "batch_processing": {
+                                "total_batches": 0,
+                                "current_batch": 0,
+                                "progress_percentage": 0,
+                                "processing_complete": False
+                            }
+                        }
+                    # If it's a dictionary with batch_processing info, return the status
+                    elif isinstance(cached_data, dict) and "batch_processing" in cached_data:
+                        # If processing is complete, return the full result including the picklist
+                        if cached_data["batch_processing"].get("processing_complete"):
+                            return cached_data  # Return the entire result with picklist data
+                        else:
+                            # If still processing, just return status info
+                            return {
+                                "status": "in_progress",
+                                "batch_processing": cached_data["batch_processing"]
+                            }
+                    # Otherwise, it's a completed non-batch job
+                    else:
+                        return {
+                            "status": "success",
+                            "batch_processing": {
+                                "total_batches": 1,
+                                "current_batch": 1,
+                                "progress_percentage": 100,
+                                "processing_complete": True
+                            }
+                        }
+                
+                # Not found in cache
+                return {
+                    "status": "not_found",
+                    "batch_processing": {
+                        "total_batches": 0,
+                        "current_batch": 0,
+                        "progress_percentage": 0,
+                        "processing_complete": False
+                    }
+                }
+        
+        # Use the simplified status check service that doesn't try to load datasets
+        status_service = StatusCheckService()
+        
+        # Get the status using our dedicated status service
+        status = status_service.get_batch_processing_status(cache_key)
+        return status
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error checking picklist generation status: {str(e)}")
 
 @router.post("/generate")
 async def generate_picklist(request: PicklistRequest):
@@ -86,12 +174,26 @@ async def generate_picklist(request: PicklistRequest):
             "team": request.your_team_number,
             "position": request.pick_position,
             "priorities": sorted([(p["id"], p["weight"]) for p in priorities]),
-            "exclude": sorted(request.exclude_teams) if request.exclude_teams else []
+            "exclude": sorted(request.exclude_teams) if request.exclude_teams else [],
+            "use_batching": request.use_batching
         }
+        
+        # Include batching parameters if batching is enabled
+        if request.use_batching:
+            cache_key_dict.update({
+                "batch_size": request.batch_size,
+                "reference_teams_count": request.reference_teams_count,
+                "reference_selection": request.reference_selection
+            })
         
         # Convert to a hash for quick comparison
         cache_key = hashlib.md5(json.dumps(cache_key_dict, sort_keys=True).encode()).hexdigest()
         logger.info(f"Request {request_id} cache key: {cache_key}")
+        
+        # Add batch processing parameters to log
+        if request.use_batching:
+            logger.info(f"Using batching with batch_size={request.batch_size}, reference_teams_count={request.reference_teams_count}")
+            logger.info(f"Reference selection strategy: {request.reference_selection}")
         
         # Use the cache on the service to prevent duplicate work
         # The generator_service has internal caching that should prevent duplicate work
@@ -101,13 +203,20 @@ async def generate_picklist(request: PicklistRequest):
             priorities=priorities,  # Use the plain dict version
             exclude_teams=request.exclude_teams,
             request_id=request_id,  # Pass the request ID for logging
-            cache_key=cache_key     # Pass the cache key for deduplication
+            cache_key=cache_key,    # Pass the cache key for deduplication
+            batch_size=request.batch_size,
+            reference_teams_count=request.reference_teams_count,
+            reference_selection=request.reference_selection,
+            use_batching=request.use_batching
         )
         
         if result.get("status") == "error":
             raise HTTPException(status_code=500, detail=result.get("message", "Error generating picklist"))
         
         logger.info(f"Successfully generated picklist for request {request_id}")
+        
+        # Add the cache key to the response for status polling
+        result["cache_key"] = cache_key
         return result
     
     except Exception as e:
