@@ -1,10 +1,18 @@
 # File: backend/app/main.py
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import openai
+import logging
+import traceback
+from app.services.logging_config import setup_logging
+
+# Setup logging
+log_file = setup_logging()
+logger = logging.getLogger(__name__)
 
 # Load environment variables and set OpenAI API key
 load_dotenv()
@@ -35,6 +43,7 @@ from app.api import test_enhanced_parser    # Import the enhanced parser test
 from app.api import progress                # Import the progress tracking API
 from app.api import debug_logs              # Import debug logs API
 from app.api import alliance_selection      # Import alliance selection API
+from app.api import archive                 # Import event archiving API
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
@@ -46,6 +55,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """
+    Global exception handler to log all unhandled exceptions
+    """
+    error_msg = f"Unhandled exception: {str(exc)}"
+    stack_trace = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+
+    # Log the full error with request details
+    logger.error(f"{error_msg}\nRequest: {request.method} {request.url}\n{stack_trace}")
+
+    # Return a JSON response
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error. Check logs for details."},
+    )
 
 # Include routers
 app.include_router(health.router, prefix="/api/health")
@@ -67,6 +94,7 @@ app.include_router(test_enhanced_parser.router)     # Add the enhanced parser te
 app.include_router(progress.router, prefix="/api")  # Add the progress tracking API
 app.include_router(debug_logs.router, prefix="/api/debug")  # Add the debug logs API
 app.include_router(alliance_selection.router)  # Add the alliance selection API
+app.include_router(archive.router)  # Add the event archiving API
 
 @app.get("/")
 async def root():

@@ -248,8 +248,8 @@ class AllianceData(BaseModel):
 class TeamActionRequest(BaseModel):
     selection_id: int
     team_number: int
-    action: str = Field(..., description="Action: 'captain', 'accept', 'decline'")
-    alliance_number: Optional[int] = None  # Required for 'captain' and 'accept' actions
+    action: str = Field(..., description="Action: 'captain', 'accept', 'decline', 'remove'")
+    alliance_number: Optional[int] = None  # Required for 'captain', 'accept', and 'remove' actions
 
 @router.post("/selection/create", response_model=AllianceSelectionResponse)
 async def create_alliance_selection(request: CreateAllianceSelectionRequest, db: Session = Depends(get_db)):
@@ -485,12 +485,71 @@ async def team_action(request: TeamActionRequest, db: Session = Depends(get_db))
             
             return {"status": "success", "action": "decline", "team_number": request.team_number}
             
+        elif request.action == "remove":
+            # Remove a team from an alliance
+            if not request.alliance_number or request.alliance_number < 1 or request.alliance_number > 8:
+                raise HTTPException(status_code=400, detail="Invalid alliance number")
+
+            # Get the alliance
+            alliance = db.query(Alliance).filter(
+                Alliance.selection_id == request.selection_id,
+                Alliance.alliance_number == request.alliance_number
+            ).first()
+
+            if not alliance:
+                raise HTTPException(status_code=404, detail="Alliance not found")
+
+            # Check if the team is part of this alliance
+            removed = False
+            position = ""
+
+            if alliance.captain_team_number == request.team_number:
+                # Can't remove a captain - that would break the alliance
+                raise HTTPException(status_code=400,
+                                   detail="Cannot remove alliance captain. Please start a new alliance selection if needed.")
+
+            elif alliance.first_pick_team_number == request.team_number:
+                alliance.first_pick_team_number = 0
+                removed = True
+                position = "first pick"
+
+            elif alliance.second_pick_team_number == request.team_number:
+                alliance.second_pick_team_number = 0
+                removed = True
+                position = "second pick"
+
+            elif alliance.backup_team_number == request.team_number:
+                alliance.backup_team_number = 0
+                removed = True
+                position = "backup"
+
+            if not removed:
+                raise HTTPException(status_code=404,
+                                   detail=f"Team {request.team_number} is not part of alliance {request.alliance_number}")
+
+            # Update the team status to make it selectable again
+            team_status.is_picked = False
+            team_status.round_eliminated = None  # Clear elimination round to make team available
+
+            db.commit()
+
+            logger.info(f"Removed team {request.team_number} as {position} from alliance {request.alliance_number}")
+
+            return {
+                "status": "success",
+                "action": "remove",
+                "team_number": request.team_number,
+                "alliance_number": request.alliance_number,
+                "position": position
+            }
+
         else:
             raise HTTPException(status_code=400, detail="Invalid action")
-            
+
     except HTTPException:
         raise
     except Exception as e:
+        logger.exception(f"Error performing team action: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error performing team action: {str(e)}")
 
 @router.post("/selection/{selection_id}/next-round")

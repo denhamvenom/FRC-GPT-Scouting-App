@@ -1,7 +1,8 @@
 # backend/app/database/models.py
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON, Table
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON, Table, LargeBinary
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+import datetime
 
 from .db import Base
 
@@ -89,3 +90,31 @@ class TeamSelectionStatus(Base):
     
     # Relationships
     selection = relationship("AllianceSelection", back_populates="team_statuses")
+
+class ArchivedEvent(Base):
+    """Model for storing archived event data"""
+    __tablename__ = "archived_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)  # User-friendly name for the archive
+    event_key = Column(String, index=True)
+    year = Column(Integer)
+
+    # Archive data
+    archive_data = Column(LargeBinary)  # SQLite BLOB to store serialized event data
+    archive_metadata = Column(JSON)  # JSON metadata about the archive (tables, counts, etc.)
+
+    # Archive status
+    is_active = Column(Boolean, default=False)  # Whether this is the currently active archive
+
+    # Metadata
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_by = Column(String, nullable=True)  # User who created the archive
+    notes = Column(String, nullable=True)  # Optional notes about the archive
+
+    @property
+    def formatted_date(self):
+        """Return a formatted date string for display"""
+        if self.created_at:
+            return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        return "Unknown date"

@@ -1,0 +1,110 @@
+2025-05-12 11:16:07,456 - root - INFO - === Logging initialized, writing to C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\logs\archive_service_20250512_111607.log ===
+2025-05-12 11:16:07,786 - googleapiclient.discovery_cache - INFO - file_cache is only supported with oauth2client<4.0.0
+2025-05-12 11:22:05,383 - archive_api - INFO - Archive and clear request received: {'name': '2025 Championship - Archimedes V2', 'event_key': '2025arc', 'year': 2025, 'notes': None, 'created_by': 'Daniel Eiland'}
+2025-05-12 11:22:05,383 - archive_api - INFO - Client IP: 127.0.0.1, Headers: {'host': 'localhost:8000', 'connection': 'keep-alive', 'content-length': '107', 'sec-ch-ua-platform': '"Windows"', 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 'sec-ch-ua': '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"', 'content-type': 'application/json', 'sec-ch-ua-mobile': '?0', 'accept': '*/*', 'origin': 'http://localhost:5173', 'sec-fetch-site': 'same-site', 'sec-fetch-mode': 'cors', 'sec-fetch-dest': 'empty', 'referer': 'http://localhost:5173/', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'en-US,en;q=0.9'}
+2025-05-12 11:22:05,390 - archive_api - INFO - Starting archive for event 2025arc (2025)
+2025-05-12 11:22:05,390 - archive_service - INFO - Starting archive for event 2025arc (2025) with name: 2025 Championship - Archimedes V2
+2025-05-12 11:22:05,392 - archive_service - INFO - Found 1 picklists and 1 selections for event 2025arc (2025)
+2025-05-12 11:22:05,398 - archive_service - INFO - Included unified dataset in archive: C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\app\data\unified_event_2025arc.json
+2025-05-12 11:22:05,401 - archive_service - INFO - Serializing archive data
+2025-05-12 11:22:05,404 - archive_service - INFO - Creating archive record in database
+2025-05-12 11:22:05,413 - archive_service - INFO - Successfully created archive with ID 2
+2025-05-12 11:22:05,414 - archive_api - INFO - Archive result: {'status': 'success', 'message': 'Successfully archived event 2025arc (2025)', 'archive_id': 2, 'metadata': {'tables': {'unified_dataset': 1, 'LockedPicklist': 1, 'AllianceSelection': 1, 'Alliance': 8, 'TeamSelectionStatus': 75}, 'event_key': '2025arc', 'year': 2025, 'archived_at': '2025-05-12T11:22:05.392096', 'is_empty': False, 'files': ['C:\\Users\\frc80\\OneDrive\\Documents\\FRC-GPT-Scouting-App\\backend\\app\\data\\unified_event_2025arc.json']}}
+2025-05-12 11:22:05,414 - archive_api - INFO - Starting clear for event 2025arc (2025)
+2025-05-12 11:22:05,426 - archive_service - INFO - Removed unified dataset: C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\app\data\unified_event_2025arc.json (backup at C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\app\data\unified_event_2025arc.json.bak)
+2025-05-12 11:22:05,426 - archive_api - INFO - Clear result: {'status': 'success', 'message': 'Successfully cleared event data for 2025arc (2025)', 'deleted_counts': {'TeamSelectionStatus': 75, 'Alliance': 8, 'AllianceSelection': 1, 'LockedPicklist': 1, 'unified_dataset': 1}}
+2025-05-12 11:22:05,426 - archive_api - INFO - Archive and clear successful for event 2025arc (2025)
+2025-05-12 11:22:20,899 - archive_service - INFO - Restored alliance selection: old_id=1, new_id=1
+2025-05-12 11:22:20,900 - archive_service - INFO - Restored 1 alliance selections
+2025-05-12 11:22:20,901 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=1
+2025-05-12 11:22:20,901 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=2
+2025-05-12 11:22:20,902 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=3
+2025-05-12 11:22:20,902 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=4
+2025-05-12 11:22:20,902 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=5
+2025-05-12 11:22:20,903 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=6
+2025-05-12 11:22:20,903 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=7
+2025-05-12 11:22:20,903 - archive_service - INFO - Restored alliance: selection_id=1->1, alliance=8
+2025-05-12 11:22:20,903 - archive_service - INFO - Restored 8 alliances
+2025-05-12 11:22:20,904 - archive_service - INFO - Restored team status: selection_id=1->1, team=2481
+2025-05-12 11:22:20,904 - archive_service - INFO - Restored team status: selection_id=1->1, team=341
+2025-05-12 11:22:20,905 - archive_service - INFO - Restored team status: selection_id=1->1, team=604
+2025-05-12 11:22:20,905 - archive_service - INFO - Restored team status: selection_id=1->1, team=1197
+2025-05-12 11:22:20,905 - archive_service - INFO - Restored team status: selection_id=1->1, team=6369
+2025-05-12 11:22:20,906 - archive_service - INFO - Restored team status: selection_id=1->1, team=5990
+2025-05-12 11:22:20,906 - archive_service - INFO - Restored team status: selection_id=1->1, team=4391
+2025-05-12 11:22:20,906 - archive_service - INFO - Restored team status: selection_id=1->1, team=2231
+2025-05-12 11:22:20,906 - archive_service - INFO - Restored team status: selection_id=1->1, team=2338
+2025-05-12 11:22:20,907 - archive_service - INFO - Restored team status: selection_id=1->1, team=987
+2025-05-12 11:22:20,907 - archive_service - INFO - Restored team status: selection_id=1->1, team=1732
+2025-05-12 11:22:20,907 - archive_service - INFO - Restored team status: selection_id=1->1, team=1114
+2025-05-12 11:22:20,908 - archive_service - INFO - Restored team status: selection_id=1->1, team=1701
+2025-05-12 11:22:20,908 - archive_service - INFO - Restored team status: selection_id=1->1, team=3940
+2025-05-12 11:22:20,908 - archive_service - INFO - Restored team status: selection_id=1->1, team=4270
+2025-05-12 11:22:20,908 - archive_service - INFO - Restored team status: selection_id=1->1, team=4400
+2025-05-12 11:22:20,909 - archive_service - INFO - Restored team status: selection_id=1->1, team=8044
+2025-05-12 11:22:20,909 - archive_service - INFO - Restored team status: selection_id=1->1, team=4028
+2025-05-12 11:22:20,909 - archive_service - INFO - Restored team status: selection_id=1->1, team=1987
+2025-05-12 11:22:20,909 - archive_service - INFO - Restored team status: selection_id=1->1, team=1756
+2025-05-12 11:22:20,911 - archive_service - INFO - Restored team status: selection_id=1->1, team=5951
+2025-05-12 11:22:20,911 - archive_service - INFO - Restored team status: selection_id=1->1, team=3767
+2025-05-12 11:22:20,912 - archive_service - INFO - Restored team status: selection_id=1->1, team=839
+2025-05-12 11:22:20,912 - archive_service - INFO - Restored team status: selection_id=1->1, team=836
+2025-05-12 11:22:20,912 - archive_service - INFO - Restored team status: selection_id=1->1, team=5216
+2025-05-12 11:22:20,912 - archive_service - INFO - Restored team status: selection_id=1->1, team=7211
+2025-05-12 11:22:20,913 - archive_service - INFO - Restored team status: selection_id=1->1, team=3620
+2025-05-12 11:22:20,913 - archive_service - INFO - Restored team status: selection_id=1->1, team=2052
+2025-05-12 11:22:20,913 - archive_service - INFO - Restored team status: selection_id=1->1, team=9408
+2025-05-12 11:22:20,914 - archive_service - INFO - Restored team status: selection_id=1->1, team=2834
+2025-05-12 11:22:20,914 - archive_service - INFO - Restored team status: selection_id=1->1, team=5801
+2025-05-12 11:22:20,914 - archive_service - INFO - Restored team status: selection_id=1->1, team=11
+2025-05-12 11:22:20,914 - archive_service - INFO - Restored team status: selection_id=1->1, team=2106
+2025-05-12 11:22:20,915 - archive_service - INFO - Restored team status: selection_id=1->1, team=1923
+2025-05-12 11:22:20,915 - archive_service - INFO - Restored team status: selection_id=1->1, team=4143
+2025-05-12 11:22:20,916 - archive_service - INFO - Restored team status: selection_id=1->1, team=2342
+2025-05-12 11:22:20,916 - archive_service - INFO - Restored team status: selection_id=1->1, team=1629
+2025-05-12 11:22:20,916 - archive_service - INFO - Restored team status: selection_id=1->1, team=1727
+2025-05-12 11:22:20,917 - archive_service - INFO - Restored team status: selection_id=1->1, team=1076
+2025-05-12 11:22:20,917 - archive_service - INFO - Restored team status: selection_id=1->1, team=6340
+2025-05-12 11:22:20,917 - archive_service - INFO - Restored team status: selection_id=1->1, team=4788
+2025-05-12 11:22:20,917 - archive_service - INFO - Restored team status: selection_id=1->1, team=2851
+2025-05-12 11:22:20,918 - archive_service - INFO - Restored team status: selection_id=1->1, team=5516
+2025-05-12 11:22:20,918 - archive_service - INFO - Restored team status: selection_id=1->1, team=10079
+2025-05-12 11:22:20,918 - archive_service - INFO - Restored team status: selection_id=1->1, team=6548
+2025-05-12 11:22:20,919 - archive_service - INFO - Restored team status: selection_id=1->1, team=7522
+2025-05-12 11:22:20,919 - archive_service - INFO - Restored team status: selection_id=1->1, team=1511
+2025-05-12 11:22:20,919 - archive_service - INFO - Restored team status: selection_id=1->1, team=9576
+2025-05-12 11:22:20,919 - archive_service - INFO - Restored team status: selection_id=1->1, team=386
+2025-05-12 11:22:20,920 - archive_service - INFO - Restored team status: selection_id=1->1, team=2590
+2025-05-12 11:22:20,920 - archive_service - INFO - Restored team status: selection_id=1->1, team=2638
+2025-05-12 11:22:20,920 - archive_service - INFO - Restored team status: selection_id=1->1, team=3132
+2025-05-12 11:22:20,921 - archive_service - INFO - Restored team status: selection_id=1->1, team=766
+2025-05-12 11:22:20,921 - archive_service - INFO - Restored team status: selection_id=1->1, team=6358
+2025-05-12 11:22:20,921 - archive_service - INFO - Restored team status: selection_id=1->1, team=2935
+2025-05-12 11:22:20,922 - archive_service - INFO - Restored team status: selection_id=1->1, team=2637
+2025-05-12 11:22:20,922 - archive_service - INFO - Restored team status: selection_id=1->1, team=4329
+2025-05-12 11:22:20,922 - archive_service - INFO - Restored team status: selection_id=1->1, team=9126
+2025-05-12 11:22:20,923 - archive_service - INFO - Restored team status: selection_id=1->1, team=2601
+2025-05-12 11:22:20,923 - archive_service - INFO - Restored team status: selection_id=1->1, team=3182
+2025-05-12 11:22:20,923 - archive_service - INFO - Restored team status: selection_id=1->1, team=4
+2025-05-12 11:22:20,923 - archive_service - INFO - Restored team status: selection_id=1->1, team=10120
+2025-05-12 11:22:20,924 - archive_service - INFO - Restored team status: selection_id=1->1, team=117
+2025-05-12 11:22:20,924 - archive_service - INFO - Restored team status: selection_id=1->1, team=5298
+2025-05-12 11:22:20,924 - archive_service - INFO - Restored team status: selection_id=1->1, team=9459
+2025-05-12 11:22:20,924 - archive_service - INFO - Restored team status: selection_id=1->1, team=597
+2025-05-12 11:22:20,925 - archive_service - INFO - Restored team status: selection_id=1->1, team=9234
+2025-05-12 11:22:20,925 - archive_service - INFO - Restored team status: selection_id=1->1, team=4146
+2025-05-12 11:22:20,925 - archive_service - INFO - Restored team status: selection_id=1->1, team=10466
+2025-05-12 11:22:20,926 - archive_service - INFO - Restored team status: selection_id=1->1, team=3880
+2025-05-12 11:22:20,926 - archive_service - INFO - Restored team status: selection_id=1->1, team=2341
+2025-05-12 11:22:20,926 - archive_service - INFO - Restored team status: selection_id=1->1, team=9583
+2025-05-12 11:22:20,927 - archive_service - INFO - Restored team status: selection_id=1->1, team=6014
+2025-05-12 11:22:20,927 - archive_service - INFO - Restored team status: selection_id=1->1, team=3489
+2025-05-12 11:22:20,927 - archive_service - INFO - Restored team status: selection_id=1->1, team=4585
+2025-05-12 11:22:20,927 - archive_service - INFO - Restored 75 team selection statuses
+2025-05-12 11:22:20,960 - archive_service - INFO - Restored unified dataset to C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\app\data\unified_event_2025arc.json
+2025-05-12 11:22:59,664 - archive_service - INFO - Removed unified dataset: C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\app\data\unified_event_2025arc.json (backup at C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\app\data\unified_event_2025arc.json.bak)
+2025-05-12 11:23:18,304 - googleapiclient.discovery - DEBUG - URL being requested: GET https://sheets.googleapis.com/v4/spreadsheets/17kNYpSOEQDomISFobIO41ua37l0Es-HY_hnl1dQ2MAs/values/Scouting%21A1%3AZ1?alt=json
+2025-05-12 11:23:18,322 - google_auth_httplib2 - DEBUG - Making request: POST https://oauth2.googleapis.com/token
+2025-05-12 11:23:22,265 - googleapiclient.discovery - DEBUG - URL being requested: GET https://sheets.googleapis.com/v4/spreadsheets/17kNYpSOEQDomISFobIO41ua37l0Es-HY_hnl1dQ2MAs/values/Scouting%21A1%3AZ1?alt=json
+2025-05-12 11:23:32,447 - googleapiclient.discovery - DEBUG - URL being requested: GET https://sheets.googleapis.com/v4/spreadsheets/17kNYpSOEQDomISFobIO41ua37l0Es-HY_hnl1dQ2MAs/values/SuperScouting%21A1%3AZ1?alt=json
+2025-05-12 11:23:41,310 - googleapiclient.discovery - DEBUG - URL being requested: GET https://sheets.googleapis.com/v4/spreadsheets/17kNYpSOEQDomISFobIO41ua37l0Es-HY_hnl1dQ2MAs/values/SuperScouting%21A1%3AZ1?alt=json

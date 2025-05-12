@@ -346,39 +346,85 @@ const AllianceSelection: React.FC = () => {
     }
   };
   
-  const advanceToNextRound = async () => {
+  const handleRemoveTeam = async (teamNumber: number, allianceNumber: number) => {
     if (!selection) return;
-    
+
+    // Confirm before removing
+    if (!window.confirm(`Are you sure you want to remove team ${teamNumber} from alliance ${allianceNumber}?`)) {
+      return;
+    }
+
     try {
       setLoading(true);
-      
+
+      const response = await fetch('http://localhost:8000/api/alliance/selection/team-action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          selection_id: selection.id,
+          team_number: teamNumber,
+          action: 'remove',
+          alliance_number: allianceNumber
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to remove team from alliance');
+      }
+
+      // Success! Reload selection data
+      await loadSelectionData(selection.id);
+
+      // Show success message
+      setSuccessMessage(`Team ${teamNumber} has been removed from alliance ${allianceNumber}`);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
+
+    } catch (err: any) {
+      setError('Error removing team: ' + err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const advanceToNextRound = async () => {
+    if (!selection) return;
+
+    try {
+      setLoading(true);
+
       const response = await fetch(`http://localhost:8000/api/alliance/selection/${selection.id}/next-round`, {
         method: 'POST'
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Failed to advance to next round');
       }
-      
+
       // Reset the selected team and action
       setSelectedTeam(null);
       setSelectedAlliance(null);
       setAction(null);
-      
+
       // Reload selection data
       await loadSelectionData(selection.id);
-      
+
       // Show success message
       setSuccessMessage(
-        selection.current_round >= 3 
+        selection.current_round >= 3
           ? 'Alliance selection completed after backup selections!'
           : `Advanced to round ${selection.current_round + 1}`
       );
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccessMessage(null), 3000);
-      
+
     } catch (err: any) {
       setError('Error advancing to next round: ' + err.message);
       console.error(err);
@@ -424,31 +470,62 @@ const AllianceSelection: React.FC = () => {
   
   /**
    * Get the team ranking based on picklist data
-   * 
+   *
    * This function returns a numeric ranking for a team:
    * - If the team is in the first pick list: rank = index (0-999)
    * - If the team is in the second pick list: rank = 1000 + index
    * - If the team is in the third pick list: rank = 2000 + index
    * - If the team isn't found in any picklist: rank = 3000 + (teamNumber/10000)
-   * 
+   *
    * This ensures teams are displayed in order of their picklist ranking.
-   * 
+   *
    * The fallback logic (for teams not in picklist) uses the team number as a rough
-   * proxy for quality, assuming historically strong teams (254, 1114, etc.) have lower 
+   * proxy for quality, assuming historically strong teams (254, 1114, etc.) have lower
    * numbers than newer teams. This is not perfect but provides reasonable sorting
    * when no picklist data is available.
-   * 
+   *
    * @param teamNumber - The team number to look up
+   * @param roundNumber - Optional round number to prioritize that specific picklist (1, 2, or 3)
    * @returns A numeric rank value (lower is better)
    */
-  const getTeamRank = (teamNumber: number): number => {
+  const getTeamRank = (teamNumber: number, roundNumber?: number): number => {
     // If we have a picklist, use it for ranking
     if (picklist) {
       console.log("Using picklist for ranking with ID:", picklist.id);
-      
+
+      // If a specific round is requested, prioritize that picklist for ranking
+      if (roundNumber) {
+        let foundInSpecifiedRound = false;
+        let rank = 0;
+
+        // Check requested picklist first
+        if (roundNumber === 1 && picklist.first_pick_data && picklist.first_pick_data.teams) {
+          const teamIndex = picklist.first_pick_data.teams.findIndex(t => t.team_number === teamNumber);
+          if (teamIndex !== -1) {
+            // Team is in the 1st pick list - use its position
+            return teamIndex;
+          }
+        } else if (roundNumber === 2 && picklist.second_pick_data && picklist.second_pick_data.teams) {
+          const teamIndex = picklist.second_pick_data.teams.findIndex(t => t.team_number === teamNumber);
+          if (teamIndex !== -1) {
+            // Team is in the 2nd pick list - use its position + 1000
+            return 1000 + teamIndex;
+          }
+        } else if (roundNumber === 3 && picklist.third_pick_data && picklist.third_pick_data.teams) {
+          const teamIndex = picklist.third_pick_data.teams.findIndex(t => t.team_number === teamNumber);
+          if (teamIndex !== -1) {
+            // Team is in the 3rd pick list - use its position + 2000
+            return 2000 + teamIndex;
+          }
+        }
+      }
+
+      // If no specific round or team wasn't found in the specified round's picklist,
+      // follow the standard approach of checking all picklists
+
       // Create array of all teams in their ranked order combining all pick positions
       const allRankedTeams: {team_number: number, rank: number}[] = [];
-      
+
       // Add teams from first pick list
       if (picklist.first_pick_data && picklist.first_pick_data.teams) {
         picklist.first_pick_data.teams.forEach((team, index) => {
@@ -458,7 +535,7 @@ const AllianceSelection: React.FC = () => {
           });
         });
       }
-      
+
       // Add teams from second pick list
       if (picklist.second_pick_data && picklist.second_pick_data.teams) {
         picklist.second_pick_data.teams.forEach((team, index) => {
@@ -471,7 +548,7 @@ const AllianceSelection: React.FC = () => {
           }
         });
       }
-      
+
       // Add teams from third pick list
       if (picklist.third_pick_data && picklist.third_pick_data.teams) {
         picklist.third_pick_data.teams.forEach((team, index) => {
@@ -484,19 +561,19 @@ const AllianceSelection: React.FC = () => {
           }
         });
       }
-      
+
       // Find the team's rank
       const teamRankObj = allRankedTeams.find(t => t.team_number === teamNumber);
       if (teamRankObj) {
         return teamRankObj.rank;
       }
     }
-    
+
     // If we don't have a picklist or the team wasn't found in the picklist,
     // use the team number itself as a fallback - higher numbers will be ranked lower
     // This means teams like 254, 1114, etc. will be ranked higher than teams with high numbers,
     // which is generally a decent fallback since historically successful teams tend to have lower numbers
-    
+
     // Scale the team number to be between 3000-4000 to ensure it's after all picklist ranks
     return 3000 + (teamNumber / 10000);
   };
@@ -505,64 +582,101 @@ const AllianceSelection: React.FC = () => {
   const getTeamColumns = (): number[][] => {
     const allTeamsWithRank: {team_number: number, rank: number}[] = [];
     let teamsToUse: number[] = [];
-    
+
     // Get all the available teams
     if (selection && selection.team_statuses && selection.team_statuses.length > 0) {
-      teamsToUse = selection.team_statuses.map(ts => ts.team_number);
-      console.log("Using team statuses from selection:", teamsToUse.length, "teams");
+      // Filter teams based on selection status - only include teams that:
+      // 1. Are not captains
+      // 2. Are not already picked
+      // 3. Have not been eliminated in a previous round
+      teamsToUse = selection.team_statuses
+        .filter(ts => {
+          // Skip teams that are captains or already picked
+          if (ts.is_captain || ts.is_picked) return false;
+
+          // Skip teams eliminated in a previous round (but allow teams eliminated in the current round)
+          if (ts.round_eliminated && ts.round_eliminated < selection.current_round) return false;
+
+          return true;
+        })
+        .map(ts => ts.team_number);
+
+      console.log(`Using team statuses from selection (filtered for round ${selection.current_round}):`, teamsToUse.length, "teams");
     } else if (teamList.length > 0) {
       teamsToUse = [...teamList];
       console.log("Using team list:", teamsToUse.length, "teams");
     } else {
       // Fallback to default list of teams for testing
-      teamsToUse = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254, 6329, 7769, 8044, 
+      teamsToUse = [254, 1114, 1678, 2056, 2767, 3310, 4414, 5254, 6329, 7769, 8044,
                     1619, 3538, 4613, 6328, 7429, 8033, 3407, 4290, 6443];
       console.log("Using fallback team list:", teamsToUse.length, "teams");
     }
-    
+
     // Log picklist status
     console.log("Picklist available:", picklist !== null);
     if (picklist) {
       console.log("First pick teams:", picklist.first_pick_data?.teams?.length || 0);
       console.log("Second pick teams:", picklist.second_pick_data?.teams?.length || 0);
       console.log("Third pick teams:", picklist.third_pick_data?.teams?.length || 0);
+      console.log("Current round:", selection?.current_round || 1);
     }
-    
+
     // Create paired list of team numbers with their ranking
     teamsToUse.forEach(teamNumber => {
-      const rank = getTeamRank(teamNumber); // This will be 9999 if not found in picklist
+      // Use the appropriate picklist based on the current round
+      let rank = 9999; // Default high rank (low priority)
+
+      if (picklist) {
+        if (selection?.current_round === 1) {
+          // For round 1, use the first pick picklist rankings
+          rank = getTeamRank(teamNumber, 1);
+        } else if (selection?.current_round === 2) {
+          // For round 2, use the second pick picklist rankings
+          rank = getTeamRank(teamNumber, 2);
+        } else if (selection?.current_round >= 3) {
+          // For round 3+, use the third pick picklist rankings if available, otherwise second pick
+          rank = picklist.third_pick_data ? getTeamRank(teamNumber, 3) : getTeamRank(teamNumber, 2);
+        } else {
+          // Fallback to first pick rankings
+          rank = getTeamRank(teamNumber, 1);
+        }
+      } else {
+        // No picklist available - use team number as fallback
+        rank = 3000 + (teamNumber / 10000);
+      }
+
       allTeamsWithRank.push({
         team_number: teamNumber,
         rank: rank
       });
-      
+
       // Log a few team ranks for debugging
-      if (teamNumber === teamsToUse[0] || teamNumber === teamsToUse[1] || 
+      if (teamNumber === teamsToUse[0] || teamNumber === teamsToUse[1] ||
           teamNumber === teamsToUse[2] || teamNumber === teamsToUse[3]) {
         console.log(`Team ${teamNumber} rank: ${rank}`);
       }
     });
-    
+
     // Sort the teams by rank (first pick first, lower ranks first)
     allTeamsWithRank.sort((a, b) => a.rank - b.rank);
-    
+
     // Extract just the team numbers in the sorted order
     const sortedTeamNumbers = allTeamsWithRank.map(team => team.team_number);
-    
+
     // Log first few sorted teams for debugging
     console.log("First few sorted teams:", sortedTeamNumbers.slice(0, 5));
-    
+
     // Split into 8 columns for display
     const columns: number[][] = [[], [], [], [], [], [], [], []];
     const teamsPerColumn = Math.ceil(sortedTeamNumbers.length / 8);
-    
+
     for (let i = 0; i < sortedTeamNumbers.length; i++) {
       const columnIndex = Math.floor(i / teamsPerColumn);
       if (columnIndex < 8) {
         columns[columnIndex].push(sortedTeamNumbers[i]);
       }
     }
-    
+
     return columns;
   };
   
@@ -715,20 +829,30 @@ const AllianceSelection: React.FC = () => {
         {/* Left Column - Team Grid */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-4">
-            <h2 className="text-xl font-bold mb-4">Team Selection</h2>
-            
+            <h2 className="text-xl font-bold mb-4">
+              Team Selection
+              {selection && (
+                <span className="text-blue-600 ml-2">
+                  {selection.current_round === 1 ? '(1st Pick List)' :
+                   selection.current_round === 2 ? '(2nd Pick List)' :
+                   selection.current_round === 3 ? '(3rd Pick List)' :
+                   '(Backup Picks)'}
+                </span>
+              )}
+            </h2>
+
             {/* Team selection grid */}
             <div className="grid grid-cols-8 gap-2">
               {getTeamColumns().map((column, columnIndex) => (
                 <div key={columnIndex} className="space-y-2">
                   <div className="text-center text-xs font-bold bg-gray-100 p-1 rounded">
-                    {columnIndex === 0 ? 'Highest Picks' : 
-                     columnIndex === 1 ? 'High Priority' : 
-                     columnIndex === 2 ? 'Priority' : 
-                     columnIndex === 3 ? 'Medium Priority' : 
-                     columnIndex === 4 ? 'Medium' : 
-                     columnIndex === 5 ? 'Medium-Low' : 
-                     columnIndex === 6 ? 'Low Priority' : 
+                    {columnIndex === 0 ? 'Highest Picks' :
+                     columnIndex === 1 ? 'High Priority' :
+                     columnIndex === 2 ? 'Priority' :
+                     columnIndex === 3 ? 'Medium Priority' :
+                     columnIndex === 4 ? 'Medium' :
+                     columnIndex === 5 ? 'Medium-Low' :
+                     columnIndex === 6 ? 'Low Priority' :
                      'Lowest Priority'}
                   </div>
                   {column.map(teamNumber => {
@@ -792,8 +916,21 @@ const AllianceSelection: React.FC = () => {
                         </div>
                         {picklist && getTeamRank(teamNumber) < 9999 && (
                           <div className="text-xs font-bold" title="Rank in your picklist">
-                            {getTeamRank(teamNumber) < 1000 ? '1st' : 
+                            {getTeamRank(teamNumber) < 1000 ? '1st' :
                              getTeamRank(teamNumber) < 2000 ? '2nd' : '3rd'} Pick #{getTeamRank(teamNumber) % 1000 + 1}
+                          </div>
+                        )}
+                        {selection && selection.current_round && picklist && (
+                          <div className="text-xs">
+                            {selection.current_round === 1 && getTeamRank(teamNumber, 1) < 1000 && (
+                              <span className="text-green-600">Current Round Pick</span>
+                            )}
+                            {selection.current_round === 2 && getTeamRank(teamNumber, 2) < 2000 && getTeamRank(teamNumber, 2) >= 1000 && (
+                              <span className="text-green-600">Current Round Pick</span>
+                            )}
+                            {selection.current_round === 3 && getTeamRank(teamNumber, 3) < 3000 && getTeamRank(teamNumber, 3) >= 2000 && picklist.third_pick_data && (
+                              <span className="text-green-600">Current Round Pick</span>
+                            )}
                           </div>
                         )}
                         {statusText && <div className="text-xs mt-1 font-semibold">{statusText}</div>}
@@ -945,8 +1082,8 @@ const AllianceSelection: React.FC = () => {
                             : '-'}
                         </div>
                       </div>
-                      
-                      <div className={`p-2 rounded ${
+
+                      <div className={`p-2 rounded relative ${
                         alliance.first_pick_team_number !== 0
                           ? 'bg-green-100 text-green-800'
                           : 'bg-gray-100 text-gray-500'
@@ -957,9 +1094,18 @@ const AllianceSelection: React.FC = () => {
                             ? `${alliance.first_pick_team_number}`
                             : '-'}
                         </div>
+                        {alliance.first_pick_team_number !== 0 && (
+                          <button
+                            onClick={() => handleRemoveTeam(alliance.first_pick_team_number, alliance.alliance_number)}
+                            className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full -mt-1 -mr-1"
+                            title="Remove team"
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
-                      
-                      <div className={`p-2 rounded ${
+
+                      <div className={`p-2 rounded relative ${
                         alliance.second_pick_team_number !== 0
                           ? 'bg-green-100 text-green-800'
                           : 'bg-gray-100 text-gray-500'
@@ -970,11 +1116,20 @@ const AllianceSelection: React.FC = () => {
                             ? `${alliance.second_pick_team_number}`
                             : '-'}
                         </div>
+                        {alliance.second_pick_team_number !== 0 && (
+                          <button
+                            onClick={() => handleRemoveTeam(alliance.second_pick_team_number, alliance.alliance_number)}
+                            className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full -mt-1 -mr-1"
+                            title="Remove team"
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
-                      
+
                       {/* Always show backup slot after round 3 starts */}
                       {selection.current_round >= 3 && (
-                        <div className={`p-2 rounded ${
+                        <div className={`p-2 rounded relative ${
                           alliance.backup_team_number && alliance.backup_team_number !== 0
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-gray-100 text-gray-500'
@@ -985,6 +1140,15 @@ const AllianceSelection: React.FC = () => {
                               ? `${alliance.backup_team_number}`
                               : '-'}
                           </div>
+                          {alliance.backup_team_number && alliance.backup_team_number !== 0 && (
+                            <button
+                              onClick={() => handleRemoveTeam(alliance.backup_team_number, alliance.alliance_number)}
+                              className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full -mt-1 -mr-1"
+                              title="Remove team"
+                            >
+                              ×
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>

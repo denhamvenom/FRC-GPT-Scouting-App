@@ -11468,3 +11468,4 @@ YOUR_TEAM_PROFILE = {
 2025-05-09 11:59:46,517 - picklist_api - INFO - Successfully generated picklist for request 1917078091360
 2025-05-09 16:28:12,237 - root - ERROR - Error reading picklist logs: 'charmap' codec can't decode byte 0x8f in position 4610: character maps to <undefined>
 2025-05-09 16:28:12,276 - root - ERROR - Error reading picklist logs: 'charmap' codec can't decode byte 0x8f in position 4610: character maps to <undefined>
+2025-05-12 07:08:28,372 - httpx - INFO - HTTP Request: GET https://www.thebluealliance.com/api/v3/events/2025/simple "HTTP/1.1 200 OK"

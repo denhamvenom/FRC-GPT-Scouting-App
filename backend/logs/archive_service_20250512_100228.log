@@ -1,0 +1,2 @@
+2025-05-12 10:02:28,064 - root - INFO - === Logging initialized, writing to C:\Users\frc80\OneDrive\Documents\FRC-GPT-Scouting-App\backend\logs\archive_service_20250512_100228.log ===
+2025-05-12 10:02:28,392 - googleapiclient.discovery_cache - INFO - file_cache is only supported with oauth2client<4.0.0
