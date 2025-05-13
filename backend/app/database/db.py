@@ -22,8 +22,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base class for models
 Base = declarative_base()
 
-# Dependency to get DB session
+# Dependency to get DB session (for FastAPI dependency injection)
 def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Session generator for regular functions that need a DB session
+def get_db_session():
     db = SessionLocal()
     try:
         yield db

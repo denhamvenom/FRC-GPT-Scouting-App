@@ -12,6 +12,7 @@ import PicklistNew from "./pages/PicklistNew"; // New component
 import UnifiedDatasetBuilder from "./pages/UnifiedDatasetBuilder"; // New component for dataset building
 import DebugLogs from "./pages/DebugLogs"; // Debug logs viewer
 import AllianceSelection from "./pages/AllianceSelection"; // Alliance selection page
+import SchemaMapping from "./pages/SchemaMapping"; // Schema mapping page
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="/debug/logs" element={<DebugLogs />} />
             <Route path="/alliance-selection" element={<AllianceSelection />} />
             <Route path="/alliance-selection/:selectionId" element={<AllianceSelection />} />
+            <Route path="/schema" element={<SchemaMapping />} />
           </Routes>
         </main>
       </div>

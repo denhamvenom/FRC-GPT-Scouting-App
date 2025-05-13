@@ -20,18 +20,46 @@ def validate_event_completeness(unified_dataset_path: str) -> Dict:
 
     expected_matches = dataset.get("expected_matches", [])
     teams_data = dataset.get("teams", {})
+    direct_scouting = dataset.get("scouting", [])  # Check for top-level scouting array
 
     scouting_records = set()
     superscouted_teams = set()
 
-    # Build scouted records
+    # If there are direct scouting records at the top level, use those first
+    if direct_scouting:
+        print(f"Found {len(direct_scouting)} direct scouting records")
+        for match in direct_scouting:
+            team_number = match.get("team_number")
+            if team_number is None:
+                continue
+
+            try:
+                team_number_int = int(team_number)
+            except ValueError:
+                continue  # Skip if team_number can't be converted to int
+
+            if "qual_number" in match:
+                try:
+                    qual_number = int(match["qual_number"])
+                    scouting_records.add((qual_number, team_number_int))
+                except (ValueError, TypeError):
+                    pass
+
+            if "match_number" in match:
+                try:
+                    match_number = int(match["match_number"])
+                    scouting_records.add((match_number, team_number_int))
+                except (ValueError, TypeError):
+                    continue  # Skip if match_number is not a valid integer
+
+    # Also check the per-team scouting data
     for team_number, team_data in teams_data.items():
         team_number_int = None
         try:
             team_number_int = int(team_number)
         except ValueError:
             continue  # Skip if team_number can't be converted to int
-            
+
         for match in team_data.get("scouting_data", []):
             if "qual_number" in match:
                 try:

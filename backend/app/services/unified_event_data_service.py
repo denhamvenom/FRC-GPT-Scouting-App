@@ -53,16 +53,16 @@ def sanitize_for_json(obj: Any) -> Any:
         return obj
 
 async def build_unified_dataset(
-    event_key: str, 
-    year: int, 
+    event_key: str,
+    year: int,
     force_rebuild: bool = False,
-    scouting_tab: str = "Scouting", 
+    scouting_tab: str = "Scouting",
     superscout_tab: str = "SuperScouting",
     operation_id: Optional[str] = None
 ) -> str:
     """
     Build a unified dataset combining scouting data, TBA data, and Statbotics data.
-    
+
     Args:
         event_key: The event key, e.g., "2025arc"
         year: The season year, e.g., 2025
@@ -70,10 +70,33 @@ async def build_unified_dataset(
         scouting_tab: Name of the scouting tab in Google Sheets
         superscout_tab: Name of the superscouting tab in Google Sheets
         operation_id: Optional unique identifier for progress tracking
-        
+
     Returns:
         str: Path to the unified dataset JSON file
     """
+    # Check if there's an active sheet configuration in the database
+    spreadsheet_id = None
+    db = None
+    try:
+        from app.database.db import get_db_session
+        from app.services.sheet_config_service import get_active_configuration
+
+        db = next(get_db_session())
+        config_result = await get_active_configuration(db, event_key, year)
+
+        if config_result["status"] == "success":
+            config = config_result["configuration"]
+            # Get the spreadsheet ID from configuration
+            spreadsheet_id = config["spreadsheet_id"]
+            # Override tab names with configured values if available
+            scouting_tab = config["match_scouting_sheet"] or scouting_tab
+            if config["super_scouting_sheet"]:
+                superscout_tab = config["super_scouting_sheet"]
+
+            print(f"\U0001F535 Using configured tabs from database: scouting={scouting_tab}, superscout={superscout_tab}")
+            print(f"\U0001F535 Using spreadsheet ID from configuration: {spreadsheet_id}")
+    except Exception as e:
+        print(f"\U0001F534 Error getting sheet configuration, using defaults: {str(e)}")
     # Initialize progress tracking if operation_id is provided
     tracker = None
     if operation_id:
@@ -97,11 +120,41 @@ async def build_unified_dataset(
     print("\U0001F535 Fetching Match Scouting data...")
     if tracker:
         tracker.update(10, "Fetching match scouting data", "Fetch scouting data")
-    
-    scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ")
+
+    # First check if the tab exists
+    try:
+        # Check available tabs - make sure to pass the spreadsheet_id
+        from app.services.sheets_service import get_all_sheet_names
+        tabs_result = await get_all_sheet_names(spreadsheet_id, db)
+        available_tabs = tabs_result.get("sheet_names", []) if tabs_result.get("status") == "success" else []
+
+        print(f"\U0001F535 Available tabs in Google Sheet: {available_tabs}")
+
+        if scouting_tab not in available_tabs:
+            print(f"\U0001F534 WARNING: '{scouting_tab}' tab not found in Google Sheet")
+            scouting_raw = []
+        else:
+            # Use a more specific range to avoid potential API issues
+            # Make sure to pass the spreadsheet_id
+            scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ1000", spreadsheet_id, db)
+    except Exception as e:
+        print(f"\U0001F534 ERROR checking available tabs: {str(e)}")
+        # Try to fetch the data anyway - with spreadsheet_id
+        scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ1000", spreadsheet_id, db)
+
+    # Enhanced logging to debug scouting data issues
+    print(f"\U0001F535 Scouting raw data received: {len(scouting_raw) if scouting_raw else 0} rows")
+
+    # Check for empty data
+    if not scouting_raw:
+        print("\U0001F534 ERROR: No scouting data received from Google Sheets")
+
     headers = scouting_raw[0] if scouting_raw else []
     scouting_rows = scouting_raw[1:] if scouting_raw else []
-    
+
+    print(f"\U0001F535 Scouting headers: {len(headers)} columns")
+    print(f"\U0001F535 Scouting data rows: {len(scouting_rows)} rows")
+
     if tracker:
         tracker.update(15, f"Processing {len(scouting_rows)} scouting records", "Process scouting data")
     
@@ -113,6 +166,21 @@ async def build_unified_dataset(
             tracker.update(progress_pct, f"Processed {i}/{len(scouting_rows)} scouting records", "Process scouting data")
             
         parsed = parse_scouting_row(row, headers)
+
+        # Debug logging for scouting parser
+        if i == 0:  # Log the first row parsing for debugging
+            print(f"\U0001F535 Sample row: {row[:5]}...")
+            print(f"\U0001F535 Parsed result: {parsed}")
+
+            # Extra debug for critical fields
+            if not parsed or "team_number" not in parsed:
+                print(f"\U0001F534 ERROR: team_number not found in parsed data!")
+                print(f"\U0001F534 Headers: {headers[:5]}...")
+                # Check schema mapping
+                from app.services.schema_loader import get_match_mapping
+                match_mapping = get_match_mapping()
+                print(f"\U0001F534 Schema mapping: {match_mapping}")
+
         if parsed:
             # Ensure match_number is present and is an integer
             if "match_number" in parsed and parsed["match_number"] is not None:
@@ -125,14 +193,14 @@ async def build_unified_dataset(
                     parsed["qual_number"] = int(parsed["qual_number"])
                 except (ValueError, TypeError):
                     pass  # Keep as is if conversion fails
-                    
+
             # Ensure team_number is an integer
             if "team_number" in parsed and parsed["team_number"] is not None:
                 try:
                     parsed["team_number"] = int(parsed["team_number"])
                 except (ValueError, TypeError):
                     pass  # Keep as is if conversion fails
-                    
+
             scouting_parsed.append(parsed)
     
     if tracker:
@@ -142,10 +210,40 @@ async def build_unified_dataset(
     print("\U0001F535 Fetching SuperScouting data...")
     if tracker:
         tracker.update(25, "Fetching superscouting data", "Fetch superscouting data")
-    
-    superscouting_raw = await get_sheet_values(f"{superscout_tab}!A1:ZZ")
+
+    # Check if the SuperScouting tab exists
+    try:
+        # Re-use available_tabs from before if it was set
+        if 'available_tabs' not in locals():
+            from app.services.sheets_service import get_all_sheet_names
+            tabs_result = await get_all_sheet_names(spreadsheet_id, db)
+            available_tabs = tabs_result.get("sheet_names", []) if tabs_result.get("status") == "success" else []
+            print(f"\U0001F535 Available tabs in Google Sheet: {available_tabs}")
+
+        if superscout_tab not in available_tabs:
+            print(f"\U0001F534 WARNING: '{superscout_tab}' tab not found in Google Sheet")
+            superscouting_raw = []
+        else:
+            # Use a more specific range to avoid potential API issues
+            # Make sure to pass the spreadsheet_id
+            superscouting_raw = await get_sheet_values(f"{superscout_tab}!A1:ZZ1000", spreadsheet_id, db)
+    except Exception as e:
+        print(f"\U0001F534 ERROR checking available tabs for superscouting: {str(e)}")
+        # Try to fetch the data anyway - with spreadsheet_id
+        superscouting_raw = await get_sheet_values(f"{superscout_tab}!A1:ZZ1000", spreadsheet_id, db)
+
+    # Enhanced logging to debug superscouting data issues
+    print(f"\U0001F535 SuperScouting raw data received: {len(superscouting_raw) if superscouting_raw else 0} rows")
+
+    # Check for empty data
+    if not superscouting_raw:
+        print("\U0001F534 ERROR: No superscouting data received from Google Sheets")
+
     superscouting_headers = superscouting_raw[0] if superscouting_raw else []
     superscouting_rows = superscouting_raw[1:] if superscouting_raw else []
+
+    print(f"\U0001F535 SuperScouting headers: {len(superscouting_headers)} columns")
+    print(f"\U0001F535 SuperScouting data rows: {len(superscouting_rows)} rows")
 
     if tracker:
         tracker.update(30, f"Processing {len(superscouting_rows)} superscouting records", "Process superscouting data")
@@ -304,9 +402,35 @@ async def build_unified_dataset(
     # 6. Save unified data locally
     if tracker:
         tracker.update(90, "Preparing to save unified dataset", "Save data")
-        
+
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
+
+    # Extract all scouting data for top-level structure for validation
+    all_scouting_records = []
+    for team_number, team_data in unified_data.items():
+        for record in team_data.get("scouting_data", []):
+            all_scouting_records.append(record)
+
+    # Extract all matches from unified data
+    all_matches = []
+    for team_number, team_data in unified_data.items():
+        for record in team_data.get("scouting_data", []):
+            if "match_number" in record:
+                match_found = False
+                for match in all_matches:
+                    if match.get("match_number") == record.get("match_number"):
+                        match_found = True
+                        break
+
+                if not match_found:
+                    all_matches.append({
+                        "match_number": record.get("match_number"),
+                        "comp_level": "qm"  # Assuming all are qualification matches
+                    })
+
+    print(f"\U0001F535 Extracted {len(all_scouting_records)} scouting records for validation")
+    print(f"\U0001F535 Extracted {len(all_matches)} unique matches for validation")
 
     output_payload = {
         "event_key": event_key,
@@ -317,7 +441,10 @@ async def build_unified_dataset(
             "scouting_headers": headers,
             "superscouting_headers": superscouting_headers,
             "created_timestamp": __import__('datetime').datetime.now().isoformat(),
-        }
+        },
+        # Add top-level matches and scouting arrays for validation
+        "matches": all_matches,
+        "scouting": all_scouting_records
     }
 
     with open(output_path, "w", encoding="utf-8") as f:

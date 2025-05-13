@@ -103,42 +103,34 @@ function Workflow() {
         <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-500">
           <h2 className="text-xl font-bold">1. Learning Setup</h2>
           <p className="text-gray-600 mb-4">Upload game manual and define scouting parameters.</p>
-          <Link 
-            to="/setup" 
+          <Link
+            to="/setup"
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
           >
             Go to Setup
           </Link>
         </div>
-        
-        {/* Step 2: Schema Mapping */}
+
+        {/* Step 2: Field Selection */}
         <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-green-500">
-          <h2 className="text-xl font-bold">2. Schema Mapping</h2>
-          <p className="text-gray-600 mb-4">Map your scouting data headers to standardized variables.</p>
-          <div className="flex space-x-2">
-            <Link 
-              to="/schema" 
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 inline-block"
-            >
-              Match Schema
-            </Link>
-            <Link 
-              to="/schema/superscout" 
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 inline-block"
-            >
-              SuperScout
-            </Link>
-          </div>
+          <h2 className="text-xl font-bold">2. Field Selection</h2>
+          <p className="text-gray-600 mb-4">Map scouting sheet headers and define critical fields.</p>
+          <Link
+            to="/field-selection"
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 inline-block"
+          >
+            Field Selection
+          </Link>
         </div>
-        
+
         {/* Step 3: Data Validation */}
         <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-amber-500">
           <h2 className="text-xl font-bold">3. Data Validation</h2>
           <p className="text-gray-600 mb-4">Find missing data and statistical outliers.</p>
-          <Link 
-            to="/validation" 
-            className={`px-4 py-2 ${datasetStatus?.status === 'exists' 
-              ? 'bg-amber-600 hover:bg-amber-700' 
+          <Link
+            to="/validation"
+            className={`px-4 py-2 ${datasetStatus?.status === 'exists'
+              ? 'bg-amber-600 hover:bg-amber-700'
               : 'bg-gray-400 cursor-not-allowed'} text-white rounded inline-block`}
             onClick={(e) => {
               if (datasetStatus?.status !== 'exists') {
@@ -267,18 +259,19 @@ function Workflow() {
           </li>
           
           <li className="pb-4 border-b">
-            <span className="font-semibold text-lg">Map scouting sheet headers</span>
+            <span className="font-semibold text-lg">Configure field selection</span>
             <p className="ml-6 mt-2 text-gray-600">
-              Go to the Schema Mapping page to map your spreadsheet headers to standardized variables.
-              This creates schema_2025.json which helps parse your data correctly.
+              Go to the Field Selection page to map your spreadsheet headers to standardized variables
+              and define critical fields. This step automatically builds the dataset when completed.
             </p>
           </li>
-          
+
           <li className="pb-4 border-b">
-            <span className="font-semibold text-lg">Build unified dataset</span>
+            <span className="font-semibold text-lg">Dataset building (automatic)</span>
             <p className="ml-6 mt-2 text-gray-600">
-              Use the controls above to build a unified dataset that combines your scouting data
+              The unified dataset is built automatically after field selection. It combines your scouting data
               with match information from The Blue Alliance and team metrics from Statbotics.
+              You can also use the controls above to manually rebuild it if needed.
             </p>
           </li>
           

@@ -103,10 +103,93 @@ async def start_setup(
     Returns:
         Setup process results
     """
-    result = await start_learning_setup(year, manual_url, manual_file)
+    result = await start_learning_setup(year, manual_url, manual_file, event_key)
 
     # Add the event_key to the result if provided
     if event_key:
         result["event_key"] = event_key
 
+        # Store the event key in the global cache for other components to use
+        from app.services.global_cache import cache
+        cache["active_event_key"] = event_key
+        cache["active_event_year"] = year
+
+        print(f"Stored event_key in cache: {event_key}")
+    else:
+        print("Warning: No event_key provided, cache not updated")
+
     return result
+
+@router.get("/info")
+async def get_setup_info():
+    """
+    Get the current setup information, including active event key and year.
+
+    This information is used by other components of the application to
+    avoid requiring users to re-enter the event key.
+
+    Returns:
+        Dictionary with active event information
+    """
+    from app.services.global_cache import cache
+
+    try:
+        # Attempt to get active event information from cache
+        event_key = cache.get("active_event_key")
+        year = cache.get("active_event_year", 2025)  # Default to 2025 if not set
+
+        print(f"Cache contains: event_key={event_key}, year={year}")
+
+        # Also check if there's an active sheet configuration
+        sheet_config = None
+        try:
+            from app.database.db import get_db_session
+            from app.services.sheet_config_service import get_active_configuration
+
+            db = next(get_db_session())
+
+            # Try with event_key from cache, but if none, get any active configuration
+            if event_key:
+                config_result = await get_active_configuration(db, event_key, year)
+            else:
+                # If no event_key in cache, get any active configuration
+                config_result = await get_active_configuration(db)
+
+                # If we find an active configuration, update the cache with its event_key
+                if config_result["status"] == "success":
+                    config_event_key = config_result["configuration"]["event_key"]
+                    if config_event_key:
+                        cache["active_event_key"] = config_event_key
+                        event_key = config_event_key
+                        print(f"Updated cache with event_key from config: {config_event_key}")
+
+            if config_result["status"] == "success":
+                sheet_config = {
+                    "id": config_result["configuration"]["id"],
+                    "name": config_result["configuration"]["name"],
+                    "spreadsheet_id": config_result["configuration"]["spreadsheet_id"],
+                    "match_scouting_sheet": config_result["configuration"]["match_scouting_sheet"],
+                    "pit_scouting_sheet": config_result["configuration"]["pit_scouting_sheet"],
+                    "super_scouting_sheet": config_result["configuration"]["super_scouting_sheet"],
+                    "event_key": config_result["configuration"]["event_key"],
+                }
+        except Exception as e:
+            # Non-critical error, just log it
+            print(f"Error getting active sheet configuration: {str(e)}")
+
+        # Print detailed debug info
+        print(f"Setup Info - Event Key: {event_key}, Year: {year}")
+        print(f"Setup Info - Sheet Config: {sheet_config}")
+
+        # Return gathered information
+        return {
+            "status": "success",
+            "event_key": event_key,
+            "year": year,
+            "sheet_config": sheet_config
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error retrieving setup info: {str(e)}"
+        }

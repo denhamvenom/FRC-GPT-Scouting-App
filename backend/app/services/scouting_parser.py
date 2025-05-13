@@ -17,16 +17,44 @@ def parse_scouting_row(row: List[str], headers: List[str]) -> Dict[str, Any]:
         Dict[str, Any]: Structured scouting dictionary
     """
 
-    match_mapping = get_match_mapping()
+    # Get schema mapping
+    schema_data = get_match_mapping()
     scouting_data = {}
 
-    # Debug: Print mapping to verify
-    # print(f"Match mapping: {json.dumps(match_mapping, indent=2)}")
+    # Handle multiple possible formats of schema data
+    match_mapping = {}
+
+    # Check if the schema is directly a mapping dictionary
+    if isinstance(schema_data, dict) and all(isinstance(k, str) for k in schema_data.keys()):
+        match_mapping = schema_data
+    # Check if it's the nested format with 'mappings' key
+    elif isinstance(schema_data, dict) and 'mappings' in schema_data and 'match' in schema_data['mappings']:
+        match_mapping = schema_data['mappings']['match']
+
+    print(f"\U0001F535 Schema structure: {type(schema_data)}")
+    print(f"\U0001F535 Using mapping with {len(match_mapping)} entries")
+
+    # Special handling for "Team Number" and "Qual Number" if they're missing from mapping
+    if "Team Number" not in match_mapping:
+        match_mapping["Team Number"] = "team_number"
+    if "Qual Number" not in match_mapping:
+        match_mapping["Qual Number"] = "match_number"
 
     for header in headers:
         if header not in match_mapping:
-            # print(f"Header '{header}' not found in mapping")
-            continue
+            # Try case-insensitive match
+            matching_key = next((k for k in match_mapping.keys() if k.lower() == header.lower()), None)
+            if matching_key:
+                header = matching_key
+            else:
+                # Handle common field names
+                if "team" in header.lower() and "number" in header.lower():
+                    match_mapping[header] = "team_number"
+                elif ("match" in header.lower() or "qual" in header.lower()) and "number" in header.lower():
+                    match_mapping[header] = "match_number"
+                else:
+                    # print(f"Header '{header}' not found in mapping")
+                    continue
 
         mapped_field = match_mapping.get(header, "ignore")
         if mapped_field == "ignore":

@@ -153,6 +153,8 @@ const PicklistNew: React.FC = () => {
   const [hasLockedPicklist, setHasLockedPicklist] = useState<boolean>(false);
   const [picklists, setPicklists] = useState<any[]>([]);
   const [activeAllianceSelection, setActiveAllianceSelection] = useState<number | null>(null);
+  const [currentEventKey, setCurrentEventKey] = useState<string>("");
+  const [currentYear, setCurrentYear] = useState<number>(2025);
   
   // State for confirmation popup
   const [showConfirmClear, setShowConfirmClear] = useState<boolean>(false);
@@ -170,17 +172,43 @@ const PicklistNew: React.FC = () => {
   // Fetch dataset path and load dataset on load
   const fetchLockedPicklists = async () => {
     try {
+      // First get current event info from setup
+      const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+      let eventKey = "";
+
+      if (setupResponse.ok) {
+        const setupData = await setupResponse.json();
+
+        if (setupData.status === "success" && setupData.event_key) {
+          eventKey = setupData.event_key;
+          // Also update the event key in state for display
+          setCurrentEventKey(eventKey);
+
+          // Update year if available
+          if (setupData.year) {
+            setCurrentYear(setupData.year);
+          }
+        }
+      }
+
+      // If we couldn't get event info, use a default
+      if (!eventKey) {
+        console.warn("Could not retrieve event info for picklists, using default");
+        eventKey = "2025lake"; // Use a default that's likely to work
+        setCurrentEventKey(eventKey); // Update state with default
+      }
+
       const response = await fetch('http://localhost:8000/api/alliance/picklists');
       const data = await response.json();
-      
+
       if (data.status === 'success') {
         setPicklists(data.picklists || []);
-        
+
         // Check if there's a locked picklist for the current event and team
-        const currentPicklist = data.picklists.find((p: any) => 
-          p.team_number === yourTeamNumber && p.event_key === '2025arc'
+        const currentPicklist = data.picklists.find((p: any) =>
+          p.team_number === yourTeamNumber && p.event_key === eventKey
         );
-        
+
         setHasLockedPicklist(!!currentPicklist);
         
         // Check if there's an active alliance selection
@@ -206,16 +234,45 @@ const PicklistNew: React.FC = () => {
   useEffect(() => {
     const initializeData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/unified/status?event_key=2025arc&year=2025');
+        // First, get current event info from setup
+        const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+        let eventKey = "";
+        let yearValue = 2025; // Default
+
+        if (setupResponse.ok) {
+          const setupData = await setupResponse.json();
+
+          if (setupData.status === "success" && setupData.event_key) {
+            eventKey = setupData.event_key;
+            if (setupData.year) {
+              yearValue = setupData.year;
+            }
+            console.log(`Using event key from setup: ${eventKey} (${yearValue})`);
+
+            // Store these values in state for display
+            setCurrentEventKey(eventKey);
+            setCurrentYear(yearValue);
+          }
+        }
+
+        // If we couldn't get event info from setup, show an error
+        if (!eventKey) {
+          console.warn("Could not retrieve event info from setup");
+          setError("No event selected. Please go to Setup page and select an event first.");
+          return;
+        }
+
+        // Now check for dataset with the current event key
+        const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${yearValue}`);
         const data = await response.json();
-        
+
         if (data.status === 'exists' && data.path) {
           setDatasetPath(data.path);
-          
+
           // Load full dataset to get team rankings
           try {
             // Try to load dataset by event_key instead of path to avoid path encoding issues
-            const response = await fetch(`http://localhost:8000/api/unified/dataset?event_key=2025arc`);
+            const response = await fetch(`http://localhost:8000/api/unified/dataset?event_key=${eventKey}`);
             if (response.ok) {
               const fullDataset = await response.json();
               setDataset(fullDataset);
@@ -235,9 +292,9 @@ const PicklistNew: React.FC = () => {
           } catch (err) {
             console.error('Error loading full dataset:', err);
           }
-          
+
           await fetchPicklistAnalysis(data.path);
-          
+
           // Check for locked picklists
           await fetchLockedPicklists();
         }
@@ -475,28 +532,28 @@ const PicklistNew: React.FC = () => {
     }
   };
   // Generate team rankings
-  const generateRankings = () => {
-    const currentPriorities = 
+  const generateRankings = async () => {
+    const currentPriorities =
       activeTab === 'first' ? firstPickPriorities :
       activeTab === 'second' ? secondPickPriorities :
       thirdPickPriorities;
-        
+
     if (currentPriorities.length === 0) {
       setError('Please add at least one priority before generating rankings');
       return;
     }
-    
+
     if (!yourTeamNumber) {
       setError('Please enter your team number before generating rankings');
       return;
     }
-    
+
     // Clear previous errors
     setError(null);
-    
+
     // Update excluded teams based on pick position and store the result
     const teamsToExclude = updateExcludedTeams();
-    
+
     // Add a UI message if teams are being excluded
     if (teamsToExclude && teamsToExclude.length > 0) {
       if (activeTab === 'second') {
@@ -505,9 +562,122 @@ const PicklistNew: React.FC = () => {
         setSuccessMessage(`Excluding alliance captains (${teamsToExclude.length} teams) for third pick analysis`);
       }
     }
-    
-    // Show picklist generator component
-    setShouldShowGenerator(true);
+
+    console.log("Starting picklist generation directly");
+
+    // Set generating state to show loading indicator
+    setIsGeneratingRankings(true);
+
+    try {
+      // Convert priorities to plain objects
+      const simplePriorities = currentPriorities.map(priority => ({
+        id: priority.id,
+        weight: priority.weight,
+        reason: priority.reason || null
+      }));
+
+      console.log(`Making API call to generate picklist for ${activeTab} pick, with ${simplePriorities.length} priorities`);
+      console.log("Using dataset path:", datasetPath);
+      console.log("Team:", yourTeamNumber);
+      console.log("Excluding teams:", teamsToExclude);
+
+      // Directly make the API call instead of relying on the component
+      const response = await fetch('http://localhost:8000/api/picklist/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unified_dataset_path: datasetPath,
+          your_team_number: yourTeamNumber,
+          pick_position: activeTab,
+          priorities: simplePriorities,
+          exclude_teams: teamsToExclude,
+          use_batching: true,
+          batch_size: 20,
+          reference_teams_count: 3,
+          reference_selection: "top_middle_bottom"
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to generate picklist');
+      }
+
+      const data = await response.json();
+      console.log("Picklist generation API response:", data);
+
+      // Handle the response directly
+      if (data.status === 'success') {
+        // If batching is used, we'll get partial results first
+        if (data.batched && data.cache_key) {
+          console.log("Batch processing initiated with cache key:", data.cache_key);
+
+          // Show a message indicating batch processing
+          setSuccessMessage('Batch processing initiated. This may take a few minutes...');
+
+          // Poll for updates periodically
+          let complete = false;
+          let attempts = 0;
+          const maxAttempts = 30; // 5 minute maximum (10 second intervals)
+
+          while (!complete && attempts < maxAttempts) {
+            attempts++;
+            await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds between polls
+
+            try {
+              const statusResponse = await fetch('http://localhost:8000/api/picklist/generate/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cache_key: data.cache_key })
+              });
+
+              if (!statusResponse.ok) {
+                console.error(`Polling error (attempt ${attempts}):`, statusResponse.status);
+                continue;
+              }
+
+              const statusData = await statusResponse.json();
+              console.log(`Polling update (attempt ${attempts}):`, statusData);
+
+              // Check if processing is complete
+              if (statusData.batch_processing?.processing_complete) {
+                console.log("Batch processing complete!");
+
+                if (statusData.picklist) {
+                  // We have the final result
+                  handlePicklistGenerated(statusData);
+                  complete = true;
+                  break;
+                }
+              } else {
+                // Update progress message
+                const progress = statusData.batch_processing?.progress_percentage || 0;
+                setSuccessMessage(`Picklist generation in progress: ${progress}% complete...`);
+              }
+            } catch (pollError) {
+              console.error(`Polling error (attempt ${attempts}):`, pollError);
+            }
+          }
+
+          if (!complete) {
+            setError('Picklist generation is taking longer than expected. Please wait or try again later.');
+          }
+        } else {
+          // For non-batched results or immediate completion
+          handlePicklistGenerated(data);
+        }
+      } else {
+        setError(data.message || 'Error generating picklist');
+      }
+    } catch (err) {
+      console.error('Error generating picklist:', err);
+      setError(err.message || 'Error connecting to server');
+    } finally {
+      setIsGeneratingRankings(false);
+
+      // Show the picklist generator to display results
+      setShouldShowGenerator(true);
+    }
   };
   
   // Create a sample dataset with rankings for testing
@@ -738,8 +908,8 @@ const PicklistNew: React.FC = () => {
     try {
       const requestBody = {
         team_number: yourTeamNumber,
-        event_key: '2025arc',  // Hardcoded for now, could be made dynamic
-        year: 2025,            // Hardcoded for now, could be made dynamic
+        event_key: currentEventKey,  // Using current event key from setup
+        year: currentYear,          // Using current year from setup
         first_pick_data: {
           teams: firstPickRankings,
           analysis: null,      // Add analysis if available
@@ -802,8 +972,8 @@ const PicklistNew: React.FC = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             picklist_id: picklist_id,
-            event_key: '2025arc',
-            year: 2025,
+            event_key: currentEventKey,
+            year: currentYear,
             team_list: Array.from(allTeams)
           })
         });
@@ -839,8 +1009,8 @@ const PicklistNew: React.FC = () => {
     }
     
     // Find the current picklist for this team and event
-    const currentPicklist = picklists.find((p: any) => 
-      p.team_number === yourTeamNumber && p.event_key === '2025arc'
+    const currentPicklist = picklists.find((p: any) =>
+      p.team_number === yourTeamNumber && p.event_key === currentEventKey
     );
     
     if (!currentPicklist) {
@@ -882,6 +1052,9 @@ const PicklistNew: React.FC = () => {
 
   // Handle picklist generation result
   const handlePicklistGenerated = (result: any) => {
+    // Reset loading state
+    setIsGeneratingRankings(false);
+
     if (result.status === 'success' && result.picklist) {
       // Store rankings in the appropriate state based on active tab
       if (activeTab === 'first') {
@@ -894,8 +1067,8 @@ const PicklistNew: React.FC = () => {
         setThirdPickRankings(result.picklist);
         // State update will trigger useEffect to save to localStorage
       }
-      
-      setSuccessMessage('Team rankings generated successfully');
+
+      setSuccessMessage('Picklist generated successfully');
     } else if (result.message) {
       setError(result.message);
     }
@@ -1012,6 +1185,54 @@ const PicklistNew: React.FC = () => {
           </svg>
           Clear All Data
         </button>
+      </div>
+
+      {/* Data Source Information Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-start">
+          <div className="flex-shrink-0 mt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="ml-3 flex-1">
+            <h3 className="text-md font-medium text-blue-800">Data Source Information</h3>
+            <div className="mt-2 text-sm text-blue-700 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+              <div>
+                <span className="font-semibold">Event:</span> {currentEventKey ? (
+                  <span className="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    {currentEventKey} ({currentYear})
+                  </span>
+                ) : (
+                  <span className="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    No event selected
+                  </span>
+                )}
+              </div>
+              <div>
+                <span className="font-semibold">Dataset File:</span> {datasetPath ? (
+                  <span className="ml-1 text-xs font-mono break-all">{datasetPath.split('/').pop()}</span>
+                ) : (
+                  <span className="ml-1 text-xs text-red-600">No dataset loaded</span>
+                )}
+              </div>
+              <div>
+                <span className="font-semibold">Teams:</span> {dataset ? (
+                  <span className="ml-1">{Object.keys(dataset.teams || {}).length} teams</span>
+                ) : (
+                  <span className="ml-1 text-red-600">No data</span>
+                )}
+              </div>
+              <div>
+                <span className="font-semibold">Matches:</span> {dataset ? (
+                  <span className="ml-1">{dataset.matches?.length || 0} matches</span>
+                ) : (
+                  <span className="ml-1 text-red-600">No data</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       {/* Confirmation Dialog for Clearing Data */}
@@ -1352,7 +1573,7 @@ const PicklistNew: React.FC = () => {
                   disabled={getActivePriorities().length === 0 || isGeneratingRankings}
                   className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300"
                 >
-                  {isGeneratingRankings ? 'Generating...' : 'Generate Rankings'}
+                  {isGeneratingRankings ? 'Generating...' : 'Generate Picklist'}
                 </button>
               </div>
             </div>

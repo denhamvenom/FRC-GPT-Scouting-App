@@ -27,6 +27,7 @@ models.Base.metadata.create_all(bind=engine)
 
 from app.api import health
 from app.api import sheets
+from app.api import sheets_headers          # Import the sheets headers API
 from app.api import schema
 from app.api import schema_save
 from app.api import schema_superscout, schema_superscout_save
@@ -44,6 +45,7 @@ from app.api import progress                # Import the progress tracking API
 from app.api import debug_logs              # Import debug logs API
 from app.api import alliance_selection      # Import alliance selection API
 from app.api import archive                 # Import event archiving API
+from app.api import sheet_config            # Import sheet configuration API
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
@@ -77,6 +79,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Include routers
 app.include_router(health.router, prefix="/api/health")
 app.include_router(sheets.router, prefix="/api/sheets")
+app.include_router(sheets_headers.router)  # Already has prefix="/api/sheets" in its definition
 app.include_router(schema.router, prefix="/api/schema")
 app.include_router(schema_save.router, prefix="/api/schema")
 app.include_router(schema_superscout.router, prefix="/api/schema/super")
@@ -95,6 +98,7 @@ app.include_router(progress.router, prefix="/api")  # Add the progress tracking 
 app.include_router(debug_logs.router, prefix="/api/debug")  # Add the debug logs API
 app.include_router(alliance_selection.router)  # Add the alliance selection API
 app.include_router(archive.router)  # Add the event archiving API
+app.include_router(sheet_config.router)  # Sheet configuration API already has prefix
 
 @app.get("/")
 async def root():

@@ -4,6 +4,8 @@ secrets/
 .env.*
 *.json
 
+backend/logs
+
 # 🐍 Python
 __pycache__/
 *.py[cod]

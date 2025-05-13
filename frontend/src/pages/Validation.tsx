@@ -81,23 +81,49 @@ function Validation() {
 
   // Check for existing datasets
   useEffect(() => {
-    const checkDatasets = async () => {
+    const fetchEventInfoAndCheckDatasets = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/unified/status?event_key=2025arc&year=2025');
+        // First, get current event info from setup
+        const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+        let eventKey = "";
+        let yearValue = 2025; // Default
+
+        if (setupResponse.ok) {
+          const setupData = await setupResponse.json();
+
+          if (setupData.status === "success" && setupData.event_key) {
+            eventKey = setupData.event_key;
+            if (setupData.year) {
+              yearValue = setupData.year;
+            }
+          }
+        }
+
+        // If we couldn't get event info from setup, show an error message
+        if (!eventKey) {
+          console.warn("Could not retrieve event info from setup");
+          setError("No event selected. Please go to Setup page and select an event first.");
+          return;
+        }
+
+        // Now check for datasets with this event key
+        const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${yearValue}`);
         const data = await response.json();
-        
+
         if (data.status === 'exists' && data.path) {
           setDatasetPath(data.path);
           fetchValidationData(data.path);
           fetchTodoList(data.path);
+        } else {
+          setError(`No dataset found for event ${eventKey}. Please build the dataset first.`);
         }
       } catch (err) {
         console.error('Error checking datasets:', err);
         setError('Error checking for datasets');
       }
     };
-    
-    checkDatasets();
+
+    fetchEventInfoAndCheckDatasets();
   }, []);
 
   const fetchValidationData = async (path: string) => {
@@ -400,8 +426,18 @@ function Validation() {
               </div>
             </div>
             
-            <div className="mt-4 text-right">
-              <button 
+            <div className="mt-4 flex justify-between items-center">
+              <button
+                onClick={() => window.location.href = '/picklist'}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+              >
+                <span className="mr-2">Validation Complete</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+              </button>
+
+              <button
                 onClick={() => fetchValidationData(datasetPath)}
                 disabled={loading}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
@@ -862,13 +898,23 @@ function Validation() {
       ) : (
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
           <h2 className="text-xl font-bold mb-4">No Dataset Available</h2>
-          <p className="mb-4">Please build a unified dataset first before using the validation tool.</p>
-          <a 
-            href="/workflow"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
-          >
-            Go to Workflow
-          </a>
+          <p className="mb-4">
+            {error ? error : "Please build a unified dataset first before using the validation tool."}
+          </p>
+          <div className="flex justify-center space-x-4">
+            <a
+              href="/workflow"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
+            >
+              Go to Workflow
+            </a>
+            <a
+              href="/build-dataset"
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 inline-block"
+            >
+              Build Dataset
+            </a>
+          </div>
         </div>
       )}
     </div>

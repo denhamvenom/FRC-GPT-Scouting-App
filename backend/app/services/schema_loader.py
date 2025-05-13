@@ -28,7 +28,21 @@ def load_schemas(year: int):
 
     try:
         with open(match_schema_path, "r", encoding="utf-8") as f:
-            SCHEMA_CACHE["match_mapping"] = json.load(f)
+            schema_data = json.load(f)
+
+            # Check if the schema has the expected structure
+            if "mappings" in schema_data and "match" in schema_data["mappings"]:
+                # Use the nested structure
+                SCHEMA_CACHE["match_mapping"] = schema_data["mappings"]["match"]
+                print(f"✅ Loaded match mapping in nested format with {len(schema_data['mappings']['match'])} entries")
+            elif isinstance(schema_data, dict) and all(isinstance(k, str) for k in schema_data.keys()):
+                # Schema is a direct mapping from header -> field
+                SCHEMA_CACHE["match_mapping"] = schema_data
+                print(f"✅ Loaded match mapping in flat format with {len(schema_data)} entries")
+            else:
+                # Unknown format, try to use as-is
+                SCHEMA_CACHE["match_mapping"] = schema_data
+                print(f"⚠️ Unknown match schema format, using as-is")
     except FileNotFoundError:
         raise Exception(f"❌ Match Scouting schema missing for {year}: {match_schema_path}")
 

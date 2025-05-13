@@ -118,3 +118,38 @@ class ArchivedEvent(Base):
         if self.created_at:
             return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
         return "Unknown date"
+
+
+class SheetConfiguration(Base):
+    """Model for storing Google Sheets configuration"""
+    __tablename__ = "sheet_configurations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)  # User-friendly name for this configuration
+    spreadsheet_id = Column(String, index=True)  # Google Sheets ID
+
+    # Sheet names for different data types (tab names in the spreadsheet)
+    match_scouting_sheet = Column(String)
+    pit_scouting_sheet = Column(String, nullable=True)
+    super_scouting_sheet = Column(String, nullable=True)
+
+    # Event association
+    event_key = Column(String, index=True)
+    year = Column(Integer)
+
+    # Metadata
+    is_active = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Cache for sheet headers (to avoid repeated API calls)
+    match_scouting_headers = Column(JSON, nullable=True)
+    pit_scouting_headers = Column(JSON, nullable=True)
+    super_scouting_headers = Column(JSON, nullable=True)
+
+    @property
+    def formatted_date(self):
+        """Return a formatted date string for display"""
+        if self.created_at:
+            return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        return "Unknown date"

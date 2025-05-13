@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import EventArchiveManager from "../components/EventArchiveManager";
+import SheetConfigManager from "../components/SheetConfigManager";
 
 interface Event {
   key: string;
@@ -129,15 +130,21 @@ function Setup() {
   };
 
   const handleContinue = () => {
-    navigate("/schema");
+    navigate("/field-selection");
   };
 
   // Determine if the manual was used or if we fell back to basic analysis
   const getAnalysisMethod = () => {
     if (!setupResult) return null;
-    
+
     const manualInfo = setupResult.manual_info || {};
-    
+
+    if (manualInfo.no_manual_warning) {
+      return "warning";  // No manual found for this year
+    }
+    if (manualInfo.using_cached_manual) {
+      return "cached";  // Using cached manual from previous run
+    }
     if (manualInfo.analysis_method === "basic_overview") {
       return "basic";
     }
@@ -233,8 +240,17 @@ function Setup() {
                   placeholder="https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf"
                   className="w-full p-2 border rounded"
                 />
+                <div className="flex items-center mt-1">
+                  <svg className="h-4 w-4 text-blue-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-blue-700">
+                    If a manual has already been processed for this year, it will be used automatically.
+                  </p>
+                </div>
                 <p className="mt-1 text-sm text-gray-500">
-                  Enter the URL to the official game manual PDF. If left empty, a basic game analysis will be generated.
+                  Enter the URL to the official game manual PDF. If left empty and no previous manual is found,
+                  a basic game analysis will be generated but with limited accuracy.
                 </p>
               </div>
 
@@ -269,17 +285,23 @@ function Setup() {
                 {setupResult.game_analysis ? (
                   <div className={`p-4 rounded ${
                     analysisMethod === "full" ? "bg-green-50" :
+                    analysisMethod === "cached" ? "bg-blue-50" :
                     analysisMethod === "basic" ? "bg-yellow-50" :
+                    analysisMethod === "warning" ? "bg-orange-50" :
                     analysisMethod === "error" ? "bg-red-50" : "bg-gray-50"
                   }`}>
                     <div className="flex items-center mb-2">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full mr-2 ${
                         analysisMethod === "full" ? "bg-green-200 text-green-800" :
+                        analysisMethod === "cached" ? "bg-blue-200 text-blue-800" :
                         analysisMethod === "basic" ? "bg-yellow-200 text-yellow-800" :
+                        analysisMethod === "warning" ? "bg-orange-200 text-orange-800" :
                         analysisMethod === "error" ? "bg-red-200 text-red-800" : "bg-gray-200"
                       }`}>
                         {analysisMethod === "full" ? "FULL MANUAL ANALYSIS" :
+                         analysisMethod === "cached" ? "USING CACHED MANUAL" :
                          analysisMethod === "basic" ? "BASIC ANALYSIS (NO MANUAL)" :
+                         analysisMethod === "warning" ? "NO MANUAL FOUND" :
                          analysisMethod === "error" ? "MANUAL ERROR - FALLBACK USED" : "UNKNOWN"}
                       </span>
                       <h4 className="font-semibold">{setupResult.game_analysis.game_name}</h4>
@@ -291,9 +313,25 @@ function Setup() {
                       </p>
                     )}
 
+                    {analysisMethod === "cached" && (
+                      <p className="text-blue-700 text-sm mb-2">
+                        Using previously analyzed game manual from this season
+                        {setupResult.manual_info.url && (
+                          <span className="block mt-1">Source: {setupResult.manual_info.url}</span>
+                        )}
+                      </p>
+                    )}
+
                     {analysisMethod === "basic" && (
                       <p className="text-yellow-700 text-sm mb-2">
-                        No manual provided. Using AI-generated game overview.
+                        No manual provided. Using AI-generated game overview with limited accuracy.
+                      </p>
+                    )}
+
+                    {analysisMethod === "warning" && (
+                      <p className="text-orange-700 text-sm mb-2">
+                        <strong>Warning:</strong> No manual found for this year and none provided.
+                        The AI is making educated guesses about the game. For better results, please provide a manual URL.
                       </p>
                     )}
 
@@ -371,27 +409,42 @@ function Setup() {
 
         {/* Right Column - Event Archive Manager */}
         <div className="lg:col-span-7">
-          <div className="bg-white p-6 rounded-lg shadow h-full">
-            <h2 className="text-xl font-bold mb-4">Event Management</h2>
-            <p className="mb-4 text-sm text-gray-600">
-              Current Event: {selectedEvent || setupResult?.event_key || "None selected"}
-              <br/>Year: {year}
-            </p>
+          <div className="space-y-6">
+            {/* Event Archive Manager */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-xl font-bold mb-4">Event Management</h2>
+              <p className="mb-4 text-sm text-gray-600">
+                Current Event: {selectedEvent || setupResult?.event_key || "None selected"}
+                <br/>Year: {year}
+              </p>
 
-            <EventArchiveManager
-              currentEventKey={selectedEvent || (setupResult?.event_key ? setupResult.event_key : undefined)}
-              currentYear={year}
-              onArchiveSuccess={() => {
-                // Reload the page or clear setup result
-                console.log("Archive success callback triggered");
-                setSetupResult(null);
-              }}
-              onRestoreSuccess={() => {
-                // Reload the page to show restored data
-                console.log("Restore success callback triggered");
-                window.location.reload();
-              }}
-            />
+              <EventArchiveManager
+                currentEventKey={selectedEvent || (setupResult?.event_key ? setupResult.event_key : undefined)}
+                currentYear={year}
+                onArchiveSuccess={() => {
+                  // Reload the page or clear setup result
+                  console.log("Archive success callback triggered");
+                  setSetupResult(null);
+                }}
+                onRestoreSuccess={() => {
+                  // Reload the page to show restored data
+                  console.log("Restore success callback triggered");
+                  window.location.reload();
+                }}
+              />
+            </div>
+
+            {/* Sheet Configuration Manager */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <SheetConfigManager
+                currentEventKey={selectedEvent || (setupResult?.event_key ? setupResult.event_key : undefined)}
+                currentYear={year}
+                onConfigurationChange={() => {
+                  // Notify of configuration changes
+                  console.log("Configuration changed");
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

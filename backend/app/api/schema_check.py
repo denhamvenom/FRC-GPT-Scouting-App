@@ -28,16 +28,33 @@ async def check_schema_exists() -> Dict[str, Any]:
     superscout_path = os.path.join(data_dir, "schema_superscout_2025.json")
     superscout_exists = os.path.exists(superscout_path)
     
+    # Get the current active event key from global cache
+    from app.services.global_cache import cache
+    event_key = cache.get("active_event_key", None)
+
     # Check for unified dataset
-    unified_path = os.path.join(data_dir, "unified_event_2025arc.json")
-    dataset_exists = os.path.exists(unified_path)
+    # If no event is selected, check if any unified dataset exists
+    dataset_exists = False
+    if event_key:
+        unified_path = os.path.join(data_dir, f"unified_event_{event_key}.json")
+        dataset_exists = os.path.exists(unified_path)
+    else:
+        # Look for any unified event files
+        for file in os.listdir(data_dir):
+            if file.startswith("unified_event_") and file.endswith(".json"):
+                dataset_exists = True
+                break
     
     # Check for validation completion
     validation_completed = False
-    if dataset_exists:
-        try:
-            with open(unified_path, 'r') as f:
-                data = json.load(f)
+    unified_path = None
+
+    if dataset_exists and event_key:
+        unified_path = os.path.join(data_dir, f"unified_event_{event_key}.json")
+        if os.path.exists(unified_path):
+            try:
+                with open(unified_path, 'r') as f:
+                    data = json.load(f)
                 # Check if validation data exists in the file
                 if "metadata" in data and "validation" in data["metadata"]:
                     validation_completed = data["metadata"]["validation"].get("completed", False)

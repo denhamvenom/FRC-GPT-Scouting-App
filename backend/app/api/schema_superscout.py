@@ -10,18 +10,49 @@ from app.services.schema_superscout_service import map_superscout_headers
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
-router = APIRouter()
+router = APIRouter(tags=["SuperSchema"])
 
 @router.get("/learn", tags=["SuperSchema"])
 async def learn_superscout_schema():
+    try:
+        # Get the active configuration to find the sheet ID
+        from app.database.db import get_db_session
+        from app.services.sheet_config_service import get_active_configuration
+        from app.services.global_cache import cache
+
+        # Get database session
+        db = next(get_db_session())
+
+        # Get event key and year from cache
+        event_key = cache.get("active_event_key")
+        year = cache.get("active_event_year", 2025)
+
+        # Get the active configuration
+        config_result = await get_active_configuration(db, event_key, year)
+
+        spreadsheet_id = None
+        superscout_tab = "SuperScouting"
+
+        if config_result["status"] == "success":
+            config = config_result["configuration"]
+            spreadsheet_id = config["spreadsheet_id"]
+
+            # Use configured tab name if available
+            if config["super_scouting_sheet"]:
+                superscout_tab = config["super_scouting_sheet"]
+
+            print(f"\U0001F535 Using spreadsheet ID: {spreadsheet_id} and tab: {superscout_tab}")
+    except Exception as e:
+        print(f"\U0001F534 Error getting active configuration: {str(e)}")
+
     # Get headers (first row)
-    sheet_data = await get_sheet_values("SuperScouting!A1:Z1")
+    sheet_data = await get_sheet_values(f"{superscout_tab}!A1:Z1", spreadsheet_id, db)
     headers = sheet_data[0] if sheet_data else []
     if not headers:
-        return {"status": "error", "message": "No headers found in SuperScouting tab"}
-    
+        return {"status": "error", "message": f"No headers found in {superscout_tab} tab"}
+
     # Get sample data (next few rows) to provide context about what the fields actually contain
-    sample_data = await get_sheet_values("SuperScouting!A2:Z6")  # Get 5 rows of sample data
+    sample_data = await get_sheet_values(f"{superscout_tab}!A2:Z6", spreadsheet_id, db)  # Get 5 rows of sample data
     
     # Pass both headers and sample data to the mapping function for better context
     mapping, offsets, insights = await map_superscout_headers(headers, sample_data)

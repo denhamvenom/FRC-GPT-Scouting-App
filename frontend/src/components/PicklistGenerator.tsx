@@ -847,7 +847,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
                   disabled={isLoading}
                   className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300"
                 >
-                  {isLoading ? 'Regenerating...' : 'Regenerate'}
+                  {isLoading ? 'Regenerating...' : 'Regenerate Picklist'}
                 </button>
               )}
             </>
