@@ -20,6 +20,10 @@ class LockedPicklist(Base):
     second_pick_data = Column(JSON)
     third_pick_data = Column(JSON, nullable=True)  # Optional for games without third picks
     
+    # Additional picklist metadata
+    excluded_teams = Column(JSON, nullable=True)  # List of teams excluded from consideration
+    strategy_prompts = Column(JSON, nullable=True)  # Original strategy prompts for each pick position
+    
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

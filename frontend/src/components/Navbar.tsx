@@ -16,7 +16,7 @@ function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold">FRC Scouting AI</span>
+              <span className="text-xl font-bold">FRC Strategy Assistant</span>
             </Link>
           </div>
           
@@ -31,17 +31,6 @@ function Navbar() {
                 }`}
               >
                 Home
-              </Link>
-              
-              <Link
-                to="/workflow"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/workflow") 
-                    ? "bg-blue-900 text-white" 
-                    : "text-gray-200 hover:bg-blue-700"
-                }`}
-              >
-                Workflow
               </Link>
               
               <Link
@@ -78,17 +67,6 @@ function Navbar() {
               </Link>
               
               <Link
-                to="/build-dataset"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/build-dataset") 
-                    ? "bg-blue-900 text-white" 
-                    : "text-gray-200 hover:bg-blue-700"
-                }`}
-              >
-                Build Dataset
-              </Link>
-              
-              <Link
                 to="/picklist"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
                   isActive("/picklist") 
@@ -108,17 +86,6 @@ function Navbar() {
                 }`}
               >
                 Alliance Selection
-              </Link>
-              
-              <Link
-                to="/debug/logs"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/debug/logs") 
-                    ? "bg-blue-900 text-white" 
-                    : "text-gray-200 hover:bg-blue-700"
-                }`}
-              >
-                Debug Logs
               </Link>
             </div>
           </div>

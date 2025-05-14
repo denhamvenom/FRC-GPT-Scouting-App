@@ -37,6 +37,12 @@ async def analyze_picklist_data(request: PicklistAnalysisRequest):
         # Get superscouting metrics - new addition
         superscout_metrics = analysis_service.identify_superscout_metrics()
         
+        # Extract pit scouting metrics
+        # For now, we'll filter game metrics that might be from pit scouting
+        pit_metrics = [m for m in game_metrics if 
+                      m.get('category', '').lower() == 'pit' or 
+                      'pit' in m.get('id', '').lower()]
+        
         # Get suggested metrics based on statistical analysis
         suggested_metrics = analysis_service.get_suggested_priorities()
         
@@ -57,7 +63,8 @@ async def analyze_picklist_data(request: PicklistAnalysisRequest):
             "status": "success",
             "game_metrics": game_metrics,
             "universal_metrics": analysis_service.universal_metrics,
-            "superscout_metrics": superscout_metrics,  # Add superscouting metrics to response
+            "superscout_metrics": superscout_metrics,
+            "pit_metrics": pit_metrics,  # Add pit scouting metrics to response
             "suggested_metrics": suggested_metrics,
             "metrics_stats": metrics_stats,
             "parsed_priorities": parsed_priorities,

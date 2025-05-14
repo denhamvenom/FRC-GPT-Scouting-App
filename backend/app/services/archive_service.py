@@ -10,7 +10,7 @@ from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import inspect, and_, or_
 
-from app.database.models import ArchivedEvent, LockedPicklist, AllianceSelection, Alliance, TeamSelectionStatus
+from app.database.models import ArchivedEvent, LockedPicklist, AllianceSelection, Alliance, TeamSelectionStatus, SheetConfiguration
 from app.services.unified_event_data_service import get_unified_dataset_path
 
 # Configure logging
@@ -21,7 +21,8 @@ TABLES_TO_ARCHIVE = [
     "LockedPicklist",
     "AllianceSelection", 
     "Alliance", 
-    "TeamSelectionStatus"
+    "TeamSelectionStatus",
+    "SheetConfiguration"  # Added to ensure Google Sheet configurations are archived
 ]
 
 async def archive_current_event(
@@ -111,6 +112,28 @@ async def archive_current_event(
             picklist_ids = [p.id for p in picklists]
         else:
             picklist_ids = []
+            
+        # Get and store sheet configurations for this event
+        sheet_configs = db.query(SheetConfiguration).filter(
+            SheetConfiguration.event_key == event_key,
+            SheetConfiguration.year == year
+        ).all()
+        
+        if sheet_configs:
+            sheet_config_data = []
+            for config in sheet_configs:
+                # Convert SQLAlchemy model to dict
+                inspector = inspect(config)
+                attrs = {}
+                for column in inspector.mapper.column_attrs:
+                    attrs[column.key] = getattr(config, column.key)
+                sheet_config_data.append(attrs)
+                
+            archive_data["SheetConfiguration"] = sheet_config_data
+            archive_metadata["tables"]["SheetConfiguration"] = len(sheet_config_data)
+            logger.info(f"Included {len(sheet_config_data)} sheet configurations in archive")
+        else:
+            logger.info(f"No sheet configurations found for event {event_key} ({year})")
 
         # Get alliance selections - try by both picklist_id and direct event/year query
         selection_data = []
@@ -291,6 +314,18 @@ async def clear_event_data(
             LockedPicklist.year == year
         ).delete(synchronize_session=False)
         counts["LockedPicklist"] = picklist_count
+        
+        # Delete sheet configurations (unless keep_configs is True)
+        # Note: We're adding this but leaving it commented out by default
+        # because deleting sheet configs might be disruptive to the user workflow
+        # Users may want to keep their sheet configurations even when clearing event data
+        '''
+        sheet_config_count = db.query(SheetConfiguration).filter(
+            SheetConfiguration.event_key == event_key,
+            SheetConfiguration.year == year
+        ).delete(synchronize_session=False)
+        counts["SheetConfiguration"] = sheet_config_count
+        '''
 
         db.commit()
 
@@ -545,6 +580,40 @@ async def restore_archived_event(db: Session, archive_id: int) -> Dict[str, Any]
 
                 restored_counts["TeamSelectionStatus"] = status_count
                 logger.info(f"Restored {status_count} team selection statuses")
+        
+        # Restore SheetConfigurations if they exist
+        if "SheetConfiguration" in archive_data:
+            sheet_config_count = 0
+            
+            for data in archive_data["SheetConfiguration"]:
+                # Remove ID to create a new record
+                data.pop("id")
+                
+                try:
+                    # Check if a configuration with the same name already exists
+                    existing_config = db.query(SheetConfiguration).filter(
+                        SheetConfiguration.name == data["name"],
+                        SheetConfiguration.event_key == data["event_key"],
+                        SheetConfiguration.year == data["year"]
+                    ).first()
+                    
+                    if existing_config:
+                        logger.info(f"Skipping sheet configuration '{data['name']}' as it already exists")
+                        continue
+                    
+                    # Create new record
+                    new_config = SheetConfiguration(**data)
+                    db.add(new_config)
+                    db.flush()
+                    logger.info(f"Restored sheet configuration: {data.get('name', 'unnamed')}")
+                    sheet_config_count += 1
+                except Exception as e:
+                    logger.error(f"Error restoring sheet configuration: {str(e)}")
+                    logger.error(f"Sheet configuration data: {data}")
+                    raise
+            
+            restored_counts["SheetConfiguration"] = sheet_config_count
+            logger.info(f"Restored {sheet_config_count} sheet configurations")
         
         # Commit all changes
         db.commit()

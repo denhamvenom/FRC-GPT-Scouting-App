@@ -57,7 +57,14 @@ const PicklistNew: React.FC = () => {
   const [gameMetrics, setGameMetrics] = useState<Metric[]>([]);
   const [suggestedMetrics, setSuggestedMetrics] = useState<Metric[]>([]);
   const [superscoutMetrics, setSuperscoutMetrics] = useState<Metric[]>([]);
+  const [pitScoutMetrics, setPitScoutMetrics] = useState<Metric[]>([]);
   const [metricsStats, setMetricsStats] = useState<Record<string, any>>({});
+  
+  // State for metrics tab selection
+  const [metricsTab, setMetricsTab] = useState<string>('suggested');
+  
+  // State for metrics search/filter
+  const [metricsFilter, setMetricsFilter] = useState<string>('');
   
   // State for selected priorities for each pick type - with localStorage persistence
   const [firstPickPriorities, setFirstPickPriorities] = useState<MetricWeight[]>(() => {
@@ -330,6 +337,18 @@ const PicklistNew: React.FC = () => {
         setGameMetrics(data.game_metrics || []);
         setSuggestedMetrics(data.suggested_metrics || []);
         setSuperscoutMetrics(data.superscout_metrics || []);
+        
+        // Extract pit scouting metrics from game metrics if they exist
+        const pitMetrics = data.game_metrics?.filter((metric: Metric) => 
+          metric.category === 'pit' || metric.id.includes('pit_')
+        ) || [];
+        
+        // Also check for any explicit pit scouting metrics that might be provided
+        if (data.pit_metrics && Array.isArray(data.pit_metrics)) {
+          pitMetrics.push(...data.pit_metrics);
+        }
+        
+        setPitScoutMetrics(pitMetrics);
         setMetricsStats(data.metrics_stats || {});
       } else {
         setError(data.message || 'Error in picklist analysis');
@@ -371,46 +390,93 @@ const PicklistNew: React.FC = () => {
       
       if (data.status === 'success' && data.parsed_priorities) {
         setParsedPriorities(data.parsed_priorities);
-        
-        // Apply the parsed metrics to the current tab
-        const currentTab = activeTab;
-        let setCurrentPriorities: React.Dispatch<React.SetStateAction<MetricWeight[]>>;
-        
-        if (currentTab === 'first') {
-          setCurrentPriorities = setFirstPickPriorities;
-        } else if (currentTab === 'second') {
-          setCurrentPriorities = setSecondPickPriorities;
-        } else {
-          setCurrentPriorities = setThirdPickPriorities;
+
+        // Log the entire parsed priorities object for debugging
+        console.log("Parsed priorities from API:", JSON.stringify(data.parsed_priorities));
+
+        // Create a completely new implementation to properly handle weights
+        const parsedMetrics = data.parsed_priorities.parsed_metrics || [];
+
+        if (parsedMetrics.length === 0) {
+          console.warn("No metrics found in parsed priorities");
+          setError("No metrics were found in your strategy description");
+          return;
         }
-        
-        // Add the parsed metrics to current priorities (avoiding duplicates)
-        setCurrentPriorities(prev => {
-          const existingIds = new Set(prev.map(p => p.id));
-          const newPriorities = [...prev];
-          
-          for (const metric of data.parsed_priorities.parsed_metrics) {
-            if (!existingIds.has(metric.id)) {
-              // Map custom weight to closest predefined weight option (0.5, 1.0, 1.5, 2.0, 3.0)
-              const validWeights = [0.5, 1.0, 1.5, 2.0, 3.0];
-              const rawWeight = metric.weight || 1.0;
-              
-              // Find closest valid weight
-              const closestWeight = validWeights.reduce((prev, curr) => 
-                Math.abs(curr - rawWeight) < Math.abs(prev - rawWeight) ? curr : prev
-              );
-              
-              newPriorities.push({
-                id: metric.id,
-                weight: closestWeight,
-                reason: metric.reason
-              });
-              existingIds.add(metric.id);
-            }
+
+        // Create new array of properly formatted metrics with correct weights
+        const processedMetrics: MetricWeight[] = [];
+
+        for (const metric of parsedMetrics) {
+          // Skip invalid metrics
+          if (!metric.id) {
+            console.warn("Skipping metric without ID", metric);
+            continue;
           }
-          
-          return newPriorities;
-        });
+
+          // Ensure weight is a valid number in our range of accepted values
+          const validWeights = [0.5, 1.0, 1.5, 2.0, 3.0];
+
+          // Parse weight regardless of format
+          let weightValue: number;
+
+          // Check different possible formats for the weight
+          if (typeof metric.weight === 'number') {
+            weightValue = metric.weight;
+          } else if (typeof metric.weight === 'string') {
+            // Try to parse string, removing any non-numeric characters except decimal point
+            const cleaned = metric.weight.replace(/[^\d.]/g, '');
+            weightValue = parseFloat(cleaned) || 1.0;
+          } else {
+            // Default if no valid weight
+            weightValue = 1.0;
+          }
+
+          // Log the original and processed weight
+          console.log(`Processing metric ${metric.id}: original weight=${metric.weight}, parsed=${weightValue}`);
+
+          // Find closest valid weight value
+          const closestWeight = validWeights.reduce((closest, current) => {
+            return Math.abs(current - weightValue) < Math.abs(closest - weightValue) ? current : closest;
+          }, 1.0);
+
+          console.log(`Final weight for ${metric.id}: ${closestWeight}`);
+
+          // Add properly processed metric to our array
+          processedMetrics.push({
+            id: metric.id,
+            weight: closestWeight,
+            reason: metric.reason || undefined
+          });
+        }
+
+        // Now update the appropriate list of priorities
+        const currentPriorities =
+          activeTab === 'first' ? firstPickPriorities :
+          activeTab === 'second' ? secondPickPriorities :
+          thirdPickPriorities;
+
+        // Create merged set avoiding duplicates
+        const existingIds = new Set(currentPriorities.map(p => p.id));
+        const mergedPriorities = [...currentPriorities];
+
+        for (const metric of processedMetrics) {
+          if (!existingIds.has(metric.id)) {
+            mergedPriorities.push(metric);
+            existingIds.add(metric.id);
+          }
+        }
+
+        // Update state based on active tab
+        if (activeTab === 'first') {
+          console.log("Setting first pick priorities:", mergedPriorities);
+          setFirstPickPriorities(mergedPriorities);
+        } else if (activeTab === 'second') {
+          console.log("Setting second pick priorities:", mergedPriorities);
+          setSecondPickPriorities(mergedPriorities);
+        } else {
+          console.log("Setting third pick priorities:", mergedPriorities);
+          setThirdPickPriorities(mergedPriorities);
+        }
         
         setSuccessMessage('Strategy parsed and applied to priorities');
       } else {
@@ -426,44 +492,99 @@ const PicklistNew: React.FC = () => {
 
   // Handle adding a metric to the current priority list
   const handleAddMetric = (metric: Metric) => {
-    const currentPriorities = 
+    console.log(`Adding metric ${metric.id} (${getMetricLabel(metric.id)}) to ${activeTab} priorities`);
+
+    const currentPriorities =
       activeTab === 'first' ? firstPickPriorities :
       activeTab === 'second' ? secondPickPriorities :
       thirdPickPriorities;
-    
+
     // Check if this metric is already in the list
     if (currentPriorities.some(p => p.id === metric.id)) {
+      console.log(`Metric ${metric.id} already in priorities, skipping`);
       return; // Skip if already added
     }
-    
+
+    // Default weight to 1.0
+    const defaultWeight = 1.0;
+
     // Add to the appropriate list
     if (activeTab === 'first') {
-      setFirstPickPriorities([...firstPickPriorities, { id: metric.id, weight: 1.0 }]);
+      const newPriorities = [...firstPickPriorities, { id: metric.id, weight: defaultWeight }];
+      console.log(`Adding to first pick priorities with weight ${defaultWeight}`, newPriorities);
+      setFirstPickPriorities(newPriorities);
     } else if (activeTab === 'second') {
-      setSecondPickPriorities([...secondPickPriorities, { id: metric.id, weight: 1.0 }]);
+      const newPriorities = [...secondPickPriorities, { id: metric.id, weight: defaultWeight }];
+      console.log(`Adding to second pick priorities with weight ${defaultWeight}`, newPriorities);
+      setSecondPickPriorities(newPriorities);
     } else {
-      setThirdPickPriorities([...thirdPickPriorities, { id: metric.id, weight: 1.0 }]);
+      const newPriorities = [...thirdPickPriorities, { id: metric.id, weight: defaultWeight }];
+      console.log(`Adding to third pick priorities with weight ${defaultWeight}`, newPriorities);
+      setThirdPickPriorities(newPriorities);
     }
+
+    // Show feedback
+    setSuccessMessage(`Added ${getMetricLabel(metric.id)} to ${activeTab} pick priorities`);
+    setTimeout(() => setSuccessMessage(null), 2000);
   };
   
   // Handle adjusting the weight of a priority
   const handleWeightChange = (pickType: 'first' | 'second' | 'third', metricId: string, newWeight: number) => {
-    if (pickType === 'first') {
-      const newPriorities = firstPickPriorities.map(p => 
-        p.id === metricId ? { ...p, weight: newWeight } : p
+    console.log(`handleWeightChange called: pickType=${pickType}, metricId=${metricId}, newWeight=${newWeight} (type: ${typeof newWeight})`);
+
+    // Ensure newWeight is a valid number
+    if (isNaN(newWeight)) {
+      console.error(`Invalid weight value: ${newWeight}`);
+      newWeight = 1.0; // Default to 1.0 if invalid
+    }
+
+    // Validate against allowed weights
+    const validWeights = [0.5, 1.0, 1.5, 2.0, 3.0];
+    if (!validWeights.includes(newWeight)) {
+      // Find closest valid weight
+      newWeight = validWeights.reduce((prev, curr) =>
+        Math.abs(curr - newWeight) < Math.abs(prev - newWeight) ? curr : prev,
+        1.0 // Start with a default of 1.0
       );
+      console.log(`Adjusted to valid weight: ${newWeight}`);
+    }
+
+    if (pickType === 'first') {
+      // Log before state
+      console.log('Before update - First priorities:', JSON.stringify(firstPickPriorities));
+
+      const newPriorities = firstPickPriorities.map(p => {
+        if (p.id === metricId) {
+          console.log(`Updating ${p.id} weight from ${p.weight} to ${newWeight}`);
+          return { ...p, weight: newWeight };
+        }
+        return p;
+      });
+
+      // Log after state
+      console.log('After update - New priorities:', JSON.stringify(newPriorities));
+
       setFirstPickPriorities(newPriorities);
     } else if (pickType === 'second') {
-      const newPriorities = secondPickPriorities.map(p => 
+      const newPriorities = secondPickPriorities.map(p =>
         p.id === metricId ? { ...p, weight: newWeight } : p
       );
       setSecondPickPriorities(newPriorities);
     } else if (pickType === 'third') {
-      const newPriorities = thirdPickPriorities.map(p => 
+      const newPriorities = thirdPickPriorities.map(p =>
         p.id === metricId ? { ...p, weight: newWeight } : p
       );
       setThirdPickPriorities(newPriorities);
     }
+
+    // Force a render to ensure the UI updates
+    setTimeout(() => {
+      console.log(`Current priorities after update for ${pickType}:`,
+        pickType === 'first' ? firstPickPriorities :
+        pickType === 'second' ? secondPickPriorities :
+        thirdPickPriorities
+      );
+    }, 0);
   };
 
   // Handle removing a priority
@@ -906,6 +1027,12 @@ const PicklistNew: React.FC = () => {
     setError(null);
     
     try {
+      // Gather all strategy prompts
+      const allStrategyPrompts = {
+        first: strategyPrompt || "", // Current prompt (we only keep the latest for now)
+        // You could store separate prompts for each pick position if needed
+      };
+      
       const requestBody = {
         team_number: yourTeamNumber,
         event_key: currentEventKey,  // Using current event key from setup
@@ -930,7 +1057,11 @@ const PicklistNew: React.FC = () => {
           metadata: {
             priorities: thirdPickPriorities
           }
-        } : null
+        } : null,
+        // Add excluded teams and strategy prompts for archiving
+        // Make sure to include both automatically excluded teams and manually excluded teams
+        excluded_teams: [...new Set([...excludedTeams, ...manuallyExcludedTeams])],
+        strategy_prompts: allStrategyPrompts
       };
       
       const response = await fetch('http://localhost:8000/api/alliance/lock-picklist', {
@@ -1362,90 +1493,294 @@ const PicklistNew: React.FC = () => {
             </div>
             
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h2 className="text-xl font-bold mb-4">Available Metrics</h2>
-              
-              {/* Suggested Metrics Section */}
-              {suggestedMetrics.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="font-semibold text-blue-700 mb-2">Suggested Metrics</h3>
-                  {suggestedMetrics.map((metric) => (
-                    <div
-                      key={metric.id}
-                      onClick={() => handleAddMetric(metric)}
-                      className="bg-blue-50 border border-blue-200 p-3 rounded mb-2 flex justify-between items-center cursor-pointer hover:bg-blue-100"
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Available Metrics</h2>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search metrics..."
+                    value={metricsFilter}
+                    onChange={(e) => setMetricsFilter(e.target.value)}
+                    className="px-3 py-1.5 border rounded-lg text-sm w-60"
+                  />
+                  {metricsFilter && (
+                    <button
+                      onClick={() => setMetricsFilter('')}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
-                      <div>
-                        <span className="font-medium">{metric.label}</span>
-                        <span className="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">
-                          {metric.category}
-                        </span>
-                      </div>
-                      {metric.importance_score !== undefined && (
-                        <span className="text-sm text-gray-600">
-                          Score: {metric.importance_score.toFixed(2)}
-                        </span>
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Tabbed Metrics Interface */}
+              <div className="mb-6">
+                <div className="mb-4 border-b pb-4">
+                  {/* Category Selector */}
+                  <div className="inline-flex items-center relative mb-2">
+                    <div className="w-3 h-3 rounded-full mr-2" 
+                      style={{
+                        backgroundColor: 
+                          metricsTab === 'suggested' ? '#3B82F6' : // blue-500
+                          metricsTab === 'universal' ? '#6B7280' : // gray-500
+                          metricsTab === 'field' ? '#10B981' :     // green-500
+                          metricsTab === 'super' ? '#8B5CF6' :     // purple-500
+                          '#F59E0B'                                // amber-500 (pit)
+                      }}>
+                    </div>
+                    <select
+                      value={metricsTab}
+                      onChange={(e) => setMetricsTab(e.target.value)}
+                      className="py-2 pr-10 pl-2 font-medium text-lg bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-auto"
+                    >
+                      <option value="suggested">
+                        Suggested Metrics ({suggestedMetrics.length})
+                      </option>
+                      <option value="universal">
+                        Universal Metrics ({universalMetrics.length})
+                      </option>
+                      <option value="field">
+                        Field Scout Metrics ({gameMetrics.length})
+                      </option>
+                      <option value="super">
+                        SuperScout Metrics ({superscoutMetrics.length})
+                      </option>
+                      <option value="pit" disabled={pitScoutMetrics.length === 0}>
+                        Pit Scout Metrics ({pitScoutMetrics.length})
+                      </option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-700">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {/* Description Message - Below the dropdown */}
+                  <div className="text-sm text-gray-600 italic pb-1 max-w-2xl">
+                    {metricsTab === 'suggested' ? (
+                      "Top-ranked metrics for effective picklists"
+                    ) : metricsTab === 'universal' ? (
+                      "Metrics that apply to any FRC game"
+                    ) : metricsTab === 'field' ? (
+                      "Data collected during match scouting"
+                    ) : metricsTab === 'super' ? (
+                      "Qualitative assessments from experienced scouts"
+                    ) : (
+                      "Technical specifications from pit visits"
+                    )}
+                  </div>
+                </div>
+                
+                {/* Helper function to filter metrics */}
+                {(() => {
+                  // Filter function for metrics based on search term
+                  const filterMetrics = (metrics: Metric[]) => {
+                    if (!metricsFilter) return metrics;
+                    
+                    const lowerCaseFilter = metricsFilter.toLowerCase();
+                    return metrics.filter(metric => 
+                      metric.label.toLowerCase().includes(lowerCaseFilter) || 
+                      metric.id.toLowerCase().includes(lowerCaseFilter) ||
+                      metric.category.toLowerCase().includes(lowerCaseFilter)
+                    );
+                  };
+                  
+                  // Variables to store filtered metrics
+                  const filteredSuggested = filterMetrics(suggestedMetrics);
+                  const filteredUniversal = filterMetrics(universalMetrics);
+                  const filteredGame = filterMetrics(gameMetrics);
+                  const filteredSuperscout = filterMetrics(superscoutMetrics);
+                  const filteredPit = filterMetrics(pitScoutMetrics);
+                  
+                  return (
+                    <>
+                      {/* Empty state when no metrics match filter */}
+                      {metricsFilter && 
+                        !(filteredSuggested.length || filteredUniversal.length || 
+                        filteredGame.length || filteredSuperscout.length || filteredPit.length) && (
+                        <div className="p-4 text-center text-gray-500 border-2 border-dashed rounded">
+                          <p>No metrics match your search for <strong>"{metricsFilter}"</strong></p>
+                        </div>
                       )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Universal Metrics Section */}
-              {universalMetrics.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="font-semibold text-gray-700 mb-2">Universal Metrics</h3>
-                  {universalMetrics.map((metric) => (
-                    <div
-                      key={metric.id}
-                      onClick={() => handleAddMetric(metric)}
-                      className="bg-white border p-3 rounded mb-2 cursor-pointer hover:bg-gray-50"
-                    >
-                      <span className="font-medium">{metric.label}</span>
-                      <span className="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">
-                        {metric.category}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Game-Specific Metrics Section */}
-              {gameMetrics.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="font-semibold text-green-700 mb-2">Game Metrics</h3>
-                  {gameMetrics.map((metric) => (
-                    <div
-                      key={metric.id}
-                      onClick={() => handleAddMetric(metric)}
-                      className="bg-green-50 border border-green-200 p-3 rounded mb-2 cursor-pointer hover:bg-green-100"
-                    >
-                      <span className="font-medium">{metric.label}</span>
-                      <span className="ml-2 text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
-                        {metric.category}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* SuperScouting Metrics Section - NEW */}
-              {superscoutMetrics.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-purple-700 mb-2">SuperScouting Metrics</h3>
-                  {superscoutMetrics.map((metric) => (
-                    <div
-                      key={metric.id}
-                      onClick={() => handleAddMetric(metric)}
-                      className="bg-purple-50 border border-purple-200 p-3 rounded mb-2 cursor-pointer hover:bg-purple-100"
-                    >
-                      <span className="font-medium">{metric.label}</span>
-                      <span className="ml-2 text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">
-                        {metric.category}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                      
+                      {/* Suggested Metrics Tab */}
+                      {metricsTab === 'suggested' && suggestedMetrics.length > 0 && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold text-blue-700">Suggested Metrics</h3>
+                            <span className="text-xs text-gray-500">
+                              These metrics are most likely to create a good picklist
+                            </span>
+                          </div>
+                          
+                          {filteredSuggested.length > 0 ? (
+                            filteredSuggested.map((metric) => (
+                              <div
+                                key={metric.id}
+                                onClick={() => handleAddMetric(metric)}
+                                className="bg-blue-50 border border-blue-200 p-3 rounded mb-2 flex justify-between items-center cursor-pointer hover:bg-blue-100"
+                              >
+                                <div>
+                                  <span className="font-medium">{metric.label}</span>
+                                  <span className="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">
+                                    {metric.category}
+                                  </span>
+                                </div>
+                                {metric.importance_score !== undefined && (
+                                  <span className="text-sm text-gray-600">
+                                    Score: {metric.importance_score.toFixed(2)}
+                                  </span>
+                                )}
+                              </div>
+                            ))
+                          ) : metricsFilter ? (
+                            <div className="p-3 text-center text-gray-500 border-dashed border rounded">
+                              <p>No suggested metrics match your search</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                      
+                      {/* Universal Metrics Tab */}
+                      {metricsTab === 'universal' && universalMetrics.length > 0 && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold text-gray-700">Universal Metrics</h3>
+                            <span className="text-xs text-gray-500">
+                              These metrics apply to any FRC game and season
+                            </span>
+                          </div>
+                          
+                          {filteredUniversal.length > 0 ? (
+                            filteredUniversal.map((metric) => (
+                              <div
+                                key={metric.id}
+                                onClick={() => handleAddMetric(metric)}
+                                className="bg-white border p-3 rounded mb-2 cursor-pointer hover:bg-gray-50"
+                              >
+                                <span className="font-medium">{metric.label}</span>
+                                <span className="ml-2 text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">
+                                  {metric.category}
+                                </span>
+                              </div>
+                            ))
+                          ) : metricsFilter ? (
+                            <div className="p-3 text-center text-gray-500 border-dashed border rounded">
+                              <p>No universal metrics match your search</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                      
+                      {/* Field Scout Metrics Tab */}
+                      {metricsTab === 'field' && gameMetrics.length > 0 && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold text-green-700">Field Scout Metrics</h3>
+                            <span className="text-xs text-gray-500">
+                              Game-specific metrics from field scouting data
+                            </span>
+                          </div>
+                          
+                          {filteredGame.length > 0 ? (
+                            filteredGame.map((metric) => (
+                              <div
+                                key={metric.id}
+                                onClick={() => handleAddMetric(metric)}
+                                className="bg-green-50 border border-green-200 p-3 rounded mb-2 cursor-pointer hover:bg-green-100"
+                              >
+                                <span className="font-medium">{metric.label}</span>
+                                <span className="ml-2 text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">
+                                  {metric.category}
+                                </span>
+                              </div>
+                            ))
+                          ) : metricsFilter ? (
+                            <div className="p-3 text-center text-gray-500 border-dashed border rounded">
+                              <p>No field scout metrics match your search</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                      
+                      {/* SuperScouting Metrics Tab */}
+                      {metricsTab === 'super' && superscoutMetrics.length > 0 && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold text-purple-700">SuperScouting Metrics</h3>
+                            <span className="text-xs text-gray-500">
+                              Qualitative metrics from experienced scouts
+                            </span>
+                          </div>
+                          
+                          {filteredSuperscout.length > 0 ? (
+                            filteredSuperscout.map((metric) => (
+                              <div
+                                key={metric.id}
+                                onClick={() => handleAddMetric(metric)}
+                                className="bg-purple-50 border border-purple-200 p-3 rounded mb-2 cursor-pointer hover:bg-purple-100"
+                              >
+                                <span className="font-medium">{metric.label}</span>
+                                <span className="ml-2 text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full">
+                                  {metric.category}
+                                </span>
+                              </div>
+                            ))
+                          ) : metricsFilter ? (
+                            <div className="p-3 text-center text-gray-500 border-dashed border rounded">
+                              <p>No super scout metrics match your search</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                      
+                      {/* Pit Scout Metrics Tab */}
+                      {metricsTab === 'pit' && pitScoutMetrics.length > 0 && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold text-amber-700">Pit Scouting Metrics</h3>
+                            <span className="text-xs text-gray-500">
+                              Technical specifications from pit visits
+                            </span>
+                          </div>
+                          
+                          {filteredPit.length > 0 ? (
+                            filteredPit.map((metric) => (
+                              <div
+                                key={metric.id}
+                                onClick={() => handleAddMetric(metric)}
+                                className="bg-amber-50 border border-amber-200 p-3 rounded mb-2 cursor-pointer hover:bg-amber-100"
+                              >
+                                <span className="font-medium">{metric.label}</span>
+                                <span className="ml-2 text-xs px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">
+                                  {metric.category}
+                                </span>
+                              </div>
+                            ))
+                          ) : metricsFilter ? (
+                            <div className="p-3 text-center text-gray-500 border-dashed border rounded">
+                              <p>No pit scout metrics match your search</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+                
+                {/* Empty State */}
+                {((metricsTab === 'suggested' && suggestedMetrics.length === 0) ||
+                  (metricsTab === 'universal' && universalMetrics.length === 0) ||
+                  (metricsTab === 'field' && gameMetrics.length === 0) ||
+                  (metricsTab === 'super' && superscoutMetrics.length === 0) ||
+                  (metricsTab === 'pit' && pitScoutMetrics.length === 0)) && (
+                  <div className="p-4 text-center text-gray-500 border-2 border-dashed rounded">
+                    <p>No metrics available in this category.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           {/* Right Columns - Priority Lists and Team Rankings */}
@@ -1517,21 +1852,24 @@ const PicklistNew: React.FC = () => {
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center">
                             <span className="mr-2 text-sm">Weight:</span>
-                            <select
-                              value={priority.weight}
-                              onChange={(e) => handleWeightChange(
-                                activeTab, 
-                                priority.id, 
-                                parseFloat(e.target.value)
-                              )}
-                              className="border rounded p-1 text-sm w-16"
-                            >
-                              <option value="0.5">0.5×</option>
-                              <option value="1.0">1.0×</option>
-                              <option value="1.5">1.5×</option>
-                              <option value="2.0">2.0×</option>
-                              <option value="3.0">3.0×</option>
-                            </select>
+
+                            {/* Replace select with individual buttons for more reliable UI */}
+                            <div className="flex border rounded overflow-hidden">
+                              {[0.5, 1.0, 1.5, 2.0, 3.0].map(weight => (
+                                <button
+                                  key={weight}
+                                  type="button"
+                                  onClick={() => handleWeightChange(activeTab, priority.id, weight)}
+                                  className={`px-2 py-1 text-xs ${
+                                    priority.weight === weight
+                                      ? 'bg-blue-600 text-white font-bold'
+                                      : 'bg-white text-gray-800 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  {weight}×
+                                </button>
+                              ))}
+                            </div>
                           </div>
                           
                           <div className="flex space-x-1">

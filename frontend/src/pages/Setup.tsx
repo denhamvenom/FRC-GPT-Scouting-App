@@ -19,6 +19,12 @@ interface GroupedEvents {
   [key: string]: Event[];
 }
 
+interface EventInfo {
+  event_key?: string;
+  event_name?: string;
+  year?: number;
+}
+
 function Setup() {
   const navigate = useNavigate();
   const [year, setYear] = useState<number>(2025);
@@ -34,6 +40,18 @@ function Setup() {
   const [groupedEvents, setGroupedEvents] = useState<GroupedEvents>({});
   const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [selectedEventName, setSelectedEventName] = useState<string>("");
+  
+  // Current event state
+  const [currentEvent, setCurrentEvent] = useState<EventInfo>({});
+  const [isLoadingCurrentEvent, setIsLoadingCurrentEvent] = useState<boolean>(true);
+  
+  // Event switching confirmation dialog
+  const [showEventSwitchDialog, setShowEventSwitchDialog] = useState<boolean>(false);
+  const [pendingEventAction, setPendingEventAction] = useState<{
+    eventKey: string;
+    eventName: string;
+    year: number;
+  } | null>(null);
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newYear = parseInt(e.target.value);
@@ -60,10 +78,43 @@ function Setup() {
     }
   };
 
-  // Load events when the component mounts or when the year changes
+  // Load current event info and events when the component mounts
   useEffect(() => {
+    // Fetch current event info
+    const fetchCurrentEvent = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/setup/info");
+        const data = await response.json();
+        
+        if (data.status === "success" && data.event_key) {
+          setCurrentEvent({
+            event_key: data.event_key,
+            event_name: data.event_name,
+            year: data.year
+          });
+          
+          // If we have a current event, set the year to match
+          if (data.year) {
+            setYear(data.year);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching current event:", err);
+      } finally {
+        setIsLoadingCurrentEvent(false);
+      }
+    };
+    
+    fetchCurrentEvent();
     fetchEvents(year);
   }, []);
+  
+  // When current event changes or year changes, load events for that year
+  useEffect(() => {
+    if (currentEvent.year && !isLoadingCurrentEvent) {
+      fetchEvents(currentEvent.year);
+    }
+  }, [currentEvent, isLoadingCurrentEvent]);
 
   const fetchEvents = async (yearToFetch: number) => {
     setLoadingEvents(true);
@@ -92,17 +143,42 @@ function Setup() {
     }
   };
 
-  const handleSetup = async (e: React.FormEvent) => {
+  const checkForEventSwitch = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // If there's already an active event and user is trying to set up a different one
+    if (currentEvent.event_key && selectedEvent && currentEvent.event_key !== selectedEvent) {
+      // Store the pending action
+      setPendingEventAction({
+        eventKey: selectedEvent,
+        eventName: selectedEventName,
+        year: year
+      });
+      
+      // Show the confirmation dialog
+      setShowEventSwitchDialog(true);
+    } else {
+      // No event switch needed, proceed normally
+      handleSetup(e);
+    }
+  };
+
+  const handleSetup = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
       const formData = new FormData();
-      formData.append("year", year.toString());
+      
+      // Use pending event action if it exists (this is for event switching)
+      const eventToUse = pendingEventAction?.eventKey || selectedEvent;
+      const yearToUse = pendingEventAction?.year || year;
+      
+      formData.append("year", yearToUse.toString());
 
-      if (selectedEvent) {
-        formData.append("event_key", selectedEvent);
+      if (eventToUse) {
+        formData.append("event_key", eventToUse);
       }
 
       if (manualUrl) {
@@ -166,8 +242,73 @@ function Setup() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column - Event Setup */}
         <div className="lg:col-span-5">
+          {/* Event Switch Confirmation Dialog */}
+          {showEventSwitchDialog && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+                <div className="flex items-center text-yellow-600 mb-4">
+                  <svg className="w-6 h-6 mr-2" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
+                  <h3 className="text-xl font-bold">Change Active Event?</h3>
+                </div>
+                
+                <p className="mb-4">
+                  An event is already loaded in the system: <strong>{currentEvent.event_name || currentEvent.event_key}</strong>
+                </p>
+                
+                <p className="mb-4">
+                  To switch to <strong>{pendingEventAction?.eventName || pendingEventAction?.eventKey}</strong>, you must either:
+                </p>
+                
+                <ul className="list-disc pl-5 mb-6 text-gray-700">
+                  <li className="mb-2">Archive the current event (recommended to preserve data)</li>
+                  <li className="mb-2">Continue without archiving (data may be lost)</li>
+                  <li>Cancel and keep working with the current event</li>
+                </ul>
+                
+                <div className="flex flex-col space-y-3">
+                  <button
+                    onClick={() => {
+                      setShowEventSwitchDialog(false);
+                      // Redirect to archive section
+                      document.getElementById("archiveSection")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Archive Current Event
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowEventSwitchDialog(false);
+                      // Proceed with setup
+                      handleSetup();
+                    }}
+                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+                  >
+                    Continue Without Archiving
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowEventSwitchDialog(false);
+                      setPendingEventAction(null);
+                      // Reset the selected event to the current one
+                      setSelectedEvent(currentEvent.event_key || "");
+                      setSelectedEventName(currentEvent.event_name || "");
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        
           {!setupResult ? (
-            <form onSubmit={handleSetup} className="space-y-6 bg-white p-6 rounded-lg shadow">
+            <form onSubmit={checkForEventSwitch} className="space-y-6 bg-white p-6 rounded-lg shadow">
               <h2 className="text-xl font-bold mb-4">New Event Setup</h2>
 
               <div>
@@ -411,20 +552,54 @@ function Setup() {
         <div className="lg:col-span-7">
           <div className="space-y-6">
             {/* Event Archive Manager */}
-            <div className="bg-white p-6 rounded-lg shadow">
+            <div id="archiveSection" className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-xl font-bold mb-4">Event Management</h2>
-              <p className="mb-4 text-sm text-gray-600">
-                Current Event: {selectedEvent || setupResult?.event_key || "None selected"}
-                <br/>Year: {year}
-              </p>
+              
+              {isLoadingCurrentEvent ? (
+                <div className="p-2 text-blue-600">Loading current event...</div>
+              ) : (
+                <div className="mb-6">
+                  <div className="flex items-center">
+                    <span className="font-semibold mr-2">Current Event:</span>
+                    {currentEvent.event_key ? (
+                      <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
+                        {currentEvent.event_name || currentEvent.event_key} ({currentEvent.year})
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+                        None Selected
+                      </span>
+                    )}
+                  </div>
+                  
+                  {setupResult?.event_key && currentEvent.event_key !== setupResult.event_key && (
+                    <div className="mt-2 text-green-700">
+                      <span className="font-semibold">New Event Selected:</span> {setupResult.event_key}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <EventArchiveManager
-                currentEventKey={selectedEvent || (setupResult?.event_key ? setupResult.event_key : undefined)}
-                currentYear={year}
+                currentEventKey={currentEvent.event_key || selectedEvent || (setupResult?.event_key ? setupResult.event_key : undefined)}
+                currentYear={currentEvent.year || year}
                 onArchiveSuccess={() => {
                   // Reload the page or clear setup result
                   console.log("Archive success callback triggered");
                   setSetupResult(null);
+                  
+                  // If there was a pending event change, proceed with it after archiving
+                  if (pendingEventAction) {
+                    setSelectedEvent(pendingEventAction.eventKey);
+                    setSelectedEventName(pendingEventAction.eventName);
+                    setYear(pendingEventAction.year);
+                    setPendingEventAction(null);
+                    
+                    // Wait a moment then submit the form
+                    setTimeout(() => {
+                      handleSetup();
+                    }, 500);
+                  }
                 }}
                 onRestoreSuccess={() => {
                   // Reload the page to show restored data

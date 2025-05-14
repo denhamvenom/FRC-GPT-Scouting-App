@@ -55,6 +55,8 @@ class LockPicklistRequest(BaseModel):
     first_pick_data: PicklistData
     second_pick_data: PicklistData
     third_pick_data: Optional[PicklistData] = None
+    excluded_teams: Optional[List[int]] = None
+    strategy_prompts: Optional[Dict[str, str]] = None
 
 class LockedPicklistResponse(BaseModel):
     id: int
@@ -82,6 +84,12 @@ async def lock_picklist(request: LockPicklistRequest, db: Session = Depends(get_
             existing_picklist.second_pick_data = request.second_pick_data.dict()
             if request.third_pick_data:
                 existing_picklist.third_pick_data = request.third_pick_data.dict()
+                
+            # Update additional metadata
+            if request.excluded_teams is not None:
+                existing_picklist.excluded_teams = request.excluded_teams
+            if request.strategy_prompts is not None:
+                existing_picklist.strategy_prompts = request.strategy_prompts
             
             db.commit()
             db.refresh(existing_picklist)
@@ -101,7 +109,9 @@ async def lock_picklist(request: LockPicklistRequest, db: Session = Depends(get_
                 year=request.year,
                 first_pick_data=request.first_pick_data.dict(),
                 second_pick_data=request.second_pick_data.dict(),
-                third_pick_data=request.third_pick_data.dict() if request.third_pick_data else None
+                third_pick_data=request.third_pick_data.dict() if request.third_pick_data else None,
+                excluded_teams=request.excluded_teams,
+                strategy_prompts=request.strategy_prompts
             )
             
             db.add(new_picklist)
