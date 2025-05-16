@@ -669,8 +669,36 @@ const PicklistNew: React.FC = () => {
       return;
     }
 
+    // Check if a picklist already exists for this round
+    const existingPicklist = activeTab === 'first' ? firstPickRankings.length > 0 :
+                           activeTab === 'second' ? secondPickRankings.length > 0 :
+                           thirdPickRankings.length > 0;
+    
+    if (existingPicklist) {
+      const confirmed = window.confirm(`A picklist already exists for the ${activeTab} pick. Generating a new one will replace the existing picklist. Are you sure?`);
+      if (!confirmed) {
+        return;
+      }
+    }
+
     // Clear previous errors
     setError(null);
+
+    // Clear the picklist cache before generating new picklist
+    if (existingPicklist) {
+      try {
+        const response = await fetch('http://localhost:8000/api/picklist/clear-cache', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        if (!response.ok) {
+          console.error('Failed to clear cache');
+        }
+      } catch (error) {
+        console.error('Error clearing cache:', error);
+      }
+    }
 
     // Update excluded teams based on pick position and store the result
     const teamsToExclude = updateExcludedTeams();
@@ -1179,6 +1207,22 @@ const PicklistNew: React.FC = () => {
     } finally {
       setIsLocking(false);
     }
+  };
+
+  // Handle picklist cleared
+  const handlePicklistCleared = () => {
+    // Clear the rankings for the current tab
+    if (activeTab === 'first') {
+      setFirstPickRankings([]);
+      localStorage.removeItem('firstPickRankings');
+    } else if (activeTab === 'second') {
+      setSecondPickRankings([]);
+      localStorage.removeItem('secondPickRankings');
+    } else if (activeTab === 'third') {
+      setThirdPickRankings([]);
+      localStorage.removeItem('thirdPickRankings');
+    }
+    setSuccessMessage('Picklist cleared successfully');
   };
 
   // Handle picklist generation result
@@ -2124,6 +2168,7 @@ const PicklistNew: React.FC = () => {
                     onPicklistGenerated={handlePicklistGenerated}
                     onExcludeTeam={handleExcludeTeam}
                     isLocked={hasLockedPicklist}
+                    onPicklistCleared={handlePicklistCleared}
                     // Create a stable key that doesn't change when navigating and returning
                     // Only change the key when actually switching tabs or when exclusions change
                     // Include a fixed timestamp based on the current rankings' existence

@@ -22,7 +22,7 @@ class PicklistRequest(BaseModel):
     batch_size: int = Field(20, ge=5, le=100, description="Number of teams in each batch (default: 20)")
     reference_teams_count: int = Field(3, ge=1, le=10, description="Number of reference teams to include (default: 3)")
     reference_selection: str = Field("top_middle_bottom", description="Strategy for selecting reference teams", enum=["even_distribution", "percentile", "top_middle_bottom"])
-    use_batching: bool = Field(True, description="Whether to use batch processing instead of one-shot generation")
+    use_batching: bool = Field(..., description="Whether to use batch processing instead of one-shot generation")
 
 class UserRanking(BaseModel):
     team_number: int
@@ -154,6 +154,10 @@ async def generate_picklist(request: PicklistRequest):
         # Initialize the service
         generator_service = PicklistGeneratorService(request.unified_dataset_path)
         
+        # Debug logging - check exactly what we're passing
+        logger.info(f"API Layer - About to call generate_picklist with use_batching={request.use_batching} (type: {type(request.use_batching)})")
+        logger.info(f"API Layer - Full request values: batch_size={request.batch_size}, reference_teams_count={request.reference_teams_count}")
+        
         # Convert priorities to plain dictionaries to avoid serialization issues
         priorities = [
             {
@@ -191,12 +195,21 @@ async def generate_picklist(request: PicklistRequest):
         logger.info(f"Request {request_id} cache key: {cache_key}")
         
         # Add batch processing parameters to log
+        logger.info(f"Received use_batching={request.use_batching} (type: {type(request.use_batching)})")
+        logger.info(f"Raw request data: {request.dict()}")
         if request.use_batching:
             logger.info(f"Using batching with batch_size={request.batch_size}, reference_teams_count={request.reference_teams_count}")
             logger.info(f"Reference selection strategy: {request.reference_selection}")
+        else:
+            logger.info("Batching is disabled, will use one-shot processing")
         
         # Use the cache on the service to prevent duplicate work
         # The generator_service has internal caching that should prevent duplicate work
+        
+        # TEMPORARY: Force batching off to test one-shot processing
+        logger.info(f"API Layer - Original use_batching={request.use_batching}")
+        logger.info("FORCING use_batching to False for testing")
+        
         result = await generator_service.generate_picklist(
             your_team_number=request.your_team_number,
             pick_position=request.pick_position,
@@ -207,7 +220,7 @@ async def generate_picklist(request: PicklistRequest):
             batch_size=request.batch_size,
             reference_teams_count=request.reference_teams_count,
             reference_selection=request.reference_selection,
-            use_batching=request.use_batching
+            use_batching=False  # FORCING TO FALSE FOR TESTING
         )
         
         if result.get("status") == "error":
@@ -344,3 +357,51 @@ async def rank_missing_teams(request: RankMissingTeamsRequest):
     except Exception as e:
         logger.error(f"Error ranking missing teams: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error ranking missing teams: {str(e)}")
+
+@router.post("/clear-cache")
+async def clear_picklist_cache(
+    request: Optional[Dict[str, Any]] = Body(None)
+):
+    """
+    Clear the picklist cache. Can optionally clear specific cache keys.
+    
+    Args:
+        request: Optional dictionary with 'cache_keys' list or 'pick_position' to clear specific entries
+        
+    Returns:
+        dict: Status message
+    """
+    import logging
+    logger = logging.getLogger('picklist_api')
+    
+    try:
+        from app.services.picklist_generator_service import PicklistGeneratorService
+        
+        if request and 'cache_keys' in request:
+            # Clear specific cache keys
+            cache_keys = request['cache_keys']
+            cleared_count = 0
+            for key in cache_keys:
+                if key in PicklistGeneratorService._picklist_cache:
+                    del PicklistGeneratorService._picklist_cache[key]
+                    cleared_count += 1
+            
+            logger.info(f"Cleared {cleared_count} specific cache entries")
+            return {
+                "status": "success",
+                "message": f"Cleared {cleared_count} cache entries"
+            }
+        else:
+            # Clear entire cache
+            old_size = len(PicklistGeneratorService._picklist_cache)
+            PicklistGeneratorService._picklist_cache.clear()
+            
+            logger.info(f"Cleared entire picklist cache (had {old_size} entries)")
+            return {
+                "status": "success",
+                "message": f"Cleared entire picklist cache ({old_size} entries removed)"
+            }
+    
+    except Exception as e:
+        logger.error(f"Error clearing picklist cache: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error clearing cache: {str(e)}")

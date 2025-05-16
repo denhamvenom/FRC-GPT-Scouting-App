@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 
 load_dotenv()
 
-GPT_MODEL = "gpt-4o"
+GPT_MODEL = "gpt-4.1"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
@@ -132,7 +132,7 @@ Headers:
     response_map = await client.chat.completions.create(
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt_mapping}],
-        temperature=0,
+        temperature=0.2,
         timeout=15
     )
 
@@ -154,7 +154,7 @@ Headers:
     response_offsets = await client.chat.completions.create(
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt_offsets}],
-        temperature=0,
+        temperature=0.2,
         timeout=15
     )
 
@@ -206,7 +206,7 @@ Headers and sample data:
         response_insights = await client.chat.completions.create(
             model=GPT_MODEL,
             messages=[{"role": "user", "content": prompt_insights}],
-            temperature=0.3,
+            temperature=0.2,
             timeout=15
         )
         

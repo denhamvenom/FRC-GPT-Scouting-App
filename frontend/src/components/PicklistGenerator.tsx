@@ -7,6 +7,7 @@ interface Team {
   nickname: string;
   score: number;
   reasoning: string;
+  is_fallback?: boolean;
 }
 
 interface MetricPriority {
@@ -69,6 +70,7 @@ interface PicklistGeneratorProps {
   initialPicklist?: Team[]; // Add prop for initial picklist data
   onExcludeTeam?: (teamNumber: number) => void; // Callback for excluding a team
   isLocked?: boolean; // Flag indicating if the picklist is locked and should be read-only
+  onPicklistCleared?: () => void; // Callback for when picklist is cleared
 }
 
 // Progress indicator component for estimated time (non-batch processing)
@@ -124,9 +126,8 @@ const ProgressIndicator: React.FC<{ estimatedTime: number; teamCount: number }> 
 // Batch progress component
 const BatchProgressIndicator: React.FC<{ 
   batchInfo: BatchProcessing; 
-  teamCount: number; 
   elapsedTime: number;
-}> = ({ batchInfo, teamCount, elapsedTime }) => {
+}> = ({ batchInfo, elapsedTime }) => {
   return (
     <div className="flex flex-col items-center w-full max-w-lg mx-auto my-8 px-4">
       <div className="text-center mb-4 space-y-2">
@@ -215,7 +216,8 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   onPicklistGenerated,
   initialPicklist = [],
   onExcludeTeam,
-  isLocked = false
+  isLocked = false,
+  onPicklistCleared
 }) => {
   const [picklist, setPicklist] = useState<Team[]>(initialPicklist);
   const [analysis, setAnalysis] = useState<PicklistAnalysis | null>(null);
@@ -241,6 +243,17 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [batchProcessingInfo, setBatchProcessingInfo] = useState<BatchProcessing | null>(null);
   const [pollingCacheKey, setPollingCacheKey] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
+  
+  // Batching control - persist in localStorage
+  const [useBatching, setUseBatching] = useState<boolean>(() => {
+    const saved = localStorage.getItem('useBatching');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+  
+  // Save useBatching to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('useBatching', JSON.stringify(useBatching));
+  }, [useBatching]);
   
   useEffect(() => {
     // Log when dependencies change
@@ -306,7 +319,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   
   // Elapsed time counter for batch processing
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
     
     if (batchProcessingActive) {
       // Start a timer that updates every 100ms
@@ -325,7 +338,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   
   // Polling effect for batch processing status
   useEffect(() => {
-    let pollingInterval: NodeJS.Timeout | null = null;
+    let pollingInterval: ReturnType<typeof setInterval> | null = null;
     
     if (batchProcessingActive && pollingCacheKey) {
       // Poll every 5 seconds to reduce OPTIONS requests
@@ -351,7 +364,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
             // If processing is complete, stop polling and process the final result
             if (data.batch_processing.processing_complete) {
               setBatchProcessingActive(false);
-              clearInterval(pollingInterval);
+              if (pollingInterval) clearInterval(pollingInterval);
               
               // Process the picklist data if it's included with the completion response
               if (data.picklist) {
@@ -441,6 +454,49 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
     }
   };
   
+  const clearPicklist = async () => {
+    // Clear the current picklist state
+    setPicklist([]);
+    setAnalysis(null);
+    
+    // Clear any cache on the backend
+    try {
+      const response = await fetch('http://localhost:8000/api/picklist/clear-cache', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      
+      if (!response.ok) {
+        console.error('Failed to clear backend cache');
+      } else {
+        const result = await response.json();
+        console.log('Cache cleared:', result.message);
+      }
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+    }
+    
+    // Reset other states
+    setError(null);
+    setSuccessMessage('Picklist cleared successfully');
+    
+    // Reset pagination
+    setCurrentPage(1);
+    setTotalPages(1);
+    
+    // Reset batch processing state
+    setBatchProcessingActive(false);
+    setBatchProcessingInfo(null);
+    setPollingCacheKey(null);
+    setElapsedTime(0);
+    
+    // Call the parent component's callback to clear its state
+    if (onPicklistCleared) {
+      onPicklistCleared();
+    }
+  };
+  
   const generatePicklist = async () => {
     if (!datasetPath || !yourTeamNumber || !priorities.length) {
       setError('Missing required inputs for picklist generation');
@@ -477,19 +533,23 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       console.log(`Excluding ${teamsToExclude.length} teams for ${pickPosition} pick:`, teamsToExclude);
       
       // Create request body with batching parameters
+      console.log('Current useBatching state before request:', useBatching);
+      console.log('Retrieved from localStorage:', localStorage.getItem('useBatching'));
+      
       const requestBody = JSON.stringify({
         unified_dataset_path: datasetPath,
         your_team_number: yourTeamNumber,
         pick_position: pickPosition,
         priorities: simplePriorities,
         exclude_teams: teamsToExclude,
-        use_batching: true,  // Enable batch processing by default
+        use_batching: useBatching,
         batch_size: 20,
         reference_teams_count: 3,
         reference_selection: "top_middle_bottom"
       });
       
       console.log('Sending request:', requestBody);
+      console.log('useBatching value in request:', useBatching);
       
       const response = await fetch('http://localhost:8000/api/picklist/generate', {
         method: 'POST',
@@ -768,7 +828,6 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       return (
         <BatchProgressIndicator 
           batchInfo={batchProcessingInfo} 
-          teamCount={datasetPath ? 75 : 0} 
           elapsedTime={elapsedTime} 
         />
       );
@@ -808,8 +867,26 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         <h2 className="text-xl font-bold">
           {pickPosition.charAt(0).toUpperCase() + pickPosition.slice(1)} Pick Rankings
         </h2>
-        <div className="flex space-x-2">
-          {isEditing ? (
+        <div className="flex items-center space-x-4">
+          {/* Batching Toggle */}
+          {!isLocked && (
+            <label className="flex items-center space-x-2 text-sm">
+              <input
+                type="checkbox"
+                checked={useBatching}
+                onChange={(e) => {
+                  const newValue = e.target.checked;
+                  console.log('Toggling useBatching from', useBatching, 'to', newValue);
+                  setUseBatching(newValue);
+                  console.log('useBatching will be saved to localStorage as:', newValue);
+                }}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span>Use batch processing (recommended for large datasets)</span>
+            </label>
+          )}
+          <div className="flex space-x-2">
+            {isEditing ? (
             <>
               <button
                 onClick={updatePicklist}
@@ -850,8 +927,17 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
                   {isLoading ? 'Regenerating...' : 'Regenerate Picklist'}
                 </button>
               )}
+              {!isLocked && picklist.length > 0 && (
+                <button
+                  onClick={clearPicklist}
+                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Clear Picklist
+                </button>
+              )}
             </>
           )}
+          </div>
         </div>
       </div>
       

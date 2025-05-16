@@ -9,7 +9,7 @@ from app.services.global_cache import cache
 
 load_dotenv()
 
-GPT_MODEL = "gpt-4o"
+GPT_MODEL = "gpt-4.1"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
@@ -27,7 +27,7 @@ Return a JSON list of strings, e.g. ["team_number", "auto_coral_l1", ...].
     response = await client.chat.completions.create(
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt + "\nManual Text:\n" + manual_text}],
-        temperature=0,
+        temperature=0.2,
         timeout=30
     )
     content = response.choices[0].message.content.strip()
@@ -64,7 +64,7 @@ Headers:
     response = await client.chat.completions.create(
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt}],
-        temperature=0,
+        temperature=0.2,
         timeout=30
     )
     content = response.choices[0].message.content.strip()

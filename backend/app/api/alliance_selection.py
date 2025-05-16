@@ -623,3 +623,53 @@ async def advance_to_next_round(selection_id: int, db: Session = Depends(get_db)
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error advancing to next round: {str(e)}")
+
+@router.post("/selection/{selection_id}/reset")
+async def reset_alliance_selection(selection_id: int, db: Session = Depends(get_db)):
+    """
+    Reset an alliance selection back to the beginning.
+    This will:
+    1. Reset all alliances (clear captain and picks)
+    2. Reset all team statuses (clear captain, picked, declined status)
+    3. Reset the selection itself (current_round to 1, is_completed to False)
+    """
+    try:
+        # Get the selection
+        selection = db.query(AllianceSelection).filter(AllianceSelection.id == selection_id).first()
+        
+        if not selection:
+            raise HTTPException(status_code=404, detail="Alliance selection not found")
+        
+        # Reset all alliances
+        alliances = db.query(Alliance).filter(Alliance.selection_id == selection_id).all()
+        for alliance in alliances:
+            alliance.captain_team_number = 0
+            alliance.first_pick_team_number = 0
+            alliance.second_pick_team_number = 0
+            alliance.backup_team_number = 0
+        
+        # Reset all team statuses
+        team_statuses = db.query(TeamSelectionStatus).filter(TeamSelectionStatus.selection_id == selection_id).all()
+        for ts in team_statuses:
+            ts.is_captain = False
+            ts.is_picked = False
+            ts.has_declined = False
+            ts.round_eliminated = None
+        
+        # Reset the selection itself
+        selection.current_round = 1
+        selection.is_completed = False
+        
+        db.commit()
+        
+        return {
+            "status": "success",
+            "action": "reset",
+            "selection_id": selection_id,
+            "message": "Alliance selection has been reset to the beginning"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error resetting alliance selection: {str(e)}")

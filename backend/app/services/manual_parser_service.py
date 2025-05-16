@@ -131,9 +131,9 @@ Format your response as structured JSON:
     try:
         # Call the OpenAI API
         response = await client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": prompt + "\n\nManual text:\n" + manual_text[:50000]}],
-            temperature=0.0,
+            temperature=0.2,
             response_format={"type": "json_object"},
             max_tokens=2000
         )
@@ -228,9 +228,9 @@ Output structured JSON only, following this format:
 
     try:
         response = await client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0,
+            temperature=0.2,
             response_format={"type": "json_object"},
             max_tokens=1000
         )
@@ -289,9 +289,9 @@ Game Description:
 
     try:
         response = await client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0,
+            temperature=0.2,
             response_format={"type": "json_object"},
             max_tokens=1000
         )

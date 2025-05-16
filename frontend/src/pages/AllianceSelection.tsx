@@ -432,6 +432,48 @@ const AllianceSelection: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const resetAllianceSelection = async () => {
+    if (!selection) return;
+
+    // Confirm before resetting
+    if (!window.confirm('Are you sure you want to reset the entire alliance selection? This will clear all captains and selections and start from the beginning.')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(`http://localhost:8000/api/alliance/selection/${selection.id}/reset`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to reset alliance selection');
+      }
+
+      // Reset the selected team and action
+      setSelectedTeam(null);
+      setSelectedAlliance(null);
+      setAction(null);
+
+      // Reload selection data
+      await loadSelectionData(selection.id);
+
+      // Show success message
+      setSuccessMessage('Alliance selection has been reset to the beginning');
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
+
+    } catch (err: any) {
+      setError('Error resetting alliance selection: ' + err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Check if a team is selectable in the current round
   const isTeamSelectable = (teamNumber: number): boolean => {
@@ -775,14 +817,23 @@ const AllianceSelection: React.FC = () => {
         
         <div className="flex items-center space-x-3">
           {selection && !selection.is_completed && (
-            <button
-              onClick={advanceToNextRound}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              {selection.current_round === 3 ? 'Complete After Backup Selections' : 
-               selection.current_round > 3 ? 'Finalize Alliance Selection' : 
-               `Advance to Round ${selection.current_round + 1}`}
-            </button>
+            <>
+              <button
+                onClick={advanceToNextRound}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                {selection.current_round === 3 ? 'Complete After Backup Selections' : 
+                 selection.current_round > 3 ? 'Finalize Alliance Selection' : 
+                 `Advance to Round ${selection.current_round + 1}`}
+              </button>
+              
+              <button
+                onClick={resetAllianceSelection}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Reset Selection
+              </button>
+            </>
           )}
           
           <button

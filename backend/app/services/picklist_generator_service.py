@@ -7,6 +7,7 @@ import logging
 import asyncio
 from typing import List, Dict, Any, Optional, Set
 from openai import OpenAI
+import tiktoken
 from dotenv import load_dotenv
 
 # Configure logging
@@ -50,6 +51,9 @@ class PicklistGeneratorService:
         
         # Load manual text for game context if available
         self.game_context = self._load_game_context()
+        
+        # Initialize token encoder for GPT-4
+        self.token_encoder = tiktoken.encoding_for_model("gpt-4o")
     
     def _load_dataset(self) -> Dict[str, Any]:
         """Load the unified dataset from the JSON file."""
@@ -76,6 +80,56 @@ class PicklistGeneratorService:
         except Exception as e:
             print(f"Error loading game context: {e}")
             return None
+    
+    def _parse_response_with_index_mapping(self, response_data: Dict[str, Any], teams_data: List[Dict[str, Any]], team_index_map: Dict[int, int] = None) -> List[Dict[str, Any]]:
+        """
+        Parse the GPT response and convert indices to team numbers if index mapping is used.
+        
+        Args:
+            response_data: The parsed JSON response from GPT
+            teams_data: The list of team data for lookups
+            team_index_map: Optional mapping from indices to team numbers
+            
+        Returns:
+            List of teams with scores and reasons
+        """
+        picklist = []
+        seen_teams = set()
+        
+        # Handle ultra-compact format {"p":[[team,score,"reason"]...],"s":"ok"}
+        if "p" in response_data and isinstance(response_data["p"], list):
+            for team_entry in response_data["p"]:
+                if len(team_entry) >= 3:  # Ensure we have at least [team/index, score, reason]
+                    first_value = int(team_entry[0])
+                    
+                    # If we have an index map, convert index to team number
+                    if team_index_map and first_value in team_index_map:
+                        team_number = team_index_map[first_value]
+                        logger.debug(f"Mapped index {first_value} to team {team_number}")
+                    else:
+                        team_number = first_value
+                    
+                    # Skip if we've seen this team already
+                    if team_number in seen_teams:
+                        logger.info(f"Skipping duplicate team {team_number} in response")
+                        continue
+                    
+                    seen_teams.add(team_number)
+                    score = float(team_entry[1])
+                    reason = team_entry[2]
+                    
+                    # Get team nickname from dataset if available
+                    team_data = next((t for t in teams_data if t["team_number"] == team_number), None)
+                    nickname = team_data.get("nickname", f"Team {team_number}") if team_data else f"Team {team_number}"
+                    
+                    picklist.append({
+                        "team_number": team_number,
+                        "nickname": nickname,
+                        "score": score,
+                        "reasoning": reason
+                    })
+        
+        return picklist
     
     def _prepare_team_data_for_gpt(self) -> List[Dict[str, Any]]:
         """
@@ -165,6 +219,69 @@ class PicklistGeneratorService:
         team_str = str(team_number)
         return self.teams_data.get(team_str)
     
+    def _calculate_weighted_score(self, team_data: Dict[str, Any], priorities: List[Dict[str, Any]]) -> float:
+        """
+        Calculate a weighted score for a team based on the given priorities.
+        
+        Args:
+            team_data: Dictionary containing team metrics
+            priorities: List of priority metrics with weights
+            
+        Returns:
+            Weighted score for the team
+        """
+        total_score = 0.0
+        total_weight = 0.0
+        
+        # Get the team's metrics
+        team_metrics = team_data.get("metrics", {})
+        
+        for priority in priorities:
+            metric_id = priority["id"]
+            weight = priority.get("weight", 1.0)
+            
+            # Check if the metric exists in the team's data
+            if metric_id in team_metrics:
+                metric_value = team_metrics[metric_id]
+                if isinstance(metric_value, (int, float)):
+                    # Normalize the metric value (simple approach: assume higher is better)
+                    # You might want to add metric-specific normalization logic here
+                    normalized_value = metric_value
+                    
+                    # Add to weighted sum
+                    total_score += normalized_value * weight
+                    total_weight += weight
+        
+        # Calculate final weighted score
+        if total_weight > 0:
+            return total_score / total_weight
+        else:
+            return 0.0
+    
+    def _check_token_count(self, system_prompt: str, user_prompt: str, max_tokens: int = 100000) -> None:
+        """
+        Check if the combined prompts exceed the token limit.
+        
+        Args:
+            system_prompt: The system prompt
+            user_prompt: The user prompt
+            max_tokens: Maximum allowed tokens (default: 100k for safety with 128k model)
+            
+        Raises:
+            ValueError: If token count exceeds the limit
+        """
+        try:
+            system_tokens = len(self.token_encoder.encode(system_prompt))
+            user_tokens = len(self.token_encoder.encode(user_prompt))
+            total_tokens = system_tokens + user_tokens
+            
+            logger.info(f"Token count: system={system_tokens}, user={user_tokens}, total={total_tokens}")
+            
+            if total_tokens > max_tokens:
+                raise ValueError(f"Prompt too large: {total_tokens} tokens exceeds limit of {max_tokens}. Consider batching teams or trimming fields.")
+        except Exception as e:
+            logger.warning(f"Token counting failed: {str(e)}, proceeding without check")
+    
     def _calculate_similarity_score(self, team1_metrics: Dict[str, float], team2_metrics: Dict[str, float]) -> float:
         """
         Calculate a similarity score between two teams based on their metrics.
@@ -229,6 +346,10 @@ class PicklistGeneratorService:
         Returns:
             Dict with generated picklist and explanations
         """
+        # Debug logging to verify what we're receiving
+        logger.info(f"Service Layer - Received use_batching={use_batching} (type: {type(use_batching)})")
+        logger.info(f"Service Layer - batch_size={batch_size}, reference_teams_count={reference_teams_count}")
+        
         # Check cache first - use provided cache_key if available, otherwise generate one
         if cache_key is None:
             # Default cache key generation (fallback for backward compatibility)
@@ -315,7 +436,12 @@ class PicklistGeneratorService:
                     reference_selection = "top_middle_bottom"
             
             # Choose between batch processing and one-shot processing
-            if use_batching and len(teams_data) > batch_size:
+            logger.info(f"DECISION POINT: use_batching={use_batching}, len(teams_data)={len(teams_data)}, batch_size={batch_size}")
+            logger.info(f"Condition check: use_batching and len(teams_data) > batch_size = {use_batching and len(teams_data) > batch_size}")
+            
+            # TEMPORARY: Force one-shot processing for testing
+            logger.info("FORCING ONE-SHOT PROCESSING for testing - ignoring use_batching parameter")
+            if False:  # Was: if use_batching and len(teams_data) > batch_size:
                 # Use batch processing for large team counts
                 logger.info(f"Using batch processing for {len(teams_data)} teams")
                 
@@ -444,6 +570,7 @@ class PicklistGeneratorService:
                 
             else:
                 # Use one-shot approach for smaller team counts or when batching is disabled
+                logger.info(f"TAKING ONE-SHOT PATH: use_batching={use_batching}, teams_count={len(teams_data)}, batch_size={batch_size}")
                 logger.info(f"Using one-shot approach for {len(teams_data)} teams")
                 
                 # Initialize variables for one-shot approach
@@ -453,18 +580,28 @@ class PicklistGeneratorService:
                 # Create prompts optimized for one-shot completion
                 system_prompt = self._create_system_prompt(pick_position, len(teams_data))
                 
+                # Create team index mapping
+                team_index_map = {}
+                for index, team in enumerate(teams_data, start=1):
+                    team_index_map[index] = team["team_number"]
+                
                 # Get sorted list of team numbers for verification
                 team_numbers = sorted([team["team_number"] for team in teams_data])
                 logger.info(f"Teams to rank: {len(team_numbers)}")
                 logger.info(f"Team numbers: {team_numbers[:10]}... (and {len(team_numbers) - 10} more)")
+                
                 
                 user_prompt = self._create_user_prompt(
                     your_team_number, 
                     pick_position, 
                     priorities, 
                     teams_data,
-                    team_numbers
+                    team_numbers,
+                    team_index_map
                 )
+                
+                # Check token count before making the API call
+                self._check_token_count(system_prompt, user_prompt)
                 
                 # Log prompts (truncated for readability but showing structure)
                 truncated_system = system_prompt[:500] + "..." if len(system_prompt) > 500 else system_prompt
@@ -479,6 +616,12 @@ class PicklistGeneratorService:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ]
+                
+                # Store parsing context
+                parsing_context = {
+                    "team_index_map": team_index_map,
+                    "teams_data": teams_data
+                }
                 
                 # Make a single API call to rank all teams at once
                 logger.info(f"--- Requesting complete picklist for {len(team_numbers)} teams ---")
@@ -495,7 +638,7 @@ class PicklistGeneratorService:
             while retry_count <= max_retries:
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4o",  # Using a model that can handle the full team list
+                        model="gpt-4.1", 
                         messages=messages,
                         temperature=0.2,  # Lower temperature for more consistent results
                         response_format={"type": "json_object"},
@@ -566,6 +709,19 @@ class PicklistGeneratorService:
                     
                     # Check for repeating patterns in teams
                     team_nums = [int(entry[0]) for entry in response_data["p"] if len(entry) >= 1]
+                    
+                    # If we're using index mapping, those numbers are indices, not team numbers
+                    if parsing_context.get("team_index_map"):
+                        logger.info("Using index mapping - converting for duplicate detection")
+                        actual_team_nums = []
+                        team_index_map = parsing_context["team_index_map"]
+                        for idx in team_nums:
+                            if idx in team_index_map:
+                                actual_team_nums.append(team_index_map[idx])
+                            else:
+                                actual_team_nums.append(idx)  # fallback if index not found
+                        team_nums = actual_team_nums
+                    
                     team_counts = {}
                     for team_num in team_nums:
                         team_counts[team_num] = team_counts.get(team_num, 0) + 1
@@ -606,33 +762,12 @@ class PicklistGeneratorService:
                                 "message": "The model is unable to rank all teams at once. Please try reducing the number of teams to rank (e.g., 25 at a time) or simplify the priorities. The model got stuck repeating the same teams."
                             }
                     
-                    # Convert ultra-compact format to standard format
-                    picklist = []
-                    seen_teams = set()  # Track teams we've already added
-                    
-                    for team_entry in response_data["p"]:
-                        if len(team_entry) >= 3:  # Ensure we have at least [team, score, reason]
-                            team_number = int(team_entry[0])
-                            
-                            # Skip if we've seen this team already
-                            if team_number in seen_teams:
-                                logger.info(f"Skipping duplicate team {team_number} in response")
-                                continue
-                                
-                            seen_teams.add(team_number)
-                            score = float(team_entry[1])
-                            reason = team_entry[2]
-                            
-                            # Get team nickname from dataset if available
-                            team_data = next((t for t in teams_data if t["team_number"] == team_number), None)
-                            nickname = team_data.get("nickname", f"Team {team_number}") if team_data else f"Team {team_number}"
-                            
-                            picklist.append({
-                                "team_number": team_number,
-                                "nickname": nickname,
-                                "score": score,
-                                "reasoning": reason
-                            })
+                    # Use the new helper method to parse with index mapping
+                    picklist = self._parse_response_with_index_mapping(
+                        response_data, 
+                        parsing_context.get("teams_data", teams_data),
+                        parsing_context.get("team_index_map")
+                    )
                             
                 # Handle regular compact format
                 elif "picklist" in response_data and isinstance(response_data["picklist"], list):
@@ -1026,42 +1161,25 @@ class PicklistGeneratorService:
             "third": "Third pick teams are more specialized, often focusing on a single critical function."
         }
         
-        return f"""You are GPT-4o, an FRC pick-list strategist.
+        context_note = position_context.get(pick_position, "")
+        # Adjust the prompt based on whether we're using team index mapping
+        index_rule = ""
+        team_reference = "team"
+        if team_count > 0:  # This is a signal that we're using index mapping
+            index_rule = f"• Use indices 1-{team_count} from TEAM_INDEX_MAP exactly once.\n"
+            team_reference = "index"
+        
+        return f"""You are GPT‑4.1, an FRC alliance strategist.
+Return one‑line minified JSON:
+{{"p":[[{team_reference},score,"≤15w"]…],"s":"ok"}}
 
-TASK
-Rank ALL {team_count} unique teams for the {pick_position} pick of Team {{your_team_number}}.
-Return MINIFIED JSON, ONE LINE, NO SPACES/NEWLINES using THIS exact shape:
+RULES
+• Rank all {team_count} teams/indices, each exactly once.  
+{index_rule}• Sort by weighted performance, then synergy with Team {{your_team_number}} for {pick_position} pick.  
+• Each reason ≤15 words and cites ≥1 metric value.  
+• If context exceeds limit, respond only {{"s":"overflow"}}.
 
-{{"p":[[team,score,"≤12 words"]...],"s":"ok"}}
-
-⚠️ CRITICAL RULES:
-1. Each team MUST appear EXACTLY ONCE. NO DUPLICATES ALLOWED!
-2. Include ALL {team_count} teams from TEAM_NUMBERS_TO_INCLUDE.
-3. Each reason must be ≤ 12 words and cite ≥ 1 metric value.
-4. NO whitespaces, tabs, or line-breaks in the output.
-5. If you cannot fit ALL {team_count} teams, STOP and ONLY return: {{"s":"overflow"}}
-
-ULTRA-COMPACT STRUCTURE EXPLANATION:
-- "p" is the array of team entries (replaces "picklist")
-- Each team is [team_number, score, "reason"] (array instead of object)
-- "s" is status ("ok" or "overflow")
-
-TOKEN OPTIMIZATION EXAMPLES (use different teams):
-- [254, 98.3, "Strong autonomous EPA 25.7"]
-- [1678, 92.1, "Excellent climb consistency 96%"]
-- [3310, 87.5, "High teleop scoring average 15.2 points"]
-- [118, 85.2, "Great defense rating 8.9"]
-
-VALIDATION REQUIREMENTS:
-1. Verify ALL {team_count} teams are included - CHECK CLOSELY!
-2. Check for duplicated team numbers - NONE ALLOWED!
-3. Verify your reasoning strings are ≤ 12 words each
-4. Ensure JSON is complete, valid, and has NO WHITESPACE
-
-Additional context: {position_context.get(pick_position, "")}
-
-OVERFLOW HANDLING: If you cannot include all {team_count} teams, return ONLY {{"s":"overflow"}} - nothing else.
-"""
+{context_note}"""
     
     def _create_user_prompt(
         self, 
@@ -1069,7 +1187,8 @@ OVERFLOW HANDLING: If you cannot include all {team_count} teams, return ONLY {{"
         pick_position: str, 
         priorities: List[Dict[str, Any]],
         teams_data: List[Dict[str, Any]],
-        team_numbers: List[int] = None
+        team_numbers: List[int] = None,
+        team_index_map: Dict[int, int] = None
     ) -> str:
         """
         Create the user prompt for GPT with all necessary context.
@@ -1087,29 +1206,46 @@ OVERFLOW HANDLING: If you cannot include all {team_count} teams, return ONLY {{"
         # Find your team's data
         your_team_info = next((team for team in teams_data if team["team_number"] == your_team_number), None)
         
-        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info, indent=2) if your_team_info else "{}"} 
-PRIORITY_METRICS  = {json.dumps(priorities, indent=2)}
+        # Calculate weighted scores for each team before passing to GPT
+        teams_with_scores = []
+        
+        # If we have an index map, format teams with indices
+        if team_index_map:
+            # Create reverse map for quick lookup
+            team_to_index = {v: k for k, v in team_index_map.items()}
+            
+            for team in teams_data:
+                weighted_score = self._calculate_weighted_score(team, priorities)
+                team_with_score = team.copy()
+                team_with_score["weighted_score"] = weighted_score
+                # Add index if available
+                if team["team_number"] in team_to_index:
+                    team_with_score["index"] = team_to_index[team["team_number"]]
+                teams_with_scores.append(team_with_score)
+        else:
+            for team in teams_data:
+                weighted_score = self._calculate_weighted_score(team, priorities)
+                team_with_score = team.copy()
+                team_with_score["weighted_score"] = weighted_score
+                teams_with_scores.append(team_with_score)
+        
+        # Include team index mapping if provided
+        team_index_info = ""
+        if team_index_map:
+            team_index_info = f"""
+TEAM_INDEX_MAP = {json.dumps(team_index_map)}
+⚠️ CRITICAL: Use indices 1 through {len(team_index_map)} from TEAM_INDEX_MAP exactly once.
+⚠️ Your response MUST use indices, NOT team numbers: [[1,score,"reason"],[2,score,"reason"]...]
+⚠️ Each index from 1 to {len(team_index_map)} must appear EXACTLY ONCE.
+"""
+        
+        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info) if your_team_info else "{}"} 
+PRIORITY_METRICS  = {json.dumps(priorities)}   # include weight field
 GAME_CONTEXT      = {json.dumps(self.game_context) if self.game_context else "null"}
-TEAM_NUMBERS_LIST = {json.dumps(team_numbers)}
+TEAM_NUMBERS_TO_INCLUDE = {json.dumps(team_numbers)}{team_index_info}
+AVAILABLE_TEAMS = {json.dumps(teams_with_scores)}     # include pre‑computed weighted_score
 
-Instructions:
-1. You MUST rank ALL {len(teams_data)} unique teams listed in TEAM_NUMBERS_LIST.
-2. Each team MUST appear EXACTLY ONCE in your output. DO NOT REPEAT TEAMS!
-3. Use metrics from AVAILABLE_TEAMS to evaluate each team's performance.
-4. Assess alliance synergy with Team {your_team_number}.
-5. Sort teams from best→worst based on weighted metrics.
-6. Verify your output contains EACH team from TEAM_NUMBERS_LIST EXACTLY ONCE.
-7. Return a single JSON object with the "p" array containing ALL {len(teams_data)} teams.
-
-⚠️ CRITICAL REQUIREMENTS:
-- NO DUPLICATES: Verify each team number appears only once
-- COMPLETENESS: Include ALL {len(teams_data)} teams from TEAM_NUMBERS_LIST
-- FORMAT: Follow the ultra-compact schema from the system prompt
-- BREVITY: Keep reasons ≤ 12 words each
-
-AVAILABLE_TEAMS   = {json.dumps(teams_data, indent=2)}
-
-End of prompt.
+Please produce output following RULES.
 """
         return prompt
 
@@ -1250,7 +1386,7 @@ End of prompt.
             while retry_count <= max_retries:
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4o",
+                        model="gpt-4.1",
                         messages=messages,
                         temperature=0.2,
                         response_format={"type": "json_object"},
@@ -1364,8 +1500,15 @@ End of prompt.
                     seen_teams = set()  # Track teams we've already added
                     
                     for team_entry in response_data["p"]:
-                        if len(team_entry) >= 3:  # Ensure we have at least [team, score, reason]
-                            team_number = int(team_entry[0])
+                        if len(team_entry) >= 3:  # Ensure we have at least [team/index, score, reason]
+                            first_value = int(team_entry[0])
+                            
+                            # If we have an index map, convert index to team number
+                            if team_index_map and first_value in team_index_map:
+                                team_number = team_index_map[first_value]
+                                logger.debug(f"Mapped index {first_value} to team {team_number}")
+                            else:
+                                team_number = first_value
                             
                             # Skip if we've seen this team already
                             if team_number in seen_teams:
@@ -2016,6 +2159,9 @@ End of prompt.
                 reference_team_numbers
             )
             
+            # Check token count before making the API call
+            self._check_token_count(system_prompt, user_prompt)
+            
             # Initialize messages
             messages = [
                 {"role": "system", "content": system_prompt},
@@ -2034,7 +2180,7 @@ End of prompt.
             while retry_count <= max_retries:
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4o",
+                        model="gpt-4.1",
                         messages=messages,
                         temperature=0.2,  # Lower temperature for more consistent results
                         response_format={"type": "json_object"},
@@ -2210,29 +2356,22 @@ Your scoring should be CONSISTENT with these reference teams. Use them as anchor
 calibrate your scoring and maintain a similar scale for the new teams in this batch.
 """
         
-        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info, indent=2) if your_team_info else "{}"} 
-PRIORITY_METRICS  = {json.dumps(priorities, indent=2)}
+        # Calculate weighted scores for each team before passing to GPT
+        teams_with_scores = []
+        for team in teams_data:
+            weighted_score = self._calculate_weighted_score(team, priorities)
+            team_with_score = team.copy()
+            team_with_score["weighted_score"] = weighted_score
+            teams_with_scores.append(team_with_score)
+        
+        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info) if your_team_info else "{}"} 
+PRIORITY_METRICS  = {json.dumps(priorities)}   # include weight field
 GAME_CONTEXT      = {json.dumps(self.game_context) if self.game_context else "null"}
-TEAM_NUMBERS_LIST = {json.dumps(team_numbers)}
+TEAM_NUMBERS_TO_INCLUDE = {json.dumps(team_numbers)}
 {reference_info}
-Instructions:
-1. You MUST rank ALL {len(teams_data)} unique teams listed in TEAM_NUMBERS_LIST.
-2. Each team MUST appear EXACTLY ONCE in your output. DO NOT REPEAT TEAMS!
-3. Use metrics from AVAILABLE_TEAMS to evaluate each team's performance.
-4. Assess alliance synergy with Team {your_team_number}.
-5. Sort teams from best→worst based on weighted metrics.
-6. Verify your output contains EACH team from TEAM_NUMBERS_LIST EXACTLY ONCE.
-7. Return a single JSON object with the "p" array containing ALL {len(teams_data)} teams.
+AVAILABLE_TEAMS = {json.dumps(teams_with_scores)}     # include pre‑computed weighted_score
 
-⚠️ CRITICAL REQUIREMENTS:
-- NO DUPLICATES: Verify each team number appears only once
-- COMPLETENESS: Include ALL {len(teams_data)} teams from TEAM_NUMBERS_LIST
-- FORMAT: Follow the ultra-compact schema from the system prompt
-- BREVITY: Keep reasons ≤ 12 words each
-
-AVAILABLE_TEAMS   = {json.dumps(teams_data, indent=2)}
-
-End of prompt.
+Please produce output following RULES.
 """
         return prompt
     
