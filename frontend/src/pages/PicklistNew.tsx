@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PicklistGenerator from '../components/PicklistGenerator';
+import ProgressTracker from '../components/ProgressTracker';
 
 // Type definitions
 interface Team {
@@ -99,6 +100,7 @@ const PicklistNew: React.FC = () => {
     return saved ? JSON.parse(saved) : [];
   });
   const [isGeneratingRankings, setIsGeneratingRankings] = useState<boolean>(false);
+  const [progressOperationId, setProgressOperationId] = useState<string | null>(null);
   // Initialize shouldShowGenerator based on whether rankings exist for the current tab
   const [shouldShowGenerator, setShouldShowGenerator] = useState<boolean>(() => {
     // Check localStorage for existing rankings
@@ -716,6 +718,10 @@ const PicklistNew: React.FC = () => {
 
     // Set generating state to show loading indicator
     setIsGeneratingRankings(true);
+    
+    // Generate a cache key for the progress tracker before making the request
+    const cacheKey = `${yourTeamNumber}_${activeTab}_${Date.now()}`;
+    setProgressOperationId(cacheKey);
 
     try {
       // Convert priorities to plain objects
@@ -743,7 +749,8 @@ const PicklistNew: React.FC = () => {
           use_batching: true,
           batch_size: 20,
           reference_teams_count: 3,
-          reference_selection: "top_middle_bottom"
+          reference_selection: "top_middle_bottom",
+          cache_key: cacheKey  // Pass the cache key we generated
         })
       });
 
@@ -823,6 +830,11 @@ const PicklistNew: React.FC = () => {
       setError(err.message || 'Error connecting to server');
     } finally {
       setIsGeneratingRankings(false);
+      
+      // Clear the progress operation ID after a short delay to ensure final status is shown
+      setTimeout(() => {
+        setProgressOperationId(null);
+      }, 3000);
 
       // Show the picklist generator to display results
       setShouldShowGenerator(true);
@@ -1958,6 +1970,23 @@ const PicklistNew: React.FC = () => {
                   {isGeneratingRankings ? 'Generating...' : 'Generate Picklist'}
                 </button>
               </div>
+              
+              {/* Progress Tracker */}
+              {progressOperationId && (
+                <div className="mt-4">
+                  <ProgressTracker 
+                    operationId={progressOperationId}
+                    pollingInterval={500} // Poll every 500ms for more responsive updates
+                    onComplete={(success) => {
+                      if (success) {
+                        setSuccessMessage('Picklist generation completed successfully!');
+                      } else {
+                        setError('Picklist generation failed. Please try again.');
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </div>
             {/* Team Rankings Section - Now with PicklistGenerator integration */}
             <div className="bg-white rounded-lg shadow-md p-4">

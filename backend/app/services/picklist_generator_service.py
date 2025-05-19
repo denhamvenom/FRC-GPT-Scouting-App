@@ -5,10 +5,12 @@ import os
 import time
 import logging
 import asyncio
+import threading
 from typing import List, Dict, Any, Optional, Set
 from openai import OpenAI
 import tiktoken
 from dotenv import load_dotenv
+from app.services.progress_tracker import ProgressTracker
 
 # Configure logging
 logging.basicConfig(
@@ -394,6 +396,15 @@ class PicklistGeneratorService:
         # Mark this cache key as "in progress" by storing the current timestamp
         PicklistGeneratorService._picklist_cache[cache_key] = current_time
         
+        # Create a progress tracker immediately
+        progress_tracker = ProgressTracker.create_tracker(cache_key)
+        progress_tracker.update(
+            progress=5,
+            message="Starting picklist generation...",
+            current_step="initialization",
+            status="active"
+        )
+        
         # Get your team data
         your_team = self._get_team_by_number(your_team_number)
         if not your_team:
@@ -627,45 +638,106 @@ class PicklistGeneratorService:
                 logger.info(f"--- Requesting complete picklist for {len(team_numbers)} teams ---")
                 request_start_time = time.time()
                 
+                # Update progress now that we're about to call the API
+                progress_tracker.update(
+                    progress=10,
+                    message=f"Preparing to analyze {len(team_numbers)} teams",
+                    current_step="preparation",
+                    status="active"
+                )
+                
                 # Call GPT with optimized settings for one-shot generation
                 logger.info("Starting API call...")
+                progress_tracker.update(
+                    progress=20,
+                    message=f"Sending {len(team_numbers)} teams to GPT for analysis",
+                    current_step="api_call",
+                    status="active"
+                )
             
             # Use exponential backoff for rate limit handling
             max_retries = 3
             initial_delay = 1.0  # Start with a 1-second delay
-            retry_count = 0
+            response = None
+            api_error = None
+            api_complete = threading.Event()
             
-            while retry_count <= max_retries:
-                try:
-                    response = client.chat.completions.create(
-                        model="gpt-4.1", 
-                        messages=messages,
-                        temperature=0.2,  # Lower temperature for more consistent results
-                        response_format={"type": "json_object"},
-                        max_tokens=4000  # Increased to prevent truncation with the compact schema
-                    )
-                    # Success - break out of the retry loop
-                    break
-                except Exception as e:
-                    # Check if it's a rate limit error (typically a 429 status code)
-                    is_rate_limit = "429" in str(e)
-                    
-                    if is_rate_limit and retry_count < max_retries:
-                        # Calculate exponential backoff delay
-                        retry_count += 1
-                        delay = initial_delay * (2 ** retry_count)  # Exponential backoff
+            # Create a thread for the API call
+            def make_api_call():
+                nonlocal response, api_error
+                retry_count = 0
+                while retry_count <= max_retries:
+                    try:
+                        response = client.chat.completions.create(
+                            model="gpt-4.1", 
+                            messages=messages,
+                            temperature=0.2,  # Lower temperature for more consistent results
+                            response_format={"type": "json_object"},
+                            max_tokens=4000  # Increased to prevent truncation with the compact schema
+                        )
+                        # Success - break out of the retry loop
+                        api_complete.set()
+                        return
+                    except Exception as e:
+                        # Check if it's a rate limit error (typically a 429 status code)
+                        is_rate_limit = "429" in str(e)
                         
-                        logger.warning(f"Rate limit hit. Retrying in {delay:.2f} seconds... (Attempt {retry_count}/{max_retries})")
-                        time.sleep(delay)
-                    else:
-                        # Either not a rate limit error or we've exceeded max retries
-                        logger.error(f"API call failed: {str(e)}")
-                        raise  # Re-raise the exception
+                        if is_rate_limit and retry_count < max_retries:
+                            # Calculate exponential backoff delay
+                            retry_count += 1
+                            delay = initial_delay * (2 ** retry_count)  # Exponential backoff
+                            
+                            logger.warning(f"Rate limit hit. Retrying in {delay:.2f} seconds... (Attempt {retry_count}/{max_retries})")
+                            time.sleep(delay)
+                        else:
+                            # Either not a rate limit error or we've exceeded max retries
+                            logger.error(f"API call failed: {str(e)}")
+                            api_error = e
+                            api_complete.set()
+                            return
+            
+            # Start the API call in a separate thread
+            api_thread = threading.Thread(target=make_api_call)
+            api_thread.start()
+            
+            # Update progress periodically while waiting for the API response
+            start_wait_time = time.time()
+            progress_increment = 30  # Start at 20%, go to 50%
+            
+            while not api_complete.is_set():
+                elapsed = time.time() - start_wait_time
+                # Estimate progress based on typical response time (50 seconds)
+                estimated_progress = min(50, 20 + (elapsed / 50) * progress_increment)
+                
+                progress_tracker.update(
+                    progress=estimated_progress,
+                    message=f"Analyzing {len(team_numbers)} teams with GPT... ({elapsed:.0f}s)",
+                    current_step="api_call",
+                    status="active"
+                )
+                
+                # Wait a bit before checking again
+                await asyncio.sleep(1.0)
+            
+            # Wait for the thread to complete
+            api_thread.join()
+            
+            # Check if there was an error
+            if api_error:
+                raise api_error
             
             # Log timing and response metadata
             request_time = time.time() - request_start_time
             logger.info(f"Total response time: {request_time:.2f}s (avg: {request_time/len(team_numbers):.2f}s per team)")
             logger.info(f"Response metadata: finish_reason={response.choices[0].finish_reason}, model={response.model}")
+            
+            # Update progress after API response
+            progress_tracker.update(
+                progress=60,
+                message="GPT analysis complete. Processing results...",
+                current_step="response_processing",
+                status="active"
+            )
             
             # Parse the response
             response_content = response.choices[0].message.content
@@ -1000,6 +1072,14 @@ class PicklistGeneratorService:
             logger.info("=== Processing picklist results ===")
             logger.info(f"Total teams received: {len(picklist)}")
             
+            # Update progress - deduplication phase
+            progress_tracker.update(
+                progress=80,
+                message="Removing duplicate teams and finalizing rankings...",
+                current_step="deduplication",
+                status="active"
+            )
+            
             # Check for duplicate teams and handle them intelligently
             team_entries = {}  # Map team numbers to their entries
             duplicates = []
@@ -1125,6 +1205,9 @@ class PicklistGeneratorService:
             logger.info(f"Average time per team: {(total_time / len(deduplicated_picklist) if deduplicated_picklist else 0):.2f}s")
             logger.info(f"Final picklist length: {len(deduplicated_picklist)}")
             
+            # Update progress - completion
+            progress_tracker.complete(f"Successfully generated picklist for {len(deduplicated_picklist)} teams")
+            
             # Cache the result, replacing the "in progress" timestamp
             self._picklist_cache[cache_key] = result
             
@@ -1133,6 +1216,10 @@ class PicklistGeneratorService:
             
         except Exception as e:
             logger.error(f"Error generating picklist with GPT: {str(e)}{request_info}", exc_info=True)
+            
+            # Update progress tracker with failure
+            if 'progress_tracker' in locals():
+                progress_tracker.fail(f"Picklist generation failed: {str(e)}")
             
             # Clean up the in-progress flag from cache so future requests can proceed
             if cache_key in self._picklist_cache and isinstance(self._picklist_cache[cache_key], float):

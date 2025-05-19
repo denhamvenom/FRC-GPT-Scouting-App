@@ -1,0 +1,232 @@
+**FRC GPT Scouting App Project Summary V2**
+
+---
+
+**Project Purpose:**
+Build a comprehensive, game-agnostic scouting and picklist assistant for FIRST Robotics Competition (FRC) teams. The system combines live scouting, superscouting, The Blue Alliance (TBA) API data, and Statbotics data into a Unified Event Dataset, with real-time progress tracking and intelligent picklist generation using GPT-4.1.
+
+---
+
+**Technology Stack:**
+- **Frontend:** React 18 + Vite + TypeScript + Tailwind CSS
+- **Backend:** FastAPI (Python 3.12+, async)
+- **Database:** SQLite with SQLAlchemy ORM
+- **Storage:** Google Sheets (read/write access via service account)
+- **External APIs:**
+  - The Blue Alliance (TBA) API (REST)
+  - Statbotics Python SDK
+  - OpenAI GPT-4.1 API
+- **Progress Tracking:** Custom implementation with threading
+- **Hosting:** Local development on Windows, cloud-friendly architecture
+- **Version Control:** Git + GitHub
+
+---
+
+**Core System Components:**
+
+- **Google Sheets Service:** Connects to Google Sheets for pulling match scouting and superscouting data with schema mapping
+- **Statbotics Client:** 
+  - Pulls team EPA metrics with year-specific field mapping
+  - Handles pagination and missing data gracefully
+- **TBA Client:**
+  - Pulls event-specific teams, matches, and rankings
+  - Async implementation for efficient data retrieval
+- **Unified Event Data Service:**
+  - Combines scouting, superscouting, TBA, and Statbotics data
+  - Creates validated event datasets in JSON format
+  - Implements caching for performance optimization
+- **Progress Tracking System:**
+  - Real-time updates for long-running operations
+  - Thread-safe implementation with percentage tracking
+  - Frontend polling with visual progress indicators
+- **Picklist Generator:**
+  - Ultra-compact JSON format (75% token reduction)
+  - Natural language strategy parsing
+  - Team exclusion logic based on pick position
+  - Progress tracking during generation
+  - Fallback mechanism for missing teams
+- **Alliance Selection:**
+  - FRC-compliant rules implementation
+  - Live draft board with real-time updates
+  - Three-round selection with backup picks
+  - Database persistence for selections
+- **Schema Learning Wizard:**
+  - GPT-powered automatic column mapping
+  - User correction interface
+  - Year-specific schema persistence
+
+---
+
+**Key Features:**
+
+### Data Management
+- Unified dataset building from multiple sources
+- Schema mapping with intelligent defaults
+- LocalStorage persistence for UI state
+- Event archival with complete backup
+- Request deduplication to prevent redundant work
+
+### Validation
+- Missing data detection with match-level granularity
+- Statistical outlier detection (Z-score, IQR, team-specific)
+- Virtual rescouting with average replacement
+- Audit trail for all corrections
+- Mark outliers as acceptable with reasons
+
+### Picklist Generation
+- Ultra-compact JSON format for efficiency
+- Real-time progress tracking (0-100%)
+- Natural language strategy parsing
+- Realistic team exclusions by round
+- Batch processing for large events
+- Automatic fallback for missing teams
+- Visual indicators for auto-added teams
+
+### Alliance Selection
+- FRC rules compliant implementation
+- Teams that decline can become captains
+- Visual status indicators (captain/picked/declined)
+- Smart filtering based on round and position
+- Database persistence with SQLAlchemy
+- Historical tracking of selections
+
+### User Experience
+- Progress indicators with time estimates
+- Error recovery with fallback mechanisms
+- Pagination for large datasets (configurable)
+- Confirmation dialogs for destructive actions
+- Debug logging with dedicated viewer
+- Mobile-responsive design
+
+---
+
+**Technical Architecture:**
+
+### Backend Architecture
+- FastAPI for async REST APIs
+- Service layer pattern for business logic
+- Repository pattern for data access
+- Threading for non-blocking operations
+- In-memory caching for active operations
+- SQLite database for persistence
+
+### Frontend Architecture
+- React with TypeScript for type safety
+- Component-based architecture
+- Custom hooks for shared logic
+- LocalStorage for state persistence
+- Polling for progress updates
+- Tailwind CSS for styling
+
+### Progress Tracking Implementation
+- Backend ProgressTracker service
+- Thread-safe operation tracking
+- Frontend ProgressTracker component
+- Configurable polling intervals
+- Graceful error handling
+
+---
+
+**Performance Optimizations:**
+- Ultra-compact JSON reduces tokens by 75%
+- Threading prevents UI blocking during API calls
+- Smart data condensing for GPT requests
+- Request caching prevents duplicate work
+- Pagination for large datasets
+- Progressive loading for better UX
+
+---
+
+**Security Considerations:**
+- Environment variables for API keys
+- Input validation on all endpoints
+- SQL injection prevention via ORM
+- XSS prevention in React
+- CORS properly configured
+- No sensitive data in localStorage
+
+---
+
+**Testing Strategy:**
+- Unit tests with pytest (backend)
+- Component tests with Jest (frontend)
+- Integration tests for API endpoints
+- Mock external services in tests
+- Progress tracking with mock timers
+- Error condition coverage
+
+---
+
+**Current Limitations:**
+- Event key selector needs improvement (defaults to 2025arc)
+- Mobile UI needs optimization
+- No OAuth implementation yet
+- Limited visualization options
+- Single event at a time
+- No cloud deployment yet
+
+---
+
+**Future Roadmap:**
+1. **Phase 1 (Current):** Core functionality complete
+2. **Phase 2:** Enhanced visualizations and analytics
+3. **Phase 3:** Multi-event support and comparisons
+4. **Phase 4:** Cloud deployment (AWS/Azure)
+5. **Phase 5:** Mobile app development
+6. **Phase 6:** Real-time collaboration features
+
+---
+
+**Deployment Guide:**
+1. Clone repository
+2. Install Python 3.12+ and Node.js 18+
+3. Set up virtual environment
+4. Install dependencies (pip, npm)
+5. Configure .env file
+6. Run database migrations
+7. Start backend server (uvicorn)
+8. Start frontend dev server (vite)
+
+---
+
+**API Documentation:**
+Complete API documentation available in README.md including:
+- All endpoints with request/response formats
+- Authentication requirements
+- Error response formats
+- Rate limiting information
+- Progress tracking endpoints
+
+---
+
+**Contributing Guidelines:**
+1. Fork repository
+2. Create feature branch
+3. Follow style guide
+4. Write tests for new features
+5. Update documentation
+6. Submit pull request
+7. Pass code review
+
+---
+
+**Recent Major Updates (May 2025):**
+- Real-time progress tracking implementation
+- Ultra-compact JSON format (75% token reduction)
+- Event archival system
+- Enhanced error recovery
+- Threading for non-blocking operations
+- Database migration system
+
+---
+
+**Support & Resources:**
+- GitHub Issues for bug reports
+- Discord community for discussions
+- Video tutorials (coming soon)
+- API reference documentation
+- Architecture diagrams in /docs
+
+---
+
+(Generated based on comprehensive system analysis - May 19, 2025)

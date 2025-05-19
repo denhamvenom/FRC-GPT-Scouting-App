@@ -24,6 +24,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [polling, setPolling] = useState<boolean>(true);
+  const [hasStarted, setHasStarted] = useState<boolean>(false);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -32,11 +33,16 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
       try {
         const response = await fetch(`http://localhost:8000/api/progress/${operationId}`);
         if (!response.ok) {
+          if (response.status === 404 && !hasStarted) {
+            // Operation not found yet, this is expected at the start
+            return;
+          }
           throw new Error('Failed to fetch progress');
         }
         
         const data = await response.json();
         setProgress(data);
+        setHasStarted(true);
         
         // If operation is completed or failed, stop polling
         if (data.status === 'completed' || data.status === 'failed') {
@@ -51,7 +57,10 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
         } else {
           setError('An unknown error occurred');
         }
-        setPolling(false);
+        // Only stop polling if we've started and there's an error
+        if (hasStarted) {
+          setPolling(false);
+        }
       }
     };
 
@@ -69,7 +78,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
         clearInterval(intervalId);
       }
     };
-  }, [operationId, polling, pollingInterval, onComplete]);
+  }, [operationId, polling, pollingInterval, onComplete, hasStarted]);
 
   if (error) {
     return (
@@ -81,8 +90,30 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
 
   if (!progress) {
     return (
-      <div className="p-4 bg-gray-100 border border-gray-300 rounded animate-pulse">
-        <p>Loading progress information...</p>
+      <div className="p-4 bg-white border rounded shadow-sm mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-lg font-medium">Operation Progress</h3>
+          <div className="flex items-center">
+            <div className="h-3 w-3 rounded-full mr-2 bg-blue-500 animate-pulse"></div>
+            <span className="capitalize">initializing</span>
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <p className="text-gray-700">Starting picklist generation...</p>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+          <div 
+            className="h-2.5 rounded-full bg-blue-500 animate-pulse" 
+            style={{ width: '5%' }}
+          ></div>
+        </div>
+        
+        <div className="flex justify-between text-sm text-gray-600">
+          <div>0% complete</div>
+        </div>
       </div>
     );
   }

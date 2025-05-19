@@ -23,6 +23,7 @@ class PicklistRequest(BaseModel):
     reference_teams_count: int = Field(3, ge=1, le=10, description="Number of reference teams to include (default: 3)")
     reference_selection: str = Field("top_middle_bottom", description="Strategy for selecting reference teams", enum=["even_distribution", "percentile", "top_middle_bottom"])
     use_batching: bool = Field(..., description="Whether to use batch processing instead of one-shot generation")
+    cache_key: Optional[str] = Field(None, description="Optional cache key to use for progress tracking")
 
 class UserRanking(BaseModel):
     team_number: int
@@ -168,31 +169,35 @@ async def generate_picklist(request: PicklistRequest):
             for p in request.priorities
         ]
         
-        # Generate a cache key for deduplication
-        import hashlib
-        import json
-        
-        # Create a deterministic representation of the request
-        cache_key_dict = {
-            "path": request.unified_dataset_path,
-            "team": request.your_team_number,
-            "position": request.pick_position,
-            "priorities": sorted([(p["id"], p["weight"]) for p in priorities]),
-            "exclude": sorted(request.exclude_teams) if request.exclude_teams else [],
-            "use_batching": request.use_batching
-        }
-        
-        # Include batching parameters if batching is enabled
-        if request.use_batching:
-            cache_key_dict.update({
-                "batch_size": request.batch_size,
-                "reference_teams_count": request.reference_teams_count,
-                "reference_selection": request.reference_selection
-            })
-        
-        # Convert to a hash for quick comparison
-        cache_key = hashlib.md5(json.dumps(cache_key_dict, sort_keys=True).encode()).hexdigest()
-        logger.info(f"Request {request_id} cache key: {cache_key}")
+        # Use provided cache key or generate one for deduplication
+        if request.cache_key:
+            cache_key = request.cache_key
+            logger.info(f"Using provided cache key: {cache_key}")
+        else:
+            import hashlib
+            import json
+            
+            # Create a deterministic representation of the request
+            cache_key_dict = {
+                "path": request.unified_dataset_path,
+                "team": request.your_team_number,
+                "position": request.pick_position,
+                "priorities": sorted([(p["id"], p["weight"]) for p in priorities]),
+                "exclude": sorted(request.exclude_teams) if request.exclude_teams else [],
+                "use_batching": request.use_batching
+            }
+            
+            # Include batching parameters if batching is enabled
+            if request.use_batching:
+                cache_key_dict.update({
+                    "batch_size": request.batch_size,
+                    "reference_teams_count": request.reference_teams_count,
+                    "reference_selection": request.reference_selection
+                })
+            
+            # Convert to a hash for quick comparison
+            cache_key = hashlib.md5(json.dumps(cache_key_dict, sort_keys=True).encode()).hexdigest()
+            logger.info(f"Generated cache key: {cache_key}")
         
         # Add batch processing parameters to log
         logger.info(f"Received use_batching={request.use_batching} (type: {type(request.use_batching)})")
@@ -216,7 +221,7 @@ async def generate_picklist(request: PicklistRequest):
             priorities=priorities,  # Use the plain dict version
             exclude_teams=request.exclude_teams,
             request_id=request_id,  # Pass the request ID for logging
-            cache_key=cache_key,    # Pass the cache key for deduplication
+            cache_key=cache_key,    # Pass the cache key for deduplication and progress tracking
             batch_size=request.batch_size,
             reference_teams_count=request.reference_teams_count,
             reference_selection=request.reference_selection,
