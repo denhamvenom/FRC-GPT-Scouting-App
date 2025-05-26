@@ -54,8 +54,8 @@ async def start_learning_setup(year: int, manual_file: Optional[UploadFile] = No
     
     for team_key in sample_team_keys:
         team_epa = get_team_epa(int(team_key), year)
-        if team_epa:
-            slimmed_team_data.append(team_epa)
+        # Always append team data, even if EPA is missing
+        slimmed_team_data.append(team_epa)
 
     # 3. Process manual, with improved handling for existing manual data
     manual_info = {"manual_file_received": manual_file is not None}

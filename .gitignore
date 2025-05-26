@@ -7,8 +7,9 @@ secrets/
 secrets/*.json
 app/data/*.json
 !frontend/package.json
-
 backend/logs
+
+backend/app/cache
 
 # 🐍 Python
 __pycache__/

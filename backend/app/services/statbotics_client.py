@@ -43,19 +43,31 @@ def get_team_epa(team_key: int, year: int) -> Dict[str, Any]:
     """
     try:
         raw_data = sb.get_team_year(team_key, year)
-        field_map = load_statbotics_field_map(year)
-
+        
+        # Always include basic team info
         slimmed_data = {
             "team_number": raw_data.get("team"),
             "team_name": raw_data.get("name")
         }
-
-        for output_field, statbotics_path in field_map.items():
-            value = get_nested_value(raw_data, statbotics_path)
-            slimmed_data[output_field] = value
+        
+        # Try to load field map and add EPA data
+        try:
+            field_map = load_statbotics_field_map(year)
+            for output_field, statbotics_path in field_map.items():
+                value = get_nested_value(raw_data, statbotics_path)
+                slimmed_data[output_field] = value
+        except Exception as field_map_error:
+            print(f"⚠️ Could not load field map for {year}, EPA data will be missing: {field_map_error}")
+            # Add None for epa_total so frontend can display "N/A"
+            slimmed_data["epa_total"] = None
 
         return slimmed_data
 
     except Exception as e:
-        print(f"❌ Error fetching EPA for {team_key} in {year}: {e}")
-        return {}
+        print(f"❌ Error fetching team data for {team_key} in {year}: {e}")
+        # Return basic info even on error
+        return {
+            "team_number": team_key,
+            "team_name": f"Team {team_key}",
+            "epa_total": None
+        }

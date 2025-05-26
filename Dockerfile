@@ -5,7 +5,8 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Copy requirements first to leverage Docker caching
-COPY backend/requirements.txt .
+COPY backend/requirements.txt requirements.txt
+COPY backend/requirements-dev.txt requirements-dev.txt
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt

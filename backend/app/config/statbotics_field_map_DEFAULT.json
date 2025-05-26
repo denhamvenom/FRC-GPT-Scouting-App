@@ -1,0 +1,9 @@
+{
+  "epa_total": "epa.total_points.mean",
+  "epa_auto": "epa.auto_points.mean",
+  "epa_teleop": "epa.teleop_points.mean",
+  "epa_endgame": "epa.endgame_points.mean",
+  "auto_epa": "epa.auto_points.mean",
+  "teleop_epa": "epa.teleop_points.mean",
+  "endgame_epa": "epa.endgame_points.mean"
+}

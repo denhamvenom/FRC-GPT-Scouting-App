@@ -20,12 +20,14 @@ interface SheetConfigManagerProps {
   currentEventKey?: string;
   currentYear?: number;
   onConfigurationChange?: () => void;
+  onConfigurationConfirmed?: () => void;
 }
 
 const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
   currentEventKey,
   currentYear,
-  onConfigurationChange
+  onConfigurationChange,
+  onConfigurationConfirmed
 }) => {
   // State
   const [configurations, setConfigurations] = useState<SheetConfig[]>([]);
@@ -472,76 +474,98 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
             <p className="mt-2 text-gray-600">Loading configurations...</p>
           </div>
         ) : configurations.length > 0 ? (
-          <div className="bg-white rounded-lg border overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sheets</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {configurations.map((config) => (
-                  <tr key={config.id} className={`hover:bg-gray-50 ${config.is_active ? 'bg-blue-50' : ''}`}>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{config.name}</div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {config.spreadsheet_id}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm">
-                        <div className="mb-1">
-                          <span className="font-medium">Match:</span> {config.match_scouting_sheet}
+          <>
+            <div className="bg-white rounded-lg border overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sheets</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {configurations.map((config) => (
+                    <tr key={config.id} className={`hover:bg-gray-50 ${config.is_active ? 'bg-blue-50' : ''}`}>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{config.name}</div>
+                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                          {config.spreadsheet_id}
                         </div>
-                        {config.pit_scouting_sheet && (
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="text-sm">
                           <div className="mb-1">
-                            <span className="font-medium">Pit:</span> {config.pit_scouting_sheet}
+                            <span className="font-medium">Match:</span> {config.match_scouting_sheet}
                           </div>
+                          {config.pit_scouting_sheet && (
+                            <div className="mb-1">
+                              <span className="font-medium">Pit:</span> {config.pit_scouting_sheet}
+                            </div>
+                          )}
+                          {config.super_scouting_sheet && (
+                            <div>
+                              <span className="font-medium">Super:</span> {config.super_scouting_sheet}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {config.is_active ? (
+                          <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                            Inactive
+                          </span>
                         )}
-                        {config.super_scouting_sheet && (
-                          <div>
-                            <span className="font-medium">Super:</span> {config.super_scouting_sheet}
-                          </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-right">
+                        {!config.is_active && (
+                          <button
+                            onClick={() => handleSetActive(config.id)}
+                            className="text-blue-600 hover:text-blue-900 mr-4"
+                            disabled={loading}
+                          >
+                            Set Active
+                          </button>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      {config.is_active ? (
-                        <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                          Inactive
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-right">
-                      {!config.is_active && (
                         <button
-                          onClick={() => handleSetActive(config.id)}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
+                          onClick={() => handleDeleteConfig(config.id, config.name)}
+                          className="text-red-600 hover:text-red-900"
                           disabled={loading}
                         >
-                          Set Active
+                          Delete
                         </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteConfig(config.id, config.name)}
-                        className="text-red-600 hover:text-red-900"
-                        disabled={loading}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Use Active Configuration Button */}
+            {configurations.some(config => config.is_active) && onConfigurationConfirmed && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-green-800">Ready to Use Active Configuration</h4>
+                    <p className="text-sm text-green-700 mt-1">
+                      The active configuration is ready for use. Click to confirm and proceed with setup.
+                    </p>
+                  </div>
+                  <button
+                    onClick={onConfigurationConfirmed}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                  >
+                    Use This Configuration
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
             <p className="text-gray-500">No configurations found</p>
