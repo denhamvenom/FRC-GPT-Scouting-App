@@ -88,7 +88,7 @@ async def get_event(event_key: str):
 async def start_setup(
     year: int = Form(...),
     event_key: Optional[str] = Form(None),
-    manual_url: Optional[str] = Form(None),
+    # manual_url: Optional[str] = Form(None), # Removed
     manual_file: Optional[UploadFile] = File(None)
 ):
     """
@@ -97,13 +97,14 @@ async def start_setup(
     Args:
         year: The FRC season year (e.g., 2023, 2024, 2025)
         event_key: Optional TBA event key (e.g., "2024caln")
-        manual_url: Optional URL to the game manual PDF
+        # manual_url: Optional URL to the game manual PDF # Removed
         manual_file: Optional uploaded game manual file
 
     Returns:
         Setup process results
     """
-    result = await start_learning_setup(year, manual_url, manual_file, event_key)
+    # Updated call to start_learning_setup, removing manual_url
+    result = await start_learning_setup(year, manual_file, event_key)
 
     # Add the event_key to the result if provided
     if event_key:
