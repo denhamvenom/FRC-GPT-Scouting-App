@@ -124,6 +124,31 @@ class ArchivedEvent(Base):
         return "Unknown date"
 
 
+class GameManual(Base):
+    """Model for storing uploaded game manuals and their associated data"""
+    __tablename__ = "game_manuals"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    year = Column(Integer, index=True, nullable=False)
+    original_filename = Column(String, nullable=False)
+    sanitized_filename_base = Column(String, nullable=False, index=True) # For easier lookups
+
+    # Paths to stored files
+    stored_pdf_path = Column(String, nullable=True) # Should ideally not be nullable after initial processing
+    toc_json_path = Column(String, nullable=True)
+    parsed_sections_path = Column(String, nullable=True) # Populated after section parsing
+
+    # Timestamps
+    upload_timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    last_accessed_timestamp = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+
+    # Unique constraint (optional, but good for preventing exact duplicates if desired)
+    # __table_args__ = (UniqueConstraint('year', 'original_filename', name='_year_original_filename_uc'),)
+
+    def __repr__(self):
+        return f"<GameManual(id={self.id}, year={self.year}, name='{self.original_filename}')>"
+
+
 class SheetConfiguration(Base):
     """Model for storing Google Sheets configuration"""
     __tablename__ = "sheet_configurations"

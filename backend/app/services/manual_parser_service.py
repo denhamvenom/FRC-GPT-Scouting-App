@@ -81,6 +81,141 @@ async def extract_manual_text(manual_file: Optional[UploadFile] = None, manual_u
     
     return text
 
+async def extract_toc_from_pdf(pdf_path: str) -> List[Dict[str, Any]]:
+    """
+    Extracts the Table of Contents (ToC) from a PDF file.
+
+    Args:
+        pdf_path: The file path to the PDF.
+
+    Returns:
+        A list of dictionaries, where each dictionary represents a ToC item.
+        Example: [{'title': 'Section 1', 'level': 1, 'page': 5}]
+        Returns an empty list if no ToC is found or an error occurs.
+    """
+    toc_list = []
+    try:
+        doc = fitz.open(pdf_path)
+        toc = doc.get_toc()  # Returns a list like [[lvl, title, page, ...], ...]
+        doc.close()
+
+        if not toc:
+            print(f"No ToC found in PDF: {pdf_path}")
+            return []
+
+        for item in toc:
+            # Ensure item has at least 3 elements (level, title, page)
+            if len(item) >= 3:
+                level, title, page = item[0], item[1], item[2]
+                # Basic cleaning of title
+                title = title.strip()
+                # Ensure page is an integer
+                try:
+                    page = int(page)
+                except ValueError:
+                    print(f"Warning: Could not parse page number for ToC item: {item} in {pdf_path}. Skipping.")
+                    continue 
+                
+                toc_list.append({
+                    "level": level,
+                    "title": title,
+                    "page": page
+                })
+            else:
+                print(f"Warning: Malformed ToC item encountered: {item} in {pdf_path}")
+
+    except Exception as e:
+        print(f"Error extracting ToC from {pdf_path}: {e}")
+        return [] # Return empty list on error
+        
+    return toc_list
+
+async def extract_text_from_selected_sections(
+    pdf_path: str, 
+    selected_sections: List[Dict[str, Any]], 
+    toc_data: List[Dict[str, Any]]
+) -> str:
+    """
+    Extracts text from specified sections of a PDF, based on ToC selections.
+
+    Args:
+        pdf_path: Path to the PDF file.
+        selected_sections: List of selected ToC items (dicts with 'title', 'level', 'page').
+        toc_data: The full ToC of the document.
+
+    Returns:
+        A single string concatenating text from all selected sections.
+    """
+    full_extracted_text = ""
+    if not os.path.exists(pdf_path):
+        print(f"Error: PDF file not found at {pdf_path}")
+        return "Error: PDF file not found."
+
+    if not selected_sections:
+        return "Error: No sections selected for extraction."
+
+    try:
+        doc = fitz.open(pdf_path)
+    except Exception as e:
+        print(f"Error opening PDF {pdf_path}: {e}")
+        return f"Error opening PDF: {e}"
+
+    # Sort toc_data by page number to help find next sections correctly
+    # And also by level, so higher level items (like main chapters) come before sub-items if on same page
+    sorted_toc_data = sorted(toc_data, key=lambda x: (x['page'], x['level']))
+
+    for i, section in enumerate(selected_sections):
+        start_page_pdf_idx = section['page'] - 1  # ToC pages are 1-indexed, PyMuPDF is 0-indexed
+        section_text = f"\n\n--- Section: {section['title']} (Page {section['page']}) ---\n"
+        
+        # Determine end_page for the current section
+        end_page_pdf_idx = doc.page_count # Default to end of document
+
+        # Find the current section's index in the *full sorted* ToC
+        current_section_toc_index = -1
+        for idx, toc_item in enumerate(sorted_toc_data):
+            if toc_item['title'] == section['title'] and toc_item['page'] == section['page'] and toc_item['level'] == section['level']:
+                current_section_toc_index = idx
+                break
+        
+        if current_section_toc_index != -1:
+            # Look for the next ToC item that has a level less than or equal to the current section's level
+            # or any item if the current section is a very low-level one (e.g. level 3, next could be level 1, 2, or 3)
+            for next_toc_idx in range(current_section_toc_index + 1, len(sorted_toc_data)):
+                next_toc_item = sorted_toc_data[next_toc_idx]
+                # The end page is the page of the *next* section that is of the same or higher level (smaller level number)
+                # OR if the next section is simply on a later page, irrespective of level, if we want to capture everything up to it.
+                # For this logic: if next ToC item is same level or higher up (smaller level number), it marks the end.
+                if next_toc_item['level'] <= section['level']:
+                    end_page_pdf_idx = next_toc_item['page'] -1 # Text ends before the next section starts
+                    break
+                # If we encounter a section on a new page that is a sub-section of a *different* higher-level section,
+                # that also implies our current section has ended.
+                # This is implicitly handled if sorted_toc_data is used correctly to find the *next relevant* section.
+
+        # Ensure start_page is not after end_page (can happen if ToC is messy or it's the last section)
+        if start_page_pdf_idx >= end_page_pdf_idx and start_page_pdf_idx < doc.page_count:
+             # If it's a single page section or determined to be the last part
+            end_page_pdf_idx = start_page_pdf_idx + 1
+        elif start_page_pdf_idx >= doc.page_count:
+            print(f"Warning: Start page {section['page']} for section '{section['title']}' is out of document bounds ({doc.page_count} pages). Skipping.")
+            continue
+
+
+        # Extract text from the determined page range
+        for page_num in range(start_page_pdf_idx, min(end_page_pdf_idx, doc.page_count)):
+            try:
+                page_obj = doc.load_page(page_num)
+                section_text += page_obj.get_text("text") + "\n"
+            except Exception as e:
+                print(f"Error extracting text from page {page_num + 1} for section '{section['title']}': {e}")
+                section_text += f"\n[Error extracting page {page_num + 1}]\n"
+        
+        full_extracted_text += section_text
+
+    doc.close()
+    return full_extracted_text.strip()
+
 async def extract_game_relevant_sections(manual_text: str, year: int) -> Dict[str, Any]:
     """
     Extract only the game-relevant sections from the manual text.
