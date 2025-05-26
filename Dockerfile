@@ -9,6 +9,7 @@ COPY backend/requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
 # Copy the rest of the backend code
 COPY backend/ .
