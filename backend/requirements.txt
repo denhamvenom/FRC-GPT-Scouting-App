@@ -11,3 +11,4 @@ statbotics==3.0.0
 python-multipart==0.0.7
 sqlalchemy==2.0.29
 alembic==1.13.1
+numpy

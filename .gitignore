@@ -2,7 +2,11 @@
 secrets/
 .env
 .env.*
-*.json
+
+# Ignore sensitive JSON files, but allow essential config like package.json
+secrets/*.json
+app/data/*.json
+!frontend/package.json
 
 backend/logs
 
