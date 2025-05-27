@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 
 load_dotenv()
 
-GPT_MODEL = "gpt-4.1"
+GPT_MODEL = "gpt-4.1-nano"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 

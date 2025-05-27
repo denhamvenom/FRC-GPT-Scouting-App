@@ -544,7 +544,7 @@ Only include metrics from the provided list.
         try:
             # Call the OpenAI API
             response = client.chat.completions.create(
-                model="gpt-4.1",
+                model="gpt-4.1-nano",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.2,
                 response_format={"type": "json_object"},

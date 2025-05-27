@@ -54,8 +54,8 @@ class PicklistGeneratorService:
         # Load manual text for game context if available
         self.game_context = self._load_game_context()
         
-        # Initialize token encoder for GPT-4
-        self.token_encoder = tiktoken.encoding_for_model("gpt-4o")
+        # Initialize token encoder for the model being used
+        self.token_encoder = tiktoken.encoding_for_model("gpt-4-turbo")
     
     def _load_dataset(self) -> Dict[str, Any]:
         """Load the unified dataset from the JSON file."""
@@ -669,11 +669,11 @@ class PicklistGeneratorService:
                 while retry_count <= max_retries:
                     try:
                         response = client.chat.completions.create(
-                            model="gpt-4.1", 
+                            model="gpt-4.1-nano", 
                             messages=messages,
                             temperature=0.2,  # Lower temperature for more consistent results
-                            response_format={"type": "json_object"},
-                            max_tokens=4000  # Increased to prevent truncation with the compact schema
+                            max_tokens=4000,  # Prevent truncation by limiting output length
+                            response_format={"type": "json_object"}
                         )
                         # Success - break out of the retry loop
                         api_complete.set()
@@ -730,6 +730,19 @@ class PicklistGeneratorService:
             request_time = time.time() - request_start_time
             logger.info(f"Total response time: {request_time:.2f}s (avg: {request_time/len(team_numbers):.2f}s per team)")
             logger.info(f"Response metadata: finish_reason={response.choices[0].finish_reason}, model={response.model}")
+            
+            # Check if the response was truncated due to token limits
+            if response.choices[0].finish_reason == "length":
+                logger.error("Response was truncated due to token length limit")
+                progress_tracker.complete(
+                    success=False,
+                    message="AI response truncated due to length limits. Try batch processing.",
+                    final_data={}
+                )
+                return {
+                    "status": "error",
+                    "message": "The AI response was cut off due to length limits. Please try with fewer teams or use batch processing."
+                }
             
             # Update progress after API response
             progress_tracker.update(
@@ -1258,15 +1271,18 @@ class PicklistGeneratorService:
         
         return f"""You are GPT‑4.1, an FRC alliance strategist.
 Return one‑line minified JSON:
-{{"p":[[{team_reference},score,"≤15w"]…],"s":"ok"}}
+{{"p":[[{team_reference},score,"reason"]…],"s":"ok"}}
 
-RULES
+CRITICAL RULES
 • Rank all {team_count} teams/indices, each exactly once.  
 {index_rule}• Sort by weighted performance, then synergy with Team {{your_team_number}} for {pick_position} pick.  
-• Each reason ≤15 words and cites ≥1 metric value.  
-• If context exceeds limit, respond only {{"s":"overflow"}}.
+• Each reason must be ≤10 words, NO REPETITION, cite 1 metric (e.g. "Strong auto: 3.2 avg").
+• NO repetitive words or phrases. Be concise and specific.
+• If you cannot complete all teams due to length limits, respond only {{"s":"overflow"}}.
 
-{context_note}"""
+{context_note}
+
+EXAMPLE: {{"p":[[1,8.5,"Strong auto: 2.8 avg"],[2,7.9,"Consistent defense"],[3,6.2,"Reliable endgame"]],"s":"ok"}}"""
     
     def _create_user_prompt(
         self, 
@@ -1473,7 +1489,7 @@ Please produce output following RULES.
             while retry_count <= max_retries:
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4.1",
+                        model="gpt-4.1-nano",
                         messages=messages,
                         temperature=0.2,
                         response_format={"type": "json_object"},
@@ -1501,6 +1517,14 @@ Please produce output following RULES.
             request_time = time.time() - request_start_time
             logger.info(f"Total response time: {request_time:.2f}s (avg: {request_time/len(teams_data):.2f}s per team)")
             logger.info(f"Response metadata: finish_reason={response.choices[0].finish_reason}, model={response.model}")
+            
+            # Check if the response was truncated due to token limits
+            if response.choices[0].finish_reason == "length":
+                logger.error("Response was truncated due to token length limit")
+                return {
+                    "status": "error",
+                    "message": "The AI response was cut off due to length limits. Please try with fewer teams or use batch processing."
+                }
             
             # Parse the response
             response_content = response.choices[0].message.content
@@ -1938,14 +1962,17 @@ TASK
 Rank ALL {team_count} unique missing teams for the {pick_position} pick of Team {{your_team_number}}.
 Return MINIFIED JSON, ONE LINE, NO SPACES/NEWLINES using THIS exact shape:
 
-{{"p":[[team,score,"≤12 words"]...],"s":"ok"}}
+{{"p":[[team,score,"reason"]...],"s":"ok"}}
 
 ⚠️ CRITICAL RULES:
 1. Each team MUST appear EXACTLY ONCE. NO DUPLICATES ALLOWED!
 2. Include ALL {team_count} teams from MISSING_TEAM_NUMBERS.
-3. Each reason must be ≤ 12 words and cite ≥ 1 metric value.
-4. NO whitespaces, tabs, or line-breaks in the output.
-5. If you cannot fit ALL {team_count} teams, STOP and ONLY return: {{"s":"overflow"}}
+3. Each reason must be ≤8 words, NO REPETITION, cite 1 metric (e.g. "Strong climber: 15s").
+4. NO repetitive words or phrases. Be concise and specific.
+5. NO whitespaces, tabs, or line-breaks in the output.
+6. If you cannot fit ALL {team_count} teams, STOP and ONLY return: {{"s":"overflow"}}
+
+EXAMPLE: {{"p":[[1234,7.2,"Fast auto: 3.1 avg"],[5678,6.8,"Reliable endgame"]],"s":"ok"}}
 
 ULTRA-COMPACT STRUCTURE EXPLANATION:
 - "p" is the array of team entries (replaces "missing_team_rankings")
@@ -2267,7 +2294,7 @@ End of prompt.
             while retry_count <= max_retries:
                 try:
                     response = client.chat.completions.create(
-                        model="gpt-4.1",
+                        model="gpt-4.1-nano",
                         messages=messages,
                         temperature=0.2,  # Lower temperature for more consistent results
                         response_format={"type": "json_object"},

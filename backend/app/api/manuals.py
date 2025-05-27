@@ -36,6 +36,9 @@ class ProcessedSectionsResponse(BaseModel):
     saved_text_path: str
     extracted_text_length: int
     sample_text: str
+    manual_text_json_created: bool = False
+    manual_text_json_path: Optional[str] = None
+    game_name_detected: Optional[str] = None
 
 class GameManualBase(BaseModel):
     year: int
@@ -132,10 +135,71 @@ async def process_selected_sections(
     
     output_filename = f"{s_filename_base}_selected_sections.txt"
     saved_text_filepath = os.path.join(parsed_sections_dir, output_filename)
+    
+    # Initialize variables that will be used in the response
+    manual_text_filepath = ""
+    game_name = f"FRC {year} Game"
 
     try:
         with open(saved_text_filepath, "w", encoding="utf-8") as f:
             f.write(extracted_text)
+        
+        # --- Create manual_text_{year}.json for picklist generator ---
+        # This file is expected by the picklist generator service
+        app_data_dir = os.path.join(backend_dir, "app", "data")
+        os.makedirs(app_data_dir, exist_ok=True)
+        
+        manual_text_filename = f"manual_text_{year}.json"
+        manual_text_filepath = os.path.join(app_data_dir, manual_text_filename)
+        
+        # Extract game name from the extracted text (look for common patterns)
+        game_name = f"FRC {year} Game"  # Default fallback
+        
+        # Try to extract game name from the text
+        text_lines = extracted_text.split('\n')
+        for line in text_lines[:20]:  # Check first 20 lines
+            line_clean = line.strip()
+            if any(keyword in line_clean.upper() for keyword in ['GAME:', 'COMPETITION:', 'SEASON:', 'FIRST']):
+                # Look for game names in common formats
+                if 'REEFSCAPE' in line_clean.upper():
+                    game_name = "REEFSCAPE 2025"
+                    break
+                elif 'CHARGED UP' in line_clean.upper():
+                    game_name = "CHARGED UP 2023"
+                    break
+                elif 'RAPID REACT' in line_clean.upper():
+                    game_name = "RAPID REACT 2022"
+                    break
+                elif 'INFINITE RECHARGE' in line_clean.upper():
+                    game_name = "INFINITE RECHARGE 2020"
+                    break
+                elif 'DESTINATION: DEEP SPACE' in line_clean.upper():
+                    game_name = "DESTINATION: DEEP SPACE 2019"
+                    break
+                elif 'POWER UP' in line_clean.upper():
+                    game_name = "POWER UP 2018"
+                    break
+                elif 'STEAMWORKS' in line_clean.upper():
+                    game_name = "STEAMWORKS 2017"
+                    break
+                elif 'STRONGHOLD' in line_clean.upper():
+                    game_name = "STRONGHOLD 2016"
+                    break
+        
+        # Create the manual text JSON structure expected by picklist generator
+        manual_text_data = {
+            "game_name": game_name,
+            "relevant_sections": extracted_text,
+            "year": year,
+            "sections_processed": len(selected_sections_dicts),
+            "processing_timestamp": datetime.datetime.now().isoformat(),
+            "source_manual": original_manual_filename
+        }
+        
+        with open(manual_text_filepath, "w", encoding="utf-8") as f:
+            json.dump(manual_text_data, f, indent=2, ensure_ascii=False)
+        
+        print(f"✅ Created manual_text_{year}.json for picklist generator at: {manual_text_filepath}")
         
         # --- Update DB with parsed_sections_path ---
         db_manual.parsed_sections_path = saved_text_filepath
@@ -152,7 +216,10 @@ async def process_selected_sections(
         manual_db_id=db_manual.id,
         saved_text_path=saved_text_filepath,
         extracted_text_length=len(extracted_text),
-        sample_text=extracted_text[:500] + "..." if len(extracted_text) > 500 else extracted_text
+        sample_text=extracted_text[:500] + "..." if len(extracted_text) > 500 else extracted_text,
+        manual_text_json_created=True,
+        manual_text_json_path=manual_text_filepath,
+        game_name_detected=game_name
     )
 
 @router.get("", response_model=List[GameManualResponse])

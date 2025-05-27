@@ -1,30 +1,3 @@
---- Section: 4 Game Overview (Page 17) ---
- 
-Section 4 Game Overview 
-V0 
-17 of 164 
-4 Game Overview 
- 
-In REEFSCAPESM presented by Haas, two competing alliances are invited to score coral, harvest algae, and 
-attach to the barge before time runs out. Alliances earn additional rewards for meeting specific scoring 
-thresholds and for cooperating with their opponents.  
-During the first 15 seconds of the match, robots are autonomous. Without guidance from their drivers, robots 
-leave their starting zone, score coral on the reef, harvest algae from the reef, and collect and score additional 
-coral. 
-During the remaining 2 minutes and 15 seconds, drivers control their robots. Robots collect coral from human 
-players at their coral station and score them on the reef. To unlock all scoring locations on the reef, robots 
-must dislodge algae from the reef and either score it in the barge or deliver it to the human player through the 
-processor. 
-A human player can then deliver the algae to the barge. If at least two algae are scored in the processor by 
-each alliance, both alliances earn a Coopertition Point (which influences their rank in the tournament) and 
-lowers the requirements for a ranking point. 
-As time runs out, robots prepare to return to the surface with their algae by grabbing onto their cages and 
-parking under the barge. 
-The alliance that earns the most points wins the match! 
-
-
-
-
 --- Section: 5 ARENA (Page 19) ---
  
 Section 5 ARENA 
@@ -1301,6 +1274,46 @@ A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) suc
 placed lightly onto the REEF, and 
 B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
 Staged ALGAE will not contact CORAL placed on L4. 
+
+
+
+--- Section: 6.3.5 CAGES (Page 46) ---
+ 
+Section 6 Game Details 
+V13 
+46 of 164 
+Figure 6-3 Staging positions for ALGAE on a REEF 
+ 
+6.3.5 CAGES 
+Each team can choose the height of the CAGE closest to their driver station. By default, all CAGES are left in 
+the state from the last match. At the start of each day, all CAGES are set as deep CAGES. If a team would like 
+to alter the CAGE height they must alert the FIELD STAFF during reset. Each team informs FIELD STAFF of their 
+preference for their corresponding CAGE height.  
+Figure 6-4 CAGE positions corresponding to DRIVER STATIONS 
+ 
+6.4 MATCH Phases 
+The first phase of each MATCH is 15 seconds long and called the Autonomous Period (AUTO). During AUTO, 
+ROBOTS operate without any DRIVE TEAM control or input. ROBOTS attempt to leave their ROBOT STARTING 
+
+
+
+--- Section: 6.4 MATCH Phases (Page 46) ---
+ 
+Section 6 Game Details 
+V13 
+46 of 164 
+Figure 6-3 Staging positions for ALGAE on a REEF 
+ 
+6.3.5 CAGES 
+Each team can choose the height of the CAGE closest to their driver station. By default, all CAGES are left in 
+the state from the last match. At the start of each day, all CAGES are set as deep CAGES. If a team would like 
+to alter the CAGE height they must alert the FIELD STAFF during reset. Each team informs FIELD STAFF of their 
+preference for their corresponding CAGE height.  
+Figure 6-4 CAGE positions corresponding to DRIVER STATIONS 
+ 
+6.4 MATCH Phases 
+The first phase of each MATCH is 15 seconds long and called the Autonomous Period (AUTO). During AUTO, 
+ROBOTS operate without any DRIVE TEAM control or input. ROBOTS attempt to leave their ROBOT STARTING 
 
 
 
@@ -2785,6 +2798,56 @@ B. 1 at the end of the PROCESSOR exit ramp
 HUMAN PLAYERS making a good-faith effort to immediately move or enter additional ALGAE is an 
 exception to this rule.  
 Violation: MAJOR FOUL per additional ALGAE. 
+
+
+
+--- Section: 10.5.3 Qualification Ranking (Page 122) ---
+ 
+Section 10 Tournaments (T) 
+V6 
+122 of 164 
+3. minimize the number of times a team plays opposite any team 
+4. minimize the use of SURROGATES (teams randomly assigned by the FMS to play an extra Qualification 
+MATCH) 
+5. provide even distribution of MATCHES played on blue and red ALLIANCE 
+6. provide even distribution of MATCHES played in each DRIVER STATION number 
+For more information about the MATCH scheduling algorithm, please see Idle 
+Loop software’s website. 
+At events with fewer than 24 participating teams, the criteria are similar, however criterion 5 is changed to 
+minimize the number of times a team swaps between the blue and red ALLIANCE rather than an even 
+distribution. 
+All teams are assigned the same number of Qualification MATCHES, equal to the number of rounds, unless the 
+number of teams multiplied by number of MATCHES is not divisible by 6. In this case, the FMS randomly 
+selects some teams to play an extra MATCH. For the purpose of seeding calculations, those teams are 
+designated as SURROGATES for the extra MATCH. If a team plays a MATCH as a SURROGATE, it is indicated 
+on the MATCH schedule, it is always their third Qualification MATCH, and the outcome of the MATCH has no 
+effect on the team’s ranking. YELLOW and RED CARDS assigned to SURROGATES, however, do carry forward 
+to subsequent MATCHES. 
+10.5.3 Qualification Ranking 
+Ranking Points are units credited to a team based on their ALLIANCE’S performance in Qualification 
+MATCHES. Ranking Points are awarded to each eligible team at the completion of each Qualification MATCH 
+per Table 6-2. 
+Exceptions to Ranking Point assignment are as follows: 
+A. A SURROGATE receives 0 Ranking Points. 
+B. A DISQUALIFIED team, as determined by the Head REFEREE, receives 0 Ranking Points.  
+C. A “no-show” team is either DISQUALIFIED from or issued a RED CARD for that MATCH (see G208). 
+A team is declared a no-show if no member of the DRIVE TEAM is in the ALLIANCE AREA at the 
+start of the MATCH. 
+The total number of Ranking Points earned by a team throughout their Qualification MATCHES divided by the 
+number of MATCHES they’ve been scheduled to play (minus any SURROGATE MATCH), then rounded to 2 
+decimal places, is their Ranking Score (RS). 
+All teams participating in Qualification MATCHES are ranked by Ranking Score. If the number of teams in 
+attendance is ‘n’, they are ranked ‘1’ through ‘n’, with ‘1’ being the team with the highest Ranking Score and ‘n’ 
+being the team with the lowest Ranking Score. 
+Teams are ranked in order, using the sorting criteria defined in Table 10-1. 
+Table 10-1 Qualification MATCH ranking criteria 
+Order Sort Criteria 
+1st 
+Ranking Score 
+2nd 
+Average Coopertition Bonus points 
+3rd 
+Average ALLIANCE MATCH points, not including MINOR FOULS and MAJOR FOULS 
 
 
 

@@ -173,7 +173,6 @@ function FieldSelection() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
-  const [gameManualUrl, setGameManualUrl] = useState<string>('');
   const [year, setYear] = useState<number>(2025);
 
   useEffect(() => {
@@ -712,7 +711,6 @@ function FieldSelection() {
       // Save the schema
       const schema = {
         field_selections: selectedFields,
-        manual_url: gameManualUrl,
         year: year,
         critical_mappings: criticalFieldMappings,
         robot_groups: robotGroups
@@ -848,36 +846,6 @@ function FieldSelection() {
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Field Selection</h1>
       
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold mb-4">Game Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium mb-2">Year</label>
-            <select
-              value={year}
-              onChange={(e) => setYear(parseInt(e.target.value))}
-              className="w-full p-2 border rounded"
-            >
-              <option value={2025}>2025</option>
-              <option value={2024}>2024</option>
-              <option value={2023}>2023</option>
-            </select>
-          </div>
-          <div>
-            <label className="block font-medium mb-2">Game Manual URL (Optional)</label>
-            <input
-              type="url"
-              value={gameManualUrl}
-              onChange={(e) => setGameManualUrl(e.target.value)}
-              placeholder="https://example.com/game-manual.pdf"
-              className="w-full p-2 border rounded"
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              Used for picklist generation and strategy insights.
-            </p>
-          </div>
-        </div>
-      </div>
       
       {error && (
         <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
