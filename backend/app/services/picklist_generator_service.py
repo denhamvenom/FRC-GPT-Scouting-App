@@ -450,9 +450,7 @@ class PicklistGeneratorService:
             logger.info(f"DECISION POINT: use_batching={use_batching}, len(teams_data)={len(teams_data)}, batch_size={batch_size}")
             logger.info(f"Condition check: use_batching and len(teams_data) > batch_size = {use_batching and len(teams_data) > batch_size}")
             
-            # TEMPORARY: Force one-shot processing for testing
-            logger.info("FORCING ONE-SHOT PROCESSING for testing - ignoring use_batching parameter")
-            if False:  # Was: if use_batching and len(teams_data) > batch_size:
+            if use_batching and len(teams_data) > batch_size:
                 # Use batch processing for large team counts
                 logger.info(f"Using batch processing for {len(teams_data)} teams")
                 
@@ -671,7 +669,7 @@ class PicklistGeneratorService:
                         response = client.chat.completions.create(
                             model="gpt-4.1-nano", 
                             messages=messages,
-                            temperature=0.2,  # Lower temperature for more consistent results
+                            temperature=0.4,  # Lower temperature for more consistent results
                             max_tokens=4000,  # Prevent truncation by limiting output length
                             response_format={"type": "json_object"}
                         )
@@ -1282,7 +1280,7 @@ CRITICAL RULES
 
 {context_note}
 
-EXAMPLE: {{"p":[[1,8.5,"Strong auto: 2.8 avg"],[2,7.9,"Consistent defense"],[3,6.2,"Reliable endgame"]],"s":"ok"}}"""
+EXAMPLE: {{"p":[[1,8.5,"Good climber: 12s"],[2,7.9,"Efficient scorer: 15pts"],[3,6.2,"Reliable endgame"]],"s":"ok"}}"""
     
     def _create_user_prompt(
         self, 
@@ -1491,7 +1489,7 @@ Please produce output following RULES.
                     response = client.chat.completions.create(
                         model="gpt-4.1-nano",
                         messages=messages,
-                        temperature=0.2,
+                        temperature=0.4,
                         response_format={"type": "json_object"},
                         max_tokens=4000  # Increased to match main method
                     )
@@ -1980,10 +1978,10 @@ ULTRA-COMPACT STRUCTURE EXPLANATION:
 - "s" is status ("ok" or "overflow")
 
 TOKEN OPTIMIZATION EXAMPLES (use different teams):
-- [254, 98.3, "Strong autonomous EPA 25.7"]
-- [1678, 92.1, "Excellent climb consistency 96%"]
-- [3310, 87.5, "High teleop scoring average 15.2 points"]
-- [118, 85.2, "Great defense rating 8.9"]
+- [1678, 92.1, "Climb success: 96%"]
+- [3310, 87.5, "Teleop score avg: 15.2"]
+- [118, 85.2, "Defense rating: 8.9"]
+- [254, 98.3, "Auto EPA: 25.7"]
 
 VALIDATION REQUIREMENTS:
 1. Verify ALL {team_count} teams are included - CHECK CLOSELY!

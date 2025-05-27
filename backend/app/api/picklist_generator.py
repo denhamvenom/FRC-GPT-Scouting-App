@@ -213,7 +213,6 @@ async def generate_picklist(request: PicklistRequest):
         
         # TEMPORARY: Force batching off to test one-shot processing
         logger.info(f"API Layer - Original use_batching={request.use_batching}")
-        logger.info("FORCING use_batching to False for testing")
         
         result = await generator_service.generate_picklist(
             your_team_number=request.your_team_number,
@@ -225,7 +224,7 @@ async def generate_picklist(request: PicklistRequest):
             batch_size=request.batch_size,
             reference_teams_count=request.reference_teams_count,
             reference_selection=request.reference_selection,
-            use_batching=False  # FORCING TO FALSE FOR TESTING
+            use_batching=request.use_batching
         )
         
         if result.get("status") == "error":
