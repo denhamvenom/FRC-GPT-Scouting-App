@@ -167,6 +167,152 @@ async def test_reason_variety_analysis():
     assert analyze_reason_variety(picklist_mixed_repetition["picklist"]) is False, "Expected low variety for picklist with repetitive keyword among stop words."
 
 
+# Imports for the new test
+import json
+from unittest.mock import patch, MagicMock
+from app.services.picklist_generator_service import PicklistGeneratorService
+from app.services.progress_tracker import ProgressTracker
+
+
+@pytest.mark.asyncio
+@patch('app.services.picklist_generator_service.OpenAI') # Patch the OpenAI class where it's used
+async def test_iterative_fallback_for_missing_teams(MockOpenAI):
+    """
+    Tests the iterative fallback mechanism when initial GPT calls miss some teams.
+    """
+    # 1. Setup
+    mock_openai_instance = MockOpenAI.return_value # Get the mocked OpenAI instance
+    mock_chat_completions_create = AsyncMock() # This will be the mock for client.chat.completions.create
+    mock_openai_instance.chat.completions.create = mock_chat_completions_create
+
+    service_instance = PicklistGeneratorService(unified_dataset_path="dummy_path.json")
+
+    # Mock team data
+    mock_teams_data_prepared = [
+        {"team_number": 1, "nickname": "Team 1", "metrics": {"metric_a": 10}},
+        {"team_number": 2, "nickname": "Team 2", "metrics": {"metric_a": 12}},
+        {"team_number": 3, "nickname": "Team 3", "metrics": {"metric_a": 8}},
+        {"team_number": 4, "nickname": "Team 4", "metrics": {"metric_a": 15}},
+        {"team_number": 5, "nickname": "Team 5", "metrics": {"metric_a": 9}},
+    ]
+    your_team_number = 999 # Dummy team number for 'your_team_number'
+    pick_position = "first"
+    priorities = [{"id": "metric_a", "weight": 1.0}]
+    team_index_map = {i + 1: team["team_number"] for i, team in enumerate(mock_teams_data_prepared)}
+
+    # 2. Mocking
+    service_instance._prepare_team_data_for_gpt = MagicMock(return_value=mock_teams_data_prepared)
+    service_instance.token_encoder.encode = MagicMock(return_value=[1, 2, 3]) # Dummy encode
+
+    # Mock ProgressTracker
+    mock_tracker_instance = MagicMock()
+    mock_tracker_instance.update = MagicMock()
+    mock_tracker_instance.complete = MagicMock()
+    mock_tracker_instance.fail = MagicMock()
+    ProgressTracker.create_tracker = MagicMock(return_value=mock_tracker_instance)
+
+
+    # --- Configure side effects for client.chat.completions.create ---
+    # First call (main picklist generation) - returns teams 1 (index 1), 2 (index 2)
+    mock_initial_response = AsyncMock()
+    mock_initial_response.choices = [MagicMock()]
+    mock_initial_response.choices[0].message = MagicMock()
+    mock_initial_response.choices[0].message.content = json.dumps({
+        "p": [
+            [1, 9.0, "Reason Team 1"], # Index 1 (Team 1)
+            [2, 8.5, "Reason Team 2"]  # Index 2 (Team 2)
+        ], "s": "ok"
+    })
+    mock_initial_response.choices[0].finish_reason = "stop"
+    mock_initial_response.model = "gpt-4.1-nano"
+
+
+    # Second call (rank_missing_teams for teams 3, 4, 5) - returns team 3
+    # Note: rank_missing_teams is NOT explicitly called in the one-shot path if initial call "succeeds"
+    # The iterative fallback _rank_single_team_with_fallback will be called directly.
+    # So, we need to prepare responses for _rank_single_team_with_fallback for teams 3, 4, 5.
+    
+    # Fallback call for Team 3 (first missing from initial call)
+    mock_fallback_team3_response = AsyncMock()
+    mock_fallback_team3_response.choices = [MagicMock()]
+    mock_fallback_team3_response.choices[0].message = MagicMock()
+    mock_fallback_team3_response.choices[0].message.content = json.dumps({"score": 8.0, "reasoning": "Fallback Reason T3"})
+    mock_fallback_team3_response.choices[0].finish_reason = "stop"
+    mock_fallback_team3_response.model = "gpt-4.1-nano"
+
+    # Fallback call for Team 4 (second missing from initial call)
+    mock_fallback_team4_response = AsyncMock()
+    mock_fallback_team4_response.choices = [MagicMock()]
+    mock_fallback_team4_response.choices[0].message = MagicMock()
+    mock_fallback_team4_response.choices[0].message.content = json.dumps({"score": 7.5, "reasoning": "Fallback Reason T4"})
+    mock_fallback_team4_response.choices[0].finish_reason = "stop"
+    mock_fallback_team4_response.model = "gpt-4.1-nano"
+
+    # Fallback call for Team 5 (third missing from initial call)
+    mock_fallback_team5_response = AsyncMock()
+    mock_fallback_team5_response.choices = [MagicMock()]
+    mock_fallback_team5_response.choices[0].message = MagicMock()
+    mock_fallback_team5_response.choices[0].message.content = json.dumps({"score": 7.0, "reasoning": "Fallback Reason T5"})
+    mock_fallback_team5_response.choices[0].finish_reason = "stop"
+    mock_fallback_team5_response.model = "gpt-4.1-nano"
+
+    # Set the side_effect on the mock for client.chat.completions.create
+    # The order is: Initial, Fallback T3, Fallback T4, Fallback T5
+    mock_chat_completions_create.side_effect = [
+        mock_initial_response,
+        mock_fallback_team3_response,
+        mock_fallback_team4_response,
+        mock_fallback_team5_response
+    ]
+
+    # 3. Execution
+    result = await service_instance.generate_picklist(
+        your_team_number=your_team_number,
+        pick_position=pick_position,
+        priorities=priorities,
+        exclude_teams=None,
+        team_index_map=team_index_map, # Pass this directly as per one-shot logic
+        teams_data=mock_teams_data_prepared, # Pass this directly as per one-shot logic
+        use_batching=False # Force one-shot path
+    )
+
+    # 4. Assertions
+    assert result["status"] == "success"
+    picklist = result["picklist"]
+    
+    # Verify all 5 teams are present
+    assert len(picklist) == 5, f"Expected 5 teams, got {len(picklist)}. Picklist: {picklist}"
+    
+    ranked_team_numbers = {entry["team_number"] for entry in picklist}
+    assert ranked_team_numbers == {1, 2, 3, 4, 5}, "Not all teams were present in the final picklist."
+
+    # Check reasons and fallback status
+    team1_entry = next((t for t in picklist if t["team_number"] == 1), None)
+    team2_entry = next((t for t in picklist if t["team_number"] == 2), None)
+    team3_entry = next((t for t in picklist if t["team_number"] == 3), None)
+    team4_entry = next((t for t in picklist if t["team_number"] == 4), None)
+    team5_entry = next((t for t in picklist if t["team_number"] == 5), None)
+
+    assert team1_entry is not None and team1_entry["reasoning"] == "Reason Team 1"
+    assert team1_entry.get("is_fallback_ranked") is not True # Should not be fallback
+
+    assert team2_entry is not None and team2_entry["reasoning"] == "Reason Team 2"
+    assert team2_entry.get("is_fallback_ranked") is not True # Should not be fallback
+    
+    assert team3_entry is not None and team3_entry["reasoning"] == "Fallback Reason T3"
+    assert team3_entry.get("is_fallback_ranked") is True
+
+    assert team4_entry is not None and team4_entry["reasoning"] == "Fallback Reason T4"
+    assert team4_entry.get("is_fallback_ranked") is True
+
+    assert team5_entry is not None and team5_entry["reasoning"] == "Fallback Reason T5"
+    assert team5_entry.get("is_fallback_ranked") is True
+    
+    assert result["missing_team_numbers"] == [], f"Expected missing_team_numbers to be empty, got {result['missing_team_numbers']}"
+
+    # Verify number of calls to OpenAI
+    assert mock_chat_completions_create.call_count == 4 # 1 initial + 3 fallback calls
+
 # Keep existing test if needed, or remove/comment out if it's purely for manual execution.
 # For automated testing with pytest, the `if __name__ == "__main__":` block is not typical.
 # def test_build_picklist():

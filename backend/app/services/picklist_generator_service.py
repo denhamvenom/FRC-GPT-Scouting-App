@@ -851,7 +851,16 @@ class PicklistGeneratorService:
                         parsing_context.get("teams_data", teams_data),
                         parsing_context.get("team_index_map")
                     )
-                            
+                    
+                    # Log teams expected vs. teams received from initial GPT call
+                    expected_teams_set = set(parsing_context.get("team_index_map", {}).values())
+                    received_teams_set = {team.get("team_number") for team in picklist if team.get("team_number") is not None}
+                    missing_from_initial_call = expected_teams_set - received_teams_set
+                    if missing_from_initial_call:
+                        logger.warning(f"Initial GPT call missed {len(missing_from_initial_call)} teams: {sorted(list(missing_from_initial_call))}")
+                    else:
+                        logger.info("Initial GPT call successfully received all expected teams.")
+
                 # Handle regular compact format
                 elif "picklist" in response_data and isinstance(response_data["picklist"], list):
                     logger.info(f"Response contains {len(response_data['picklist'])} teams in regular format")
@@ -1160,51 +1169,91 @@ class PicklistGeneratorService:
             coverage_percent = (len(ranked_team_numbers) / len(available_team_numbers)) * 100 if available_team_numbers else 0
             logger.info(f"GPT coverage: {coverage_percent:.1f}% ({len(ranked_team_numbers)} of {len(available_team_numbers)} teams)")
             
-            # If we're missing teams, add them to the end
-            if missing_team_numbers:
-                logger.warning(f"Missing {len(missing_team_numbers)} teams from GPT response")
-                if len(missing_team_numbers) <= 10:  # Only log all missing teams if there aren't too many
-                    logger.warning(f"Missing team numbers: {sorted(list(missing_team_numbers))}")
-                else:
-                    logger.warning(f"First 10 missing team numbers: {sorted(list(missing_team_numbers))[:10]}...")
-                
-                # Get the lowest score from the existing picklist
-                min_score = min([team["score"] for team in deduplicated_picklist]) if deduplicated_picklist else 0.0
-                backup_score = max(0.1, min_score * 0.5)  # Use half of the minimum score or 0.1, whichever is higher
-                logger.info(f"Using backup score {backup_score} for missing teams")
-                
-                # Add missing teams to the end of the picklist
-                for team_number in missing_team_numbers:
-                    # Find the team data
-                    team_data = next((t for t in teams_data if t["team_number"] == team_number), None)
-                    if team_data:
-                        # Add to the end with a lower score
+            # If we're missing teams from the initial call, this was logged earlier.
+            # The 'missing_team_numbers' variable here refers to 'missing_from_initial_call'.
+            # The original fallback (adding with a generic message) is now replaced by the iterative fallback.
+
+            # Iterative Fallback for any teams still not in deduplicated_picklist
+            # 'teams_data' here refers to the full list of teams prepared for the one-shot call.
+            # 'team_index_map' contains the mapping of all teams intended for the one-shot call.
+            all_originally_expected_team_numbers = set(team_index_map.values())
+            current_ranked_team_numbers = {team['team_number'] for team in deduplicated_picklist}
+            still_missing_final = all_originally_expected_team_numbers - current_ranked_team_numbers
+
+            if still_missing_final:
+                logger.info(f"Starting iterative fallback for {len(still_missing_final)} finally missing teams: {sorted(list(still_missing_final))}")
+                progress_tracker.update(
+                    progress=90, # Assuming previous steps brought it to 80
+                    message=f"Attempting fallback ranking for {len(still_missing_final)} teams...",
+                    current_step="iterative_fallback",
+                    status="active"
+                )
+                fallback_success_count = 0
+                for team_num_to_fallback in still_missing_final:
+                    team_data_for_fallback = next((t for t in teams_data if t["team_number"] == team_num_to_fallback), None)
+                    
+                    if not team_data_for_fallback:
+                        logger.error(f"Could not find data for team {team_num_to_fallback} during iterative fallback.")
                         deduplicated_picklist.append({
-                            "team_number": team_number,
-                            "nickname": team_data.get("nickname", f"Team {team_number}"),
-                            "score": backup_score,
-                            "reasoning": "Added to complete the picklist - not enough data available for detailed analysis",
-                            "is_fallback": True  # Flag to indicate this team was added as a fallback
+                            "team_number": team_num_to_fallback,
+                            "nickname": f"Team {team_num_to_fallback}", # Generic nickname
+                            "score": 0.0, 
+                            "reasoning": "Data not found for fallback ranking.",
+                            "is_fallback_ranked": True, # Mark as processed by this system
+                            "ranking_failed": True # Indicate specific failure
                         })
+                        continue
+
+                    fallback_entry = await self._rank_single_team_with_fallback(
+                        team_to_rank=team_data_for_fallback,
+                        your_team_number=your_team_number, # from generate_picklist args
+                        pick_position=pick_position,       # from generate_picklist args
+                        priorities=priorities              # from generate_picklist args
+                    )
+                    if fallback_entry:
+                        deduplicated_picklist.append(fallback_entry)
+                        logger.info(f"Team {team_num_to_fallback} successfully ranked via iterative fallback.")
+                        fallback_success_count +=1
+                    else:
+                        logger.warning(f"Iterative fallback failed for team {team_num_to_fallback}. Adding placeholder.")
+                        deduplicated_picklist.append({
+                            "team_number": team_num_to_fallback,
+                            "nickname": team_data_for_fallback.get("nickname", f"Team {team_num_to_fallback}"),
+                            "score": 0.0, 
+                            "reasoning": "Could not be ranked by AI (fallback attempt).",
+                            "is_fallback_ranked": True,
+                            "ranking_failed": True
+                        })
+                logger.info(f"Iterative fallback process completed. Successfully ranked {fallback_success_count} of {len(still_missing_final)} teams.")
             
+            # Update the missing_team_numbers list for the final result based on who is *still* missing
+            # After the iterative fallback, this list should ideally be empty.
+            final_ranked_team_numbers = {team['team_number'] for team in deduplicated_picklist}
+            final_missing_list = list(all_originally_expected_team_numbers - final_ranked_team_numbers)
+            if final_missing_list:
+                 logger.error(f"CRITICAL: {len(final_missing_list)} teams are STILL MISSING from picklist after all fallbacks: {sorted(final_missing_list)}")
+            else:
+                 logger.info("All originally expected teams are now present in the picklist (either ranked or with a fallback placeholder).")
+
+
             # Assemble final result
             result = {
                 "status": "success",
                 "picklist": deduplicated_picklist,
                 "analysis": analysis,
-                "missing_team_numbers": list(missing_team_numbers) if missing_team_numbers else [],
+                "missing_team_numbers": final_missing_list, 
                 "performance": {
                     "total_time": request_time,
-                    "team_count": len(team_numbers),
+                    "team_count": len(team_numbers), 
                     "avg_time_per_team": request_time / len(team_numbers) if team_numbers else 0,
-                    "missing_teams": len(missing_team_numbers),
+                    "missing_teams": len(final_missing_list), 
                     "duplicate_teams": len(duplicates)
                 },
                 "batched": False,
                 "batch_processing": {
                     "total_batches": 1,
-                    "current_batch": 1,  # Indicates processing is complete
-                    "progress_percentage": 100,  # 100% complete
+                    "current_batch": 1,
+                    "progress_percentage": 100,
                     "processing_complete": True
                 }
             }
@@ -1276,6 +1325,7 @@ CRITICAL RULES
 {index_rule}• Sort by weighted performance, then synergy with Team {{your_team_number}} for {pick_position} pick.  
 • Each reason must be ≤10 words, NO REPETITION, cite 1 metric (e.g. "Strong auto: 3.2 avg").
 • NO repetitive words or phrases. Be concise and specific.
+• CRITICAL FAILURE if any team/index from TEAM_NUMBERS_TO_INCLUDE is missing in your output. ALL {team_count} teams/indices MUST be ranked.
 • If you cannot complete all teams due to length limits, respond only {{"s":"overflow"}}.
 
 {context_note}
@@ -1870,17 +1920,26 @@ Please produce output following RULES.
             logger.info(f"After deduplication: {len(deduplicated_rankings)} teams")
             
             # Check if we got all the missing teams
-            ranked_team_numbers = {team["team_number"] for team in deduplicated_rankings}
-            still_missing = set(missing_team_numbers) - ranked_team_numbers
+            expected_teams_for_this_call_set = set(missing_team_numbers) # 'missing_team_numbers' is the input to this function
+            received_teams_in_rankings_set = {team.get("team_number") for team in deduplicated_rankings if team.get("team_number") is not None}
+            still_missing_after_focused_call = expected_teams_for_this_call_set - received_teams_in_rankings_set
+            
+            if still_missing_after_focused_call:
+                logger.warning(f"rank_missing_teams call missed {len(still_missing_after_focused_call)} teams: {sorted(list(still_missing_after_focused_call))}")
+            elif expected_teams_for_this_call_set: # Only log success if there were teams to rank
+                logger.info("rank_missing_teams call successfully received all teams it was asked to rank.")
+
+            ranked_team_numbers = received_teams_in_rankings_set # Use the already computed set
+            still_missing = still_missing_after_focused_call # Use the already computed set for consistency
             
             # Log the completeness
-            coverage_percent = (len(ranked_team_numbers) / len(missing_team_numbers)) * 100 if missing_team_numbers else 0
-            logger.info(f"GPT coverage: {coverage_percent:.1f}% ({len(ranked_team_numbers)} of {len(missing_team_numbers)} teams)")
+            coverage_percent = (len(ranked_team_numbers) / len(expected_teams_for_this_call_set)) * 100 if expected_teams_for_this_call_set else 0
+            logger.info(f"GPT coverage for rank_missing_teams: {coverage_percent:.1f}% ({len(ranked_team_numbers)} of {len(expected_teams_for_this_call_set)} teams)")
             
             # For any teams that are still missing, add fallbacks
-            if still_missing:
-                logger.warning(f"Still missing {len(still_missing)} teams")
-                logger.warning(f"Missing team numbers: {sorted(list(still_missing))}")
+            if still_missing: # This uses the 'still_missing_after_focused_call'
+                logger.warning(f"Still missing {len(still_missing)} teams after focused call.")
+                # The original log for missing team numbers is now part of the new logging above.
                 
                 # Get avg score from the ranked teams we were able to get for better consistency
                 avg_score = sum([team["score"] for team in deduplicated_rankings]) / len(deduplicated_rankings) if deduplicated_rankings else 0.1
@@ -1969,6 +2028,7 @@ Return MINIFIED JSON, ONE LINE, NO SPACES/NEWLINES using THIS exact shape:
 4. NO repetitive words or phrases. Be concise and specific.
 5. NO whitespaces, tabs, or line-breaks in the output.
 6. If you cannot fit ALL {team_count} teams, STOP and ONLY return: {{"s":"overflow"}}
+7. CRITICAL FAILURE if any team from MISSING_TEAM_NUMBERS is missing. ALL {team_count} teams MUST be present.
 
 EXAMPLE: {{"p":[[1234,7.2,"Fast auto: 3.1 avg"],[5678,6.8,"Reliable endgame"]],"s":"ok"}}
 
@@ -2636,3 +2696,75 @@ Please produce output following RULES.
                 })
         
         return new_picklist
+
+    async def _rank_single_team_with_fallback(
+        self, 
+        team_to_rank: Dict[str, Any], 
+        your_team_number: int, 
+        pick_position: str, 
+        priorities: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Attempts to rank a single team using a focused GPT call with minimal prompts.
+        This is a fallback mechanism for teams missed by broader ranking attempts.
+        """
+        team_number_to_rank = team_to_rank.get("team_number")
+        logger.info(f"Attempting fallback ranking for team: {team_number_to_rank}")
+
+        try:
+            # Minimal system prompt
+            system_prompt = f"""You are an FRC alliance strategist.
+Return MINIFIED JSON: {{"score":float,"reasoning":"concise_reason_max_7_words"}}
+Evaluate Team {team_number_to_rank} for {pick_position} pick for Team {your_team_number}.
+Base the score (0-100) and reasoning on its data and priorities.
+Reasoning must be very concise (max 7 words)."""
+
+            # User prompt with specific team data and context
+            your_team_profile = next((t for t in self._prepare_team_data_for_gpt() if t["team_number"] == your_team_number), {})
+            
+            user_prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_profile)}
+PRIORITY_METRICS = {json.dumps(priorities)}
+TEAM_DATA_TO_RANK = {json.dumps(team_to_rank)}
+
+Provide score (0-100 scale, higher is better) and reasoning (max 7 words, concise)."""
+
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+
+            # API Call
+            response = await client.chat.completions.create(
+                model="gpt-4.1-nano",
+                messages=messages,
+                temperature=0.2,
+                max_tokens=150, # Sufficient for score and short reason
+                response_format={"type": "json_object"}
+            )
+
+            response_content = response.choices[0].message.content
+            logger.debug(f"Fallback response for team {team_number_to_rank}: {response_content}")
+            
+            parsed_response = json.loads(response_content)
+            
+            score = parsed_response.get("score")
+            reasoning = parsed_response.get("reasoning")
+
+            if score is None or reasoning is None:
+                logger.error(f"Fallback for team {team_number_to_rank} missing score or reasoning. Response: {response_content}")
+                return None
+
+            return {
+                "team_number": team_number_to_rank,
+                "nickname": team_to_rank.get("nickname", f"Team {team_number_to_rank}"),
+                "score": float(score),
+                "reasoning": str(reasoning),
+                "is_fallback_ranked": True 
+            }
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Fallback JSON parsing error for team {team_number_to_rank}: {e}. Response: {response_content}")
+            return None
+        except Exception as e:
+            logger.error(f"Fallback API call error for team {team_number_to_rank}: {e}")
+            return None
