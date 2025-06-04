@@ -51,3 +51,15 @@ python test_picklist_compact.py
 - Reduces chances of truncated responses
 - Improves error handling and recovery
 - Maintains backward compatibility with existing frontend code
+
+## Batch Re-ranking
+
+When batching is enabled, the service now performs a final GPT call to re-rank
+the merged results. This ensures teams from different batches are compared
+directly. Set `final_rerank=False` in `generate_picklist` to disable this step.
+
+### Model Selection
+
+The OpenAI model can be configured via the `OPENAI_MODEL` environment variable.
+For large team counts (>40) the service automatically switches from
+`gpt-4.1-nano` to `gpt-4-turbo` to avoid context limitations.
