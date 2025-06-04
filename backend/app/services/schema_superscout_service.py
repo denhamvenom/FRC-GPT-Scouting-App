@@ -1,13 +1,14 @@
 # backend/app/services/schema_superscout_service.py
 
 import os
-from typing import List, Dict, Tuple, Any
+from typing import Any, Dict, List, Tuple
+
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
 load_dotenv()
 
-GPT_MODEL = "gpt-4.1-nano"
+GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
@@ -15,23 +16,19 @@ SUPER_TAGS = [
     # Critical Fields
     "team_number",
     "match_number",
-    
     # Positioning and Starting
     "starting_position",
     "alliance_color",
-    
     # Game Phases
     "auto_behavior",
     "auto_strategy",
     "teleop_strategy",
     "endgame_strategy",
-    
     # Action Types (How robots perform actions)
-    "pickup_type",         # HOW robot picks up game pieces (ground, human player, etc)
-    "scoring_method",      # HOW robot scores (high, low, etc)
-    "climbing_method",     # HOW robot climbs/parks
-    "scoring_position",    # WHERE on the field robot typically scores
-    
+    "pickup_type",  # HOW robot picks up game pieces (ground, human player, etc)
+    "scoring_method",  # HOW robot scores (high, low, etc)
+    "climbing_method",  # HOW robot climbs/parks
+    "scoring_position",  # WHERE on the field robot typically scores
     # Performance Metrics
     "auto_contact",
     "defense_level",
@@ -41,27 +38,29 @@ SUPER_TAGS = [
     "red_card",
     "driver_skill",
     "field_awareness",
-    
     # Issues and Notes
     "strategy_notes",
     "robot_connection_issue",
     "no_show",
     "mechanism_failure",
-    "general_comments"
+    "general_comments",
 ]
 
-async def map_superscout_headers(headers: List[str], sample_data: List[List[str]] = None) -> Tuple[Dict[str, str], Dict[str, List[str]], Dict[str, Any]]:
+
+async def map_superscout_headers(
+    headers: List[str], sample_data: List[List[str]] = None
+) -> Tuple[Dict[str, str], Dict[str, List[str]], Dict[str, Any]]:
     """
     Return:
     - Header → Tag mapping
     - Robot Groups → List of headers for each robot
     - Data insights → Information about data content and special patterns
-    
+
     Args:
         headers: List of column headers from the spreadsheet
         sample_data: Sample rows of data to provide context about the actual content
     """
-    
+
     # Format sample data for the prompt
     sample_data_str = ""
     if sample_data and len(sample_data) > 0:
@@ -133,7 +132,7 @@ Headers:
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt_mapping}],
         temperature=0.2,
-        timeout=15
+        timeout=15,
     )
 
     content_map = response_map.choices[0].message.content.strip()
@@ -155,7 +154,7 @@ Headers:
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt_offsets}],
         temperature=0.2,
-        timeout=15
+        timeout=15,
     )
 
     content_offsets = response_offsets.choices[0].message.content.strip()
@@ -171,7 +170,7 @@ Headers:
     except Exception as e:
         print("Offsets parse error:", e)
         offsets = {"error": "Failed to parse offset output."}
-    
+
     # Generate insights about the data content
     prompt_insights = f"""
 Analyze the headers and sample data to provide insights about what information is being collected and how it's structured.
@@ -207,9 +206,9 @@ Headers and sample data:
             model=GPT_MODEL,
             messages=[{"role": "user", "content": prompt_insights}],
             temperature=0.2,
-            timeout=15
+            timeout=15,
         )
-        
+
         content_insights = response_insights.choices[0].message.content.strip()
         if content_insights.startswith("```json"):
             content_insights = content_insights[7:]
@@ -217,7 +216,7 @@ Headers and sample data:
             content_insights = content_insights[3:]
         if content_insights.endswith("```"):
             content_insights = content_insights[:-3]
-            
+
         try:
             insights = eval(content_insights)
         except Exception as e:
@@ -228,7 +227,7 @@ Headers and sample data:
         insights = {
             "content_insights": [],
             "strategic_insights": "Could not analyze data content.",
-            "robot_comparison_fields": []
+            "robot_comparison_fields": [],
         }
 
     return mapping, offsets, insights

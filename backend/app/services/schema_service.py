@@ -1,17 +1,19 @@
 # File: backend/app/services/schema_service.py
 
-from typing import List, Dict
 import os
-from dotenv import load_dotenv
-from openai import AsyncOpenAI
-from fastapi import UploadFile
+from typing import Dict, List
+
 from app.services.global_cache import cache
+from dotenv import load_dotenv
+from fastapi import UploadFile
+from openai import AsyncOpenAI
 
 load_dotenv()
 
-GPT_MODEL = "gpt-4.1-nano"
+GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+
 
 async def extract_game_tags_from_manual(manual_text: str) -> List[str]:
     """
@@ -26,9 +28,11 @@ Return a JSON list of strings, e.g. ["team_number", "auto_coral_l1", ...].
 """
     response = await client.chat.completions.create(
         model=GPT_MODEL,
-        messages=[{"role": "user", "content": prompt + "\nManual Text:\n" + manual_text}],
+        messages=[
+            {"role": "user", "content": prompt + "\nManual Text:\n" + manual_text}
+        ],
         temperature=0.2,
-        timeout=30
+        timeout=30,
     )
     content = response.choices[0].message.content.strip()
     try:
@@ -37,7 +41,10 @@ Return a JSON list of strings, e.g. ["team_number", "auto_coral_l1", ...].
     except Exception:
         return []
 
-async def map_headers_to_tags(headers: List[str], game_tags: List[str]) -> Dict[str, str]:
+
+async def map_headers_to_tags(
+    headers: List[str], game_tags: List[str]
+) -> Dict[str, str]:
     """
     Map spreadsheet column headers to the provided list of standardized game tags.
     Uses GPT to align each header with the best match or 'ignore'.
@@ -65,7 +72,7 @@ Headers:
         model=GPT_MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2,
-        timeout=30
+        timeout=30,
     )
     content = response.choices[0].message.content.strip()
     for fence in ("```json", "```"):
@@ -75,6 +82,7 @@ Headers:
     except Exception:
         return {h: "error" for h in headers}
 
+
 async def extract_manual_text(manual_file: UploadFile) -> str:
     """
     Read uploaded manual file and extract text content.
@@ -83,8 +91,9 @@ async def extract_manual_text(manual_file: UploadFile) -> str:
     """
     content = await manual_file.read()
     text = content.decode("utf-8", errors="ignore")
-    cache['manual_text'] = text
+    cache["manual_text"] = text
     return text
+
 
 def extract_sheet_id(sheet_url: str) -> str:
     """
