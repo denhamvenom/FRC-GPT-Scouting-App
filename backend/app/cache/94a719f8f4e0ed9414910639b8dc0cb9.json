@@ -1,5 +1,5 @@
 {
-  "timestamp": 1748275318.586317,
+  "timestamp": 1749047990.408848,
   "data": [
     {
       "city": "\u0130stanbul",
@@ -3513,6 +3513,19 @@
       "year": 2025
     },
     {
+      "city": "North Andover",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-05-31",
+      "event_code": "macmp",
+      "event_type": 99,
+      "key": "2025macmp",
+      "name": "MA State Championship",
+      "start_date": "2025-05-31",
+      "state_prov": "MA",
+      "year": 2025
+    },
+    {
       "city": "North Kansas City",
       "country": "USA",
       "district": null,
@@ -3552,6 +3565,19 @@
       "year": 2025
     },
     {
+      "city": "Wolcott",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-06-14",
+      "event_code": "wiwi",
+      "event_type": 99,
+      "key": "2025wiwi",
+      "name": "WIWI",
+      "start_date": "2025-06-13",
+      "state_prov": "CT",
+      "year": 2025
+    },
+    {
       "city": "Sheboygan",
       "country": "USA",
       "district": null,
@@ -3578,16 +3604,16 @@
       "year": 2025
     },
     {
-      "city": "Taylor",
-      "country": "USA",
+      "city": "Kocaeli",
+      "country": "T\u00fcrkiye",
       "district": null,
-      "end_date": "2025-06-21",
-      "event_code": "mibb",
+      "end_date": "2025-06-22",
+      "event_code": "trdar",
       "event_type": 99,
-      "key": "2025mibb",
-      "name": "Big Bang!",
-      "start_date": "2025-06-19",
-      "state_prov": "MI",
+      "key": "2025trdar",
+      "name": "Dar\u0131ca Robocube Off-Season",
+      "start_date": "2025-06-20",
+      "state_prov": "Kocaeli",
       "year": 2025
     },
     {
@@ -3650,7 +3676,7 @@
       "event_code": "xxmel",
       "event_type": 99,
       "key": "2025xxmel",
-      "name": "Melbourne Robotics Tournament",
+      "name": "Melbourne Robotics Tournament (MRT 2025)",
       "start_date": "2025-07-11",
       "state_prov": "VIC",
       "year": 2025
@@ -3799,6 +3825,19 @@
       "year": 2025
     },
     {
+      "city": "El Segundo",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-12",
+      "event_code": "cass",
+      "event_type": 99,
+      "key": "2025cass",
+      "name": "SoCal Showdown ",
+      "start_date": "2025-10-10",
+      "state_prov": "CA",
+      "year": 2025
+    },
+    {
       "city": "Becker",
       "country": "USA",
       "district": null,
@@ -3864,6 +3903,19 @@
       "year": 2025
     },
     {
+      "city": "Glen Allen",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-25",
+      "event_code": "vagle2",
+      "event_type": 99,
+      "key": "2025vagle2",
+      "name": "Rumble #10",
+      "start_date": "2025-10-24",
+      "state_prov": "VA",
+      "year": 2025
+    },
+    {
       "city": "Brainerd",
       "country": "USA",
       "district": null,
@@ -3874,6 +3926,19 @@
       "name": "NMRC Open",
       "start_date": "2025-10-25",
       "state_prov": "MN",
+      "year": 2025
+    },
+    {
+      "city": "Manchester",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-25",
+      "event_code": "nhrr",
+      "event_type": 99,
+      "key": "2025nhrr",
+      "name": "RiverRage 28",
+      "start_date": "2025-10-25",
+      "state_prov": "NH",
       "year": 2025
     }
   ]

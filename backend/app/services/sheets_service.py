@@ -3,6 +3,8 @@
 from typing import Any, List, Dict, Optional
 import os
 import logging
+import base64
+import json
 from sqlalchemy.orm import Session
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -66,10 +68,32 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 @lru_cache(maxsize=1)
 def get_sheets_service():
     """Create and cache the Google Sheets service."""
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
-    )
+    SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+    part1 = os.getenv("B64_PART_1")
+    part2 = os.getenv("B64_PART_2")
+
+    if part1 and part2:
+        try:
+            joined = part1 + part2
+            json_bytes = base64.b64decode(joined)
+            service_account_info = json.loads(json_bytes)
+            credentials = service_account.Credentials.from_service_account_info(
+                service_account_info, scopes=SCOPES
+            )
+            logger.info("Loaded service account credentials from split base64 env variables.")
+        except Exception as e:
+            logger.exception("Failed to decode or parse split base64 credentials.")
+            raise
+    elif SERVICE_ACCOUNT_FILE:
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES
+        )
+        logger.info(f"Loaded service account credentials from file: {SERVICE_ACCOUNT_FILE}")
+    else:
+        raise RuntimeError("No valid Google service account credentials found.")
+
     return build("sheets", "v4", credentials=credentials)
+
 
 async def get_active_spreadsheet_id(db: Optional[Session] = None) -> str:
     """
