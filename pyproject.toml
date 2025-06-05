@@ -1,0 +1,7 @@
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+[tool.ruff.lint]
+extend-ignore = ["E402", "E712", "F401", "F823", "F841"]

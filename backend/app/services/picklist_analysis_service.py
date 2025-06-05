@@ -81,9 +81,7 @@ class PicklistAnalysisService:
         """Load the field selection mappings from config file."""
         try:
             # Try to load field selections based on year
-            field_selections_path = os.path.join(
-                DATA_DIR, f"field_selections_{self.year}.json"
-            )
+            field_selections_path = os.path.join(DATA_DIR, f"field_selections_{self.year}.json")
 
             if os.path.exists(field_selections_path):
                 with open(field_selections_path, "r", encoding="utf-8") as f:
@@ -112,9 +110,7 @@ class PicklistAnalysisService:
                     manual_data = json.load(f)
 
                 # Check if we have cached the processed manual text
-                manual_text_path = os.path.join(
-                    DATA_DIR, f"manual_text_{self.year}.json"
-                )
+                manual_text_path = os.path.join(DATA_DIR, f"manual_text_{self.year}.json")
                 if os.path.exists(manual_text_path):
                     with open(manual_text_path, "r", encoding="utf-8") as f:
                         manual_text_data = json.load(f)
@@ -247,11 +243,7 @@ class PicklistAnalysisService:
 
             # Combine all metrics in phase order
             return (
-                auto_metrics
-                + teleop_metrics
-                + endgame_metrics
-                + strategy_metrics
-                + other_metrics
+                auto_metrics + teleop_metrics + endgame_metrics + strategy_metrics + other_metrics
             )
         # Fallback to analyzing dataset structure if no field selections found
         if not self.teams_data:
@@ -267,9 +259,7 @@ class PicklistAnalysisService:
 
         # Get the first match scouting data
         first_match = (
-            first_team.get("scouting_data", [])[0]
-            if first_team.get("scouting_data")
-            else {}
+            first_team.get("scouting_data", [])[0] if first_team.get("scouting_data") else {}
         )
 
         # Identify game-specific metrics from field names
@@ -307,24 +297,16 @@ class PicklistAnalysisService:
             # Determine the game phase category
             if field.startswith("auto_"):
                 category = "auto"
-                auto_metrics.append(
-                    {"id": metric_id, "label": label, "category": category}
-                )
+                auto_metrics.append({"id": metric_id, "label": label, "category": category})
             elif field.startswith("teleop_") or field.startswith("tele_"):
                 category = "teleop"
-                teleop_metrics.append(
-                    {"id": metric_id, "label": label, "category": category}
-                )
+                teleop_metrics.append({"id": metric_id, "label": label, "category": category})
             elif field.startswith("endgame_") or "climb" in field or "park" in field:
                 category = "endgame"
-                endgame_metrics.append(
-                    {"id": metric_id, "label": label, "category": category}
-                )
+                endgame_metrics.append({"id": metric_id, "label": label, "category": category})
             else:
                 category = "other"
-                game_metrics.append(
-                    {"id": metric_id, "label": label, "category": category}
-                )
+                game_metrics.append({"id": metric_id, "label": label, "category": category})
 
         # Combine all metrics, placing them in phase order
         return auto_metrics + teleop_metrics + endgame_metrics + game_metrics
@@ -365,9 +347,7 @@ class PicklistAnalysisService:
                     for tba_match in tba_matches:
                         if tba_match.get("match_number") == match_number:
                             # Check if this alliance won
-                            alliance_result = tba_match.get("alliances", {}).get(
-                                alliance_color, {}
-                            )
+                            alliance_result = tba_match.get("alliances", {}).get(alliance_color, {})
                             if alliance_result:
                                 # TBA marks the winner with "winner" field
                                 won_match = alliance_result.get("winner", False)
@@ -384,9 +364,7 @@ class PicklistAnalysisService:
 
                         # If we know the match outcome, record the value-win pair
                         if won_match is not None:
-                            metric_win_pairs[field].append(
-                                (value, 1 if won_match else 0)
-                            )
+                            metric_win_pairs[field].append((value, 1 if won_match else 0))
 
             # Now include superscouting numeric data
             superscouting_data = team_data.get("superscouting_data", [])
@@ -405,9 +383,7 @@ class PicklistAnalysisService:
                     for tba_match in tba_matches:
                         if tba_match.get("match_number") == match_number:
                             # Check if this alliance won
-                            alliance_result = tba_match.get("alliances", {}).get(
-                                alliance_color, {}
-                            )
+                            alliance_result = tba_match.get("alliances", {}).get(alliance_color, {})
                             if alliance_result:
                                 # TBA marks the winner with "winner" field
                                 won_match = alliance_result.get("winner", False)
@@ -428,9 +404,7 @@ class PicklistAnalysisService:
 
                         # If we know the match outcome, record the value-win pair
                         if won_match is not None:
-                            metric_win_pairs[metric_id].append(
-                                (value, 1 if won_match else 0)
-                            )
+                            metric_win_pairs[metric_id].append((value, 1 if won_match else 0))
 
         # Calculate statistics for each metric
         stats = {}
@@ -446,7 +420,7 @@ class PicklistAnalysisService:
                 # Calculate correlation coefficient
                 try:
                     win_correlation = np.corrcoef(metric_vals, win_vals)[0, 1]
-                except:
+                except Exception:
                     win_correlation = 0  # Default to 0 if calculation fails
 
             stats[metric] = {
@@ -461,9 +435,7 @@ class PicklistAnalysisService:
         self.metric_cache["stats"] = stats
         return stats
 
-    def get_suggested_priorities(
-        self, num_suggestions: int = 10
-    ) -> List[Dict[str, Any]]:
+    def get_suggested_priorities(self, num_suggestions: int = 10) -> List[Dict[str, Any]]:
         """
         Generate suggested priorities based on statistical analysis.
 
@@ -503,9 +475,7 @@ class PicklistAnalysisService:
             # Normalize standard deviation to range for relative importance
             std_normalized = 0
             if metric_stats["mean"] != 0:
-                std_normalized = metric_stats["std"] / max(
-                    abs(metric_stats["mean"]), 0.001
-                )
+                std_normalized = metric_stats["std"] / max(abs(metric_stats["mean"]), 0.001)
 
             differentiation_score = min(std_normalized, 1.0)  # Cap at 1.0
 
@@ -540,9 +510,7 @@ class PicklistAnalysisService:
         """
         # Get all available metrics
         game_metrics = self.identify_game_specific_metrics()
-        superscout_metrics = (
-            self.identify_superscout_metrics()
-        )  # Add superscouting metrics
+        superscout_metrics = self.identify_superscout_metrics()  # Add superscouting metrics
         all_metrics = (
             self.universal_metrics + game_metrics + superscout_metrics
         )  # Include them in all metrics
@@ -573,9 +541,7 @@ class PicklistAnalysisService:
                     "average": round(stats.get("mean", 0), 2),
                     "min": round(stats.get("min", 0), 2),
                     "max": round(stats.get("max", 0), 2),
-                    "correlation_with_winning": round(
-                        stats.get("correlation_to_win", 0), 2
-                    ),
+                    "correlation_with_winning": round(stats.get("correlation_to_win", 0), 2),
                 }
 
             metric_info.append(description)
@@ -694,9 +660,7 @@ Only include metrics from the provided list.
 
         # First pass: Prioritize superscouting metrics with direct matches
         # These are more likely to contain mechanism types and strategic capabilities
-        superscout_metrics = [
-            m for m in all_metrics if "super" in m.get("category", "").lower()
-        ]
+        superscout_metrics = [m for m in all_metrics if "super" in m.get("category", "").lower()]
         for metric in superscout_metrics:
             metric_id = metric["id"]
             metric_label = metric["label"].lower()
@@ -710,7 +674,7 @@ Only include metrics from the provided list.
                         {
                             "id": metric_id,
                             "weight": weight,
-                            "reason": f"Directly mentioned superscouting metric in strategy",
+                            "reason": "Directly mentioned superscouting metric in strategy",
                         }
                     )
                     added_metric_ids.add(metric_id)
@@ -728,7 +692,7 @@ Only include metrics from the provided list.
                     {
                         "id": metric_id,
                         "weight": weight,
-                        "reason": f"Directly mentioned in strategy",
+                        "reason": "Directly mentioned in strategy",
                     }
                 )
                 added_metric_ids.add(metric_id)
@@ -753,14 +717,10 @@ Only include metrics from the provided list.
 
                 # Prioritize superscouting metrics in matching
                 superscouting_matches = [
-                    m
-                    for m in matching_metrics
-                    if "super" in m.get("category", "").lower()
+                    m for m in matching_metrics if "super" in m.get("category", "").lower()
                 ]
                 other_matches = [
-                    m
-                    for m in matching_metrics
-                    if "super" not in m.get("category", "").lower()
+                    m for m in matching_metrics if "super" not in m.get("category", "").lower()
                 ]
                 sorted_matches = superscouting_matches + other_matches
 
@@ -798,13 +758,9 @@ Only include metrics from the provided list.
                     for m in parsed_metrics
                 )
             )
-            interpretation = (
-                f"Looking for robots with strengths in {', '.join(categories)}."
-            )
+            interpretation = f"Looking for robots with strengths in {', '.join(categories)}."
         else:
-            interpretation = (
-                "Could not identify specific metrics from your description."
-            )
+            interpretation = "Could not identify specific metrics from your description."
 
         return {"interpretation": interpretation, "parsed_metrics": parsed_metrics}
 
@@ -882,9 +838,7 @@ Only include metrics from the provided list.
                         if len(values) > 1:
                             mean = sum(values) / len(values)
                             if mean != 0:
-                                std = (
-                                    sum((x - mean) ** 2 for x in values) / len(values)
-                                ) ** 0.5
+                                std = (sum((x - mean) ** 2 for x in values) / len(values)) ** 0.5
                                 # Coefficient of variation (lower is better)
                                 cv = std / abs(mean) if mean != 0 else 0
                                 # Convert to a 0-10 scale (inverse, since lower CV is better)
@@ -895,9 +849,7 @@ Only include metrics from the provided list.
                     # Average across all metrics
                     if consistency_score > 0:
                         num_metrics = len(consistency_metrics)
-                        reliability = (
-                            consistency_score / num_metrics if num_metrics > 0 else 0
-                        )
+                        reliability = consistency_score / num_metrics if num_metrics > 0 else 0
                         score += reliability * weight
                         used_metrics.append(
                             {
@@ -931,9 +883,7 @@ Only include metrics from the provided list.
                         defense_ratings = []
                         for entry in team_data["superscouting_data"]:
                             for field in defense_fields:
-                                if field in entry and isinstance(
-                                    entry[field], (int, float)
-                                ):
+                                if field in entry and isinstance(entry[field], (int, float)):
                                     defense_ratings.append(entry[field])
 
                         if defense_ratings:
@@ -966,9 +916,7 @@ Only include metrics from the provided list.
                         skill_ratings = []
                         for entry in team_data["superscouting_data"]:
                             for field in skill_fields:
-                                if field in entry and isinstance(
-                                    entry[field], (int, float)
-                                ):
+                                if field in entry and isinstance(entry[field], (int, float)):
                                     skill_ratings.append(entry[field])
 
                         if skill_ratings:
