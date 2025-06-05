@@ -13,11 +13,22 @@ sys.path.append(os.path.abspath("backend"))
 from dotenv import load_dotenv
 load_dotenv()
 
-# Test Google Sheets service
-from app.services.sheets_service import get_sheets_service
+missing_creds = not (
+    os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
+    or (os.getenv("B64_PART_1") and os.getenv("B64_PART_2"))
+)
 
-try:
-    sheets = get_sheets_service()
-    print("✅ Google Sheets API initialized successfully.")
-except Exception as e:
-    print("❌ Failed to initialize Google Sheets API:", e)
+if missing_creds:
+    print(
+        "⚠️  Google service account credentials not found. "
+        "Set GOOGLE_SERVICE_ACCOUNT_FILE or B64_PART_1 and B64_PART_2 in your .env"
+    )
+else:
+    # Test Google Sheets service only if credentials are available
+    from app.services.sheets_service import get_sheets_service
+
+    try:
+        sheets = get_sheets_service()
+        print("✅ Google Sheets API initialized successfully.")
+    except Exception as e:
+        print("❌ Failed to initialize Google Sheets API:", e)
