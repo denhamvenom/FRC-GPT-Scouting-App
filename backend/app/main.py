@@ -47,6 +47,7 @@ from app.api import alliance_selection  # Import alliance selection API
 from app.api import archive  # Import event archiving API
 from app.api import sheet_config  # Import sheet configuration API
 from app.api import manuals as manuals_router  # Import the new manuals router
+from app.api import team_comparison  # New team comparison API
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
@@ -95,6 +96,7 @@ app.include_router(unified_dataset.router, prefix="/api/unified")
 app.include_router(field_selection.router)  # Add the field selection router
 app.include_router(picklist_analysis.router, prefix="/api")
 app.include_router(picklist_generator.router)
+app.include_router(team_comparison.router)
 app.include_router(test_schema_superscout.router)  # Add the test endpoint
 app.include_router(test_enhanced_parser.router)  # Add the enhanced parser test
 app.include_router(progress.router, prefix="/api")  # Add the progress tracking API
