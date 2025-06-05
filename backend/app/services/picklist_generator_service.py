@@ -113,25 +113,19 @@ class PicklistGeneratorService:
         # Handle ultra-compact format {"p":[[team,score,"reason"]...],"s":"ok"}
         if "p" in response_data and isinstance(response_data["p"], list):
             for team_entry in response_data["p"]:
-                if (
-                    len(team_entry) >= 3
-                ):  # Ensure we have at least [team/index, score, reason]
+                if len(team_entry) >= 3:  # Ensure we have at least [team/index, score, reason]
                     first_value = int(team_entry[0])
 
                     # If we have an index map, convert index to team number
                     if team_index_map and first_value in team_index_map:
                         team_number = team_index_map[first_value]
-                        logger.debug(
-                            f"Mapped index {first_value} to team {team_number}"
-                        )
+                        logger.debug(f"Mapped index {first_value} to team {team_number}")
                     else:
                         team_number = first_value
 
                     # Skip if we've seen this team already
                     if team_number in seen_teams:
-                        logger.info(
-                            f"Skipping duplicate team {team_number} in response"
-                        )
+                        logger.info(f"Skipping duplicate team {team_number} in response")
                         continue
 
                     seen_teams.add(team_number)
@@ -186,9 +180,7 @@ class PicklistGeneratorService:
                 "metrics": {},
                 # Only include match count if we have scouting data
                 "match_count": (
-                    len(team_data.get("scouting_data", []))
-                    if team_data.get("scouting_data")
-                    else 0
+                    len(team_data.get("scouting_data", [])) if team_data.get("scouting_data") else 0
                 ),
             }
 
@@ -345,9 +337,7 @@ class PicklistGeneratorService:
             Similarity score (0.0 to 1.0)
         """
         # Find common metrics
-        common_metrics = set(team1_metrics.keys()).intersection(
-            set(team2_metrics.keys())
-        )
+        common_metrics = set(team1_metrics.keys()).intersection(set(team2_metrics.keys()))
 
         if not common_metrics:
             return 0.0
@@ -489,9 +479,7 @@ class PicklistGeneratorService:
 
         # Filter out excluded teams
         if exclude_teams:
-            teams_data = [
-                team for team in teams_data if team["team_number"] not in exclude_teams
-            ]
+            teams_data = [team for team in teams_data if team["team_number"] not in exclude_teams]
 
         try:
             # Start comprehensive logging
@@ -535,11 +523,8 @@ class PicklistGeneratorService:
                 f"Condition check: use_batching and len(teams_data) > batch_size = {use_batching and len(teams_data) > batch_size}"
             )
 
-            # TEMPORARY: Force one-shot processing for testing
-            logger.info(
-                "FORCING ONE-SHOT PROCESSING for testing - ignoring use_batching parameter"
-            )
-            if False:  # Was: if use_batching and len(teams_data) > batch_size:
+            # Decide between batch processing and one-shot generation
+            if use_batching and len(teams_data) > batch_size:
                 # Use batch processing for large team counts
                 logger.info(f"Using batch processing for {len(teams_data)} teams")
 
@@ -591,12 +576,9 @@ class PicklistGeneratorService:
                         current_batch = batch_index + 1
                         progress_percentage = int((current_batch / total_batches) * 100)
                         # Only update if there's an in-progress object (not a timestamp)
-                        if (
-                            cache_key in PicklistGeneratorService._picklist_cache
-                            and isinstance(
-                                PicklistGeneratorService._picklist_cache[cache_key],
-                                dict,
-                            )
+                        if cache_key in PicklistGeneratorService._picklist_cache and isinstance(
+                            PicklistGeneratorService._picklist_cache[cache_key],
+                            dict,
                         ):
                             PicklistGeneratorService._picklist_cache[cache_key][
                                 "batch_processing"
@@ -609,9 +591,7 @@ class PicklistGeneratorService:
 
                     # Check for errors in batch processing
                     if batch_result.get("status") == "error":
-                        logger.error(
-                            f"Error in batch {batch_index}: {batch_result.get('message')}"
-                        )
+                        logger.error(f"Error in batch {batch_index}: {batch_result.get('message')}")
                         return {
                             "status": "error",
                             "message": f"Error in batch {batch_index}: {batch_result.get('message')}",
@@ -637,9 +617,7 @@ class PicklistGeneratorService:
 
                 # Combine results from all batches
                 logger.info("\n----- Combining Results from All Batches -----")
-                picklist = self._combine_batch_results(
-                    batch_results, reference_teams_count
-                )
+                picklist = self._combine_batch_results(batch_results, reference_teams_count)
 
                 # Optionally re-rank the combined list using GPT for a final global ordering
                 if final_rerank:
@@ -654,9 +632,7 @@ class PicklistGeneratorService:
                 # Log completion for batch processing
                 total_time = time.time() - start_time
                 logger.info(f"Total batch processing time: {total_time:.2f}s")
-                logger.info(
-                    f"Average time per team: {(total_time / len(teams_data)):.2f}s"
-                )
+                logger.info(f"Average time per team: {(total_time / len(teams_data)):.2f}s")
                 logger.info(f"Final picklist length: {len(picklist)}")
 
                 # Create minimal analysis since we removed it from the schema
@@ -675,9 +651,7 @@ class PicklistGeneratorService:
                     "performance": {
                         "total_time": total_time,
                         "team_count": len(teams_data),
-                        "avg_time_per_team": (
-                            total_time / len(teams_data) if teams_data else 0
-                        ),
+                        "avg_time_per_team": (total_time / len(teams_data) if teams_data else 0),
                         "batch_count": len(team_batches),
                         "batch_size": batch_size,
                         "reference_teams_count": reference_teams_count,
@@ -686,9 +660,7 @@ class PicklistGeneratorService:
                     "batched": True,
                     "batch_processing": {
                         "total_batches": len(team_batches),
-                        "current_batch": len(
-                            team_batches
-                        ),  # Indicates processing is complete
+                        "current_batch": len(team_batches),  # Indicates processing is complete
                         "progress_percentage": 100,  # 100% complete
                         "processing_complete": True,
                     },
@@ -712,9 +684,7 @@ class PicklistGeneratorService:
                 logger.info(f"Estimated completion time: {estimated_time:.1f} seconds")
 
                 # Create prompts optimized for one-shot completion
-                system_prompt = self._create_system_prompt(
-                    pick_position, len(teams_data)
-                )
+                system_prompt = self._create_system_prompt(pick_position, len(teams_data))
 
                 # Create team index mapping
                 team_index_map = {}
@@ -742,16 +712,13 @@ class PicklistGeneratorService:
 
                 # Log prompts (truncated for readability but showing structure)
                 truncated_system = (
-                    system_prompt[:500] + "..."
-                    if len(system_prompt) > 500
-                    else system_prompt
+                    system_prompt[:500] + "..." if len(system_prompt) > 500 else system_prompt
                 )
                 logger.info(f"SYSTEM PROMPT (truncated):\n{truncated_system}")
 
                 # Log just the structure of the user prompt, not the full team data which would be too large
                 user_prompt_structure = (
-                    "\n".join(user_prompt.split("\n")[:10])
-                    + "\n...[Team data truncated]..."
+                    "\n".join(user_prompt.split("\n")[:10]) + "\n...[Team data truncated]..."
                 )
                 logger.info(f"USER PROMPT (structure):\n{user_prompt_structure}")
 
@@ -768,9 +735,7 @@ class PicklistGeneratorService:
                 }
 
                 # Make a single API call to rank all teams at once
-                logger.info(
-                    f"--- Requesting complete picklist for {len(team_numbers)} teams ---"
-                )
+                logger.info(f"--- Requesting complete picklist for {len(team_numbers)} teams ---")
                 request_start_time = time.time()
 
                 # Update progress now that we're about to call the API
@@ -820,9 +785,7 @@ class PicklistGeneratorService:
                         if is_rate_limit and retry_count < max_retries:
                             # Calculate exponential backoff delay
                             retry_count += 1
-                            delay = initial_delay * (
-                                2**retry_count
-                            )  # Exponential backoff
+                            delay = initial_delay * (2**retry_count)  # Exponential backoff
 
                             logger.warning(
                                 f"Rate limit hit. Retrying in {delay:.2f} seconds... (Attempt {retry_count}/{max_retries})"
@@ -900,9 +863,7 @@ class PicklistGeneratorService:
 
             # Log a sample of the response (first 200 chars)
             response_sample = (
-                response_content[:200] + "..."
-                if len(response_content) > 200
-                else response_content
+                response_content[:200] + "..." if len(response_content) > 200 else response_content
             )
             logger.info(f"Response sample: {response_sample}")
 
@@ -910,9 +871,7 @@ class PicklistGeneratorService:
             try:
                 # Log the full raw response (limited to 1000 chars) for debugging purposes
                 if len(response_content) > 1000:
-                    logger.info(
-                        f"Raw JSON response (first 1000 chars):\n{response_content[:1000]}"
-                    )
+                    logger.info(f"Raw JSON response (first 1000 chars):\n{response_content[:1000]}")
                 else:
                     logger.info(f"Raw JSON response:\n{response_content}")
 
@@ -941,29 +900,21 @@ class PicklistGeneratorService:
 
                     # Log first few teams for debugging
                     teams_sample = response_data["p"][:3]
-                    logger.info(
-                        f"First few teams (ultra-compact): {json.dumps(teams_sample)}"
-                    )
+                    logger.info(f"First few teams (ultra-compact): {json.dumps(teams_sample)}")
 
                     # Check for repeating patterns in teams
-                    team_nums = [
-                        int(entry[0]) for entry in response_data["p"] if len(entry) >= 1
-                    ]
+                    team_nums = [int(entry[0]) for entry in response_data["p"] if len(entry) >= 1]
 
                     # If we're using index mapping, those numbers are indices, not team numbers
                     if parsing_context.get("team_index_map"):
-                        logger.info(
-                            "Using index mapping - converting for duplicate detection"
-                        )
+                        logger.info("Using index mapping - converting for duplicate detection")
                         actual_team_nums = []
                         team_index_map = parsing_context["team_index_map"]
                         for idx in team_nums:
                             if idx in team_index_map:
                                 actual_team_nums.append(team_index_map[idx])
                             else:
-                                actual_team_nums.append(
-                                    idx
-                                )  # fallback if index not found
+                                actual_team_nums.append(idx)  # fallback if index not found
                         team_nums = actual_team_nums
 
                     team_counts = {}
@@ -971,9 +922,7 @@ class PicklistGeneratorService:
                         team_counts[team_num] = team_counts.get(team_num, 0) + 1
 
                     # Check if we have duplicates
-                    duplicates = {
-                        team: count for team, count in team_counts.items() if count > 1
-                    }
+                    duplicates = {team: count for team, count in team_counts.items() if count > 1}
                     if duplicates:
                         logger.warning(f"Response contains duplicates: {duplicates}")
                         logger.warning(f"First 20 team numbers: {team_nums[:20]}")
@@ -984,9 +933,7 @@ class PicklistGeneratorService:
                             for pattern_length in [4, 8, 12, 16]:
                                 if len(team_nums) >= pattern_length * 2:
                                     pattern1 = team_nums[:pattern_length]
-                                    pattern2 = team_nums[
-                                        pattern_length : pattern_length * 2
-                                    ]
+                                    pattern2 = team_nums[pattern_length : pattern_length * 2]
                                     if pattern1 == pattern2:
                                         logger.warning(
                                             f"Detected repeating pattern of length {pattern_length}"
@@ -998,9 +945,7 @@ class PicklistGeneratorService:
                                         logger.warning(
                                             f"Truncating response to first {pattern_length} teams"
                                         )
-                                        response_data["p"] = response_data["p"][
-                                            :pattern_length
-                                        ]
+                                        response_data["p"] = response_data["p"][:pattern_length]
                                         break
 
                     # Calculate duplication percentage
@@ -1010,9 +955,7 @@ class PicklistGeneratorService:
                         duplication_percentage = (
                             (total_entries - unique_teams) / total_entries
                         ) * 100
-                        logger.warning(
-                            f"Duplication percentage: {duplication_percentage:.1f}%"
-                        )
+                        logger.warning(f"Duplication percentage: {duplication_percentage:.1f}%")
 
                         # If duplication is extreme (over 80%), warn that model might be in a loop
                         if duplication_percentage > 80 and total_entries > 30:
@@ -1032,9 +975,7 @@ class PicklistGeneratorService:
                     )
 
                 # Handle regular compact format
-                elif "picklist" in response_data and isinstance(
-                    response_data["picklist"], list
-                ):
+                elif "picklist" in response_data and isinstance(response_data["picklist"], list):
                     logger.info(
                         f"Response contains {len(response_data['picklist'])} teams in regular format"
                     )
@@ -1055,11 +996,7 @@ class PicklistGeneratorService:
                             team_number = team_entry["team"]
                             # Get team nickname from dataset if available
                             team_data = next(
-                                (
-                                    t
-                                    for t in teams_data
-                                    if t["team_number"] == team_number
-                                ),
+                                (t for t in teams_data if t["team_number"] == team_number),
                                 None,
                             )
                             nickname = (
@@ -1073,9 +1010,7 @@ class PicklistGeneratorService:
                                     "team_number": team_number,
                                     "nickname": nickname,
                                     "score": team_entry.get("score", 0.0),
-                                    "reasoning": team_entry.get(
-                                        "reason", "No reasoning provided"
-                                    ),
+                                    "reasoning": team_entry.get("reason", "No reasoning provided"),
                                 }
                             )
                         else:
@@ -1095,9 +1030,7 @@ class PicklistGeneratorService:
             except json.JSONDecodeError as e:
                 # Log the error and the full response for debugging
                 logger.error(f"JSON parse error: {e}")
-                logger.error(
-                    f"Full response that couldn't be parsed: {response_content}"
-                )
+                logger.error(f"Full response that couldn't be parsed: {response_content}")
 
                 # Try to fix common JSON issues and salvage what we can
                 try:
@@ -1106,9 +1039,7 @@ class PicklistGeneratorService:
                     import re
 
                     # Simple fix for unescaped quotes
-                    fixed_content = re.sub(
-                        r'(?<!\\)"(?=(,|\]|\}|:))', r'\\"', response_content
-                    )
+                    fixed_content = re.sub(r'(?<!\\)"(?=(,|\]|\}|:))', r'\\"', response_content)
 
                     # Try parsing again
                     logger.info("Attempting to repair the JSON response...")
@@ -1132,18 +1063,12 @@ class PicklistGeneratorService:
 
                     # Extract any team data we can using regex
                     try:
-                        logger.info(
-                            "Attempting to extract team data from broken JSON..."
-                        )
+                        logger.info("Attempting to extract team data from broken JSON...")
 
                         # Try to extract from ultra-compact format first
                         # Format: [teamnum,score,"reason"] in a p array
-                        compact_pattern = (
-                            r'\[\s*(\d+)\s*,\s*([\d\.]+)\s*,\s*"([^"]*)"\s*\]'
-                        )
-                        compact_teams_extracted = re.findall(
-                            compact_pattern, response_content
-                        )
+                        compact_pattern = r'\[\s*(\d+)\s*,\s*([\d\.]+)\s*,\s*"([^"]*)"\s*\]'
+                        compact_teams_extracted = re.findall(compact_pattern, response_content)
 
                         if compact_teams_extracted:
                             logger.info(
@@ -1152,9 +1077,7 @@ class PicklistGeneratorService:
 
                             # Log the first few raw extractions for debugging
                             for i, team_raw in enumerate(compact_teams_extracted[:3]):
-                                logger.info(
-                                    f"Raw extraction {i+1} (ultra-compact): {team_raw}"
-                                )
+                                logger.info(f"Raw extraction {i+1} (ultra-compact): {team_raw}")
 
                             picklist = []
                             team_numbers_seen = (
@@ -1178,11 +1101,7 @@ class PicklistGeneratorService:
 
                                     # Get team nickname from dataset if available
                                     team_data = next(
-                                        (
-                                            t
-                                            for t in teams_data
-                                            if t["team_number"] == team_number
-                                        ),
+                                        (t for t in teams_data if t["team_number"] == team_number),
                                         None,
                                     )
                                     nickname = (
@@ -1200,9 +1119,7 @@ class PicklistGeneratorService:
                                         }
                                     )
                                 except Exception as team_error:
-                                    logger.error(
-                                        f"Error parsing team data: {team_error}"
-                                    )
+                                    logger.error(f"Error parsing team data: {team_error}")
                                     continue
 
                             analysis = {
@@ -1211,20 +1128,16 @@ class PicklistGeneratorService:
                                 "final_recommendations": "Analysis not available - recovered from parsing error",
                             }
 
-                            logger.info(
-                                f"Salvaged {len(picklist)} teams from broken response"
-                            )
+                            logger.info(f"Salvaged {len(picklist)} teams from broken response")
                         else:
                             # If not found, try the regular compact format
-                            team_pattern1 = r'"team":\s*(\d+),\s*"score":\s*([\d\.]+),\s*"reason":\s*"([^"]*)"'
+                            team_pattern1 = (
+                                r'"team":\s*(\d+),\s*"score":\s*([\d\.]+),\s*"reason":\s*"([^"]*)"'
+                            )
                             team_pattern2 = r'"team_number":\s*(\d+),\s*"nickname":\s*"([^"]*)",\s*"score":\s*([\d\.]+),\s*"reasoning":\s*"([^"]*)"'
 
-                            teams_extracted1 = re.findall(
-                                team_pattern1, response_content
-                            )
-                            teams_extracted2 = re.findall(
-                                team_pattern2, response_content
-                            )
+                            teams_extracted1 = re.findall(team_pattern1, response_content)
+                            teams_extracted2 = re.findall(team_pattern2, response_content)
 
                             if teams_extracted1:
                                 logger.info(
@@ -1233,14 +1146,10 @@ class PicklistGeneratorService:
 
                                 # Log the first few raw extractions for debugging
                                 for i, team_raw in enumerate(teams_extracted1[:3]):
-                                    logger.info(
-                                        f"Raw extraction {i+1} (compact): {team_raw}"
-                                    )
+                                    logger.info(f"Raw extraction {i+1} (compact): {team_raw}")
 
                                 picklist = []
-                                team_numbers_seen = (
-                                    set()
-                                )  # Track team numbers to detect duplicates
+                                team_numbers_seen = set()  # Track team numbers to detect duplicates
 
                                 for team_match in teams_extracted1:
                                     try:
@@ -1267,9 +1176,7 @@ class PicklistGeneratorService:
                                             None,
                                         )
                                         nickname = (
-                                            team_data.get(
-                                                "nickname", f"Team {team_number}"
-                                            )
+                                            team_data.get("nickname", f"Team {team_number}")
                                             if team_data
                                             else f"Team {team_number}"
                                         )
@@ -1283,9 +1190,7 @@ class PicklistGeneratorService:
                                             }
                                         )
                                     except Exception as team_error:
-                                        logger.error(
-                                            f"Error parsing team data: {team_error}"
-                                        )
+                                        logger.error(f"Error parsing team data: {team_error}")
                                         continue
 
                                 analysis = {
@@ -1294,9 +1199,7 @@ class PicklistGeneratorService:
                                     "final_recommendations": "Analysis not available - recovered from parsing error",
                                 }
 
-                                logger.info(
-                                    f"Salvaged {len(picklist)} teams from broken response"
-                                )
+                                logger.info(f"Salvaged {len(picklist)} teams from broken response")
                             elif teams_extracted2:
                                 logger.info(
                                     f"Extracted {len(teams_extracted2)} team entries from broken standard JSON"
@@ -1307,9 +1210,7 @@ class PicklistGeneratorService:
                                     logger.info(f"Raw extraction {i+1}: {team_raw}")
 
                                 picklist = []
-                                team_numbers_seen = (
-                                    set()
-                                )  # Track team numbers to detect duplicates
+                                team_numbers_seen = set()  # Track team numbers to detect duplicates
 
                                 for team_match in teams_extracted2:
                                     try:
@@ -1336,9 +1237,7 @@ class PicklistGeneratorService:
                                             }
                                         )
                                     except Exception as team_error:
-                                        logger.error(
-                                            f"Error parsing team data: {team_error}"
-                                        )
+                                        logger.error(f"Error parsing team data: {team_error}")
                                         continue
 
                                 analysis = {
@@ -1347,9 +1246,7 @@ class PicklistGeneratorService:
                                     "final_recommendations": "Analysis not available - recovered from parsing error",
                                 }
 
-                                logger.info(
-                                    f"Salvaged {len(picklist)} teams from broken response"
-                                )
+                                logger.info(f"Salvaged {len(picklist)} teams from broken response")
                             else:
                                 # If we couldn't extract any teams, re-raise the original error
                                 logger.error(
@@ -1401,12 +1298,8 @@ class PicklistGeneratorService:
             deduplicated_picklist = list(team_entries.values())
 
             if duplicates:
-                logger.info(
-                    f"Found {len(duplicates)} duplicate teams: {duplicates[:10]}..."
-                )
-                logger.info(
-                    f"Resolved by keeping the entry with higher score for each team"
-                )
+                logger.info(f"Found {len(duplicates)} duplicate teams: {duplicates[:10]}...")
+                logger.info(f"Resolved by keeping the entry with higher score for each team")
 
                 # Analyze the duplicates in more detail
                 duplicate_counts = {}
@@ -1430,24 +1323,18 @@ class PicklistGeneratorService:
                             for i, team in enumerate(picklist)
                             if team.get("team_number") == most_duplicated
                         ]
-                        logger.info(
-                            f"Team {most_duplicated} appears at positions: {positions}"
-                        )
+                        logger.info(f"Team {most_duplicated} appears at positions: {positions}")
 
             logger.info(f"After deduplication: {len(deduplicated_picklist)} teams")
 
             # Check if we're missing teams
             available_team_numbers = {team["team_number"] for team in teams_data}
-            ranked_team_numbers = {
-                team["team_number"] for team in deduplicated_picklist
-            }
+            ranked_team_numbers = {team["team_number"] for team in deduplicated_picklist}
             missing_team_numbers = available_team_numbers - ranked_team_numbers
 
             # Debug: Log the first 5 teams in the picklist before deduplication
             if picklist and len(picklist) > 0:
-                logger.info(
-                    f"First 5 raw teams from GPT response BEFORE deduplication:"
-                )
+                logger.info(f"First 5 raw teams from GPT response BEFORE deduplication:")
                 for i, team in enumerate(picklist[:5]):
                     logger.info(
                         f"  Raw Team {i+1}: {team.get('team_number')} - {team.get('nickname')}"
@@ -1455,9 +1342,7 @@ class PicklistGeneratorService:
 
                 # Also log team numbers in sequence to check for patterns in the duplicates
                 team_numbers_sequence = [t.get("team_number") for t in picklist[:20]]
-                logger.info(
-                    f"First 20 team numbers in response: {team_numbers_sequence}"
-                )
+                logger.info(f"First 20 team numbers in response: {team_numbers_sequence}")
 
             # Log the completeness
             coverage_percent = (
@@ -1471,15 +1356,11 @@ class PicklistGeneratorService:
 
             # If we're missing teams, add them to the end
             if missing_team_numbers:
-                logger.warning(
-                    f"Missing {len(missing_team_numbers)} teams from GPT response"
-                )
+                logger.warning(f"Missing {len(missing_team_numbers)} teams from GPT response")
                 if (
                     len(missing_team_numbers) <= 10
                 ):  # Only log all missing teams if there aren't too many
-                    logger.warning(
-                        f"Missing team numbers: {sorted(list(missing_team_numbers))}"
-                    )
+                    logger.warning(f"Missing team numbers: {sorted(list(missing_team_numbers))}")
                 else:
                     logger.warning(
                         f"First 10 missing team numbers: {sorted(list(missing_team_numbers))[:10]}..."
@@ -1507,9 +1388,7 @@ class PicklistGeneratorService:
                         deduplicated_picklist.append(
                             {
                                 "team_number": team_number,
-                                "nickname": team_data.get(
-                                    "nickname", f"Team {team_number}"
-                                ),
+                                "nickname": team_data.get("nickname", f"Team {team_number}"),
                                 "score": backup_score,
                                 "reasoning": "Added to complete the picklist - not enough data available for detailed analysis",
                                 "is_fallback": True,  # Flag to indicate this team was added as a fallback
@@ -1527,9 +1406,7 @@ class PicklistGeneratorService:
                 "performance": {
                     "total_time": request_time,
                     "team_count": len(team_numbers),
-                    "avg_time_per_team": (
-                        request_time / len(team_numbers) if team_numbers else 0
-                    ),
+                    "avg_time_per_team": (request_time / len(team_numbers) if team_numbers else 0),
                     "missing_teams": len(missing_team_numbers),
                     "duplicate_teams": len(duplicates),
                 },
@@ -1545,9 +1422,7 @@ class PicklistGeneratorService:
             # Log completion stats
             total_time = time.time() - start_time
             logger.info(f"====== PICKLIST GENERATION COMPLETE ======")
-            logger.info(
-                f"Total time: {total_time:.2f}s for {len(deduplicated_picklist)} teams"
-            )
+            logger.info(f"Total time: {total_time:.2f}s for {len(deduplicated_picklist)} teams")
             logger.info(
                 f"Average time per team: {(total_time / len(deduplicated_picklist) if deduplicated_picklist else 0):.2f}s"
             )
@@ -1608,9 +1483,7 @@ class PicklistGeneratorService:
         index_rule = ""
         team_reference = "team"
         if team_count > 0:  # This is a signal that we're using index mapping
-            index_rule = (
-                f"• Use indices 1-{team_count} from TEAM_INDEX_MAP exactly once.\n"
-            )
+            index_rule = f"• Use indices 1-{team_count} from TEAM_INDEX_MAP exactly once.\n"
             team_reference = "index"
 
         return f"""You are GPT‑4.1, an FRC alliance strategist.
@@ -1788,9 +1661,7 @@ Please produce output following RULES.
         # Prepare team data for GPT (only for missing teams)
         all_teams_data = self._prepare_team_data_for_gpt()
         teams_data = [
-            team
-            for team in all_teams_data
-            if team["team_number"] in missing_team_numbers
+            team for team in all_teams_data if team["team_number"] in missing_team_numbers
         ]
 
         if not teams_data:
@@ -1816,9 +1687,7 @@ Please produce output following RULES.
             logger.info(f"Estimated completion time: {estimated_time:.1f} seconds")
 
             # Create specialized system prompt for missing teams
-            system_prompt = self._create_missing_teams_system_prompt(
-                pick_position, len(teams_data)
-            )
+            system_prompt = self._create_missing_teams_system_prompt(pick_position, len(teams_data))
 
             # Create specialized user prompt for missing teams that includes already-ranked teams
             user_prompt = self._create_missing_teams_user_prompt(
@@ -1827,9 +1696,7 @@ Please produce output following RULES.
 
             # Log prompts (truncated for readability)
             truncated_system = (
-                system_prompt[:500] + "..."
-                if len(system_prompt) > 500
-                else system_prompt
+                system_prompt[:500] + "..." if len(system_prompt) > 500 else system_prompt
             )
             logger.info(f"MISSING TEAMS SYSTEM PROMPT (truncated):\n{truncated_system}")
 
@@ -1902,9 +1769,7 @@ Please produce output following RULES.
             # Parse the response
             response_content = response.choices[0].message.content
             response_sample = (
-                response_content[:200] + "..."
-                if len(response_content) > 200
-                else response_content
+                response_content[:200] + "..." if len(response_content) > 200 else response_content
             )
             logger.info(f"Response sample: {response_sample}")
 
@@ -1912,9 +1777,7 @@ Please produce output following RULES.
             try:
                 # Log the full raw response (limited to 1000 chars) for debugging purposes
                 if len(response_content) > 1000:
-                    logger.info(
-                        f"Raw JSON response (first 1000 chars):\n{response_content[:1000]}"
-                    )
+                    logger.info(f"Raw JSON response (first 1000 chars):\n{response_content[:1000]}")
                 else:
                     logger.info(f"Raw JSON response:\n{response_content}")
 
@@ -1943,22 +1806,16 @@ Please produce output following RULES.
 
                     # Log first few teams for debugging
                     teams_sample = response_data["p"][:3]
-                    logger.info(
-                        f"First few teams (ultra-compact): {json.dumps(teams_sample)}"
-                    )
+                    logger.info(f"First few teams (ultra-compact): {json.dumps(teams_sample)}")
 
                     # Check for repeating patterns in teams
-                    team_nums = [
-                        int(entry[0]) for entry in response_data["p"] if len(entry) >= 1
-                    ]
+                    team_nums = [int(entry[0]) for entry in response_data["p"] if len(entry) >= 1]
                     team_counts = {}
                     for team_num in team_nums:
                         team_counts[team_num] = team_counts.get(team_num, 0) + 1
 
                     # Check if we have duplicates
-                    duplicates = {
-                        team: count for team, count in team_counts.items() if count > 1
-                    }
+                    duplicates = {team: count for team, count in team_counts.items() if count > 1}
                     if duplicates:
                         logger.warning(f"Response contains duplicates: {duplicates}")
                         logger.warning(f"First 20 team numbers: {team_nums[:20]}")
@@ -1969,9 +1826,7 @@ Please produce output following RULES.
                             for pattern_length in [4, 8, 12, 16]:
                                 if len(team_nums) >= pattern_length * 2:
                                     pattern1 = team_nums[:pattern_length]
-                                    pattern2 = team_nums[
-                                        pattern_length : pattern_length * 2
-                                    ]
+                                    pattern2 = team_nums[pattern_length : pattern_length * 2]
                                     if pattern1 == pattern2:
                                         logger.warning(
                                             f"Detected repeating pattern of length {pattern_length}"
@@ -1983,9 +1838,7 @@ Please produce output following RULES.
                                         logger.warning(
                                             f"Truncating response to first {pattern_length} teams"
                                         )
-                                        response_data["p"] = response_data["p"][
-                                            :pattern_length
-                                        ]
+                                        response_data["p"] = response_data["p"][:pattern_length]
                                         break
 
                     # Calculate duplication percentage
@@ -1995,9 +1848,7 @@ Please produce output following RULES.
                         duplication_percentage = (
                             (total_entries - unique_teams) / total_entries
                         ) * 100
-                        logger.warning(
-                            f"Duplication percentage: {duplication_percentage:.1f}%"
-                        )
+                        logger.warning(f"Duplication percentage: {duplication_percentage:.1f}%")
 
                         # If duplication is extreme (over 80%), warn that model might be in a loop
                         if duplication_percentage > 80 and total_entries > 30:
@@ -2022,17 +1873,13 @@ Please produce output following RULES.
                             # If we have an index map, convert index to team number
                             if team_index_map and first_value in team_index_map:
                                 team_number = team_index_map[first_value]
-                                logger.debug(
-                                    f"Mapped index {first_value} to team {team_number}"
-                                )
+                                logger.debug(f"Mapped index {first_value} to team {team_number}")
                             else:
                                 team_number = first_value
 
                             # Skip if we've seen this team already
                             if team_number in seen_teams:
-                                logger.info(
-                                    f"Skipping duplicate team {team_number} in response"
-                                )
+                                logger.info(f"Skipping duplicate team {team_number} in response")
                                 continue
 
                             seen_teams.add(team_number)
@@ -2041,11 +1888,7 @@ Please produce output following RULES.
 
                             # Get team nickname from dataset if available
                             team_data = next(
-                                (
-                                    t
-                                    for t in teams_data
-                                    if t["team_number"] == team_number
-                                ),
+                                (t for t in teams_data if t["team_number"] == team_number),
                                 None,
                             )
                             nickname = (
@@ -2085,11 +1928,7 @@ Please produce output following RULES.
                             team_number = team_entry["team"]
                             # Get team nickname from dataset if available
                             team_data = next(
-                                (
-                                    t
-                                    for t in teams_data
-                                    if t["team_number"] == team_number
-                                ),
+                                (t for t in teams_data if t["team_number"] == team_number),
                                 None,
                             )
                             nickname = (
@@ -2103,9 +1942,7 @@ Please produce output following RULES.
                                     "team_number": team_number,
                                     "nickname": nickname,
                                     "score": team_entry.get("score", 0.0),
-                                    "reasoning": team_entry.get(
-                                        "reason", "No reasoning provided"
-                                    ),
+                                    "reasoning": team_entry.get("reason", "No reasoning provided"),
                                 }
                             )
                         else:
@@ -2125,9 +1962,7 @@ Please produce output following RULES.
                     # Try to extract from ultra-compact format first
                     # Format: [teamnum,score,"reason"] in a p array
                     compact_pattern = r'\[\s*(\d+)\s*,\s*([\d\.]+)\s*,\s*"([^"]*)"\s*\]'
-                    compact_teams_extracted = re.findall(
-                        compact_pattern, response_content
-                    )
+                    compact_teams_extracted = re.findall(compact_pattern, response_content)
 
                     if compact_teams_extracted:
                         logger.info(
@@ -2136,14 +1971,10 @@ Please produce output following RULES.
 
                         # Log the first few raw extractions for debugging
                         for i, team_raw in enumerate(compact_teams_extracted[:3]):
-                            logger.info(
-                                f"Raw extraction {i+1} (ultra-compact): {team_raw}"
-                            )
+                            logger.info(f"Raw extraction {i+1} (ultra-compact): {team_raw}")
 
                         # Also log team numbers in sequence to check for patterns in the duplicates
-                        team_numbers_sequence = [
-                            int(t[0]) for t in compact_teams_extracted[:20]
-                        ]
+                        team_numbers_sequence = [int(t[0]) for t in compact_teams_extracted[:20]]
                         logger.info(
                             f"First 20 team numbers in missing teams response: {team_numbers_sequence}"
                         )
@@ -2170,11 +2001,7 @@ Please produce output following RULES.
 
                                 # Get team nickname from dataset if available
                                 team_data = next(
-                                    (
-                                        t
-                                        for t in teams_data
-                                        if t["team_number"] == team_number
-                                    ),
+                                    (t for t in teams_data if t["team_number"] == team_number),
                                     None,
                                 )
                                 nickname = (
@@ -2195,12 +2022,12 @@ Please produce output following RULES.
                                 logger.error(f"Error parsing team data: {team_error}")
                                 continue
 
-                        logger.info(
-                            f"Salvaged {len(rankings)} teams from broken response"
-                        )
+                        logger.info(f"Salvaged {len(rankings)} teams from broken response")
                     else:
                         # Try older formats if ultra-compact format not found
-                        team_pattern1 = r'"team":\s*(\d+),\s*"score":\s*([\d\.]+),\s*"reason":\s*"([^"]*)"'
+                        team_pattern1 = (
+                            r'"team":\s*(\d+),\s*"score":\s*([\d\.]+),\s*"reason":\s*"([^"]*)"'
+                        )
                         team_pattern2 = r'"team_number":\s*(\d+),\s*"nickname":\s*"([^"]*)",\s*"score":\s*([\d\.]+),\s*"reasoning":\s*"([^"]*)"'
 
                         teams_extracted1 = re.findall(team_pattern1, response_content)
@@ -2213,14 +2040,10 @@ Please produce output following RULES.
 
                             # Log the first few raw extractions for debugging
                             for i, team_raw in enumerate(teams_extracted1[:3]):
-                                logger.info(
-                                    f"Raw extraction {i+1} (compact): {team_raw}"
-                                )
+                                logger.info(f"Raw extraction {i+1} (compact): {team_raw}")
 
                             rankings = []
-                            team_numbers_seen = (
-                                set()
-                            )  # Track team numbers to detect duplicates
+                            team_numbers_seen = set()  # Track team numbers to detect duplicates
 
                             for team_match in teams_extracted1:
                                 try:
@@ -2239,11 +2062,7 @@ Please produce output following RULES.
 
                                     # Get team nickname from dataset if available
                                     team_data = next(
-                                        (
-                                            t
-                                            for t in teams_data
-                                            if t["team_number"] == team_number
-                                        ),
+                                        (t for t in teams_data if t["team_number"] == team_number),
                                         None,
                                     )
                                     nickname = (
@@ -2261,14 +2080,10 @@ Please produce output following RULES.
                                         }
                                     )
                                 except Exception as team_error:
-                                    logger.error(
-                                        f"Error parsing team data: {team_error}"
-                                    )
+                                    logger.error(f"Error parsing team data: {team_error}")
                                     continue
 
-                            logger.info(
-                                f"Salvaged {len(rankings)} teams from broken response"
-                            )
+                            logger.info(f"Salvaged {len(rankings)} teams from broken response")
                         elif teams_extracted2:
                             logger.info(
                                 f"Extracted {len(teams_extracted2)} team entries from broken standard JSON"
@@ -2279,9 +2094,7 @@ Please produce output following RULES.
                                 logger.info(f"Raw extraction {i+1}: {team_raw}")
 
                             rankings = []
-                            team_numbers_seen = (
-                                set()
-                            )  # Track team numbers to detect duplicates
+                            team_numbers_seen = set()  # Track team numbers to detect duplicates
 
                             for team_match in teams_extracted2:
                                 try:
@@ -2308,19 +2121,13 @@ Please produce output following RULES.
                                         }
                                     )
                                 except Exception as team_error:
-                                    logger.error(
-                                        f"Error parsing team data: {team_error}"
-                                    )
+                                    logger.error(f"Error parsing team data: {team_error}")
                                     continue
 
-                            logger.info(
-                                f"Salvaged {len(rankings)} teams from broken response"
-                            )
+                            logger.info(f"Salvaged {len(rankings)} teams from broken response")
                         else:
                             # If we couldn't extract any teams, raise error
-                            logger.error(
-                                "Could not extract any team data from the broken response"
-                            )
+                            logger.error("Could not extract any team data from the broken response")
                             rankings = []
                 except Exception as extract_error:
                     logger.error(f"Failed to extract team data: {extract_error}")
@@ -2362,9 +2169,7 @@ Please produce output following RULES.
                 logger.info(
                     f"Found {len(duplicates)} duplicate teams in missing teams rankings: {duplicates[:10]}..."
                 )
-                logger.info(
-                    f"Resolved by keeping the entry with higher score for each team"
-                )
+                logger.info(f"Resolved by keeping the entry with higher score for each team")
 
                 # Analyze the duplicates in more detail
                 duplicate_counts = {}
@@ -2390,16 +2195,12 @@ Please produce output following RULES.
                             for i, team in enumerate(rankings)
                             if team.get("team_number") == most_duplicated
                         ]
-                        logger.info(
-                            f"Team {most_duplicated} appears at positions: {positions}"
-                        )
+                        logger.info(f"Team {most_duplicated} appears at positions: {positions}")
 
             logger.info(f"After deduplication: {len(deduplicated_rankings)} teams")
 
             # Check if we got all the missing teams
-            ranked_team_numbers = {
-                team["team_number"] for team in deduplicated_rankings
-            }
+            ranked_team_numbers = {team["team_number"] for team in deduplicated_rankings}
             still_missing = set(missing_team_numbers) - ranked_team_numbers
 
             # Log the completeness
@@ -2425,9 +2226,7 @@ Please produce output following RULES.
                     else 0.1
                 )
                 backup_score = max(0.1, avg_score * 0.7)  # Use 70% of avg score
-                logger.info(
-                    f"Using backup score {backup_score} for still missing teams"
-                )
+                logger.info(f"Using backup score {backup_score} for still missing teams")
 
                 # Add still missing teams to the rankings
                 for team_number in still_missing:
@@ -2438,9 +2237,7 @@ Please produce output following RULES.
                         deduplicated_rankings.append(
                             {
                                 "team_number": team_number,
-                                "nickname": team_data.get(
-                                    "nickname", f"Team {team_number}"
-                                ),
+                                "nickname": team_data.get("nickname", f"Team {team_number}"),
                                 "score": backup_score,
                                 "reasoning": "Added to complete the picklist - not enough data available for detailed analysis",
                                 "is_fallback": True,
@@ -2455,9 +2252,7 @@ Please produce output following RULES.
                     "total_time": request_time,
                     "team_count": len(missing_team_numbers),
                     "avg_time_per_team": (
-                        request_time / len(missing_team_numbers)
-                        if missing_team_numbers
-                        else 0
+                        request_time / len(missing_team_numbers) if missing_team_numbers else 0
                     ),
                     "missing_teams": len(still_missing),
                     "duplicate_teams": len(duplicates),
@@ -2467,9 +2262,7 @@ Please produce output following RULES.
             # Log completion stats
             total_time = time.time() - start_time
             logger.info(f"====== MISSING TEAMS RANKING COMPLETE ======")
-            logger.info(
-                f"Total time: {total_time:.2f}s for {len(deduplicated_rankings)} teams"
-            )
+            logger.info(f"Total time: {total_time:.2f}s for {len(deduplicated_rankings)} teams")
             logger.info(
                 f"Average time per team: {(total_time / len(deduplicated_rankings) if deduplicated_rankings else 0):.2f}s"
             )
@@ -2497,9 +2290,7 @@ Please produce output following RULES.
                 "message": f"Failed to rank missing teams: {str(e)}",
             }
 
-    def _create_missing_teams_system_prompt(
-        self, pick_position: str, team_count: int
-    ) -> str:
+    def _create_missing_teams_system_prompt(self, pick_position: str, team_count: int) -> str:
         """
         Create a specialized system prompt for ranking missing teams.
         Uses the ultra-compact schema to optimize token usage.
@@ -2654,9 +2445,7 @@ End of prompt.
         reference_teams_count = min(reference_teams_count, len(ranked_teams))
 
         # Sort teams by score to ensure consistent selection
-        sorted_teams = sorted(
-            ranked_teams, key=lambda x: x.get("score", 0), reverse=True
-        )
+        sorted_teams = sorted(ranked_teams, key=lambda x: x.get("score", 0), reverse=True)
 
         if reference_selection == "top_middle_bottom":
             # Always select top, middle, and bottom teams
@@ -2695,9 +2484,7 @@ End of prompt.
 
             # Get the teams at the selected indices
             reference_teams = [
-                sorted_teams[i]
-                for i in sorted(selected_indices)
-                if i < len(sorted_teams)
+                sorted_teams[i] for i in sorted(selected_indices) if i < len(sorted_teams)
             ]
 
         elif reference_selection == "percentile":
@@ -2765,9 +2552,7 @@ End of prompt.
                 return {
                     "status": (
                         "in_progress"
-                        if not cached_data["batch_processing"].get(
-                            "processing_complete"
-                        )
+                        if not cached_data["batch_processing"].get("processing_complete")
                         else "success"
                     ),
                     "batch_processing": cached_data["batch_processing"],
@@ -2843,9 +2628,7 @@ End of prompt.
                 )
 
             # Get list of team numbers in this batch
-            batch_team_numbers = sorted(
-                [team["team_number"] for team in combined_teams]
-            )
+            batch_team_numbers = sorted([team["team_number"] for team in combined_teams])
 
             logger.info(
                 f"Batch {batch_index}: Processing {len(combined_teams)} teams (including {len(reference_teams)} reference teams)"
@@ -2857,9 +2640,7 @@ End of prompt.
             )
 
             # Create prompt for this batch
-            system_prompt = self._create_system_prompt(
-                pick_position, len(combined_teams)
-            )
+            system_prompt = self._create_system_prompt(pick_position, len(combined_teams))
 
             # Create a modified user prompt with reference team context
             user_prompt = self._create_user_prompt_with_reference_teams(
@@ -2929,9 +2710,7 @@ End of prompt.
 
             # Log a sample of the response (first 200 chars)
             response_sample = (
-                response_content[:200] + "..."
-                if len(response_content) > 200
-                else response_content
+                response_content[:200] + "..." if len(response_content) > 200 else response_content
             )
             logger.info(f"Batch {batch_index}: Response sample: {response_sample}")
 
@@ -2939,10 +2718,7 @@ End of prompt.
             response_data = json.loads(response_content)
 
             # Check for overflow condition in ultra-compact format
-            if (
-                response_data.get("s") == "overflow"
-                or response_data.get("status") == "overflow"
-            ):
+            if response_data.get("s") == "overflow" or response_data.get("status") == "overflow":
                 logger.warning(
                     f"Batch {batch_index}: GPT returned overflow status - token limit reached"
                 )
@@ -2969,9 +2745,7 @@ End of prompt.
                 seen_teams = set()  # Track teams we've already added
 
                 for team_entry in response_data["p"]:
-                    if (
-                        len(team_entry) >= 3
-                    ):  # Ensure we have at least [team, score, reason]
+                    if len(team_entry) >= 3:  # Ensure we have at least [team, score, reason]
                         team_number = int(team_entry[0])
 
                         # Skip if we've seen this team already
@@ -2987,11 +2761,7 @@ End of prompt.
 
                         # Get team nickname from dataset if available
                         team_data = next(
-                            (
-                                t
-                                for t in combined_teams
-                                if t["team_number"] == team_number
-                            ),
+                            (t for t in combined_teams if t["team_number"] == team_number),
                             None,
                         )
                         nickname = (
@@ -3013,9 +2783,7 @@ End of prompt.
                             }
                         )
 
-            elif "picklist" in response_data and isinstance(
-                response_data["picklist"], list
-            ):
+            elif "picklist" in response_data and isinstance(response_data["picklist"], list):
                 logger.info(
                     f"Batch {batch_index}: Response contains {len(response_data['picklist'])} teams in regular format"
                 )
@@ -3031,11 +2799,7 @@ End of prompt.
                         team_number = team_entry["team"]
                         # Get team nickname from dataset if available
                         team_data = next(
-                            (
-                                t
-                                for t in combined_teams
-                                if t["team_number"] == team_number
-                            ),
+                            (t for t in combined_teams if t["team_number"] == team_number),
                             None,
                         )
                         nickname = (
@@ -3052,9 +2816,7 @@ End of prompt.
                                 "team_number": team_number,
                                 "nickname": nickname,
                                 "score": team_entry.get("score", 0.0),
-                                "reasoning": team_entry.get(
-                                    "reason", "No reasoning provided"
-                                ),
+                                "reasoning": team_entry.get("reason", "No reasoning provided"),
                                 "is_reference": is_reference,
                             }
                         )
@@ -3068,9 +2830,7 @@ End of prompt.
                 logger.warning(f"Batch {batch_index}: Response has no valid picklist")
 
             # Log batch completion
-            logger.info(
-                f"Batch {batch_index}: Successfully processed {len(picklist)} teams"
-            )
+            logger.info(f"Batch {batch_index}: Successfully processed {len(picklist)} teams")
 
             return {
                 "status": "success",
@@ -3080,9 +2840,7 @@ End of prompt.
             }
 
         except Exception as e:
-            logger.error(
-                f"Batch {batch_index}: Error processing batch: {str(e)}", exc_info=True
-            )
+            logger.error(f"Batch {batch_index}: Error processing batch: {str(e)}", exc_info=True)
             return {
                 "status": "error",
                 "batch_index": batch_index,
@@ -3200,8 +2958,7 @@ Please produce output following RULES.
             batch_reference_teams = [
                 (team["team_number"], team["score"])
                 for team in batch_picklist
-                if team.get("is_reference", False)
-                and team["team_number"] in reference_avg_scores
+                if team.get("is_reference", False) and team["team_number"] in reference_avg_scores
             ]
 
             # Skip normalization for the first batch
@@ -3222,9 +2979,7 @@ Please produce output following RULES.
 
             # Calculate the average normalization factor
             normalization_factor = (
-                normalization_sum / normalization_count
-                if normalization_count > 0
-                else 1.0
+                normalization_sum / normalization_count if normalization_count > 0 else 1.0
             )
 
             # Log the normalization details
@@ -3247,9 +3002,7 @@ Please produce output following RULES.
                 if normalization_factor != 1.0:
                     original_score = team["score"]
                     team["score"] = original_score * normalization_factor
-                    team["original_score"] = (
-                        original_score  # Keep track of the original score
-                    )
+                    team["original_score"] = original_score  # Keep track of the original score
 
                 # Remove the reference flag
                 if "is_reference" in team:
