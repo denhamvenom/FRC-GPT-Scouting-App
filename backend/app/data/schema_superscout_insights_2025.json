@@ -1,29 +1,3 @@
 {
-  "content_insights": [
-    {
-      "header": "Stratagies",
-      "tag": "robot_action_method",
-      "values": [
-        "Scores Primarily Coral",
-        "Versatile Scoring",
-        "Fast Movement",
-        "Can intake from floor"
-      ],
-      "insight": "The 'Stratagies' field provides insight into HOW robots perform their actions, such as their primary scoring locations ('Scores Primarily Coral'), their ability to score in multiple ways ('Versatile Scoring'), their movement speed ('Fast Movement'), and their intake method ('Can intake from floor'). These details reveal not just what robots do, but the methods and capabilities they use to achieve their objectives, which is critical for understanding robot strengths and strategic fit."
-    },
-    {
-      "header": "Comments",
-      "tag": "performance_feedback",
-      "values": [
-        "Scored well",
-        "They have a good robot and efficient intake but their driving is not the best and their accuracy needs improvement"
-      ],
-      "insight": "The 'Comments' field often contains qualitative feedback on HOW robots perform, such as the efficiency of their intake systems, driving skill, and scoring accuracy. This field can reveal operational strengths and weaknesses that go beyond raw scoring numbers, such as the effectiveness of specific mechanisms or the consistency of performance."
-    }
-  ],
-  "strategic_insights": "The most important strategic information in this dataset comes from the 'Stratagies' field, which details not only what robots do (e.g., score) but HOW they do it (e.g., where they score, how they intake game pieces, and their movement speed). This allows teams to identify robots with complementary capabilities or unique strengths, such as the ability to intake from the floor or excel in specific scoring zones. The 'Comments' field adds further depth by providing qualitative assessments of robot mechanisms and driver skill, which can influence alliance selection and match strategy.",
-  "robot_comparison_fields": [
-    "Stratagies",
-    "Comments"
-  ]
+  "error": "Failed to parse insights output."
 }

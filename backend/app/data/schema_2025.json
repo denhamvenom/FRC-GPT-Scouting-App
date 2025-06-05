@@ -26,7 +26,7 @@
   "Strategies": "strategy",
   "Comments": "strategy",
   "Was your robot disabled? If so, how? ": "other",
-  "Was Defended": "strategy",
+  "Was Defended": "endgame",
   "Defense Bot": "strategy",
   "Team": "other",
   "Stratagies": "strategy",
