@@ -9,6 +9,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 # Global cache
 SCHEMA_CACHE = {}
 
+
 def load_schemas(year: int):
     """
     Loads scouting and superscouting schemas for the given season year.
@@ -34,15 +35,19 @@ def load_schemas(year: int):
             if "mappings" in schema_data and "match" in schema_data["mappings"]:
                 # Use the nested structure
                 SCHEMA_CACHE["match_mapping"] = schema_data["mappings"]["match"]
-                print(f"✅ Loaded match mapping in nested format with {len(schema_data['mappings']['match'])} entries")
-            elif isinstance(schema_data, dict) and all(isinstance(k, str) for k in schema_data.keys()):
+                print(
+                    f"✅ Loaded match mapping in nested format with {len(schema_data['mappings']['match'])} entries"
+                )
+            elif isinstance(schema_data, dict) and all(
+                isinstance(k, str) for k in schema_data.keys()
+            ):
                 # Schema is a direct mapping from header -> field
                 SCHEMA_CACHE["match_mapping"] = schema_data
                 print(f"✅ Loaded match mapping in flat format with {len(schema_data)} entries")
             else:
                 # Unknown format, try to use as-is
                 SCHEMA_CACHE["match_mapping"] = schema_data
-                print(f"⚠️ Unknown match schema format, using as-is")
+                print("⚠️ Unknown match schema format, using as-is")
     except FileNotFoundError:
         raise Exception(f"❌ Match Scouting schema missing for {year}: {match_schema_path}")
 
@@ -62,11 +67,14 @@ def load_schemas(year: int):
 
     print(f"✅ Schemas loaded for {year}")
 
+
 def get_match_mapping():
     return SCHEMA_CACHE.get("match_mapping")
 
+
 def get_super_mapping():
     return SCHEMA_CACHE.get("super_mapping")
+
 
 def get_super_offsets():
     return SCHEMA_CACHE.get("super_offsets")

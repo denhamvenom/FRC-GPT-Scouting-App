@@ -12,6 +12,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 
 router = APIRouter(tags=["SuperSchema"])
 
+
 @router.get("/learn", tags=["SuperSchema"])
 async def learn_superscout_schema():
     try:
@@ -41,9 +42,9 @@ async def learn_superscout_schema():
             if config["super_scouting_sheet"]:
                 superscout_tab = config["super_scouting_sheet"]
 
-            print(f"\U0001F535 Using spreadsheet ID: {spreadsheet_id} and tab: {superscout_tab}")
+            print(f"\U0001f535 Using spreadsheet ID: {spreadsheet_id} and tab: {superscout_tab}")
     except Exception as e:
-        print(f"\U0001F534 Error getting active configuration: {str(e)}")
+        print(f"\U0001f534 Error getting active configuration: {str(e)}")
 
     # Get headers (first row)
     sheet_data = await get_sheet_values(f"{superscout_tab}!A1:Z1", spreadsheet_id, db)
@@ -52,11 +53,13 @@ async def learn_superscout_schema():
         return {"status": "error", "message": f"No headers found in {superscout_tab} tab"}
 
     # Get sample data (next few rows) to provide context about what the fields actually contain
-    sample_data = await get_sheet_values(f"{superscout_tab}!A2:Z6", spreadsheet_id, db)  # Get 5 rows of sample data
-    
+    sample_data = await get_sheet_values(
+        f"{superscout_tab}!A2:Z6", spreadsheet_id, db
+    )  # Get 5 rows of sample data
+
     # Pass both headers and sample data to the mapping function for better context
     mapping, offsets, insights = await map_superscout_headers(headers, sample_data)
-    
+
     # Save mapping and offsets
     try:
         # Save mapping
@@ -64,24 +67,24 @@ async def learn_superscout_schema():
         os.makedirs(os.path.dirname(mapping_path), exist_ok=True)
         with open(mapping_path, "w", encoding="utf-8") as f:
             json.dump(mapping, f, indent=2)
-        
+
         # Save offsets
         offsets_path = os.path.join(DATA_DIR, "schema_superscout_offsets_2025.json")
         with open(offsets_path, "w", encoding="utf-8") as f:
             json.dump(offsets, f, indent=2)
-            
+
         # Also save insights about data content
         insights_path = os.path.join(DATA_DIR, "schema_superscout_insights_2025.json")
         with open(insights_path, "w", encoding="utf-8") as f:
             json.dump(insights, f, indent=2)
     except Exception as e:
         print(f"Error saving schema files: {e}")
-    
+
     return {
         "status": "success",
         "headers": headers,
         "mapping": mapping,
         "offsets": offsets,
         "insights": insights,
-        "sample_analyzed": True if sample_data else False
+        "sample_analyzed": True if sample_data else False,
     }

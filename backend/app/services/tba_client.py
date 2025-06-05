@@ -13,19 +13,16 @@ load_dotenv(dotenv_path=ENV_PATH)
 TBA_API_KEY = os.getenv("TBA_API_KEY")
 TBA_BASE_URL = "https://www.thebluealliance.com/api/v3"
 
-HEADERS = {
-    "X-TBA-Auth-Key": TBA_API_KEY
-}
+HEADERS = {"X-TBA-Auth-Key": TBA_API_KEY}
 
 # Default to using the value from environment, but if not available, use a hardcoded key
 # This allows the application to work out of the box for testing
 if not TBA_API_KEY:
     TBA_API_KEY = "PpK8kpfWt94Nf15uoK8UbanbFQzZ97rwWwGqnqB9wILs9VBfcNjfRLvlkvYcGqoA"
-    HEADERS = {
-        "X-TBA-Auth-Key": TBA_API_KEY
-    }
+    HEADERS = {"X-TBA-Auth-Key": TBA_API_KEY}
 
-@cached(max_age_seconds=3600*24)  # Cache for 24 hours
+
+@cached(max_age_seconds=3600 * 24)  # Cache for 24 hours
 async def get_event_teams(event_key: str) -> List[Dict[str, Any]]:
     """
     Pulls simple team listings at an event.
@@ -36,7 +33,8 @@ async def get_event_teams(event_key: str) -> List[Dict[str, Any]]:
         response.raise_for_status()
         return response.json()
 
-@cached(max_age_seconds=3600*8)  # Cache for 8 hours
+
+@cached(max_age_seconds=3600 * 8)  # Cache for 8 hours
 async def get_event_matches(event_key: str) -> List[Dict[str, Any]]:
     """
     Pulls simple match listings at an event.
@@ -47,7 +45,8 @@ async def get_event_matches(event_key: str) -> List[Dict[str, Any]]:
         response.raise_for_status()
         return response.json()
 
-@cached(max_age_seconds=3600*4)  # Cache for 4 hours
+
+@cached(max_age_seconds=3600 * 4)  # Cache for 4 hours
 async def get_event_rankings(event_key: str) -> Optional[Dict[str, Any]]:
     """
     Pulls event rankings (qual RP, tie-breakers, etc.).
@@ -60,6 +59,7 @@ async def get_event_rankings(event_key: str) -> Optional[Dict[str, Any]]:
         response.raise_for_status()
         return response.json()
 
+
 async def get_match_detail(match_key: str) -> Dict[str, Any]:
     """
     Pulls detailed match breakdown for a specific match.
@@ -69,6 +69,7 @@ async def get_match_detail(match_key: str) -> Dict[str, Any]:
         response = await client.get(url, headers=HEADERS)
         response.raise_for_status()
         return response.json()
+
 
 async def get_team_status_at_event(team_key: str, event_key: str) -> Optional[Dict[str, Any]]:
     """
@@ -82,7 +83,8 @@ async def get_team_status_at_event(team_key: str, event_key: str) -> Optional[Di
         response.raise_for_status()
         return response.json()
 
-@cached(max_age_seconds=3600*24*7)  # Cache for 1 week (events don't change often)
+
+@cached(max_age_seconds=3600 * 24 * 7)  # Cache for 1 week (events don't change often)
 async def get_events_by_year(year: int) -> List[Dict[str, Any]]:
     """
     Pulls a list of all events for a specific FRC season year.
@@ -112,9 +114,10 @@ async def get_events_by_year(year: int) -> List[Dict[str, Any]]:
         events = response.json()
 
         # Sort events by start date then name
-        return sorted(events, key=lambda e: (e.get('start_date', ''), e.get('name', '')))
+        return sorted(events, key=lambda e: (e.get("start_date", ""), e.get("name", "")))
 
-@cached(max_age_seconds=3600*24*7)  # Cache for 1 week
+
+@cached(max_age_seconds=3600 * 24 * 7)  # Cache for 1 week
 async def get_event_details(event_key: str) -> Dict[str, Any]:
     """
     Gets detailed information about a specific event.

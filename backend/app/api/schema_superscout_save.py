@@ -9,6 +9,7 @@ router = APIRouter()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
+
 @router.post("/save", tags=["SuperSchema"])
 async def save_superscout_schema(request: Request):
     payload = await request.json()
@@ -42,7 +43,9 @@ async def save_superscout_schema(request: Request):
             print(f" - {header}")
 
     if extra_in_offsets:
-        print("⚠️ Warning: The following headers appear in robot offsets but are not mapped to tags:")
+        print(
+            "⚠️ Warning: The following headers appear in robot offsets but are not mapped to tags:"
+        )
         for header in extra_in_offsets:
             print(f" - {header}")
 

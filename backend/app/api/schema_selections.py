@@ -8,9 +8,11 @@ from typing import Dict, Optional, List, Any
 
 router = APIRouter()
 
+
 class CriticalMappings(BaseModel):
     team_number: List[str]
     match_number: List[str]
+
 
 class FieldSelections(BaseModel):
     field_selections: Dict[str, str]
@@ -18,6 +20,7 @@ class FieldSelections(BaseModel):
     year: int
     critical_mappings: Optional[CriticalMappings] = None
     robot_groups: Optional[Dict[str, List[str]]] = None
+
 
 @router.post("/save-selections")
 async def save_field_selections(selections: FieldSelections):
@@ -45,6 +48,7 @@ async def save_field_selections(selections: FieldSelections):
         # If manual URL is provided, save it to cache
         if selections.manual_url:
             from app.services.global_cache import cache
+
             cache["manual_url"] = selections.manual_url
             cache["manual_year"] = selections.year
 
@@ -72,10 +76,7 @@ async def save_field_selections(selections: FieldSelections):
                     source = "unknown"
 
                 # Store both category and source
-                category_mapping[header] = {
-                    "category": category,
-                    "source": source
-                }
+                category_mapping[header] = {"category": category, "source": source}
 
                 # Add robot group mapping for superscout fields
                 if source == "super" and selections.robot_groups:
@@ -96,7 +97,7 @@ async def save_field_selections(selections: FieldSelections):
         return {
             "status": "success",
             "message": "Field selections saved successfully",
-            "path": selections_path
+            "path": selections_path,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

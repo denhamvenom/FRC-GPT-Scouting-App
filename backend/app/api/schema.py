@@ -11,6 +11,7 @@ from app.database.db import get_db
 
 router = APIRouter()
 
+
 @router.get("/learn", tags=["Schema"])
 async def learn_schema(db: Session = Depends(get_db)):
     """
@@ -27,7 +28,10 @@ async def learn_schema(db: Session = Depends(get_db)):
         selections_path = os.path.join(data_dir, f"field_selections_{year}.json")
 
         if not os.path.exists(selections_path):
-            return {"status": "error", "message": "Field selections not found. Please configure fields first."}
+            return {
+                "status": "error",
+                "message": "Field selections not found. Please configure fields first.",
+            }
 
         with open(selections_path, "r", encoding="utf-8") as f:
             selections = json.load(f)
@@ -39,10 +43,9 @@ async def learn_schema(db: Session = Depends(get_db)):
             return {"status": "error", "message": "No field selections found in saved data."}
 
         # Get critical mappings
-        critical_mappings = selections.get("critical_mappings", {
-            "team_number": [],
-            "match_number": []
-        })
+        critical_mappings = selections.get(
+            "critical_mappings", {"team_number": [], "match_number": []}
+        )
 
         # Get robot groups for superscouting
         robot_groups = selections.get("robot_groups", {})
@@ -68,9 +71,17 @@ async def learn_schema(db: Session = Depends(get_db)):
         if not scouting_vars:
             # Use standard FRC variables as a fallback
             scouting_vars = [
-                "team_number", "match_number", "alliance_color", "auto_score",
-                "teleop_score", "endgame_score", "total_score", "comments",
-                "starting_position", "driver_skill", "defense_rating"
+                "team_number",
+                "match_number",
+                "alliance_color",
+                "auto_score",
+                "teleop_score",
+                "endgame_score",
+                "total_score",
+                "comments",
+                "starting_position",
+                "driver_skill",
+                "defense_rating",
             ]
 
         # Add our custom categories to the mapping options
@@ -80,14 +91,19 @@ async def learn_schema(db: Session = Depends(get_db)):
             "teleop": ["teleop", "driver"],
             "endgame": ["endgame", "climb", "park"],
             "strategy": ["strategy", "defense", "skill"],
-            "other": ["other"]
+            "other": ["other"],
         }.items():
             scouting_vars.extend([f"{category}_{i}" for i in range(1, 4)])
 
         # Add pit scouting specific tags
         pit_vars = scouting_vars + [
-            "pit_drivetrain", "pit_motors", "pit_weight", "pit_height",
-            "pit_notes", "pit_design", "pit_programming_language"
+            "pit_drivetrain",
+            "pit_motors",
+            "pit_weight",
+            "pit_height",
+            "pit_notes",
+            "pit_design",
+            "pit_programming_language",
         ]
 
         # Process each scouting tab if present
@@ -95,7 +111,11 @@ async def learn_schema(db: Session = Depends(get_db)):
         # 1. Match Scouting
         if match_headers:
             # Get relevant headers (that aren't ignored)
-            relevant_headers = [h for h in match_headers if h in field_selections and field_selections[h] != "ignore"]
+            relevant_headers = [
+                h
+                for h in match_headers
+                if h in field_selections and field_selections[h] != "ignore"
+            ]
             # Map headers to variables
             if relevant_headers:
                 match_mapping = await map_headers_to_tags(relevant_headers, scouting_vars)
@@ -104,7 +124,9 @@ async def learn_schema(db: Session = Depends(get_db)):
         # 2. Pit Scouting
         if pit_headers:
             # Get relevant headers (that aren't ignored)
-            relevant_headers = [h for h in pit_headers if h in field_selections and field_selections[h] != "ignore"]
+            relevant_headers = [
+                h for h in pit_headers if h in field_selections and field_selections[h] != "ignore"
+            ]
             # Map headers to variables
             if relevant_headers:
                 pit_mapping = await map_headers_to_tags(relevant_headers, pit_vars)
@@ -117,7 +139,9 @@ async def learn_schema(db: Session = Depends(get_db)):
 
             for group, headers in robot_groups.items():
                 # Get relevant headers (that aren't ignored)
-                relevant_headers = [h for h in headers if h in field_selections and field_selections[h] != "ignore"]
+                relevant_headers = [
+                    h for h in headers if h in field_selections and field_selections[h] != "ignore"
+                ]
                 # Map headers to variables
                 if relevant_headers:
                     group_mapping = await map_headers_to_tags(relevant_headers, scouting_vars)
@@ -129,22 +153,27 @@ async def learn_schema(db: Session = Depends(get_db)):
         # Store the combined schema
         schema_path = os.path.join(data_dir, f"schema_{year}.json")
         with open(schema_path, "w", encoding="utf-8") as f:
-            json.dump({
-                "mappings": mappings,
-                "critical_fields": critical_mappings,
-                "robot_groups": robot_groups,
-                "year": year
-            }, f, indent=2)
+            json.dump(
+                {
+                    "mappings": mappings,
+                    "critical_fields": critical_mappings,
+                    "robot_groups": robot_groups,
+                    "year": year,
+                },
+                f,
+                indent=2,
+            )
 
         return {
             "status": "success",
             "schema_path": schema_path,
             "mappings": mappings,
-            "critical_fields": critical_mappings
+            "critical_fields": critical_mappings,
         }
 
     except Exception as e:
         import traceback
+
         print(f"Error in learn_schema: {e}")
         print(traceback.format_exc())
         return {"status": "error", "message": str(e)}

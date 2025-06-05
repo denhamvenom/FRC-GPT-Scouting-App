@@ -173,12 +173,8 @@ async def extract_text_from_selected_sections(
     sorted_toc_data = sorted(toc_data, key=lambda x: (x["page"], x["level"]))
 
     for i, section in enumerate(selected_sections):
-        start_page_pdf_idx = (
-            section["page"] - 1
-        )  # ToC pages are 1-indexed, PyMuPDF is 0-indexed
-        section_text = (
-            f"\n\n--- Section: {section['title']} (Page {section['page']}) ---\n"
-        )
+        start_page_pdf_idx = section["page"] - 1  # ToC pages are 1-indexed, PyMuPDF is 0-indexed
+        section_text = f"\n\n--- Section: {section['title']} (Page {section['page']}) ---\n"
 
         # Determine end_page for the current section
         end_page_pdf_idx = doc.page_count  # Default to end of document
@@ -197,9 +193,7 @@ async def extract_text_from_selected_sections(
         if current_section_toc_index != -1:
             # Look for the next ToC item that has a level less than or equal to the current section's level
             # or any item if the current section is a very low-level one (e.g. level 3, next could be level 1, 2, or 3)
-            for next_toc_idx in range(
-                current_section_toc_index + 1, len(sorted_toc_data)
-            ):
+            for next_toc_idx in range(current_section_toc_index + 1, len(sorted_toc_data)):
                 next_toc_item = sorted_toc_data[next_toc_idx]
                 # The end page is the page of the *next* section that is of the same or higher level (smaller level number)
                 # OR if the next section is simply on a later page, irrespective of level, if we want to capture everything up to it.
@@ -214,10 +208,7 @@ async def extract_text_from_selected_sections(
                 # This is implicitly handled if sorted_toc_data is used correctly to find the *next relevant* section.
 
         # Ensure start_page is not after end_page (can happen if ToC is messy or it's the last section)
-        if (
-            start_page_pdf_idx >= end_page_pdf_idx
-            and start_page_pdf_idx < doc.page_count
-        ):
+        if start_page_pdf_idx >= end_page_pdf_idx and start_page_pdf_idx < doc.page_count:
             # If it's a single page section or determined to be the last part
             end_page_pdf_idx = start_page_pdf_idx + 1
         elif start_page_pdf_idx >= doc.page_count:
@@ -227,9 +218,7 @@ async def extract_text_from_selected_sections(
             continue
 
         # Extract text from the determined page range
-        for page_num in range(
-            start_page_pdf_idx, min(end_page_pdf_idx, doc.page_count)
-        ):
+        for page_num in range(start_page_pdf_idx, min(end_page_pdf_idx, doc.page_count)):
             try:
                 page_obj = doc.load_page(page_num)
                 section_text += page_obj.get_text("text") + "\n"

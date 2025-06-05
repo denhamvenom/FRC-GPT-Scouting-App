@@ -1,102 +1,124 @@
 # backend/app/database/models.py
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON, Table, LargeBinary
+from sqlalchemy import (
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    DateTime,
+    JSON,
+    Table,
+    LargeBinary,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import datetime
 
 from .db import Base
 
+
 class LockedPicklist(Base):
     """Model for storing locked picklists"""
+
     __tablename__ = "locked_picklists"
 
     id = Column(Integer, primary_key=True, index=True)
     team_number = Column(Integer, index=True)
     event_key = Column(String, index=True)
     year = Column(Integer)
-    
+
     # JSON fields to store picklist data
     first_pick_data = Column(JSON)
     second_pick_data = Column(JSON)
     third_pick_data = Column(JSON, nullable=True)  # Optional for games without third picks
-    
+
     # Additional picklist metadata
     excluded_teams = Column(JSON, nullable=True)  # List of teams excluded from consideration
-    strategy_prompts = Column(JSON, nullable=True)  # Original strategy prompts for each pick position
-    
+    strategy_prompts = Column(
+        JSON, nullable=True
+    )  # Original strategy prompts for each pick position
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     # Relationships to alliance selections
     alliance_selections = relationship("AllianceSelection", back_populates="picklist")
 
+
 class AllianceSelection(Base):
     """Model for storing alliance selection events"""
+
     __tablename__ = "alliance_selections"
 
     id = Column(Integer, primary_key=True, index=True)
     picklist_id = Column(Integer, ForeignKey("locked_picklists.id"))
     event_key = Column(String, index=True)
     year = Column(Integer)
-    
+
     # Status tracking
     is_completed = Column(Boolean, default=False)
     current_round = Column(Integer, default=1)
-    
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     # Relationships
     picklist = relationship("LockedPicklist", back_populates="alliance_selections")
     alliances = relationship("Alliance", back_populates="selection")
     team_statuses = relationship("TeamSelectionStatus", back_populates="selection")
 
+
 class Alliance(Base):
     """Model for storing alliances in a selection"""
+
     __tablename__ = "alliances"
 
     id = Column(Integer, primary_key=True, index=True)
     selection_id = Column(Integer, ForeignKey("alliance_selections.id"))
     alliance_number = Column(Integer)  # 1-8 for the 8 alliances
-    
+
     # Team numbers (0 means empty slot)
     captain_team_number = Column(Integer, default=0)
     first_pick_team_number = Column(Integer, default=0)
     second_pick_team_number = Column(Integer, default=0)
     backup_team_number = Column(Integer, default=0, nullable=True)  # Optional backup
-    
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     # Relationships
     selection = relationship("AllianceSelection", back_populates="alliances")
 
+
 class TeamSelectionStatus(Base):
     """Model for tracking team status during selection"""
+
     __tablename__ = "team_selection_statuses"
 
     id = Column(Integer, primary_key=True, index=True)
     selection_id = Column(Integer, ForeignKey("alliance_selections.id"))
     team_number = Column(Integer)
-    
+
     # Status flags
     is_captain = Column(Boolean, default=False)
     is_picked = Column(Boolean, default=False)
     has_declined = Column(Boolean, default=False)
     round_eliminated = Column(Integer, nullable=True)  # Round in which team was eliminated
-    
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     # Relationships
     selection = relationship("AllianceSelection", back_populates="team_statuses")
 
+
 class ArchivedEvent(Base):
     """Model for storing archived event data"""
+
     __tablename__ = "archived_events"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -126,17 +148,20 @@ class ArchivedEvent(Base):
 
 class GameManual(Base):
     """Model for storing uploaded game manuals and their associated data"""
+
     __tablename__ = "game_manuals"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     year = Column(Integer, index=True, nullable=False)
     original_filename = Column(String, nullable=False)
-    sanitized_filename_base = Column(String, nullable=False, index=True) # For easier lookups
+    sanitized_filename_base = Column(String, nullable=False, index=True)  # For easier lookups
 
     # Paths to stored files
-    stored_pdf_path = Column(String, nullable=True) # Should ideally not be nullable after initial processing
+    stored_pdf_path = Column(
+        String, nullable=True
+    )  # Should ideally not be nullable after initial processing
     toc_json_path = Column(String, nullable=True)
-    parsed_sections_path = Column(String, nullable=True) # Populated after section parsing
+    parsed_sections_path = Column(String, nullable=True)  # Populated after section parsing
 
     # Timestamps
     upload_timestamp = Column(DateTime(timezone=True), server_default=func.now())
@@ -151,6 +176,7 @@ class GameManual(Base):
 
 class SheetConfiguration(Base):
     """Model for storing Google Sheets configuration"""
+
     __tablename__ = "sheet_configurations"
 
     id = Column(Integer, primary_key=True, index=True)

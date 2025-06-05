@@ -14,10 +14,11 @@ from app.services.data_validation_service import (
     add_to_todo_list,
     get_todo_list,
     update_todo_status,
-    preview_virtual_scout
+    preview_virtual_scout,
 )
 
 router = APIRouter()
+
 
 class CorrectionRequest(BaseModel):
     team_number: int
@@ -25,16 +26,19 @@ class CorrectionRequest(BaseModel):
     corrections: Dict[str, Any]
     reason: Optional[str] = ""
 
+
 class IgnoreMatchRequest(BaseModel):
     team_number: int
     match_number: int
     reason_category: str  # not_operational, not_present, other
     reason_text: Optional[str] = ""
 
+
 class TodoStatusUpdateRequest(BaseModel):
     team_number: int
     match_number: int
     status: str  # pending, completed, cancelled
+
 
 @router.get("/validate/event")
 async def validate_event(unified_dataset_path: str):
@@ -47,6 +51,7 @@ async def validate_event(unified_dataset_path: str):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+
 @router.get("/validate/enhanced")
 async def validate_enhanced(unified_dataset_path: str, z_score_threshold: float = 3.0):
     """
@@ -57,6 +62,7 @@ async def validate_enhanced(unified_dataset_path: str, z_score_threshold: float 
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/validate/suggest-corrections")
 async def get_suggested_corrections(unified_dataset_path: str, team_number: int, match_number: int):
@@ -69,6 +75,7 @@ async def get_suggested_corrections(unified_dataset_path: str, team_number: int,
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/validate/apply-correction")
 async def apply_corrections(unified_dataset_path: str, request: CorrectionRequest):
     """
@@ -80,17 +87,18 @@ async def apply_corrections(unified_dataset_path: str, request: CorrectionReques
             request.team_number,
             request.match_number,
             request.corrections,
-            request.reason
+            request.reason,
         )
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/validate/ignore-match")
 async def ignore_match_endpoint(unified_dataset_path: str, request: IgnoreMatchRequest):
     """
     Mark a match as intentionally ignored with a reason.
-    
+
     Accepted reason categories:
     - not_operational: Robot was not operational in the match
     - not_present: Robot was not present in the match
@@ -102,42 +110,41 @@ async def ignore_match_endpoint(unified_dataset_path: str, request: IgnoreMatchR
             request.team_number,
             request.match_number,
             request.reason_category,
-            request.reason_text
+            request.reason_text,
         )
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/validate/create-virtual-scout")
-async def create_virtual_scout_endpoint(unified_dataset_path: str, team_number: int, match_number: int):
+async def create_virtual_scout_endpoint(
+    unified_dataset_path: str, team_number: int, match_number: int
+):
     """
     Create a virtual scout entry for a team's missing match based on team averages
     and Blue Alliance match data.
     """
     try:
-        result = create_virtual_scout(
-            unified_dataset_path, 
-            team_number, 
-            match_number
-        )
+        result = create_virtual_scout(unified_dataset_path, team_number, match_number)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/validate/preview-virtual-scout")
-async def preview_virtual_scout_endpoint(unified_dataset_path: str, team_number: int, match_number: int):
+async def preview_virtual_scout_endpoint(
+    unified_dataset_path: str, team_number: int, match_number: int
+):
     """
     Preview what a virtual scout entry would look like without saving it.
     """
     try:
-        result = preview_virtual_scout(
-            unified_dataset_path, 
-            team_number, 
-            match_number
-        )
+        result = preview_virtual_scout(unified_dataset_path, team_number, match_number)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/validate/add-to-todo")
 async def add_to_todo_endpoint(unified_dataset_path: str, team_number: int, match_number: int):
@@ -145,14 +152,11 @@ async def add_to_todo_endpoint(unified_dataset_path: str, team_number: int, matc
     Add a team-match combination to the to-do list for manual scouting.
     """
     try:
-        result = add_to_todo_list(
-            unified_dataset_path,
-            team_number,
-            match_number
-        )
+        result = add_to_todo_list(unified_dataset_path, team_number, match_number)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/validate/todo-list")
 async def get_todo_list_endpoint(unified_dataset_path: str):
@@ -165,6 +169,7 @@ async def get_todo_list_endpoint(unified_dataset_path: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/validate/update-todo-status")
 async def update_todo_status_endpoint(unified_dataset_path: str, request: TodoStatusUpdateRequest):
     """
@@ -172,10 +177,7 @@ async def update_todo_status_endpoint(unified_dataset_path: str, request: TodoSt
     """
     try:
         result = update_todo_status(
-            unified_dataset_path,
-            request.team_number,
-            request.match_number,
-            request.status
+            unified_dataset_path, request.team_number, request.match_number, request.status
         )
         return result
     except Exception as e:

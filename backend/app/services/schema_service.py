@@ -21,16 +21,14 @@ async def extract_game_tags_from_manual(manual_text: str) -> List[str]:
     Could use GPT or simple parsing to identify field names (e.g., "auto_coral_l1").
     Returns a list of tag strings.
     """
-    prompt = f"""
+    prompt = """
 You are a technical assistant. Given the text of a FIRST Robotics Competition game manual,
 extract all standardized action and scoring tags (snake_case) that correspond to match data fields.
 Return a JSON list of strings, e.g. ["team_number", "auto_coral_l1", ...].
 """
     response = await client.chat.completions.create(
         model=GPT_MODEL,
-        messages=[
-            {"role": "user", "content": prompt + "\nManual Text:\n" + manual_text}
-        ],
+        messages=[{"role": "user", "content": prompt + "\nManual Text:\n" + manual_text}],
         temperature=0.2,
         timeout=30,
     )
@@ -42,9 +40,7 @@ Return a JSON list of strings, e.g. ["team_number", "auto_coral_l1", ...].
         return []
 
 
-async def map_headers_to_tags(
-    headers: List[str], game_tags: List[str]
-) -> Dict[str, str]:
+async def map_headers_to_tags(headers: List[str], game_tags: List[str]) -> Dict[str, str]:
     """
     Map spreadsheet column headers to the provided list of standardized game tags.
     Uses GPT to align each header with the best match or 'ignore'.

@@ -16,10 +16,11 @@ from app.services.archive_service import (
     get_archived_events,
     get_archived_event,
     restore_archived_event,
-    delete_archived_event
+    delete_archived_event,
 )
 
 router = APIRouter(prefix="/api/archive", tags=["Archive"])
+
 
 # Pydantic models for request/response
 class ArchiveEventRequest(BaseModel):
@@ -29,15 +30,19 @@ class ArchiveEventRequest(BaseModel):
     notes: Optional[str] = None
     created_by: Optional[str] = None
 
+
 class ClearEventRequest(BaseModel):
     event_key: str
     year: int
 
+
 class RestoreArchiveRequest(BaseModel):
     archive_id: int
 
+
 class DeleteArchiveRequest(BaseModel):
     archive_id: int
+
 
 @router.post("/create")
 async def create_archive(request: ArchiveEventRequest, req: Request, db: Session = Depends(get_db)):
@@ -54,7 +59,7 @@ async def create_archive(request: ArchiveEventRequest, req: Request, db: Session
             event_key=request.event_key,
             year=request.year,
             notes=request.notes,
-            created_by=request.created_by
+            created_by=request.created_by,
         )
 
         logger.info(f"Archive result: {result}")
@@ -68,21 +73,19 @@ async def create_archive(request: ArchiveEventRequest, req: Request, db: Session
         logger.exception(f"Unexpected error in create_archive endpoint: {str(e)}")
         raise
 
+
 @router.post("/clear")
 async def clear_archive(request: ClearEventRequest, db: Session = Depends(get_db)):
     """
     Clear all data for a specific event.
     """
-    result = await clear_event_data(
-        db=db,
-        event_key=request.event_key,
-        year=request.year
-    )
-    
+    result = await clear_event_data(db=db, event_key=request.event_key, year=request.year)
+
     if result["status"] == "error":
         raise HTTPException(status_code=400, detail=result["message"])
-        
+
     return result
+
 
 @router.get("/list")
 async def list_archives(db: Session = Depends(get_db)):
@@ -90,11 +93,9 @@ async def list_archives(db: Session = Depends(get_db)):
     Get a list of all archived events.
     """
     archives = await get_archived_events(db)
-    
-    return {
-        "status": "success",
-        "archives": archives
-    }
+
+    return {"status": "success", "archives": archives}
+
 
 @router.get("/{archive_id}")
 async def get_archive(archive_id: int, db: Session = Depends(get_db)):
@@ -102,14 +103,12 @@ async def get_archive(archive_id: int, db: Session = Depends(get_db)):
     Get details of a specific archived event.
     """
     archive = await get_archived_event(db, archive_id)
-    
+
     if not archive:
         raise HTTPException(status_code=404, detail=f"Archive with ID {archive_id} not found")
-        
-    return {
-        "status": "success",
-        "archive": archive
-    }
+
+    return {"status": "success", "archive": archive}
+
 
 @router.post("/restore")
 async def restore_archive(request: RestoreArchiveRequest, db: Session = Depends(get_db)):
@@ -117,11 +116,12 @@ async def restore_archive(request: RestoreArchiveRequest, db: Session = Depends(
     Restore an archived event to the active database.
     """
     result = await restore_archived_event(db, request.archive_id)
-    
+
     if result["status"] == "error":
         raise HTTPException(status_code=400, detail=result["message"])
-        
+
     return result
+
 
 @router.post("/delete")
 async def delete_archive(request: DeleteArchiveRequest, db: Session = Depends(get_db)):
@@ -129,14 +129,17 @@ async def delete_archive(request: DeleteArchiveRequest, db: Session = Depends(ge
     Delete an archived event.
     """
     result = await delete_archived_event(db, request.archive_id)
-    
+
     if result["status"] == "error":
         raise HTTPException(status_code=400, detail=result["message"])
-        
+
     return result
 
+
 @router.post("/archive-and-clear")
-async def archive_and_clear(request: ArchiveEventRequest, req: Request, db: Session = Depends(get_db)):
+async def archive_and_clear(
+    request: ArchiveEventRequest, req: Request, db: Session = Depends(get_db)
+):
     """
     Archive the current event and then clear the data.
     This is a convenience endpoint that combines both operations.
@@ -153,7 +156,7 @@ async def archive_and_clear(request: ArchiveEventRequest, req: Request, db: Sess
             event_key=request.event_key,
             year=request.year,
             notes=request.notes,
-            created_by=request.created_by
+            created_by=request.created_by,
         )
 
         logger.info(f"Archive result: {archive_result}")
@@ -164,11 +167,7 @@ async def archive_and_clear(request: ArchiveEventRequest, req: Request, db: Sess
 
         # Then clear the event data
         logger.info(f"Starting clear for event {request.event_key} ({request.year})")
-        clear_result = await clear_event_data(
-            db=db,
-            event_key=request.event_key,
-            year=request.year
-        )
+        clear_result = await clear_event_data(db=db, event_key=request.event_key, year=request.year)
 
         logger.info(f"Clear result: {clear_result}")
 
@@ -178,7 +177,7 @@ async def archive_and_clear(request: ArchiveEventRequest, req: Request, db: Sess
                 "status": "partial",
                 "message": f"Event was archived successfully, but could not be cleared: {clear_result['message']}",
                 "archive_result": archive_result,
-                "clear_result": clear_result
+                "clear_result": clear_result,
             }
 
         logger.info(f"Archive and clear successful for event {request.event_key} ({request.year})")
@@ -186,7 +185,7 @@ async def archive_and_clear(request: ArchiveEventRequest, req: Request, db: Sess
             "status": "success",
             "message": f"Successfully archived and cleared event {request.event_key} ({request.year})",
             "archive_result": archive_result,
-            "clear_result": clear_result
+            "clear_result": clear_result,
         }
     except Exception as e:
         logger.exception(f"Unexpected error in archive_and_clear endpoint: {str(e)}")

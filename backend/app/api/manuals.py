@@ -16,19 +16,22 @@ from app.database.models import GameManual
 
 router = APIRouter(prefix="/api/manuals", tags=["Manuals"])
 
+
 # --- Pydantic Models ---
 class TocItem(BaseModel):
     title: str
     level: int
     page: int
-    
+
     class Config:
         extra = "allow"
 
+
 class SelectedSectionsRequest(BaseModel):
-    manual_identifier: str # Original filename of the PDF
+    manual_identifier: str  # Original filename of the PDF
     year: int
     selected_sections: List[TocItem]
+
 
 class ProcessedSectionsResponse(BaseModel):
     message: str
@@ -40,6 +43,7 @@ class ProcessedSectionsResponse(BaseModel):
     manual_text_json_path: Optional[str] = None
     game_name_detected: Optional[str] = None
 
+
 class GameManualBase(BaseModel):
     year: int
     original_filename: str
@@ -47,15 +51,18 @@ class GameManualBase(BaseModel):
     upload_timestamp: Optional[datetime.datetime] = None
     last_accessed_timestamp: Optional[datetime.datetime] = None
 
+
 class GameManualCreate(GameManualBase):
     stored_pdf_path: Optional[str] = None
     toc_json_path: Optional[str] = None
+
 
 class GameManualResponse(GameManualBase):
     id: int
 
     class Config:
-        from_attributes = True # Changed from orm_mode for Pydantic v2
+        from_attributes = True  # Changed from orm_mode for Pydantic v2
+
 
 class GameManualDetailResponse(GameManualResponse):
     stored_pdf_path: Optional[str] = None
@@ -69,15 +76,16 @@ class GameManualDetailResponse(GameManualResponse):
 def sanitize_filename_base_for_path(filename: str) -> str:
     """Sanitizes a filename to be used as a base for paths, returns only the base without extension."""
     base, _ = os.path.splitext(filename)
-    sanitized_base = "".join(c if c.isalnum() or c in ['_', '-'] else '_' for c in base)
+    sanitized_base = "".join(c if c.isalnum() or c in ["_", "-"] else "_" for c in base)
     return sanitized_base
+
 
 # --- API Endpoints ---
 
+
 @router.post("/process-sections", response_model=ProcessedSectionsResponse)
 async def process_selected_sections(
-    request_data: SelectedSectionsRequest = Body(...),
-    db: Session = Depends(get_db_session)
+    request_data: SelectedSectionsRequest = Body(...), db: Session = Depends(get_db_session)
 ):
     """
     Processes selected sections from a game manual PDF based on its Table of Contents (ToC).
@@ -86,21 +94,29 @@ async def process_selected_sections(
     original_manual_filename = request_data.manual_identifier
     year = request_data.year
     selected_sections_dicts = [item.model_dump() for item in request_data.selected_sections]
-    
+
     s_filename_base = sanitize_filename_base_for_path(original_manual_filename)
 
     # --- Retrieve GameManual from DB ---
-    db_manual = db.query(GameManual).filter_by(
-        year=year, 
-        sanitized_filename_base=s_filename_base
-    ).first()
+    db_manual = (
+        db.query(GameManual).filter_by(year=year, sanitized_filename_base=s_filename_base).first()
+    )
 
     if not db_manual:
-        raise HTTPException(status_code=404, detail=f"GameManual record not found for {original_manual_filename}, year {year}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"GameManual record not found for {original_manual_filename}, year {year}",
+        )
     if not db_manual.stored_pdf_path or not os.path.exists(db_manual.stored_pdf_path):
-        raise HTTPException(status_code=404, detail=f"Stored PDF path not found or invalid for manual ID {db_manual.id}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Stored PDF path not found or invalid for manual ID {db_manual.id}",
+        )
     if not db_manual.toc_json_path or not os.path.exists(db_manual.toc_json_path):
-        raise HTTPException(status_code=404, detail=f"ToC JSON path not found or invalid for manual ID {db_manual.id}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"ToC JSON path not found or invalid for manual ID {db_manual.id}",
+        )
 
     pdf_path = db_manual.stored_pdf_path
     toc_json_path = db_manual.toc_json_path
@@ -114,28 +130,33 @@ async def process_selected_sections(
     # --- Call the extraction service ---
     try:
         extracted_text = await extract_text_from_selected_sections(
-            pdf_path=pdf_path,
-            selected_sections=selected_sections_dicts,
-            toc_data=full_toc_data 
+            pdf_path=pdf_path, selected_sections=selected_sections_dicts, toc_data=full_toc_data
         )
     except Exception as e:
         # Log the exception server-side for more details
         print(f"Error during text extraction from selected sections: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to extract text from sections: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to extract text from sections: {str(e)}"
+        )
 
     if not extracted_text or extracted_text.startswith("Error:"):
-        raise HTTPException(status_code=400, detail=f"Text extraction resulted in an error or no text: {extracted_text}")
-        
+        raise HTTPException(
+            status_code=400,
+            detail=f"Text extraction resulted in an error or no text: {extracted_text}",
+        )
+
     # --- Save the extracted text ---
     # Construct path relative to backend/data/ for consistency
     current_file_dir = os.path.dirname(os.path.abspath(__file__))
     backend_dir = os.path.join(current_file_dir, "..", "..")
-    parsed_sections_dir = os.path.join(backend_dir, "data", f"manual_processing_data_{year}", "parsed_sections")
+    parsed_sections_dir = os.path.join(
+        backend_dir, "data", f"manual_processing_data_{year}", "parsed_sections"
+    )
     os.makedirs(parsed_sections_dir, exist_ok=True)
-    
+
     output_filename = f"{s_filename_base}_selected_sections.txt"
     saved_text_filepath = os.path.join(parsed_sections_dir, output_filename)
-    
+
     # Initialize variables that will be used in the response
     manual_text_filepath = ""
     game_name = f"FRC {year} Game"
@@ -143,49 +164,52 @@ async def process_selected_sections(
     try:
         with open(saved_text_filepath, "w", encoding="utf-8") as f:
             f.write(extracted_text)
-        
+
         # --- Create manual_text_{year}.json for picklist generator ---
         # This file is expected by the picklist generator service
         app_data_dir = os.path.join(backend_dir, "app", "data")
         os.makedirs(app_data_dir, exist_ok=True)
-        
+
         manual_text_filename = f"manual_text_{year}.json"
         manual_text_filepath = os.path.join(app_data_dir, manual_text_filename)
-        
+
         # Extract game name from the extracted text (look for common patterns)
         game_name = f"FRC {year} Game"  # Default fallback
-        
+
         # Try to extract game name from the text
-        text_lines = extracted_text.split('\n')
+        text_lines = extracted_text.split("\n")
         for line in text_lines[:20]:  # Check first 20 lines
             line_clean = line.strip()
-            if any(keyword in line_clean.upper() for keyword in ['GAME:', 'COMPETITION:', 'SEASON:', 'FIRST']):
+            if any(
+                keyword in line_clean.upper()
+                for keyword in ["GAME:", "COMPETITION:", "SEASON:", "FIRST"]
+            ):
                 # Look for game names in common formats
-                if 'REEFSCAPE' in line_clean.upper():
+                if "REEFSCAPE" in line_clean.upper():
                     game_name = "REEFSCAPE 2025"
                     break
-                elif 'CHARGED UP' in line_clean.upper():
+                elif "CHARGED UP" in line_clean.upper():
                     game_name = "CHARGED UP 2023"
                     break
-                elif 'RAPID REACT' in line_clean.upper():
+                elif "RAPID REACT" in line_clean.upper():
                     game_name = "RAPID REACT 2022"
                     break
-                elif 'INFINITE RECHARGE' in line_clean.upper():
+                elif "INFINITE RECHARGE" in line_clean.upper():
                     game_name = "INFINITE RECHARGE 2020"
                     break
-                elif 'DESTINATION: DEEP SPACE' in line_clean.upper():
+                elif "DESTINATION: DEEP SPACE" in line_clean.upper():
                     game_name = "DESTINATION: DEEP SPACE 2019"
                     break
-                elif 'POWER UP' in line_clean.upper():
+                elif "POWER UP" in line_clean.upper():
                     game_name = "POWER UP 2018"
                     break
-                elif 'STEAMWORKS' in line_clean.upper():
+                elif "STEAMWORKS" in line_clean.upper():
                     game_name = "STEAMWORKS 2017"
                     break
-                elif 'STRONGHOLD' in line_clean.upper():
+                elif "STRONGHOLD" in line_clean.upper():
                     game_name = "STRONGHOLD 2016"
                     break
-        
+
         # Create the manual text JSON structure expected by picklist generator
         manual_text_data = {
             "game_name": game_name,
@@ -193,23 +217,27 @@ async def process_selected_sections(
             "year": year,
             "sections_processed": len(selected_sections_dicts),
             "processing_timestamp": datetime.datetime.now().isoformat(),
-            "source_manual": original_manual_filename
+            "source_manual": original_manual_filename,
         }
-        
+
         with open(manual_text_filepath, "w", encoding="utf-8") as f:
             json.dump(manual_text_data, f, indent=2, ensure_ascii=False)
-        
-        print(f"✅ Created manual_text_{year}.json for picklist generator at: {manual_text_filepath}")
-        
+
+        print(
+            f"✅ Created manual_text_{year}.json for picklist generator at: {manual_text_filepath}"
+        )
+
         # --- Update DB with parsed_sections_path ---
         db_manual.parsed_sections_path = saved_text_filepath
         db_manual.last_accessed_timestamp = func.now()
         db.commit()
         db.refresh(db_manual)
-        
+
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error saving extracted text or updating DB: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error saving extracted text or updating DB: {str(e)}"
+        )
 
     return ProcessedSectionsResponse(
         message="Successfully processed selected sections.",
@@ -219,21 +247,25 @@ async def process_selected_sections(
         sample_text=extracted_text[:500] + "..." if len(extracted_text) > 500 else extracted_text,
         manual_text_json_created=True,
         manual_text_json_path=manual_text_filepath,
-        game_name_detected=game_name
+        game_name_detected=game_name,
     )
+
 
 @router.get("", response_model=List[GameManualResponse])
 async def list_manuals(db: Session = Depends(get_db_session)):
     """
     List all uploaded game manuals.
     """
-    manuals = db.query(GameManual).order_by(GameManual.year.desc(), GameManual.original_filename).all()
+    manuals = (
+        db.query(GameManual).order_by(GameManual.year.desc(), GameManual.original_filename).all()
+    )
     return manuals
+
 
 @router.get("/{manual_id}", response_model=GameManualDetailResponse)
 async def get_manual_details(
     manual_id: int = FastApiPath(..., title="The ID of the manual to retrieve"),
-    db: Session = Depends(get_db_session)
+    db: Session = Depends(get_db_session),
 ):
     """
     Get detailed information for a specific game manual, including its ToC.
@@ -242,8 +274,8 @@ async def get_manual_details(
     if not db_manual:
         raise HTTPException(status_code=404, detail=f"Manual with ID {manual_id} not found.")
 
-    response_data = GameManualDetailResponse.model_validate(db_manual) # Pydantic v2
-    
+    response_data = GameManualDetailResponse.model_validate(db_manual)  # Pydantic v2
+
     if db_manual.toc_json_path and os.path.exists(db_manual.toc_json_path):
         try:
             with open(db_manual.toc_json_path, "r", encoding="utf-8") as f:
@@ -261,15 +293,16 @@ async def get_manual_details(
         db_manual.last_accessed_timestamp = func.now()
         db.commit()
     except Exception as e:
-        db.rollback() # Rollback timestamp update error, but still return data
+        db.rollback()  # Rollback timestamp update error, but still return data
         print(f"Error updating last_accessed_timestamp for manual {manual_id}: {e}")
 
     return response_data
 
+
 @router.delete("/{manual_id}", status_code=200)
 async def delete_manual(
     manual_id: int = FastApiPath(..., title="The ID of the manual to delete"),
-    db: Session = Depends(get_db_session)
+    db: Session = Depends(get_db_session),
 ):
     """
     Delete a game manual record and its associated files.
@@ -281,9 +314,9 @@ async def delete_manual(
     paths_to_delete = [
         db_manual.stored_pdf_path,
         db_manual.toc_json_path,
-        db_manual.parsed_sections_path
+        db_manual.parsed_sections_path,
     ]
-    
+
     deleted_files_count = 0
     errors_deleting_files = []
 
@@ -297,17 +330,21 @@ async def delete_manual(
                 error_msg = f"Error deleting file {file_path}: {str(e)}"
                 print(error_msg)
                 errors_deleting_files.append(error_msg)
-    
+
     try:
         db.delete(db_manual)
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error deleting manual record: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Database error deleting manual record: {str(e)}"
+        )
 
     response_message = f"Manual ID {manual_id} ('{db_manual.original_filename}') deleted. {deleted_files_count} associated file(s) removed."
     if errors_deleting_files:
-        response_message += " Errors encountered during file deletion: " + "; ".join(errors_deleting_files)
+        response_message += " Errors encountered during file deletion: " + "; ".join(
+            errors_deleting_files
+        )
         # Still return 200 as DB record deleted, but include error info
         return {"message": response_message, "file_deletion_errors": errors_deleting_files}
 

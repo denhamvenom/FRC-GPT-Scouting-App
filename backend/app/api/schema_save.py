@@ -10,6 +10,7 @@ router = APIRouter()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
+
 @router.post("/save", tags=["Schema"])
 async def save_schema(request: Request):
     mapping = await request.json()

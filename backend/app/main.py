@@ -27,7 +27,7 @@ models.Base.metadata.create_all(bind=engine)
 
 from app.api import health
 from app.api import sheets
-from app.api import sheets_headers          # Import the sheets headers API
+from app.api import sheets_headers  # Import the sheets headers API
 from app.api import schema
 from app.api import schema_save
 from app.api import schema_superscout, schema_superscout_save
@@ -40,13 +40,13 @@ from app.api import field_selection  # Import the new field selection router
 from app.api import picklist_analysis
 from app.api import picklist_generator
 from app.api import test_schema_superscout  # Import the test endpoint
-from app.api import test_enhanced_parser    # Import the enhanced parser test
-from app.api import progress                # Import the progress tracking API
-from app.api import debug_logs              # Import debug logs API
-from app.api import alliance_selection      # Import alliance selection API
-from app.api import archive                 # Import event archiving API
-from app.api import sheet_config            # Import sheet configuration API
-from app.api import manuals as manuals_router # Import the new manuals router
+from app.api import test_enhanced_parser  # Import the enhanced parser test
+from app.api import progress  # Import the progress tracking API
+from app.api import debug_logs  # Import debug logs API
+from app.api import alliance_selection  # Import alliance selection API
+from app.api import archive  # Import event archiving API
+from app.api import sheet_config  # Import sheet configuration API
+from app.api import manuals as manuals_router  # Import the new manuals router
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
@@ -58,6 +58,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Global exception handler
 @app.exception_handler(Exception)
@@ -77,6 +78,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal server error. Check logs for details."},
     )
 
+
 # Include routers
 app.include_router(health.router, prefix="/api/health")
 app.include_router(sheets.router, prefix="/api/sheets")
@@ -94,13 +96,14 @@ app.include_router(field_selection.router)  # Add the field selection router
 app.include_router(picklist_analysis.router, prefix="/api")
 app.include_router(picklist_generator.router)
 app.include_router(test_schema_superscout.router)  # Add the test endpoint
-app.include_router(test_enhanced_parser.router)     # Add the enhanced parser test
+app.include_router(test_enhanced_parser.router)  # Add the enhanced parser test
 app.include_router(progress.router, prefix="/api")  # Add the progress tracking API
 app.include_router(debug_logs.router, prefix="/api/debug")  # Add the debug logs API
 app.include_router(alliance_selection.router)  # Add the alliance selection API
 app.include_router(archive.router)  # Add the event archiving API
 app.include_router(sheet_config.router)  # Sheet configuration API already has prefix
-app.include_router(manuals_router.router) # Add the manuals router
+app.include_router(manuals_router.router)  # Add the manuals router
+
 
 @app.get("/")
 async def root():

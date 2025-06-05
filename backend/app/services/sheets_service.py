@@ -21,6 +21,7 @@ load_dotenv()
 SERVICE_ACCOUNT_FILE_ENV = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
 DEFAULT_SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID")  # Fallback if no config in DB
 
+
 # Path resolution logic to handle both Windows and Linux/Docker paths
 def resolve_service_account_path(path: Optional[str]) -> Optional[str]:
     """Safely resolve a service account file path."""
@@ -61,12 +62,14 @@ def resolve_service_account_path(path: Optional[str]) -> Optional[str]:
     # Let the original error happen
     return path
 
+
 # Resolve the service account file path
 SERVICE_ACCOUNT_FILE = resolve_service_account_path(SERVICE_ACCOUNT_FILE_ENV)
 logger.info(f"Using service account file: {SERVICE_ACCOUNT_FILE}")
 
 # Setup
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
 
 @lru_cache(maxsize=1)
 def get_sheets_service():
@@ -108,18 +111,20 @@ async def get_active_spreadsheet_id(db: Optional[Session] = None) -> str:
         # Import here to avoid circular imports
         from app.services.sheet_config_service import get_active_configuration
         from app.services.global_cache import cache
-        
+
         # Try to get the active event key and year from the cache
         event_key = cache.get("active_event_key")
         year = cache.get("active_event_year", 2025)
-        
+
         # First, try to get configuration for the current event
         if event_key:
             result = await get_active_configuration(db, event_key, year)
             if result["status"] == "success":
-                print(f"Using active configuration for event {event_key}: {result['configuration']['name']}")
+                print(
+                    f"Using active configuration for event {event_key}: {result['configuration']['name']}"
+                )
                 return result["configuration"]["spreadsheet_id"]
-        
+
         # If no event-specific configuration, try to get any active configuration
         result = await get_active_configuration(db)
         if result["status"] == "success":
@@ -130,6 +135,7 @@ async def get_active_spreadsheet_id(db: Optional[Session] = None) -> str:
     logger.warning("No active configuration found. Please set up a sheet configuration first.")
     # Return None which will cause the calling code to raise a more specific error
     return None
+
 
 async def get_all_sheets_metadata(spreadsheet_id: str) -> List[dict]:
     """
@@ -144,15 +150,14 @@ async def get_all_sheets_metadata(spreadsheet_id: str) -> List[dict]:
     try:
         sheet = get_sheets_service().spreadsheets()
         response = sheet.get(spreadsheetId=spreadsheet_id).execute()
-        return response.get('sheets', [])
+        return response.get("sheets", [])
     except Exception as e:
         logger.exception(f"Error getting spreadsheet metadata: {str(e)}")
         return []
 
+
 async def get_sheet_values(
-    range_name: str,
-    spreadsheet_id: Optional[str] = None,
-    db: Optional[Session] = None
+    range_name: str, spreadsheet_id: Optional[str] = None, db: Optional[Session] = None
 ) -> List[List[Any]]:
     """
     Read data from a Google Sheet.
@@ -167,7 +172,7 @@ async def get_sheet_values(
     """
     # Get spreadsheet ID if not provided
     if not spreadsheet_id:
-        logger.debug(f"No spreadsheet_id provided for get_sheet_values, using active configuration")
+        logger.debug("No spreadsheet_id provided for get_sheet_values, using active configuration")
         sheet_id = await get_active_spreadsheet_id(db)
         if sheet_id:
             logger.debug(f"Found active spreadsheet ID: {sheet_id}")
@@ -185,7 +190,7 @@ async def get_sheet_values(
         parts = range_name.split("!", 1)
         tab_name = parts[0].strip("'")  # Remove any quotes
         cell_range = parts[1]
-    
+
     try:
         # Get actual sheet names from the spreadsheet to find the right one
         sheets_metadata = await get_all_sheets_metadata(sheet_id)
@@ -199,7 +204,7 @@ async def get_sheet_values(
                 actual_tab_name = title
                 logger.debug(f"Found matching sheet: '{actual_tab_name}'")
                 break
-        
+
         if not actual_tab_name:
             # Try to find a partial match
             for title in sheet_titles:
@@ -212,7 +217,9 @@ async def get_sheet_values(
             if sheet_titles:
                 # Default to first sheet if no match found
                 actual_tab_name = sheet_titles[0]
-                logger.warning(f"No matching sheet found for '{tab_name}', using first sheet: '{actual_tab_name}'")
+                logger.warning(
+                    f"No matching sheet found for '{tab_name}', using first sheet: '{actual_tab_name}'"
+                )
             else:
                 logger.error(f"No sheets found in spreadsheet {sheet_id}")
                 return []
@@ -220,23 +227,24 @@ async def get_sheet_values(
         # Use the actual sheet name from the spreadsheet
         actual_range = f"{actual_tab_name}!{cell_range}"
         logger.debug(f"Using range: {actual_range}")
-        
+
         sheet = get_sheets_service().spreadsheets()
         result = sheet.values().get(spreadsheetId=sheet_id, range=actual_range).execute()
         values = result.get("values", [])
         return values
-        
+
     except Exception as e:
         logger.exception(f"Error getting sheet values for {range_name}: {str(e)}")
         # Return empty result on error instead of raising
         logger.warning(f"Returning empty result for {range_name} due to error")
         return []
 
+
 async def update_sheet_values(
     range_name: str,
     values: List[List[Any]],
     spreadsheet_id: Optional[str] = None,
-    db: Optional[Session] = None
+    db: Optional[Session] = None,
 ) -> Dict[str, Any]:
     """
     Write data to a Google Sheet.
@@ -258,21 +266,23 @@ async def update_sheet_values(
     try:
         body = {"values": values}
         sheet = get_sheets_service().spreadsheets()
-        result = sheet.values().update(
-            spreadsheetId=sheet_id,
-            range=range_name,
-            valueInputOption="RAW",
-            body=body,
-        ).execute()
+        result = (
+            sheet.values()
+            .update(
+                spreadsheetId=sheet_id,
+                range=range_name,
+                valueInputOption="RAW",
+                body=body,
+            )
+            .execute()
+        )
         return result
     except Exception as e:
         logger.exception(f"Error updating sheet values for {range_name}: {str(e)}")
         raise
 
-async def test_spreadsheet_connection(
-    spreadsheet_id: str,
-    sheet_name: str
-) -> Dict[str, Any]:
+
+async def test_spreadsheet_connection(spreadsheet_id: str, sheet_name: str) -> Dict[str, Any]:
     """
     Test the connection to a Google Sheet.
 
@@ -295,7 +305,7 @@ async def test_spreadsheet_connection(
 
         # Get all sheet names
         sheet_metadata = sheet.get(spreadsheetId=spreadsheet_id).execute()
-        sheets = sheet_metadata.get('sheets', [])
+        sheets = sheet_metadata.get("sheets", [])
         sheet_names = [s.get("properties", {}).get("title", "") for s in sheets]
 
         return {
@@ -303,7 +313,7 @@ async def test_spreadsheet_connection(
             "message": f"Successfully connected to spreadsheet '{sheet_title}'",
             "spreadsheet_title": sheet_title,
             "available_sheets": sheet_names,
-            "found_requested_sheet": sheet_name in sheet_names
+            "found_requested_sheet": sheet_name in sheet_names,
         }
     except HttpError as e:
         logger.exception(f"HTTP error testing connection to spreadsheet {spreadsheet_id}: {str(e)}")
@@ -311,28 +321,22 @@ async def test_spreadsheet_connection(
         if e.status_code == 404:
             return {
                 "status": "error",
-                "message": "Spreadsheet not found. Please check the ID and make sure the service account has access."
+                "message": "Spreadsheet not found. Please check the ID and make sure the service account has access.",
             }
         elif e.status_code == 403:
             return {
                 "status": "error",
-                "message": "Access denied. Please share the spreadsheet with the service account email."
+                "message": "Access denied. Please share the spreadsheet with the service account email.",
             }
         else:
-            return {
-                "status": "error",
-                "message": f"HTTP error {e.status_code}: {str(e)}"
-            }
+            return {"status": "error", "message": f"HTTP error {e.status_code}: {str(e)}"}
     except Exception as e:
         logger.exception(f"Error testing connection to spreadsheet {spreadsheet_id}: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Error testing connection: {str(e)}"
-        }
+        return {"status": "error", "message": f"Error testing connection: {str(e)}"}
+
 
 async def get_all_sheet_names(
-    spreadsheet_id: Optional[str] = None,
-    db: Optional[Session] = None
+    spreadsheet_id: Optional[str] = None, db: Optional[Session] = None
 ) -> Dict[str, Any]:
     """
     Get all sheet names in a spreadsheet.
@@ -350,7 +354,7 @@ async def get_all_sheet_names(
         if not sheet_id:
             return {
                 "status": "error",
-                "message": "No spreadsheet ID provided and no active configuration found"
+                "message": "No spreadsheet ID provided and no active configuration found",
             }
 
         # Get spreadsheet metadata
@@ -358,46 +362,39 @@ async def get_all_sheet_names(
             # Use our helper function that gets sheets metadata
             sheets_metadata = await get_all_sheets_metadata(sheet_id)
             sheet_names = [s.get("properties", {}).get("title", "") for s in sheets_metadata]
-            
-            logger.debug(f"Successfully retrieved {len(sheet_names)} sheet names from spreadsheet {sheet_id}")
 
-            return {
-                "status": "success",
-                "sheet_names": sheet_names
-            }
+            logger.debug(
+                f"Successfully retrieved {len(sheet_names)} sheet names from spreadsheet {sheet_id}"
+            )
+
+            return {"status": "success", "sheet_names": sheet_names}
         except Exception as metadata_error:
             logger.error(f"Error getting sheet metadata: {str(metadata_error)}")
             # Try direct API call as fallback
             sheet = get_sheets_service().spreadsheets()
             metadata = sheet.get(spreadsheetId=sheet_id).execute()
-            sheets = metadata.get('sheets', [])
+            sheets = metadata.get("sheets", [])
             sheet_names = [s.get("properties", {}).get("title", "") for s in sheets]
-            
-            logger.debug(f"Fallback: Retrieved {len(sheet_names)} sheet names from spreadsheet {sheet_id}")
-            
-            return {
-                "status": "success",
-                "sheet_names": sheet_names
-            }
-        
+
+            logger.debug(
+                f"Fallback: Retrieved {len(sheet_names)} sheet names from spreadsheet {sheet_id}"
+            )
+
+            return {"status": "success", "sheet_names": sheet_names}
+
     except ValueError as ve:
         logger.warning(f"Value error getting sheet names: {str(ve)}")
-        return {
-            "status": "error",
-            "message": str(ve)
-        }
+        return {"status": "error", "message": str(ve)}
     except Exception as e:
         logger.exception(f"Error getting sheet names for spreadsheet {spreadsheet_id}: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Error getting sheet names: {str(e)}"
-        }
+        return {"status": "error", "message": f"Error getting sheet names: {str(e)}"}
+
 
 async def get_sheet_headers_async(
     tab: str,
     spreadsheet_id: Optional[str] = None,
     db: Optional[Session] = None,
-    log_errors: bool = True
+    log_errors: bool = True,
 ) -> List[str]:
     """
     Async version of get_sheet_headers.
@@ -417,31 +414,33 @@ async def get_sheet_headers_async(
         sheet_id = spreadsheet_id
         if not sheet_id:
             if log_errors:
-                logger.info(f"No spreadsheet_id provided for tab '{tab}', getting active configuration")
-            
+                logger.info(
+                    f"No spreadsheet_id provided for tab '{tab}', getting active configuration"
+                )
+
             sheet_id = await get_active_spreadsheet_id(db)
             if not sheet_id:
                 if log_errors:
                     logger.warning("No active spreadsheet ID found")
                 return []
-            
+
             if log_errors:
                 logger.info(f"Using active spreadsheet ID: {sheet_id}")
-                
+
             # When using active configuration, also check if we have configured tab names
             if db:
                 try:
                     from app.services.sheet_config_service import get_active_configuration
                     from app.services.global_cache import cache
-                    
+
                     event_key = cache.get("active_event_key")
                     year = cache.get("active_event_year", 2025)
-                    
+
                     # Get the active configuration to check if we need to map tab names
                     result = await get_active_configuration(db, event_key, year)
                     if result["status"] == "success":
                         config = result["configuration"]
-                        
+
                         # Map tab name if it's standard
                         if tab == "Scouting" and config.get("match_scouting_sheet"):
                             mapped_tab = config["match_scouting_sheet"]
@@ -451,42 +450,45 @@ async def get_sheet_headers_async(
                         elif tab == "PitScouting" and config.get("pit_scouting_sheet"):
                             mapped_tab = config["pit_scouting_sheet"]
                             if log_errors:
-                                logger.info(f"Mapping 'PitScouting' to configured tab: {mapped_tab}")
+                                logger.info(
+                                    f"Mapping 'PitScouting' to configured tab: {mapped_tab}"
+                                )
                             tab = mapped_tab
                         elif tab == "SuperScouting" and config.get("super_scouting_sheet"):
                             mapped_tab = config["super_scouting_sheet"]
                             if log_errors:
-                                logger.info(f"Mapping 'SuperScouting' to configured tab: {mapped_tab}")
+                                logger.info(
+                                    f"Mapping 'SuperScouting' to configured tab: {mapped_tab}"
+                                )
                             tab = mapped_tab
                 except Exception as e:
                     if log_errors:
                         logger.warning(f"Error mapping tab name: {str(e)}")
-        
+
         # Use our get_sheet_values function which has better error handling
         range_name = f"{tab}!A1:ZZ1"
         if log_errors:
             logger.info(f"Getting headers from {range_name} in spreadsheet {sheet_id}")
-            
+
         values = await get_sheet_values(range_name, sheet_id, db)
-        
+
         if not values or len(values) == 0:
             if log_errors:
                 logger.warning(f"No headers found in tab '{tab}'")
             return []
-            
+
         if log_errors:
             logger.info(f"Found {len(values[0])} headers in tab '{tab}'")
-            
+
         return values[0]
     except Exception as e:
         if log_errors:
             logger.exception(f"Error getting headers from {tab}: {str(e)}")
         return []
 
+
 def get_sheet_headers(
-    tab: str,
-    spreadsheet_id: Optional[str] = None,
-    log_errors: bool = True
+    tab: str, spreadsheet_id: Optional[str] = None, log_errors: bool = True
 ) -> List[str]:
     """
     Get headers from a specific sheet tab with optional error suppression.
@@ -502,7 +504,7 @@ def get_sheet_headers(
     try:
         import asyncio
         from app.database.db import get_db_session
-        
+
         # Get database session for retrieving active configuration
         db = None
         try:
@@ -513,30 +515,30 @@ def get_sheet_headers(
         except Exception as db_error:
             if log_errors:
                 logger.warning(f"Could not get database session: {str(db_error)}")
-        
+
         # Check if tab needs to be mapped from configuration
         if not spreadsheet_id and db:
             try:
                 from app.database.models import SheetConfiguration
                 from app.services.global_cache import cache
-                
+
                 event_key = cache.get("active_event_key")
                 year = cache.get("active_event_year", 2025)
-                
+
                 if log_errors:
                     logger.info(f"Checking for tab mapping for event {event_key}, year {year}")
-                
+
                 # Get active configuration
-                config = db.query(SheetConfiguration).filter_by(
-                    event_key=event_key,
-                    year=year,
-                    is_active=True
-                ).first()
-                
+                config = (
+                    db.query(SheetConfiguration)
+                    .filter_by(event_key=event_key, year=year, is_active=True)
+                    .first()
+                )
+
                 if config:
                     if log_errors:
                         logger.info(f"Found active config: {config.name}")
-                    
+
                     # Map tab name
                     if tab == "Scouting" and config.match_scouting_sheet:
                         original_tab = tab
@@ -553,38 +555,44 @@ def get_sheet_headers(
                         tab = config.super_scouting_sheet
                         if log_errors:
                             logger.info(f"Mapped tab name from '{original_tab}' to '{tab}'")
-                    
+
                     # Use spreadsheet ID from configuration if none provided
                     if not spreadsheet_id:
                         spreadsheet_id = config.spreadsheet_id
                         if log_errors:
-                            logger.info(f"Using spreadsheet ID from active config: {spreadsheet_id}")
+                            logger.info(
+                                f"Using spreadsheet ID from active config: {spreadsheet_id}"
+                            )
             except Exception as e:
                 if log_errors:
                     logger.warning(f"Error mapping tab name: {str(e)}")
-        
+
         # If still no spreadsheet ID, return an error
         if not spreadsheet_id:
             if log_errors:
-                logger.error("No active sheet configuration found. Please set up a sheet configuration first.")
+                logger.error(
+                    "No active sheet configuration found. Please set up a sheet configuration first."
+                )
             return []
 
         # Try to run the async function
         try:
             # For Windows, we need to use WindowsSelectorEventLoopPolicy
-            if os.name == 'nt':
+            if os.name == "nt":
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
             # Create a new event loop
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
             # Run the async function
-            headers = loop.run_until_complete(get_sheet_headers_async(tab, spreadsheet_id, db, log_errors))
-            
+            headers = loop.run_until_complete(
+                get_sheet_headers_async(tab, spreadsheet_id, db, log_errors)
+            )
+
             # Close the loop
             loop.close()
-            
+
             return headers
         except RuntimeError as e:
             if "This event loop is already running" in str(e):
@@ -592,55 +600,54 @@ def get_sheet_headers(
                 # Fall back to direct API call using our get_sheet_values function
                 if log_errors:
                     logger.warning(f"Already in async context, using direct API call for {tab}")
-                
+
                 # Create a synchronous request to get headers
                 sheet = get_sheets_service().spreadsheets()
-                
+
                 # Get available sheets first
                 try:
                     metadata = sheet.get(spreadsheetId=spreadsheet_id).execute()
-                    sheets = metadata.get('sheets', [])
+                    sheets = metadata.get("sheets", [])
                     sheet_titles = [s.get("properties", {}).get("title", "") for s in sheets]
-                    
+
                     # Find the right sheet
                     actual_tab = None
                     for title in sheet_titles:
                         if title.lower() == tab.lower():
                             actual_tab = title
                             break
-                    
+
                     # If not found, try partial match
                     if not actual_tab:
                         for title in sheet_titles:
                             if tab.lower() in title.lower() or title.lower() in tab.lower():
                                 actual_tab = title
                                 break
-                    
+
                     # If still not found, use first sheet
                     if not actual_tab and sheet_titles:
                         actual_tab = sheet_titles[0]
-                    
+
                     if not actual_tab:
                         return []
-                    
+
                     # Get headers from the sheet
                     range_name = f"{actual_tab}!A1:ZZ1"
-                    result = sheet.values().get(
-                        spreadsheetId=spreadsheet_id,
-                        range=range_name
-                    ).execute()
-                    
+                    result = (
+                        sheet.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+                    )
+
                     values = result.get("values", [])
                     if values:
                         return values[0]
                 except Exception as direct_error:
                     if log_errors:
                         logger.exception(f"Error in direct API call: {str(direct_error)}")
-                
+
                 return []
             else:
                 raise
-        
+
     except Exception as e:
         if log_errors:
             logger.exception(f"Error in sync get_sheet_headers for {tab}: {str(e)}")

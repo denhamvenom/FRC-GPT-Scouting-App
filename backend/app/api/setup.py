@@ -7,6 +7,7 @@ from app.services.tba_client import get_events_by_year, get_event_details
 
 router = APIRouter(prefix="/api/setup", tags=["Setup"])
 
+
 @router.get("/events")
 async def get_events(year: int = Query(..., description="FRC Season Year")):
     """
@@ -28,14 +29,12 @@ async def get_events(year: int = Query(..., description="FRC Season Year")):
                 "key": event.get("key"),
                 "name": event.get("name"),
                 "code": event.get("event_code"),
-                "location": ", ".join(filter(None, [
-                    event.get("city"),
-                    event.get("state_prov"),
-                    event.get("country")
-                ])),
+                "location": ", ".join(
+                    filter(None, [event.get("city"), event.get("state_prov"), event.get("country")])
+                ),
                 "dates": f"{event.get('start_date')} to {event.get('end_date')}",
                 "type": event.get("event_type_string"),
-                "week": event.get("week")
+                "week": event.get("week"),
             }
             simplified_events.append(simplified_event)
 
@@ -51,14 +50,11 @@ async def get_events(year: int = Query(..., description="FRC Season Year")):
             "status": "success",
             "year": year,
             "grouped_events": grouped_events,
-            "all_events": simplified_events
+            "all_events": simplified_events,
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e),
-            "year": year
-        }
+        return {"status": "error", "message": str(e), "year": year}
+
 
 @router.get("/event/{event_key}")
 async def get_event(event_key: str):
@@ -73,23 +69,17 @@ async def get_event(event_key: str):
     """
     try:
         event_details = await get_event_details(event_key)
-        return {
-            "status": "success",
-            "event": event_details
-        }
+        return {"status": "success", "event": event_details}
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e),
-            "event_key": event_key
-        }
+        return {"status": "error", "message": str(e), "event_key": event_key}
+
 
 @router.post("/start")
 async def start_setup(
     year: int = Form(...),
     event_key: Optional[str] = Form(None),
     # manual_url: Optional[str] = Form(None), # Removed
-    manual_file: Optional[UploadFile] = File(None)
+    manual_file: Optional[UploadFile] = File(None),
 ):
     """
     Starts the learning setup process.
@@ -112,6 +102,7 @@ async def start_setup(
 
         # Store the event key in the global cache for other components to use
         from app.services.global_cache import cache
+
         cache["active_event_key"] = event_key
         cache["active_event_year"] = year
 
@@ -120,6 +111,7 @@ async def start_setup(
         print("Warning: No event_key provided, cache not updated")
 
     return result
+
 
 @router.get("/info")
 async def get_setup_info():
@@ -187,10 +179,7 @@ async def get_setup_info():
             "status": "success",
             "event_key": event_key,
             "year": year,
-            "sheet_config": sheet_config
+            "sheet_config": sheet_config,
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "message": f"Error retrieving setup info: {str(e)}"
-        }
+        return {"status": "error", "message": f"Error retrieving setup info: {str(e)}"}
