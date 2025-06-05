@@ -20,7 +20,7 @@ class CompareTeamsRequest(BaseModel):
     unified_dataset_path: str
     team_numbers: List[int]
     your_team_number: int
-    pick_position: str = Field(..., regex="^(first|second|third)$")
+    pick_position: str = Field(..., pattern="^(first|second|third)$")
     priorities: List[MetricPriority]
     question: Optional[str] = None
 
