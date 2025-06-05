@@ -483,7 +483,7 @@ class PicklistGeneratorService:
 
         try:
             # Start comprehensive logging
-            logger.info(f"====== STARTING PICKLIST GENERATION ======")
+            logger.info("====== STARTING PICKLIST GENERATION ======")
             logger.info(f"Pick position: {pick_position}")
             logger.info(f"Your team: {your_team_number}")
             logger.info(f"Priority metrics count: {len(priorities)}")
@@ -669,7 +669,7 @@ class PicklistGeneratorService:
                 # Cache the result
                 self._picklist_cache[cache_key] = result
 
-                logger.info(f"====== BATCH PROCESSING COMPLETE ======")
+                logger.info("====== BATCH PROCESSING COMPLETE ======")
                 return result
 
             else:
@@ -939,7 +939,7 @@ class PicklistGeneratorService:
                                             f"Detected repeating pattern of length {pattern_length}"
                                         )
                                         logger.warning(
-                                            f"Model is repeating teams instead of ranking all teams"
+                                            "Model is repeating teams instead of ranking all teams"
                                         )
                                         # Truncate to first pattern only to avoid duplicates
                                         logger.warning(
@@ -1299,7 +1299,7 @@ class PicklistGeneratorService:
 
             if duplicates:
                 logger.info(f"Found {len(duplicates)} duplicate teams: {duplicates[:10]}...")
-                logger.info(f"Resolved by keeping the entry with higher score for each team")
+                logger.info("Resolved by keeping the entry with higher score for each team")
 
                 # Analyze the duplicates in more detail
                 duplicate_counts = {}
@@ -1334,7 +1334,7 @@ class PicklistGeneratorService:
 
             # Debug: Log the first 5 teams in the picklist before deduplication
             if picklist and len(picklist) > 0:
-                logger.info(f"First 5 raw teams from GPT response BEFORE deduplication:")
+                logger.info("First 5 raw teams from GPT response BEFORE deduplication:")
                 for i, team in enumerate(picklist[:5]):
                     logger.info(
                         f"  Raw Team {i+1}: {team.get('team_number')} - {team.get('nickname')}"
@@ -1421,7 +1421,7 @@ class PicklistGeneratorService:
 
             # Log completion stats
             total_time = time.time() - start_time
-            logger.info(f"====== PICKLIST GENERATION COMPLETE ======")
+            logger.info("====== PICKLIST GENERATION COMPLETE ======")
             logger.info(f"Total time: {total_time:.2f}s for {len(deduplicated_picklist)} teams")
             logger.info(
                 f"Average time per team: {(total_time / len(deduplicated_picklist) if deduplicated_picklist else 0):.2f}s"
@@ -1667,12 +1667,12 @@ Please produce output following RULES.
         if not teams_data:
             return {
                 "status": "error",
-                "message": f"No team data found for missing teams",
+                "message": "No team data found for missing teams",
             }
 
         try:
             # Start comprehensive logging
-            logger.info(f"====== STARTING MISSING TEAMS RANKING ======")
+            logger.info("====== STARTING MISSING TEAMS RANKING ======")
             logger.info(f"Pick position: {pick_position}")
             logger.info(f"Your team: {your_team_number}")
             logger.info(f"Priority metrics count: {len(priorities)}")
@@ -1832,7 +1832,7 @@ Please produce output following RULES.
                                             f"Detected repeating pattern of length {pattern_length}"
                                         )
                                         logger.warning(
-                                            f"Model is repeating teams instead of ranking all teams"
+                                            "Model is repeating teams instead of ranking all teams"
                                         )
                                         # Truncate to first pattern only to avoid duplicates
                                         logger.warning(
@@ -1863,6 +1863,7 @@ Please produce output following RULES.
                     # Convert ultra-compact format to standard format
                     rankings = []
                     seen_teams = set()  # Track teams we've already added
+                    team_index_map = locals().get("team_index_map")
 
                     for team_entry in response_data["p"]:
                         if (
@@ -2169,7 +2170,7 @@ Please produce output following RULES.
                 logger.info(
                     f"Found {len(duplicates)} duplicate teams in missing teams rankings: {duplicates[:10]}..."
                 )
-                logger.info(f"Resolved by keeping the entry with higher score for each team")
+                logger.info("Resolved by keeping the entry with higher score for each team")
 
                 # Analyze the duplicates in more detail
                 duplicate_counts = {}
@@ -2261,7 +2262,7 @@ Please produce output following RULES.
 
             # Log completion stats
             total_time = time.time() - start_time
-            logger.info(f"====== MISSING TEAMS RANKING COMPLETE ======")
+            logger.info("====== MISSING TEAMS RANKING COMPLETE ======")
             logger.info(f"Total time: {total_time:.2f}s for {len(deduplicated_rankings)} teams")
             logger.info(
                 f"Average time per team: {(total_time / len(deduplicated_rankings) if deduplicated_rankings else 0):.2f}s"
