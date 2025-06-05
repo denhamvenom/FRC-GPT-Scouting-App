@@ -2,8 +2,23 @@
 
 ## 2025-06-05
 
-- Added team comparison modal with GPT-powered re-ranking
-- New `/api/picklist/compare-teams` endpoint
+### Enhanced Team Comparison & Re-Ranking Feature
+
+- **Complete redesign of TeamComparisonModal** with professional two-panel layout
+  - Left panel: Selected teams, strategy selection, ranking results, and controls
+  - Right panel: Chat-style GPT analysis interface with conversation history
+- **Chat-style conversational interface** for team analysis
+  - Initial analysis provides comprehensive narrative explaining team rankings
+  - Follow-up questions maintain conversation context for deeper insights
+  - Auto-scrolling chat with proper message formatting and timestamps
+- **Enhanced backend analysis** with custom system prompts for detailed explanations
+  - New `_create_comparison_system_prompt()` method for narrative analysis
+  - Structured JSON response format with both ranking data and 200-400 word summaries
+  - Improved response parsing to handle detailed analysis format
+- **Visual improvements** including loading states, error handling, and professional styling
+- **Keyboard shortcuts** (Enter to send, Shift+Enter for new lines)
+- **Chat management** with options to clear conversation or reset analysis
+- Updated API endpoint `/api/picklist/compare-teams` with chat history support
 
 ## 2025-05-20
 

@@ -6,6 +6,7 @@ A year‑agnostic, team‑agnostic, data‑agnostic toolkit that automates FRC e
 * **Field Selection** – Select which fields from your scouting spreadsheet to analyze; game manual analysis for strategic insights
 * **Data Validation** – Flag missing or outlier match rows and let users rescout virtually, replace with averages, or ignore with reason
 * **Pick‑List Builder** – Create ranked first/second/third‑pick lists from validated data given user‑ranked priorities; allow manual drag‑drop; includes both scouting and superscouting metrics
+* **Team Comparison & Re-Ranking** – Interactive chat-style interface for comparing 2-3 teams using GPT analysis; provides detailed narrative explanations and suggested re-rankings with conversational follow-up questions
 * **Alliance Selection** – Live draft tracker with realistic FRC rules; automatically excludes alliance captains for 2nd/3rd picks; real-time updates with visual team status indicators
 * **Progress Tracking** – Real-time progress updates during picklist generation with percentage completion and time estimates
 
@@ -54,6 +55,7 @@ backend/
 │   │   ├── unified_event_data_service.py  # Dataset building service
 │   │   ├── picklist_generator_service.py  # GPT picklist generation
 │   │   ├── picklist_analysis_service.py   # Metrics analysis service
+│   │   ├── team_comparison_service.py     # Team comparison with narrative analysis
 │   │   ├── sheets_service.py              # Google Sheets service
 │   │   ├── sheet_config_service.py        # Sheet configuration
 │   │   ├── schema_service.py              # Schema management
@@ -102,6 +104,7 @@ frontend/
 │   ├── components/
 │   │   ├── Navbar.tsx                    # Navigation component
 │   │   ├── PicklistGenerator.tsx         # Picklist display component
+│   │   ├── TeamComparisonModal.tsx       # Team comparison & re-ranking modal
 │   │   ├── ProgressTracker.tsx           # Progress tracking UI
 │   │   ├── EventArchiveManager.tsx       # Event archive UI
 │   │   ├── SheetConfigManager.tsx        # Sheet config UI
@@ -131,6 +134,7 @@ frontend/
 | `/api/picklist/analyze` | POST JSON | `{ unified_dataset_path, [priorities], [strategy_prompt] }` | Available metrics & analysis |
 | `/api/picklist/generate` | POST JSON | `{ unified_dataset_path, your_team_number, pick_position, priorities, exclude_teams, cache_key? }` | Ranked picklist |
 | `/api/picklist/generate/status` | POST JSON | `{ cache_key }` | Generation progress status |
+| `/api/picklist/compare-teams` | POST JSON | `{ unified_dataset_path, team_numbers[], your_team_number, pick_position, priorities, question?, chat_history? }` | Team comparison with narrative analysis |
 | `/api/progress/{operation_id}` | GET | - | Progress tracking data |
 | `/api/alliance/lock-picklist` | POST JSON | `{ team_number, event_key, year, first_pick_data, second_pick_data, third_pick_data }` | Lock picklist |
 | `/api/alliance/picklist/{picklist_id}` | DELETE | - | Unlock picklist |
