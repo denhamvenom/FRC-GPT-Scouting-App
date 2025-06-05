@@ -156,3 +156,11 @@
 * **Batch Processing** – Efficient handling of large team counts
 * **Progress Tracking** – Real-time feedback for long operations
 * **Request Deduplication** – Cache keys prevent redundant work
+### Database Models
+* **LockedPicklist** – stores generated picklists with excluded teams and prompts
+* **AllianceSelection** – tracks the state of draft events
+* **Alliance** – teams chosen for each alliance position
+* **TeamSelectionStatus** – captain/picked/declined status for teams
+* **GameManual** – uploaded PDF manuals and parsed sections
+* **SheetConfiguration** – Google Sheets tab mapping for each event
+* **ArchivedEvent** – serialized event data backups

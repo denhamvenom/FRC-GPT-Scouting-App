@@ -1,5 +1,11 @@
 # Changelog
 
+## 2025-05-20
+* Documentation refreshed with database model overview
+* Added Docker quickstart instructions to README
+* Updated requirements to latest versions
+* New Architecture section for database models
+
 ## 2025-05-19
 * Implemented real-time progress tracking for picklist generation
 * Added ProgressTracker component with percentage completion and time estimates

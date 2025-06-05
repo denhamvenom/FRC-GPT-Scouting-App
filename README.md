@@ -186,6 +186,13 @@ frontend/
    cd frontend
    npm run dev
    ```
+### Docker Quickstart
+To run the stack with Docker, install Docker and Docker Compose then execute:
+```bash
+docker-compose up --build
+```
+The backend will be on http://localhost:8000 and the frontend on http://localhost:5173.
+
 
 ## Features
 
