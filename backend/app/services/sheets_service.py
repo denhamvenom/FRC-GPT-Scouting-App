@@ -22,7 +22,10 @@ SERVICE_ACCOUNT_FILE_ENV = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
 DEFAULT_SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID")  # Fallback if no config in DB
 
 # Path resolution logic to handle both Windows and Linux/Docker paths
-def resolve_service_account_path(path: str) -> str:
+def resolve_service_account_path(path: Optional[str]) -> Optional[str]:
+    """Safely resolve a service account file path."""
+    if not path:
+        return None
     # If the path exists as-is, use it
     if os.path.exists(path):
         return path
