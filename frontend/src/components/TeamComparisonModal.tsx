@@ -25,6 +25,15 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface ComparisonData {
+  teams: Array<{
+    team_number: number;
+    nickname: string;
+    stats: Record<string, number>;
+  }>;
+  metrics: string[];
+}
+
 interface TeamComparisonModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -50,6 +59,7 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
   const [currentQuestion, setCurrentQuestion] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [result, setResult] = useState<Team[] | null>(null);
+  const [comparisonData, setComparisonData] = useState<ComparisonData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasInitialAnalysis, setHasInitialAnalysis] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -107,6 +117,14 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
       // Only update result if we got new team rankings (initial analysis)
       if (data.ordered_teams) {
         setResult(data.ordered_teams);
+      }
+      
+      // Update comparison data if available
+      if (data.comparison_data) {
+        console.log('Comparison data received:', data.comparison_data);
+        setComparisonData(data.comparison_data);
+      } else {
+        console.log('No comparison_data in response:', data);
       }
       
       if (data.summary) {
@@ -175,14 +193,46 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
   const resetAnalysis = () => {
     setChatHistory([]);
     setResult(null);
+    setComparisonData(null);
     setHasInitialAnalysis(false);
+  };
+
+  const getStatColor = (value: number, allValues: number[]) => {
+    if (allValues.length <= 1) return "bg-gray-100";
+    
+    const sortedValues = [...allValues].sort((a, b) => b - a); // Descending order
+    const highestValue = sortedValues[0];
+    const lowestValue = sortedValues[sortedValues.length - 1];
+    
+    if (allValues.length === 2) {
+      return value === highestValue ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+    } else {
+      // Three teams: highest = green, lowest = red, middle = yellow
+      if (value === highestValue) return "bg-green-100 text-green-800";
+      if (value === lowestValue) return "bg-red-100 text-red-800";
+      return "bg-yellow-100 text-yellow-800";
+    }
+  };
+
+  const formatMetricName = (metric: string) => {
+    return metric
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, l => l.toUpperCase())
+      .replace(/\bAvg\b/g, 'Average')
+      .replace(/\bEpa\b/g, 'EPA')
+      .replace(/\bTeleop\b/g, 'Teleop')
+      .replace(/\bAuto\b/g, 'Autonomous')
+      .replace(/\bTeleoperated\b/g, 'Teleoperated')
+      .replace(/\bAutonomous\b/g, 'Autonomous')
+      .replace(/\bPts\b/g, 'Points')
+      .replace(/\bDef\b/g, 'Defense');
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-6xl h-5/6 flex flex-col">
+      <div className="bg-white rounded-lg w-full max-w-7xl h-5/6 flex flex-col">
         {/* Header */}
         <div className="border-b border-gray-200 p-4 flex justify-between items-center">
           <h3 className="text-xl font-semibold">Team Comparison & Re-Ranking</h3>
@@ -197,7 +247,7 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
         {/* Main Content */}
         <div className="flex-1 flex min-h-0">
           {/* Left Panel - Team Selection & Controls */}
-          <div className="w-1/3 border-r border-gray-200 p-4 flex flex-col">
+          <div className="w-1/4 border-r border-gray-200 p-4 flex flex-col">
             <div className="space-y-4">
               {/* Selected Teams */}
               <div>
@@ -301,8 +351,8 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
             </div>
           </div>
 
-          {/* Right Panel - Chat Analysis */}
-          <div className="flex-1 flex flex-col">
+          {/* Center Panel - Chat Analysis */}
+          <div className="flex-1 flex flex-col border-r border-gray-200">
             {/* Chat Header */}
             <div className="border-b border-gray-200 p-3">
               <h4 className="font-medium text-gray-900">GPT Analysis</h4>
@@ -426,6 +476,108 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Right Panel - Statistical Comparison */}
+          <div className="w-1/3 flex flex-col">
+            {/* Stats Header */}
+            <div className="border-b border-gray-200 p-3">
+              <h4 className="font-medium text-gray-900">Statistical Comparison</h4>
+              <p className="text-sm text-gray-600">
+                {comparisonData?.metrics?.length > 0 
+                  ? "GPT-selected key metrics for comparison" 
+                  : "Direct comparison of key metrics"}
+              </p>
+            </div>
+
+            {/* Stats Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {!comparisonData ? (
+                <div className="text-center text-gray-500 mt-8">
+                  <div className="bg-gray-50 rounded-lg p-6 border">
+                    <p className="font-medium">No Comparison Data</p>
+                    <p className="text-sm mt-2">
+                      Run analysis to see statistical comparison
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {comparisonData.metrics.length === 0 ? (
+                    <div className="text-center text-gray-500">
+                      <p>No comparable metrics found</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {comparisonData.metrics.map((metric) => {
+                        const teams = comparisonData.teams.filter(team => 
+                          team.stats[metric] !== undefined && team.stats[metric] !== null
+                        );
+                        
+                        if (teams.length === 0) return null;
+                        
+                        const values = teams.map(team => team.stats[metric]);
+                        
+                        return (
+                          <div key={metric} className="bg-white border rounded-lg p-3">
+                            <h5 className="font-medium text-sm text-gray-800 mb-2">
+                              {formatMetricName(metric)}
+                            </h5>
+                            <div className="space-y-1">
+                              {teams.map((team) => {
+                                const value = team.stats[metric];
+                                const colorClass = getStatColor(value, values);
+                                
+                                return (
+                                  <div
+                                    key={team.team_number}
+                                    className={`flex justify-between items-center p-2 rounded text-sm ${colorClass}`}
+                                  >
+                                    <span className="font-medium">
+                                      Team {team.team_number}
+                                    </span>
+                                    <span className="font-mono">
+                                      {typeof value === 'number' ? value.toFixed(2) : value}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      
+                      {comparisonData.metrics.length > 0 && (
+                        <div className="text-center text-sm text-gray-500 italic mt-4">
+                          Showing {comparisonData.metrics.length} GPT-recommended metrics
+                        </div>
+                      )}
+                      
+                      {/* Legend */}
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg border">
+                        <p className="text-xs font-medium text-gray-700 mb-2">Legend:</p>
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <div className="flex items-center space-x-1">
+                            <div className="w-3 h-3 bg-green-100 rounded"></div>
+                            <span>Highest</span>
+                          </div>
+                          {comparisonData.teams.length === 3 && (
+                            <div className="flex items-center space-x-1">
+                              <div className="w-3 h-3 bg-yellow-100 rounded"></div>
+                              <span>Middle</span>
+                            </div>
+                          )}
+                          <div className="flex items-center space-x-1">
+                            <div className="w-3 h-3 bg-red-100 rounded"></div>
+                            <span>Lowest</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
