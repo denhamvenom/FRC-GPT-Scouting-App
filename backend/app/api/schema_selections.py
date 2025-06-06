@@ -2,6 +2,7 @@
 
 import os
 import json
+import re
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Optional, List, Any
@@ -38,6 +39,10 @@ async def save_field_selections(selections: FieldSelections):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         data_dir = os.path.join(base_dir, "data")
         os.makedirs(data_dir, exist_ok=True)
+
+        # Auto-generate robot groups for superscouting fields if not provided
+        if not selections.robot_groups:
+            selections.robot_groups = generate_auto_robot_groups_for_save(selections.field_selections)
 
         # Save selections to file
         selections_path = os.path.join(data_dir, f"field_selections_{selections.year}.json")
@@ -101,3 +106,64 @@ async def save_field_selections(selections: FieldSelections):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def generate_auto_robot_groups_for_save(field_selections: Dict[str, str]) -> Dict[str, List[str]]:
+    """
+    Auto-generate robot groups for superscouting fields.
+    
+    Args:
+        field_selections: Dictionary of field selections from the frontend
+        
+    Returns:
+        Dictionary mapping robot labels to their field lists
+    """
+    # Get superscouting headers
+    try:
+        from app.services.sheets_service import get_sheet_headers
+        super_headers = get_sheet_headers("SuperScouting", log_errors=False) or []
+    except Exception:
+        # Fallback: get superscouting fields from field_selections
+        super_headers = [header for header, category in field_selections.items() 
+                        if category != "ignore"]
+    
+    # Filter to only include superscouting fields that are not ignored
+    active_super_headers = [header for header in super_headers 
+                           if header in field_selections and field_selections[header] != "ignore"]
+    
+    auto_groups = {
+        "robot_1": [],
+        "robot_2": [],
+        "robot_3": []
+    }
+    
+    # Try to detect existing robot patterns first
+    robot_patterns = [
+        [re.compile(r'robot\s*1|r1\b', re.IGNORECASE), re.compile(r'robot\s*2|r2\b', re.IGNORECASE), re.compile(r'robot\s*3|r3\b', re.IGNORECASE)],
+        [re.compile(r'\b1\s*[-_]'), re.compile(r'\b2\s*[-_]'), re.compile(r'\b3\s*[-_]')],
+        [re.compile(r'_1_'), re.compile(r'_2_'), re.compile(r'_3_')],
+        [re.compile(r'\b1\b'), re.compile(r'\b2\b'), re.compile(r'\b3\b')]  # More general pattern
+    ]
+    
+    pattern_found = False
+    for pattern_set in robot_patterns:
+        r1_headers = [h for h in active_super_headers if pattern_set[0].search(h)]
+        r2_headers = [h for h in active_super_headers if pattern_set[1].search(h)]
+        r3_headers = [h for h in active_super_headers if pattern_set[2].search(h)]
+        
+        # If we found substantial matches for at least two robots, use this pattern
+        if len(r1_headers) > 0 and len(r2_headers) > 0:
+            auto_groups["robot_1"] = r1_headers
+            auto_groups["robot_2"] = r2_headers
+            auto_groups["robot_3"] = r3_headers
+            pattern_found = True
+            print(f"Auto-detected robot pattern for save: R1={len(r1_headers)}, R2={len(r2_headers)}, R3={len(r3_headers)} fields")
+            break
+    
+    # If no patterns found, assign ALL active superscouting fields to ALL robots
+    if not pattern_found:
+        print(f"No robot patterns detected for save. Assigning all {len(active_super_headers)} active superscouting fields to all 3 robots.")
+        for robot_label in auto_groups.keys():
+            auto_groups[robot_label] = active_super_headers.copy()
+    
+    return auto_groups

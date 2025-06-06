@@ -102,36 +102,6 @@ const autoCategorizeField = (header: string): string => {
   return 'other';
 };
 
-// Helper function to ensure robot group team numbers and match numbers are correctly handled
-const processRobotGroups = (groups: { [key: string]: string[] }, selectedFields: { [key: string]: string }) => {
-  // Check all fields for potential match numbers
-  Object.entries(selectedFields).forEach(([header, _]) => {
-    if (/qual\s*number/i.test(header)) {
-      selectedFields[header] = 'match_number';
-    }
-  });
-  
-  Object.entries(groups).forEach(([_, headers]) => {
-    // Find team number field in this robot group
-    const teamNumberField = headers.find(header => 
-      /robot\s*\d+\s*number/i.test(header)
-    );
-    
-    // If found, make sure it's mapped as team_number
-    if (teamNumberField) {
-      selectedFields[teamNumberField] = 'team_number';
-    }
-    
-    // Also map match related fields if they exist in groups
-    headers.forEach(header => {
-      if (/qual\s*number/i.test(header)) {
-        selectedFields[header] = 'match_number';
-      }
-    });
-  });
-  
-  return selectedFields;
-};
 
 function FieldSelection() {
   const navigate = useNavigate();
@@ -155,18 +125,6 @@ function FieldSelection() {
     match_number: []
   });
 
-  // Robot grouping for superscouting
-  const [robotGroups, setRobotGroups] = useState<{ [key: string]: string[] }>({
-    robot_1: [],
-    robot_2: [],
-    robot_3: []
-  });
-
-  // Current robot group being edited
-  const [activeRobotGroup, setActiveRobotGroup] = useState<string>('robot_1');
-
-  // Headers that are already assigned to a robot group
-  const [assignedHeaders, setAssignedHeaders] = useState<Set<string>>(new Set());
 
   // UI state
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -361,11 +319,10 @@ function FieldSelection() {
         try {
           availableTabs = await tryEndpoints();
 
-          // If we have no available tabs, it's likely because we couldn't find the configuration
+          // If we have no available tabs, we'll try to fetch headers anyway using fallback logic
           if (!availableTabs || availableTabs.length === 0) {
-            setError("Could not fetch sheet tabs. Please make sure you have set up a valid sheet configuration in the Setup page and that you have selected an event.");
-            setIsLoading(false);
-            return;
+            console.warn("Could not fetch sheet tabs list, but will attempt to fetch headers using configured tab names");
+            // Don't return here - continue with the header fetching logic
           }
         } catch (error) {
           console.error("Exception in tab search process:", error);
@@ -374,13 +331,13 @@ function FieldSelection() {
           return;
         }
 
-        // Check if our configured tabs exist in the available tabs
-        const hasMatchTab = availableTabs.includes(matchScoutingTab);
-        const hasSuperTab = availableTabs.includes(superScoutingTab);
-        const hasPitTab = availableTabs.includes(pitScoutingTab);
+        // Check if our configured tabs exist in the available tabs (if we got the tab list)
+        const hasMatchTab = availableTabs.length === 0 || availableTabs.includes(matchScoutingTab);
+        const hasSuperTab = availableTabs.length === 0 || availableTabs.includes(superScoutingTab);
+        const hasPitTab = availableTabs.length === 0 || availableTabs.includes(pitScoutingTab);
 
-        // Show warning if we can't find the match scouting tab
-        if (!hasMatchTab) {
+        // Show warning if we can't find the match scouting tab and we have a valid tab list
+        if (!hasMatchTab && availableTabs.length > 0) {
           setError(`Could not find the configured match scouting tab "${matchScoutingTab}" in the spreadsheet. Available tabs are: ${availableTabs.join(", ")}`);
         }
 
@@ -472,6 +429,12 @@ function FieldSelection() {
         setSuperscoutingHeaders(superData.headers || []);
         setPitScoutingHeaders(pitData.headers || []);
 
+        // Clear any previous errors if we successfully got headers
+        const totalHeaders = (scoutData.headers || []).length + (superData.headers || []).length + (pitData.headers || []).length;
+        if (totalHeaders > 0) {
+          setError(null);
+        }
+
         // Initialize all headers with auto-categorization
         const initialFields: { [key: string]: string } = {};
         [
@@ -482,54 +445,16 @@ function FieldSelection() {
           initialFields[header] = autoCategorizeField(header);
         });
 
-        // Try to auto-detect robot groupings in superscouting headers
-        const superHeaders = superData.headers || [];
-        const newRobotGroups = { ...robotGroups };
-        const newAssignedHeaders = new Set<string>();
+        // Set selected fields with auto-categorization
+        setSelectedFields(initialFields);
 
-        // Try to detect patterns like "Robot 1 X", "Robot 2 X", "Robot 3 X"
-        // or "R1 X", "R2 X", "R3 X"
-        const robotPatterns = [
-          [/robot\s*1|r1\b/i, /robot\s*2|r2\b/i, /robot\s*3|r3\b/i],
-          [/\b1\s*-/, /\b2\s*-/, /\b3\s*-/],
-          [/_1_/, /_2_/, /_3_/]
-        ];
-
-        for (const patternSet of robotPatterns) {
-          const r1Headers = superHeaders.filter((h: string) => patternSet[0].test(h));
-          const r2Headers = superHeaders.filter((h: string) => patternSet[1].test(h));
-          const r3Headers = superHeaders.filter((h: string) => patternSet[2].test(h));
-
-          // If we found substantial matches for all robots, use them
-          if (r1Headers.length > 1 && r2Headers.length > 1 && r3Headers.length > 1) {
-            newRobotGroups.robot_1 = r1Headers;
-            newRobotGroups.robot_2 = r2Headers;
-            newRobotGroups.robot_3 = r3Headers;
-
-            // Mark these headers as assigned
-            [...r1Headers, ...r2Headers, ...r3Headers].forEach((h: string) => {
-              newAssignedHeaders.add(h);
-            });
-
-            break;
-          }
-        }
-
-        // Set up robot groups first
-        setRobotGroups(newRobotGroups);
-        setAssignedHeaders(newAssignedHeaders);
-
-        // Process fields after robot groups are established
-        const processedFields = processRobotGroups(newRobotGroups, initialFields);
-        setSelectedFields(processedFields);
-
-        // Update critical field mappings after processing
+        // Update critical field mappings
         const newCriticalMappings = {
           team_number: [] as string[],
           match_number: [] as string[]
         };
 
-        Object.entries(processedFields).forEach(([header, category]) => {
+        Object.entries(initialFields).forEach(([header, category]) => {
           if (category === 'team_number') {
             newCriticalMappings.team_number.push(header);
           } else if (category === 'match_number') {
@@ -539,7 +464,7 @@ function FieldSelection() {
         setCriticalFieldMappings(newCriticalMappings);
 
         // Add feedback about automated categorization
-        const autoMappedCount = Object.values(processedFields).filter(v => v !== 'ignore' && v !== 'other').length;
+        const autoMappedCount = Object.values(initialFields).filter(v => v !== 'ignore' && v !== 'other').length;
         if (autoMappedCount > 0) {
           setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on naming patterns. Please review and adjust as needed.`);
         }
@@ -607,44 +532,6 @@ function FieldSelection() {
     // Validation will run automatically via useEffect
   };
 
-  const handleAddToRobotGroup = (header: string) => {
-    // Remove from any existing robot group
-    const updatedGroups = { ...robotGroups };
-    
-    // Remove header from all groups
-    Object.keys(updatedGroups).forEach(group => {
-      updatedGroups[group] = updatedGroups[group].filter(h => h !== header);
-    });
-    
-    // Add to current active group
-    updatedGroups[activeRobotGroup] = [...updatedGroups[activeRobotGroup], header];
-    
-    // Update state
-    setRobotGroups(updatedGroups);
-    
-    // Update assigned headers
-    const newAssignedHeaders = new Set(assignedHeaders);
-    newAssignedHeaders.add(header);
-    setAssignedHeaders(newAssignedHeaders);
-  };
-
-  const handleRemoveFromRobotGroup = (header: string, group: string) => {
-    const updatedGroups = { ...robotGroups };
-    updatedGroups[group] = updatedGroups[group].filter(h => h !== header);
-    setRobotGroups(updatedGroups);
-    
-    // Only remove from assigned headers if it's not in any group
-    const isAssigned = Object.values(updatedGroups).some(headers => headers.includes(header));
-    if (!isAssigned) {
-      const newAssignedHeaders = new Set(assignedHeaders);
-      newAssignedHeaders.delete(header);
-      setAssignedHeaders(newAssignedHeaders);
-    }
-  };
-
-  const handleRobotGroupChange = (robot: string) => {
-    setActiveRobotGroup(robot);
-  };
 
   // Handle changing the UI category tab
   const handleTabChange = (categoryId: string) => {
@@ -712,8 +599,7 @@ function FieldSelection() {
       const schema = {
         field_selections: selectedFields,
         year: year,
-        critical_mappings: criticalFieldMappings,
-        robot_groups: robotGroups
+        critical_mappings: criticalFieldMappings
       };
       
       const response = await fetch('http://localhost:8000/api/schema/save-selections', {
@@ -729,18 +615,10 @@ function FieldSelection() {
       // Show initial success message
       setSuccessMessage('Field selections saved successfully! Now learning schema mappings...');
       
-      // Trigger schema mapping for both regular scouting and superscout
+      // Trigger schema mapping for regular scouting
       try {
         // Learn regular scouting schema
         await fetch('http://localhost:8000/api/schema/learn');
-        
-        // Learn superscouting schema with data analysis
-        const superResponse = await fetch('http://localhost:8000/api/schema/super/learn');
-        const superData = await superResponse.json();
-        
-        if (superResponse.ok && superData.status === 'success') {
-          setSuccessMessage('Field selections and schema mappings saved successfully! Analyzing data content...');
-        }
         
         // Show building dataset message
         setSuccessMessage('Field selections and schema mappings saved successfully! Building dataset...');
@@ -881,7 +759,7 @@ function FieldSelection() {
           <p className="mb-4 text-blue-700">
             These fields are required for proper data validation and match tracking.
             They must be mapped correctly for the system to function properly.
-            <span className="block mt-1">Note: You can select multiple team number and match number fields for superscouting robot groups.</span>
+            <span className="block mt-1">Note: You can select multiple team number and match number fields if needed.</span>
           </p>
 
           <div className="grid grid-cols-1 gap-4">
@@ -1134,118 +1012,45 @@ function FieldSelection() {
 
           {superscoutingHeaders.length > 0 ? (
             <>
-              <h3 className="text-lg font-bold mb-4">Robot Groups</h3>
               <p className="mb-4 text-gray-600">
-                Group superscouting headers by robot to create separate records for each robot in a match.
-                <span className="block mt-1 font-semibold text-blue-700">
-                  You can mark multiple team number fields - one for each robot group.
+                Select which fields to include in analysis and categorize them.
+                These fields come from the "SuperScouting" tab in your spreadsheet.
+                <span className="block mt-2 p-3 bg-blue-50 rounded border-l-4 border-blue-400 text-blue-800">
+                  <strong>Note:</strong> All superscouting fields will automatically be applied to all three robots in each match.
+                  No manual robot assignment is needed.
                 </span>
               </p>
 
-              {/* Robot Group Selection Tabs */}
-              <div className="flex border-b mb-4">
-                {Object.keys(robotGroups).map((robot) => (
-                  <button
-                    key={robot}
-                    onClick={() => handleRobotGroupChange(robot)}
-                    className={`py-2 px-4 font-medium ${
-                      activeRobotGroup === robot
-                        ? 'text-blue-600 border-b-2 border-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    {robot.replace('_', ' ').toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              {/* Robot Group Members Display */}
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                {Object.entries(robotGroups).map(([robot, headers]) => (
-                  <div
-                    key={robot}
-                    className={`border rounded-lg p-4 ${
-                      activeRobotGroup === robot ? 'border-blue-500 bg-blue-50' : ''
-                    }`}
-                  >
-                    <h3 className="font-bold mb-2">{robot.replace('_', ' ').toUpperCase()}</h3>
-                    {headers.length === 0 ? (
-                      <p className="text-gray-500 text-sm italic">No fields assigned</p>
-                    ) : (
-                      <ul className="space-y-1">
-                        {headers.map(header => {
-                          const criticalType = getCriticalFieldType(header);
-                          return (
-                            <li key={header} className="flex justify-between items-center text-sm">
-                              <span>
-                                {header}
-                                {criticalType && (
-                                  <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                    {criticalType === 'team_number' ? 'Team #' : 'Match #'}
-                                  </span>
-                                )}
-                              </span>
-                              <button
-                                onClick={() => handleRemoveFromRobotGroup(header, robot)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                ×
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <h3 className="text-lg font-bold mb-4">Available SuperScouting Fields</h3>
-              <p className="mb-4 text-gray-600">
-                Add fields to the currently selected robot group above.
-              </p>
-
-              <div>
+              <div className="mb-6">
                 <table className="min-w-full border">
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="border px-4 py-2 text-left">Header</th>
                       <th className="border px-4 py-2 text-left">Category</th>
-                      <th className="border px-4 py-2 text-center w-24">Robot Group</th>
                     </tr>
                   </thead>
                   <tbody>
                     {superscoutingHeaders.map((header, index) => {
-                      const isAssigned = assignedHeaders.has(header);
-                      const assignedGroup = Object.entries(robotGroups)
-                        .find(([_, headers]) => headers.includes(header))?.[0];
                       const criticalType = getCriticalFieldType(header);
 
                       return (
                         <tr
                           key={`super-${index}`}
-                          className={`${isAssigned ? 'bg-gray-100' : 'hover:bg-gray-50'} ${
-                            criticalType ? 'bg-blue-50' : ''
-                          }`}
+                          className={`${criticalType ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                         >
                           <td className="border px-4 py-2">
-                            {header}
-                            {assignedGroup && (
-                              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                {assignedGroup.replace('_', ' ').toUpperCase()}
-                              </span>
-                            )}
                             {criticalType && (
-                              <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
-                                {criticalType === 'team_number' ? 'Team #' : 'Match #'}
+                              <span className="inline-block mr-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                {criticalType === 'team_number' ? 'Team Number' : 'Match Number'}
                               </span>
                             )}
+                            {header}
                           </td>
                           <td className="border px-4 py-2">
                             <select
                               value={selectedFields[header] || 'ignore'}
                               onChange={(e) => handleCategoryChange(header, e.target.value)}
-                              className="w-full p-1 border rounded"
+                              className={`w-full p-1 border rounded ${criticalType ? 'bg-blue-50 font-medium' : ''}`}
                             >
                               <option value="ignore">Ignore</option>
                               <option value="team_number">Team Number</option>
@@ -1256,23 +1061,6 @@ function FieldSelection() {
                                 </option>
                               ))}
                             </select>
-                          </td>
-                          <td className="border px-4 py-2 text-center">
-                            {assignedGroup ? (
-                              <button
-                                onClick={() => handleRemoveFromRobotGroup(header, assignedGroup)}
-                                className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200"
-                              >
-                                Remove
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleAddToRobotGroup(header)}
-                                className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs hover:bg-blue-200"
-                              >
-                                {`Add to ${activeRobotGroup.replace('_', ' ').toUpperCase()}`}
-                              </button>
-                            )}
                           </td>
                         </tr>
                       );

@@ -90,7 +90,7 @@ def get_sheets_service():
         except Exception as e:
             logger.exception("Failed to decode or parse split base64 credentials.")
             raise
-    elif SERVICE_ACCOUNT_FILE:
+    elif SERVICE_ACCOUNT_FILE_ENV:
         SERVICE_ACCOUNT_FILE = resolve_service_account_path(SERVICE_ACCOUNT_FILE_ENV)
         credentials = service_account.Credentials.from_service_account_file(
             SERVICE_ACCOUNT_FILE, scopes=SCOPES
