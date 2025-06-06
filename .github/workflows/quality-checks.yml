@@ -1,0 +1,368 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.9"
+  NODE_VERSION: "18"
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.changes.outputs.backend }}
+      frontend: ${{ steps.changes.outputs.frontend }}
+      docs: ${{ steps.changes.outputs.docs }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'pyproject.toml'
+              - 'requirements*.txt'
+            frontend:
+              - 'frontend/**'
+            docs:
+              - '**/*.md'
+              - 'docs/**'
+
+  python-quality:
+    name: Python Code Quality
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-quality-${{ hashFiles('backend/requirements*.txt', 'pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-quality-
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run Black formatting check
+        working-directory: backend
+        run: |
+          python -m black --config ../pyproject.toml --check --diff .
+        continue-on-error: false
+
+      - name: Run Ruff linting
+        working-directory: backend
+        run: |
+          python -m ruff check --config ../pyproject.toml --output-format=github .
+        continue-on-error: false
+
+      - name: Run isort import sorting check
+        working-directory: backend
+        run: |
+          python -m isort --settings-path ../pyproject.toml --check-only --diff .
+        continue-on-error: false
+
+      - name: Run mypy type checking
+        working-directory: backend
+        run: |
+          python -m mypy --config-file ../pyproject.toml .
+        continue-on-error: false
+
+      - name: Run bandit security scanning
+        working-directory: backend
+        run: |
+          python -m bandit -r . -f json -o bandit-report.json
+          python -m bandit -r . -f txt
+        continue-on-error: true
+
+      - name: Upload bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report-${{ github.sha }}
+          path: backend/bandit-report.json
+          retention-days: 30
+
+  typescript-quality:
+    name: TypeScript Code Quality
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: |
+          npx eslint . --ext .ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
+          npx eslint . --ext .ts,.tsx --max-warnings 0
+        continue-on-error: false
+
+      - name: Upload ESLint results to GitHub
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: frontend/eslint-results.sarif
+          wait-for-processing: true
+
+      - name: Run Prettier formatting check
+        working-directory: frontend
+        run: |
+          npx prettier --check "src/**/*.{ts,tsx,css,scss,json,md}"
+        continue-on-error: false
+
+      - name: Run TypeScript compilation check
+        working-directory: frontend
+        run: |
+          npx tsc --noEmit
+        continue-on-error: false
+
+      - name: Run TypeScript strict checks
+        working-directory: frontend
+        run: |
+          npx tsc --noEmit --strict
+        continue-on-error: true
+
+  dependency-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: needs.detect-changes.outputs.backend == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        if: needs.detect-changes.outputs.frontend == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Python dependencies
+        if: needs.detect-changes.outputs.backend == 'true'
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety pip-audit
+
+      - name: Run Python security audit with Safety
+        if: needs.detect-changes.outputs.backend == 'true'
+        working-directory: backend
+        run: |
+          safety check --json --output safety-report.json || true
+          safety check
+        continue-on-error: true
+
+      - name: Run Python security audit with pip-audit
+        if: needs.detect-changes.outputs.backend == 'true'
+        working-directory: backend
+        run: |
+          pip-audit --format=json --output=pip-audit-report.json || true
+          pip-audit
+        continue-on-error: true
+
+      - name: Install frontend dependencies
+        if: needs.detect-changes.outputs.frontend == 'true'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run npm security audit
+        if: needs.detect-changes.outputs.frontend == 'true'
+        working-directory: frontend
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit-report.json || true
+          npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports-${{ github.sha }}
+          path: |
+            backend/safety-report.json
+            backend/pip-audit-report.json
+            frontend/npm-audit-report.json
+          retention-days: 30
+
+  documentation-quality:
+    name: Documentation Quality
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.docs == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install markdownlint
+        run: |
+          npm install -g markdownlint-cli
+
+      - name: Run markdownlint
+        run: |
+          markdownlint "**/*.md" --ignore node_modules --ignore .github --config .markdownlint.json || true
+        continue-on-error: true
+
+      - name: Check for broken links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.markdown-link-check.json'
+        continue-on-error: true
+
+  code-metrics:
+    name: Code Metrics & Complexity
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.frontend == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: needs.detect-changes.outputs.backend == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python analysis tools
+        if: needs.detect-changes.outputs.backend == 'true'
+        run: |
+          pip install radon xenon flake8 mccabe
+
+      - name: Calculate Python complexity metrics
+        if: needs.detect-changes.outputs.backend == 'true'
+        working-directory: backend
+        run: |
+          echo "## Python Code Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### Cyclomatic Complexity" >> $GITHUB_STEP_SUMMARY
+          radon cc . --show-complexity --min B || true
+          
+          echo "### Maintainability Index" >> $GITHUB_STEP_SUMMARY
+          radon mi . --show || true
+          
+          echo "### Raw Metrics" >> $GITHUB_STEP_SUMMARY
+          radon raw . --summary || true
+        continue-on-error: true
+
+      - name: Set up Node.js
+        if: needs.detect-changes.outputs.frontend == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install TypeScript analysis tools
+        if: needs.detect-changes.outputs.frontend == 'true'
+        run: |
+          npm install -g typescript-complexity eslint-plugin-complexity
+
+      - name: Calculate TypeScript complexity metrics
+        if: needs.detect-changes.outputs.frontend == 'true'
+        working-directory: frontend
+        run: |
+          echo "## TypeScript Code Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          find src -name "*.ts" -o -name "*.tsx" | head -10 | while read file; do
+            echo "### Analyzing $file" >> $GITHUB_STEP_SUMMARY
+            npx ts-complexity "$file" || true
+          done
+        continue-on-error: true
+
+  quality-summary:
+    name: Quality Gate Summary
+    runs-on: ubuntu-latest
+    needs: [python-quality, typescript-quality, dependency-audit, documentation-quality, code-metrics]
+    if: always()
+    
+    steps:
+      - name: Generate quality summary
+        run: |
+          echo "## Code Quality Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Quality | ${{ needs.python-quality.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript Quality | ${{ needs.typescript-quality.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Audit | ${{ needs.dependency-audit.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation | ${{ needs.documentation-quality.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Metrics | ${{ needs.code-metrics.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Quality gate enforcement
+          if [[ "${{ needs.python-quality.result }}" == "failure" ]] || 
+             [[ "${{ needs.typescript-quality.result }}" == "failure" ]]; then
+            echo "❌ **Quality Gate Failed** - Code quality issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please fix the following issues:" >> $GITHUB_STEP_SUMMARY
+            
+            if [[ "${{ needs.python-quality.result }}" == "failure" ]]; then
+              echo "- Python code quality checks failed" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            if [[ "${{ needs.typescript-quality.result }}" == "failure" ]]; then
+              echo "- TypeScript code quality checks failed" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            exit 1
+          else
+            echo "✅ **Quality Gate Passed** - All quality checks successful" >> $GITHUB_STEP_SUMMARY
+          fi

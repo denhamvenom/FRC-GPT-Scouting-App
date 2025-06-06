@@ -1,0 +1,436 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.9"
+  NODE_VERSION: "18"
+
+jobs:
+  secret-scanning:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
+
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python', 'javascript']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Set up Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies
+        if: matrix.language == 'python'
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up Node.js
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        if: matrix.language == 'javascript'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+  python-security:
+    name: Python Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety semgrep
+
+      - name: Install project dependencies
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Bandit security linter
+        working-directory: backend
+        run: |
+          bandit -r . -f json -o bandit-report.json
+          bandit -r . -ll --severity-level medium
+        continue-on-error: true
+
+      - name: Run Safety vulnerability scanner
+        working-directory: backend
+        run: |
+          safety check --json --output safety-report.json
+          safety check --short-report
+        continue-on-error: true
+
+      - name: Run Semgrep SAST
+        run: |
+          semgrep --config=auto backend/ --json --output=semgrep-report.json
+          semgrep --config=auto backend/ --error
+        continue-on-error: true
+
+      - name: Upload Python security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-security-reports-${{ github.sha }}
+          path: |
+            backend/bandit-report.json
+            backend/safety-report.json
+            semgrep-report.json
+          retention-days: 30
+
+  javascript-security:
+    name: JavaScript Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run npm audit
+        working-directory: frontend
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit-report.json
+          npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run ESLint Security Plugin
+        working-directory: frontend
+        run: |
+          npx eslint . --ext .ts,.tsx -c .eslintrc-security.js --format json --output-file eslint-security-report.json || true
+          npx eslint . --ext .ts,.tsx -c .eslintrc-security.js || true
+        continue-on-error: true
+
+      - name: Create ESLint security config
+        working-directory: frontend
+        run: |
+          cat > .eslintrc-security.js << 'EOF'
+          module.exports = {
+            extends: [
+              'eslint:recommended',
+              '@typescript-eslint/recommended'
+            ],
+            plugins: [
+              'security'
+            ],
+            rules: {
+              'security/detect-object-injection': 'error',
+              'security/detect-non-literal-regexp': 'error',
+              'security/detect-unsafe-regex': 'error',
+              'security/detect-buffer-noassert': 'error',
+              'security/detect-child-process': 'error',
+              'security/detect-disable-mustache-escape': 'error',
+              'security/detect-eval-with-expression': 'error',
+              'security/detect-new-buffer': 'error',
+              'security/detect-no-csrf-before-method-override': 'error',
+              'security/detect-possible-timing-attacks': 'error',
+              'security/detect-pseudoRandomBytes': 'error'
+            }
+          }
+          EOF
+
+      - name: Install ESLint security plugin
+        working-directory: frontend
+        run: |
+          npm install --save-dev eslint-plugin-security
+
+      - name: Run Retire.js vulnerability scanner
+        working-directory: frontend
+        run: |
+          npx retire --js --node --outputformat json --outputpath retire-report.json || true
+          npx retire --js --node || true
+        continue-on-error: true
+
+      - name: Upload JavaScript security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: javascript-security-reports-${{ github.sha }}
+          path: |
+            frontend/npm-audit-report.json
+            frontend/eslint-security-report.json
+            frontend/retire-report.json
+          retention-days: 30
+
+  docker-security:
+    name: Docker Security Scanning
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'Dockerfile') || contains(github.event.head_commit.modified, 'docker-compose.yml') || github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image for scanning
+        run: |
+          if [ -f Dockerfile ]; then
+            docker build -t frc-scouting-app:security-scan .
+          elif [ -f docker-compose.yml ]; then
+            docker-compose build
+            docker tag $(docker-compose images -q | head -1) frc-scouting-app:security-scan
+          fi
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'frc-scouting-app:security-scan'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Docker Bench for Security
+        run: |
+          docker run --rm --net host --pid host --userns host --cap-add audit_control \
+            -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
+            -v /etc:/etc:ro \
+            -v /usr/bin/containerd:/usr/bin/containerd:ro \
+            -v /usr/bin/runc:/usr/bin/runc:ro \
+            -v /usr/lib/systemd:/usr/lib/systemd:ro \
+            -v /var/lib:/var/lib:ro \
+            -v /var/run/docker.sock:/var/run/docker.sock:ro \
+            --label docker_bench_security \
+            docker/docker-bench-security > docker-bench-results.txt || true
+
+      - name: Upload Docker security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-security-reports-${{ github.sha }}
+          path: |
+            trivy-results.sarif
+            docker-bench-results.txt
+          retention-days: 30
+
+  infrastructure-security:
+    name: Infrastructure Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov IaC scanner
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: github_actions,dockerfile,docker_compose
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+          quiet: true
+          soft_fail: true
+
+      - name: Upload Checkov scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: checkov-results.sarif
+
+      - name: Scan GitHub Actions workflows
+        run: |
+          echo "Scanning GitHub Actions workflows for security issues..."
+          find .github/workflows -name "*.yml" -o -name "*.yaml" | while read workflow; do
+            echo "Checking $workflow for potential security issues..."
+            
+            # Check for hardcoded secrets
+            if grep -E "(password|secret|key|token)" "$workflow" | grep -v "secrets\." | grep -v "env\." ; then
+              echo "WARNING: Potential hardcoded secret in $workflow"
+            fi
+            
+            # Check for unsafe actions
+            if grep -E "(actions/checkout@v[12]|actions/setup-)" "$workflow"; then
+              echo "INFO: Consider updating to latest action versions in $workflow"
+            fi
+            
+            # Check for script injection vulnerabilities
+            if grep -E "\$\{\{.*github\.event\.(issue|pull_request)\.(title|body)" "$workflow"; then
+              echo "WARNING: Potential script injection vulnerability in $workflow"
+            fi
+          done
+
+  dependency-security:
+    name: Comprehensive Dependency Security
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Python security tools
+        run: |
+          pip install pip-audit safety osv-scanner
+
+      - name: Install project dependencies
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run OSV Scanner (Python)
+        working-directory: backend
+        run: |
+          osv-scanner --format json --output osv-python-report.json . || true
+          osv-scanner . || true
+        continue-on-error: true
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run OSV Scanner (JavaScript)
+        working-directory: frontend
+        run: |
+          osv-scanner --format json --output osv-js-report.json . || true
+          osv-scanner . || true
+        continue-on-error: true
+
+      - name: Upload dependency security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-security-reports-${{ github.sha }}
+          path: |
+            backend/osv-python-report.json
+            frontend/osv-js-report.json
+          retention-days: 30
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [secret-scanning, codeql-analysis, python-security, javascript-security, docker-security, infrastructure-security, dependency-security]
+    if: always()
+    
+    steps:
+      - name: Generate security summary
+        run: |
+          echo "## 🔒 Security Scanning Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Status | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Detection | ${{ needs.secret-scanning.result || 'skipped' }} | TruffleHog & GitLeaks |" >> $GITHUB_STEP_SUMMARY
+          echo "| CodeQL Analysis | ${{ needs.codeql-analysis.result || 'skipped' }} | GitHub Advanced Security |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Security | ${{ needs.python-security.result || 'skipped' }} | Bandit, Safety, Semgrep |" >> $GITHUB_STEP_SUMMARY
+          echo "| JavaScript Security | ${{ needs.javascript-security.result || 'skipped' }} | npm audit, ESLint security |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Security | ${{ needs.docker-security.result || 'skipped' }} | Trivy, Docker Bench |" >> $GITHUB_STEP_SUMMARY
+          echo "| Infrastructure Security | ${{ needs.infrastructure-security.result || 'skipped' }} | Checkov IaC scanning |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Security | ${{ needs.dependency-security.result || 'skipped' }} | OSV Scanner |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for any critical security failures
+          CRITICAL_FAILURE=false
+          
+          if [[ "${{ needs.secret-scanning.result }}" == "failure" ]]; then
+            echo "🚨 **CRITICAL**: Secret detection failed - potential secrets detected!" >> $GITHUB_STEP_SUMMARY
+            CRITICAL_FAILURE=true
+          fi
+          
+          if [[ "${{ needs.codeql-analysis.result }}" == "failure" ]]; then
+            echo "⚠️ **HIGH**: CodeQL analysis detected security vulnerabilities" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "$CRITICAL_FAILURE" == "true" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Security Gate Failed** - Critical security issues must be resolved" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ **Security Gate Passed** - No critical security issues detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "View detailed reports in the artifacts section for any warnings or recommendations." >> $GITHUB_STEP_SUMMARY
+          fi

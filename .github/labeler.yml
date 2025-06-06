@@ -1,0 +1,84 @@
+# Auto-labeling configuration for PRs based on file changes
+
+# Backend changes
+backend:
+  - 'backend/**'
+  - 'requirements*.txt'
+  - 'pyproject.toml'
+
+# Frontend changes  
+frontend:
+  - 'frontend/**'
+  - 'package*.json'
+
+# API changes
+api:
+  - 'backend/app/api/**'
+
+# Database changes
+database:
+  - 'backend/app/database/**'
+  - 'backend/migrate_*.py'
+  - 'backend/run_migrations.sh'
+  - '**/*migration*'
+
+# Services
+services:
+  - 'backend/app/services/**'
+
+# Configuration changes
+configuration:
+  - '**/*.yml'
+  - '**/*.yaml'
+  - '**/*.json'
+  - '**/*.toml'
+  - '**/*.ini'
+  - '.github/**'
+  - 'docker-compose*.yml'
+  - 'Dockerfile*'
+  - '.dockerignore'
+
+# Documentation changes
+documentation:
+  - '**/*.md'
+  - '**/*.txt'
+  - 'docs/**'
+
+# Tests
+tests:
+  - '**/test_*.py'
+  - '**/*_test.py'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - 'backend/tests/**'
+  - 'frontend/src/__tests__/**'
+  - 'backend/conftest.py'
+  - 'frontend/vitest.config.ts'
+
+# CI/CD changes
+ci:
+  - '.github/workflows/**'
+  - '.github/dependabot.yml'
+  - '.pre-commit-config.yaml'
+
+# Dependencies
+dependencies:
+  - 'requirements*.txt'
+  - 'package*.json'
+  - 'pyproject.toml'
+
+# UI/UX changes
+ui:
+  - 'frontend/src/components/**'
+  - 'frontend/src/pages/**'
+  - '**/*.css'
+  - 'tailwind.config.js'
+
+# Security
+security:
+  - 'secrets/**'
+  - '**/*secret*'
+  - '**/*key*'
+  - '**/*auth*'
