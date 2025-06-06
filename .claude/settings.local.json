@@ -8,7 +8,17 @@
       "Bash(python:*)",
       "Bash(/home/frc80/.nvm/versions/node/v22.15.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 100 \"def _create_system_prompt\" /mnt/c/Users/frc80/OneDrive/Documents/FRC-GPT-Scouting-App/backend/app/services/picklist_generator_service.py)",
       "Bash(/home/frc80/.nvm/versions/node/v22.15.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -A 150 \"_create_user_prompt\" /mnt/c/Users/frc80/OneDrive/Documents/FRC-GPT-Scouting-App/backend/app/services/picklist_generator_service.py)",
-      "Bash(/home/frc80/.nvm/versions/node/v22.15.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -i \"summary\" /mnt/c/Users/frc80/OneDrive/Documents/FRC-GPT-Scouting-App/backend/app/services/picklist_generator_service.py)"
+      "Bash(/home/frc80/.nvm/versions/node/v22.15.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-linux/rg -i \"summary\" /mnt/c/Users/frc80/OneDrive/Documents/FRC-GPT-Scouting-App/backend/app/services/picklist_generator_service.py)",
+      "Bash(black:*)",
+      "Bash(ls:*)",
+      "Bash(source:*)",
+      "Bash(venv/bin/python -m pip list:*)",
+      "Bash(venv/bin/python -m pip install:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   },

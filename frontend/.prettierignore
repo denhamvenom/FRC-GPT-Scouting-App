@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build outputs
+dist/
+build/
+coverage/
+.vite/
+*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Environment files
+.env*
+!.env.example
+
+# Generated files
+*.generated.*
+*.min.js
+*.min.css
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+
+# Specific files to ignore
+public/mockServiceWorker.js
+src/vite-env.d.ts
+
+# Documentation build
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Storybook
+storybook-static/
+.storybook/cache/
