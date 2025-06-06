@@ -1,0 +1,131 @@
+# Auto-labeling configuration for PRs based on file changes
+
+# Backend changes
+backend:
+  - changed-files:
+    - any-glob-to-any-file: 'backend/**'
+  - changed-files:
+    - any-glob-to-any-file: 'requirements*.txt'
+  - changed-files:
+    - any-glob-to-any-file: 'pyproject.toml'
+
+# Frontend changes  
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: 'frontend/**'
+  - changed-files:
+    - any-glob-to-any-file: 'package*.json'
+
+# API changes
+api:
+  - changed-files:
+    - any-glob-to-any-file: 'backend/app/api/**'
+
+# Database changes
+database:
+  - changed-files:
+    - any-glob-to-any-file: 'backend/app/database/**'
+  - changed-files:
+    - any-glob-to-any-file: 'backend/migrate_*.py'
+  - changed-files:
+    - any-glob-to-any-file: 'backend/run_migrations.sh'
+  - changed-files:
+    - any-glob-to-any-file: '**/*migration*'
+
+# Services
+services:
+  - changed-files:
+    - any-glob-to-any-file: 'backend/app/services/**'
+
+# Configuration changes
+configuration:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.yml'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.yaml'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.json'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.toml'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.ini'
+  - changed-files:
+    - any-glob-to-any-file: '.github/**'
+  - changed-files:
+    - any-glob-to-any-file: 'docker-compose*.yml'
+  - changed-files:
+    - any-glob-to-any-file: 'Dockerfile*'
+  - changed-files:
+    - any-glob-to-any-file: '.dockerignore'
+
+# Documentation changes
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.md'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.txt'
+  - changed-files:
+    - any-glob-to-any-file: 'docs/**'
+
+# Tests
+tests:
+  - changed-files:
+    - any-glob-to-any-file: '**/test_*.py'
+  - changed-files:
+    - any-glob-to-any-file: '**/*_test.py'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.test.ts'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.test.tsx'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.spec.ts'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.spec.tsx'
+  - changed-files:
+    - any-glob-to-any-file: 'backend/tests/**'
+  - changed-files:
+    - any-glob-to-any-file: 'frontend/src/__tests__/**'
+  - changed-files:
+    - any-glob-to-any-file: 'backend/conftest.py'
+  - changed-files:
+    - any-glob-to-any-file: 'frontend/vitest.config.ts'
+
+# CI/CD changes
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/**'
+  - changed-files:
+    - any-glob-to-any-file: '.github/dependabot.yml'
+  - changed-files:
+    - any-glob-to-any-file: '.pre-commit-config.yaml'
+
+# Dependencies
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file: 'requirements*.txt'
+  - changed-files:
+    - any-glob-to-any-file: 'package*.json'
+  - changed-files:
+    - any-glob-to-any-file: 'pyproject.toml'
+
+# UI/UX changes
+ui:
+  - changed-files:
+    - any-glob-to-any-file: 'frontend/src/components/**'
+  - changed-files:
+    - any-glob-to-any-file: 'frontend/src/pages/**'
+  - changed-files:
+    - any-glob-to-any-file: '**/*.css'
+  - changed-files:
+    - any-glob-to-any-file: 'tailwind.config.js'
+
+# Security
+security:
+  - changed-files:
+    - any-glob-to-any-file: 'secrets/**'
+  - changed-files:
+    - any-glob-to-any-file: '**/*secret*'
+  - changed-files:
+    - any-glob-to-any-file: '**/*key*'
+  - changed-files:
+    - any-glob-to-any-file: '**/*auth*'

@@ -1,0 +1,285 @@
+name: PR Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  auto-label:
+    name: Auto Label PR
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Auto-label based on file changes
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+      
+      - name: Label by size
+        uses: pascalgn/size-label-action@v0.4.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          sizes: >
+            {
+              "0": "XS",
+              "10": "S", 
+              "50": "M",
+              "200": "L",
+              "500": "XL",
+              "1000": "XXL"
+            }
+      
+      - name: Analyze PR changes
+        id: analyze
+        run: |
+          # Get changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          # Count changes by type
+          BACKEND_CHANGES=$(echo "$CHANGED_FILES" | grep -c "^backend/" || echo 0)
+          FRONTEND_CHANGES=$(echo "$CHANGED_FILES" | grep -c "^frontend/" || echo 0)
+          DOCS_CHANGES=$(echo "$CHANGED_FILES" | grep -c -E "\.(md|txt)$" || echo 0)
+          CONFIG_CHANGES=$(echo "$CHANGED_FILES" | grep -c -E "\.(yml|yaml|json|toml)$" || echo 0)
+          TEST_CHANGES=$(echo "$CHANGED_FILES" | grep -c -E "test_|_test\.|\.test\." || echo 0)
+          
+          echo "backend_changes=$BACKEND_CHANGES" >> $GITHUB_OUTPUT
+          echo "frontend_changes=$FRONTEND_CHANGES" >> $GITHUB_OUTPUT
+          echo "docs_changes=$DOCS_CHANGES" >> $GITHUB_OUTPUT
+          echo "config_changes=$CONFIG_CHANGES" >> $GITHUB_OUTPUT
+          echo "test_changes=$TEST_CHANGES" >> $GITHUB_OUTPUT
+          
+          # Check for breaking changes
+          if echo "$CHANGED_FILES" | grep -q -E "(database|models\.py|schema|migration)"; then
+            echo "breaking_change=true" >> $GITHUB_OUTPUT
+          else
+            echo "breaking_change=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Add component labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { backend_changes, frontend_changes, docs_changes, config_changes, test_changes, breaking_change } = ${{ steps.analyze.outputs }};
+            
+            const labels = [];
+            
+            if (backend_changes > 0) labels.push('backend');
+            if (frontend_changes > 0) labels.push('frontend');
+            if (docs_changes > 0) labels.push('documentation');
+            if (config_changes > 0) labels.push('configuration');
+            if (test_changes > 0) labels.push('tests');
+            if (breaking_change === 'true') labels.push('breaking-change');
+            
+            // Add type labels based on branch name or title
+            const prTitle = context.payload.pull_request.title.toLowerCase();
+            const branchName = context.payload.pull_request.head.ref.toLowerCase();
+            
+            if (prTitle.includes('fix') || prTitle.includes('bug') || branchName.includes('fix')) {
+              labels.push('bug');
+            }
+            if (prTitle.includes('feat') || prTitle.includes('feature') || branchName.includes('feature')) {
+              labels.push('enhancement');
+            }
+            if (prTitle.includes('chore') || branchName.includes('chore')) {
+              labels.push('maintenance');
+            }
+            if (prTitle.includes('refactor') || branchName.includes('refactor')) {
+              labels.push('refactoring');
+            }
+            
+            // Add labels
+            for (const label of labels) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.pull_request.number,
+                  labels: [label]
+                });
+              } catch (error) {
+                console.log(`Label '${label}' may not exist, skipping`);
+              }
+            }
+
+  check-requirements:
+    name: Check PR Requirements
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check PR title format
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            ci
+          scopes: |
+            backend
+            frontend
+            api
+            ui
+            db
+            config
+            deps
+          requireScope: false
+      
+      - name: Check for linked issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const hasLinkedIssue = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\d+/i.test(prBody) ||
+                                  /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+https:\/\/github\.com\/[^\/]+\/[^\/]+\/issues\/\d+/i.test(prBody);
+            
+            if (!hasLinkedIssue && !context.payload.pull_request.title.toLowerCase().includes('chore')) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: '⚠️ This PR doesn\'t appear to link to an issue. Consider linking an issue with "Closes #123" or "Fixes #123" in the description.'
+              });
+            }
+      
+      - name: Check for breaking changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const prTitle = context.payload.pull_request.title;
+            
+            const hasBreakingChange = prTitle.includes('!') || 
+                                    prBody.toLowerCase().includes('breaking change') ||
+                                    prBody.toLowerCase().includes('breaking:');
+            
+            if (hasBreakingChange) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ['breaking-change']
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: '⚠️ **Breaking Change Detected**\n\nThis PR contains breaking changes. Please ensure:\n- [ ] Migration guide is included\n- [ ] Version bump is appropriate\n- [ ] Documentation is updated'
+              });
+            }
+
+  approve-dependabot:
+    name: Auto-approve Dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Auto-approve minor/patch updates
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            
+            // Only auto-approve minor and patch updates
+            if (prTitle.includes('Bump') && !prTitle.includes('major')) {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'APPROVE',
+                body: 'Auto-approving Dependabot minor/patch update'
+              });
+            }
+
+  check-conflicts:
+    name: Check for Merge Conflicts
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for merge conflicts
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          
+          # Check if the PR branch can be merged cleanly
+          if ! git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) HEAD origin/${{ github.base_ref }} | grep -q "<<<<<<< "; then
+            echo "✅ No merge conflicts detected"
+          else
+            echo "❌ Merge conflicts detected"
+            echo "conflict=true" >> $GITHUB_ENV
+          fi
+      
+      - name: Comment on conflicts
+        if: env.conflict == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: '⚠️ **Merge Conflicts Detected**\n\nThis PR has merge conflicts with the base branch. Please resolve them before merging.'
+            });
+
+  notify-reviewers:
+    name: Notify Reviewers
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    
+    steps:
+      - name: Request reviews
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Auto-assign reviewers based on file changes
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+            
+            const reviewers = new Set();
+            
+            // Add reviewers based on changed files
+            for (const file of files) {
+              if (file.filename.startsWith('backend/')) {
+                reviewers.add('backend-team'); // Replace with actual team/user
+              }
+              if (file.filename.startsWith('frontend/')) {
+                reviewers.add('frontend-team'); // Replace with actual team/user
+              }
+            }
+            
+            // Don't request review from the author
+            reviewers.delete(context.payload.pull_request.user.login);
+            
+            if (reviewers.size > 0) {
+              console.log('Would request reviews from:', Array.from(reviewers));
+              // Uncomment when you have actual reviewers configured:
+              // await github.rest.pulls.requestReviewers({
+              //   owner: context.repo.owner,
+              //   repo: context.repo.repo,
+              //   pull_number: context.payload.pull_request.number,
+              //   reviewers: Array.from(reviewers)
+              // });
+            }
