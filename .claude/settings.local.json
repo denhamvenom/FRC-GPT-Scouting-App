@@ -18,7 +18,8 @@
       "Bash(mypy:*)",
       "Bash(npx eslint:*)",
       "Bash(npx prettier:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   },
