@@ -104,18 +104,16 @@ def mock_openai_client():
 
 @pytest.fixture(scope="function")
 def mock_tba_client():
-    """Mock The Blue Alliance client for testing."""
-    with patch("app.services.tba_client.TBAClient") as mock_client:
-        mock_instance = MagicMock()
-        mock_client.return_value = mock_instance
-        
+    """Mock The Blue Alliance client functions for testing."""
+    with patch("app.services.tba_client.get_event_teams") as mock_get_teams, \
+         patch("app.services.tba_client.get_event_matches") as mock_get_matches:
         # Mock common TBA responses
-        mock_instance.get_event_teams.return_value = [
+        mock_get_teams.return_value = [
             {"team_number": 1234, "nickname": "Test Team 1"},
             {"team_number": 5678, "nickname": "Test Team 2"}
         ]
         
-        mock_instance.get_event_matches.return_value = [
+        mock_get_matches.return_value = [
             {
                 "match_number": 1,
                 "alliances": {
@@ -125,25 +123,27 @@ def mock_tba_client():
             }
         ]
         
-        yield mock_instance
+        yield {
+            "get_event_teams": mock_get_teams,
+            "get_event_matches": mock_get_matches
+        }
 
 
 @pytest.fixture(scope="function")
 def mock_statbotics_client():
-    """Mock Statbotics client for testing."""
-    with patch("app.services.statbotics_client.StatboticsClient") as mock_client:
-        mock_instance = MagicMock()
-        mock_client.return_value = mock_instance
-        
+    """Mock Statbotics client functions for testing."""
+    with patch("app.services.statbotics_client.get_team_epa") as mock_get_epa:
         # Mock common Statbotics responses
-        mock_instance.get_team_stats.return_value = {
+        mock_get_epa.return_value = {
             "team": 1234,
             "epa": {"total_points": {"mean": 150.5}},
             "auto_points": {"mean": 25.0},
             "teleop_points": {"mean": 100.0}
         }
         
-        yield mock_instance
+        yield {
+            "get_team_epa": mock_get_epa
+        }
 
 
 @pytest.fixture(scope="function")

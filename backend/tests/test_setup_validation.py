@@ -27,8 +27,10 @@ class TestInfrastructureValidation:
     def test_mock_external_apis(self, mock_openai_client, mock_tba_client, mock_statbotics_client):
         """Test that external API mocks are working."""
         assert isinstance(mock_openai_client, MagicMock)
-        assert isinstance(mock_tba_client, MagicMock)
-        assert isinstance(mock_statbotics_client, MagicMock)
+        assert isinstance(mock_tba_client, dict)
+        assert isinstance(mock_statbotics_client, dict)
+        assert "get_event_teams" in mock_tba_client
+        assert "get_team_epa" in mock_statbotics_client
     
     def test_test_data_factory(self):
         """Test that the test data factory works correctly."""

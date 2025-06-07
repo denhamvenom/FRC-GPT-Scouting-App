@@ -1,0 +1,1 @@
+# Configuration Management for FRC GPT Scouting App

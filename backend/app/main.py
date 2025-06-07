@@ -2,28 +2,30 @@
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import openai
 import logging
 import traceback
-from app.services.logging_config import setup_logging
 
-# Setup logging
-log_file = setup_logging()
+# New configuration system imports
+from app.config.settings import get_settings
+from app.config.logging import setup_logging
+from app.config.database import init_database
+from app.core.dependencies import initialize_dependencies, cleanup_dependencies
+
+# Initialize configuration and logging first
+setup_logging()
 logger = logging.getLogger(__name__)
 
-# Load environment variables and set OpenAI API key
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize all dependencies
+if not initialize_dependencies():
+    logger.error("Failed to initialize dependencies")
+    raise RuntimeError("Application initialization failed")
 
-# Database imports
-from app.database.db import engine
-from app.database import models
+# Get application settings
+settings = get_settings()
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+# Initialize database
+init_database()
 
 from app.api import health
 from app.api import sheets
@@ -46,13 +48,17 @@ from app.api import sheet_config  # Import sheet configuration API
 from app.api import manuals as manuals_router  # Import the new manuals router
 from app.api import team_comparison  # New team comparison API
 
-app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
+app = FastAPI(
+    title=settings.app.app_name,
+    version=settings.app.app_version,
+    debug=settings.app.debug
+)
 
-# Allow frontend (localhost:5173) to call backend (localhost:8000)
+# Configure CORS using settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
+    allow_origins=settings.app.cors_origins,
+    allow_credentials=settings.app.cors_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -101,6 +107,39 @@ app.include_router(sheet_config.router)  # Sheet configuration API already has p
 app.include_router(manuals_router.router)  # Add the manuals router
 
 
+# Application lifecycle events
+@app.on_event("startup")
+async def startup_event():
+    """Application startup tasks"""
+    logger.info(f"Starting {settings.app.app_name} v{settings.app.app_version}")
+    logger.info(f"Environment: {settings.app.environment}")
+    logger.info(f"Debug mode: {settings.app.debug}")
+    
+    # Validate configuration on startup
+    try:
+        from app.config.validators import quick_health_check
+        health_status = quick_health_check()
+        if health_status["status"] == "healthy":
+            logger.info("Configuration health check passed")
+        else:
+            logger.warning(f"Configuration health check issues: {health_status}")
+    except Exception as e:
+        logger.error(f"Configuration health check failed: {e}")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Application shutdown tasks"""
+    logger.info("Shutting down application...")
+    cleanup_dependencies()
+    logger.info("Application shutdown complete")
+
+
 @app.get("/")
 async def root():
-    return {"message": "Backend is running!"}
+    return {
+        "message": "Backend is running!",
+        "app_name": settings.app.app_name,
+        "version": settings.app.app_version,
+        "environment": settings.app.environment
+    }
