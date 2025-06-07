@@ -145,8 +145,9 @@ class DatabaseConfig:
     def test_connection(self) -> bool:
         """Test database connection"""
         try:
+            from sqlalchemy import text
             with self.session_scope() as session:
-                session.execute("SELECT 1")
+                session.execute(text("SELECT 1"))
             logger.info("Database connection test successful")
             return True
         except Exception as e:
@@ -156,12 +157,13 @@ class DatabaseConfig:
     def get_database_info(self) -> dict:
         """Get database information and statistics"""
         try:
+            from sqlalchemy import text
             with self.session_scope() as session:
                 if self.settings.database_url.startswith("sqlite"):
                     # SQLite-specific queries
-                    result = session.execute("PRAGMA database_list").fetchall()
+                    result = session.execute(text("PRAGMA database_list")).fetchall()
                     tables = session.execute(
-                        "SELECT name FROM sqlite_master WHERE type='table'"
+                        text("SELECT name FROM sqlite_master WHERE type='table'")
                     ).fetchall()
                     
                     return {
@@ -242,18 +244,19 @@ class DatabaseConfig:
     def get_table_sizes(self) -> dict:
         """Get size information for all tables"""
         try:
+            from sqlalchemy import text
             with self.session_scope() as session:
                 if self.settings.database_url.startswith("sqlite"):
                     # SQLite table sizes
                     tables = session.execute(
-                        "SELECT name FROM sqlite_master WHERE type='table'"
+                        text("SELECT name FROM sqlite_master WHERE type='table'")
                     ).fetchall()
                     
                     sizes = {}
                     for table in tables:
                         table_name = table[0]
                         count = session.execute(
-                            f"SELECT COUNT(*) FROM {table_name}"
+                            text(f"SELECT COUNT(*) FROM {table_name}")
                         ).scalar()
                         sizes[table_name] = {"row_count": count}
                     

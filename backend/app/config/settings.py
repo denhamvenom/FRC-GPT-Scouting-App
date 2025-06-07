@@ -3,7 +3,8 @@
 import os
 from pathlib import Path
 from typing import List, Optional, Dict, Any
-from pydantic import BaseSettings, Field, validator, root_validator
+from pydantic import Field, field_validator, model_validator
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -35,15 +36,19 @@ class DatabaseSettings(BaseSettings):
         description="Database connection pool timeout in seconds"
     )
     
-    @validator("database_path")
+    @field_validator("database_path")
+    @classmethod
     def validate_database_path(cls, v):
-        # Ensure the directory exists
-        db_path = Path(v)
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        return str(db_path.resolve())
+        # Ensure the directory exists if possible
+        try:
+            db_path = Path(v)
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+            return str(db_path.resolve())
+        except (PermissionError, OSError):
+            # If we can't create the directory, just return the path
+            return v
 
-    class Config:
-        env_prefix = "DB_"
+    model_config = {"env_prefix": "DB_"}
 
 
 class OpenAISettings(BaseSettings):
@@ -78,20 +83,21 @@ class OpenAISettings(BaseSettings):
         description="Custom base URL for OpenAI API"
     )
 
-    @validator("api_key")
+    @field_validator("api_key")
+    @classmethod
     def validate_api_key(cls, v):
         if not v or v.strip() == "":
             raise ValueError("OpenAI API key is required")
         return v
 
-    @validator("temperature")
+    @field_validator("temperature")
+    @classmethod
     def validate_temperature(cls, v):
         if not 0.0 <= v <= 2.0:
             raise ValueError("Temperature must be between 0.0 and 2.0")
         return v
 
-    class Config:
-        env_prefix = "OPENAI_"
+    model_config = {"env_prefix": "OPENAI_"}
 
 
 class TBASettings(BaseSettings):
@@ -122,14 +128,14 @@ class TBASettings(BaseSettings):
         description="User agent for API requests"
     )
 
-    @validator("api_key")
+    @field_validator("api_key")
+    @classmethod
     def validate_api_key(cls, v):
         if not v or v.strip() == "":
             raise ValueError("TBA API key is required")
         return v
 
-    class Config:
-        env_prefix = "TBA_"
+    model_config = {"env_prefix": "TBA_"}
 
 
 class GoogleSheetsSettings(BaseSettings):
@@ -170,15 +176,18 @@ class GoogleSheetsSettings(BaseSettings):
         description="Base64 encoded service account part 2"
     )
 
-    @validator("service_account_file")
+    @field_validator("service_account_file")
+    @classmethod
     def validate_service_account_file(cls, v):
         if v and not Path(v).exists():
-            # Create directory if it doesn't exist
-            Path(v).parent.mkdir(parents=True, exist_ok=True)
+            # Create directory if it doesn't exist and we have permission
+            try:
+                Path(v).parent.mkdir(parents=True, exist_ok=True)
+            except (PermissionError, OSError):
+                pass  # Ignore permission errors during validation
         return v
 
-    class Config:
-        env_prefix = "GOOGLE_"
+    model_config = {"env_prefix": "GOOGLE_"}
 
 
 class StatboticsSettings(BaseSettings):
@@ -205,8 +214,7 @@ class StatboticsSettings(BaseSettings):
         description="User agent for API requests"
     )
 
-    class Config:
-        env_prefix = "STATBOTICS_"
+    model_config = {"env_prefix": "STATBOTICS_"}
 
 
 class CacheSettings(BaseSettings):
@@ -233,14 +241,18 @@ class CacheSettings(BaseSettings):
         description="Enable cache compression"
     )
 
-    @validator("cache_dir")
+    @field_validator("cache_dir")
+    @classmethod
     def validate_cache_dir(cls, v):
-        cache_path = Path(v)
-        cache_path.mkdir(parents=True, exist_ok=True)
-        return str(cache_path.resolve())
+        try:
+            cache_path = Path(v)
+            cache_path.mkdir(parents=True, exist_ok=True)
+            return str(cache_path.resolve())
+        except (PermissionError, OSError):
+            # If we can't create the directory, just return the path
+            return v
 
-    class Config:
-        env_prefix = "CACHE_"
+    model_config = {"env_prefix": "CACHE_"}
 
 
 class LoggingSettings(BaseSettings):
@@ -275,21 +287,26 @@ class LoggingSettings(BaseSettings):
         description="Enable file logging"
     )
 
-    @validator("log_level")
+    @field_validator("log_level")
+    @classmethod
     def validate_log_level(cls, v):
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
             raise ValueError(f"Log level must be one of: {valid_levels}")
         return v.upper()
 
-    @validator("log_dir")
+    @field_validator("log_dir")
+    @classmethod
     def validate_log_dir(cls, v):
-        log_path = Path(v)
-        log_path.mkdir(parents=True, exist_ok=True)
-        return str(log_path.resolve())
+        try:
+            log_path = Path(v)
+            log_path.mkdir(parents=True, exist_ok=True)
+            return str(log_path.resolve())
+        except (PermissionError, OSError):
+            # If we can't create the directory, just return the path
+            return v
 
-    class Config:
-        env_prefix = "LOG_"
+    model_config = {"env_prefix": "LOG_"}
 
 
 class AppSettings(BaseSettings):
@@ -357,21 +374,22 @@ class AppSettings(BaseSettings):
         description="Maximum concurrent progress operations"
     )
 
-    @validator("environment")
+    @field_validator("environment")
+    @classmethod
     def validate_environment(cls, v):
         valid_envs = ["development", "staging", "production", "testing"]
         if v.lower() not in valid_envs:
             raise ValueError(f"Environment must be one of: {valid_envs}")
         return v.lower()
 
-    @validator("port")
+    @field_validator("port")
+    @classmethod
     def validate_port(cls, v):
         if not 1 <= v <= 65535:
             raise ValueError("Port must be between 1 and 65535")
         return v
 
-    class Config:
-        env_prefix = "APP_"
+    model_config = {"env_prefix": "APP_"}
 
 
 class Settings(BaseSettings):
@@ -393,7 +411,8 @@ class Settings(BaseSettings):
     cache: CacheSettings = Field(default_factory=CacheSettings)
     logging: LoggingSettings = Field(default_factory=LoggingSettings)
 
-    @root_validator
+    @model_validator(mode='before')
+    @classmethod
     def validate_settings(cls, values):
         """Cross-validation between different settings sections"""
         # Add any cross-section validation logic here
@@ -434,10 +453,11 @@ class Settings(BaseSettings):
         
         return Path("./app/config") / filename
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+        "case_sensitive": False
+    }
 
 
 # Global settings instance

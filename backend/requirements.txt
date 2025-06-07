@@ -2,8 +2,11 @@ fastapi==0.115.12
 uvicorn[standard]==0.34.2
 httpx==0.28.1
 pydantic==2.11.3
+pydantic-settings==2.7.0
 python-dotenv==1.1.0
 google-api-python-client==2.168.0
+gspread==6.1.4
+google-auth==2.37.0
 openai==1.76.0
 tiktoken==0.8.0
 PyMuPDF==1.23.5

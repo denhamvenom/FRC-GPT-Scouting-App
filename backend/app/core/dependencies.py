@@ -164,14 +164,7 @@ def get_openai_configuration() -> Dict[str, Any]:
 @lru_cache()
 def get_cache_service() -> CacheService:
     """Get cached CacheService instance (singleton)"""
-    settings = get_cached_settings()
-    return CacheService(
-        cache_dir=settings.cache.cache_dir,
-        default_ttl_hours=settings.cache.default_ttl_hours,
-        max_cache_size_mb=settings.cache.max_cache_size_mb,
-        cleanup_interval_hours=settings.cache.cleanup_interval_hours,
-        enable_compression=settings.cache.enable_compression
-    )
+    return CacheService()
 
 
 def get_cache_dependency() -> CacheService:
@@ -179,19 +172,14 @@ def get_cache_dependency() -> CacheService:
     return get_cache_service()
 
 
-@lru_cache()
-def get_progress_tracker() -> ProgressTracker:
-    """Get cached ProgressTracker instance (singleton)"""
-    settings = get_cached_settings()
-    return ProgressTracker(
-        cleanup_hours=settings.app.progress_cleanup_hours,
-        max_operations=settings.app.max_progress_operations
-    )
+def get_progress_tracker_class():
+    """Get ProgressTracker class for dependency injection"""
+    return ProgressTracker
 
 
-def get_progress_dependency() -> ProgressTracker:
-    """FastAPI dependency for progress tracker"""
-    return get_progress_tracker()
+def get_progress_dependency():
+    """FastAPI dependency for progress tracker class"""
+    return ProgressTracker
 
 
 # =============================================================================
@@ -285,13 +273,13 @@ class AppDependencies:
         settings: Settings = Depends(get_app_settings),
         db_session: Session = Depends(get_database_session),
         cache_service: CacheService = Depends(get_cache_dependency),
-        progress_tracker: ProgressTracker = Depends(get_progress_dependency),
+        progress_tracker_class = Depends(get_progress_dependency),
         logger: logging.Logger = Depends(get_api_logger),
     ):
         self.settings = settings
         self.db_session = db_session
         self.cache_service = cache_service
-        self.progress_tracker = progress_tracker
+        self.progress_tracker_class = progress_tracker_class
         self.logger = logger
 
 
@@ -359,9 +347,9 @@ def initialize_dependencies():
         cache_service = get_cache_service()
         logger.info("Cache service initialized")
         
-        # Initialize progress tracker
-        progress_tracker = get_progress_tracker()
-        logger.info("Progress tracker initialized")
+        # Initialize progress tracker class
+        progress_tracker_class = get_progress_tracker_class()
+        logger.info("Progress tracker class initialized")
         
         # Initialize logging
         logging_config = get_logging_service()
@@ -400,9 +388,8 @@ def cleanup_dependencies():
         cache_service = get_cache_service()
         # Add any cache cleanup logic here
         
-        # Cleanup progress tracker
-        progress_tracker = get_progress_tracker()
-        # Add any progress tracker cleanup logic here
+        # Progress tracker cleanup (class-based, no instance cleanup needed)
+        # Add any progress tracker cleanup logic here if needed
         
         logger.info("Dependencies cleanup completed")
         
@@ -430,7 +417,7 @@ def get_dependency_health() -> Dict[str, Any]:
         
         # Additional dependency-specific checks
         health_status["dependencies"]["cache_service"] = "✓"  # Cache service is always available
-        health_status["dependencies"]["progress_tracker"] = "✓"  # Progress tracker is always available
+        health_status["dependencies"]["progress_tracker_class"] = "✓"  # Progress tracker class is always available
         
         # External API status
         try:
