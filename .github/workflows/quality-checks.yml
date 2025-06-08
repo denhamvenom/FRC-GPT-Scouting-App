@@ -2,9 +2,9 @@ name: Code Quality Checks
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, refactorV1]
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, refactorV1]
   workflow_dispatch:
 
 env:
