@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Body
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional, Set, Union
 
-from app.services.picklist_generator_service import PicklistGeneratorService
+from app.services.picklist_service_adapter import PicklistServiceAdapter
 
 router = APIRouter(prefix="/api/picklist", tags=["Picklist"])
 
@@ -79,7 +79,7 @@ async def get_picklist_generation_status(request: Dict[str, str] = Body(...)):
 
         # For status checks, we don't need to initialize with a real dataset path
         # so just create a service instance without loading the dataset
-        from app.services.picklist_generator_service import PicklistGeneratorService
+        from app.services.picklist_service_adapter import PicklistServiceAdapter
 
         class StatusCheckService:
             def __init__(self):
@@ -87,8 +87,8 @@ async def get_picklist_generation_status(request: Dict[str, str] = Body(...)):
 
             def get_batch_processing_status(self, cache_key):
                 # Use the same logic as the original service but without loading any dataset
-                if cache_key in PicklistGeneratorService._picklist_cache:
-                    cached_data = PicklistGeneratorService._picklist_cache[cache_key]
+                if cache_key in PicklistServiceAdapter._picklist_cache:
+                    cached_data = PicklistServiceAdapter._picklist_cache[cache_key]
 
                     # If it's a timestamp, it's in progress but no batches have completed yet
                     if isinstance(cached_data, float):
@@ -181,7 +181,7 @@ async def generate_picklist(request: PicklistRequest):
             )
 
         # Initialize the service
-        generator_service = PicklistGeneratorService(request.unified_dataset_path)
+        generator_service = PicklistServiceAdapter(request.unified_dataset_path)
 
         # Debug logging - check exactly what we're passing
         logger.info(
@@ -290,7 +290,7 @@ async def update_picklist(request: UpdatePicklistRequest):
     """
     try:
         # Initialize the service
-        generator_service = PicklistGeneratorService(request.unified_dataset_path)
+        generator_service = PicklistServiceAdapter(request.unified_dataset_path)
 
         # Convert user rankings to the format expected by the service
         user_rankings = [
@@ -353,7 +353,7 @@ async def rank_missing_teams(request: RankMissingTeamsRequest):
             raise HTTPException(status_code=400, detail="No missing teams to rank")
 
         # Initialize the service
-        generator_service = PicklistGeneratorService(request.unified_dataset_path)
+        generator_service = PicklistServiceAdapter(request.unified_dataset_path)
 
         # Convert priorities to plain dictionaries
         priorities = [
@@ -417,23 +417,23 @@ async def clear_picklist_cache(request: Optional[Dict[str, Any]] = Body(None)):
     logger = logging.getLogger("picklist_api")
 
     try:
-        from app.services.picklist_generator_service import PicklistGeneratorService
+        from app.services.picklist_service_adapter import PicklistServiceAdapter
 
         if request and "cache_keys" in request:
             # Clear specific cache keys
             cache_keys = request["cache_keys"]
             cleared_count = 0
             for key in cache_keys:
-                if key in PicklistGeneratorService._picklist_cache:
-                    del PicklistGeneratorService._picklist_cache[key]
+                if key in PicklistServiceAdapter._picklist_cache:
+                    del PicklistServiceAdapter._picklist_cache[key]
                     cleared_count += 1
 
             logger.info(f"Cleared {cleared_count} specific cache entries")
             return {"status": "success", "message": f"Cleared {cleared_count} cache entries"}
         else:
             # Clear entire cache
-            old_size = len(PicklistGeneratorService._picklist_cache)
-            PicklistGeneratorService._picklist_cache.clear()
+            old_size = len(PicklistServiceAdapter._picklist_cache)
+            PicklistServiceAdapter._picklist_cache.clear()
 
             logger.info(f"Cleared entire picklist cache (had {old_size} entries)")
             return {

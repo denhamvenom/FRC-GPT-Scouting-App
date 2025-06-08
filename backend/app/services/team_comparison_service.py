@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from app.services.picklist_generator_service import PicklistGeneratorService
+from app.services.picklist_service_adapter import PicklistServiceAdapter
 
 load_dotenv()
 
@@ -21,7 +21,7 @@ class TeamComparisonService:
     """Compare up to three teams and return a ranking and summary."""
 
     def __init__(self, unified_dataset_path: str) -> None:
-        self.generator = PicklistGeneratorService(unified_dataset_path)
+        self.generator = PicklistServiceAdapter(unified_dataset_path)
 
     def _create_comparison_system_prompt(self, pick_position: str, num_teams: int) -> str:
         """Create a system prompt specifically for team comparison with narrative analysis."""

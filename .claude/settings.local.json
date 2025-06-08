@@ -19,7 +19,9 @@
       "Bash(npx eslint:*)",
       "Bash(npx prettier:*)",
       "Bash(npx tsc:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(awk:*)",
+      "Bash(echo:*)"
     ],
     "deny": []
   },
