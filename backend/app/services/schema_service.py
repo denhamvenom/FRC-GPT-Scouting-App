@@ -1,5 +1,6 @@
 # File: backend/app/services/schema_service.py
 
+import ast
 import os
 from typing import Dict, List
 
@@ -34,9 +35,9 @@ Return a JSON list of strings, e.g. ["team_number", "auto_coral_l1", ...].
     )
     content = response.choices[0].message.content.strip()
     try:
-        tags = eval(content)
+        tags = ast.literal_eval(content)
         return tags if isinstance(tags, list) else []
-    except Exception:
+    except (ValueError, SyntaxError):
         return []
 
 
@@ -74,8 +75,8 @@ Headers:
     for fence in ("```json", "```"):
         content = content.strip().lstrip(fence).rstrip(fence)
     try:
-        return eval(content)
-    except Exception:
+        return ast.literal_eval(content)
+    except (ValueError, SyntaxError):
         return {h: "error" for h in headers}
 
 

@@ -21,7 +21,9 @@
       "Bash(npx tsc:*)",
       "Bash(mkdir:*)",
       "Bash(awk:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(bandit:*)",
+      "Bash(pytest:*)"
     ],
     "deny": []
   },

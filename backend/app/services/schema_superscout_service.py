@@ -1,5 +1,6 @@
 # backend/app/services/schema_superscout_service.py
 
+import ast
 import os
 from typing import Any, Dict, List, Tuple
 
@@ -144,8 +145,8 @@ Headers:
         content_map = content_map[:-3]
 
     try:
-        mapping = eval(content_map)
-    except Exception as e:
+        mapping = ast.literal_eval(content_map)
+    except (ValueError, SyntaxError) as e:
         print("Mapping parse error:", e)
         mapping = {"error": "Failed to parse mapping output."}
 
@@ -166,8 +167,8 @@ Headers:
         content_offsets = content_offsets[:-3]
 
     try:
-        offsets = eval(content_offsets)
-    except Exception as e:
+        offsets = ast.literal_eval(content_offsets)
+    except (ValueError, SyntaxError) as e:
         print("Offsets parse error:", e)
         offsets = {"error": "Failed to parse offset output."}
 
@@ -218,8 +219,8 @@ Headers and sample data:
             content_insights = content_insights[:-3]
 
         try:
-            insights = eval(content_insights)
-        except Exception as e:
+            insights = ast.literal_eval(content_insights)
+        except (ValueError, SyntaxError) as e:
             print("Insights parse error:", e)
             insights = {"error": "Failed to parse insights output."}
     except Exception as e:
