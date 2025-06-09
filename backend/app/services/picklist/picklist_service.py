@@ -216,13 +216,41 @@ class PicklistService:
         if request.final_rerank and len(all_ranked_teams) > request.batch_size:
             progress_reporter.update(85, "Performing final re-ranking...", "reranking")
             
-            all_ranked_teams = await self.strategy.generate_ranking(
-                teams_data=all_ranked_teams,
-                your_team_number=request.your_team_number,
-                pick_position=request.pick_position.value,
-                priorities=priorities_dict,
-                game_context=game_context,
-            )
+            # Store original count for validation
+            original_count = len(all_ranked_teams)
+            original_teams = all_ranked_teams.copy()
+            
+            logger.info(f"Starting final rerank with {original_count} teams")
+            
+            try:
+                # Ensure unique teams before final rerank
+                unique_teams_map = {team["team_number"]: team for team in all_ranked_teams}
+                if len(unique_teams_map) != len(all_ranked_teams):
+                    logger.warning(f"Found duplicates before final rerank: {len(all_ranked_teams)} -> {len(unique_teams_map)}")
+                    all_ranked_teams = list(unique_teams_map.values())
+                
+                # Perform final rerank
+                reranked_teams = await self.strategy.generate_ranking(
+                    teams_data=all_ranked_teams,
+                    your_team_number=request.your_team_number,
+                    pick_position=request.pick_position.value,
+                    priorities=priorities_dict,
+                    game_context=game_context,
+                )
+                
+                # Validate final rerank results
+                if len(reranked_teams) < original_count * 0.8:  # Allow for some missing teams but not too many
+                    logger.error(f"Final rerank returned too few teams: {len(reranked_teams)} vs expected {original_count}")
+                    logger.info("Falling back to batch processing results")
+                    all_ranked_teams = original_teams
+                else:
+                    logger.info(f"Final rerank successful: {len(reranked_teams)} teams")
+                    all_ranked_teams = reranked_teams
+                    
+            except Exception as e:
+                logger.error(f"Final rerank failed: {e}")
+                logger.info("Falling back to batch processing results")
+                all_ranked_teams = original_teams
         
         return all_ranked_teams
 

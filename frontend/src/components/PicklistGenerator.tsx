@@ -77,6 +77,7 @@ interface PicklistGeneratorProps {
   onExcludeTeam?: (teamNumber: number) => void; // Callback for excluding a team
   isLocked?: boolean; // Flag indicating if the picklist is locked and should be read-only
   onPicklistCleared?: () => void; // Callback for when picklist is cleared
+  useBatching?: boolean; // Whether to use batch processing (controlled from parent)
 }
 
 // Progress indicator component for estimated time (non-batch processing)
@@ -240,6 +241,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   onExcludeTeam,
   isLocked = false,
   onPicklistCleared,
+  useBatching = false,
 }) => {
   const [picklist, setPicklist] = useState<Team[]>(initialPicklist);
   const [analysis, setAnalysis] = useState<PicklistAnalysis | null>(null);
@@ -274,16 +276,6 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [pollingCacheKey, setPollingCacheKey] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
 
-  // Batching control - persist in localStorage
-  const [useBatching, setUseBatching] = useState<boolean>(() => {
-    const saved = localStorage.getItem("useBatching");
-    return saved !== null ? JSON.parse(saved) : true;
-  });
-
-  // Save useBatching to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("useBatching", JSON.stringify(useBatching));
-  }, [useBatching]);
 
   useEffect(() => {
     // Log when dependencies change
@@ -968,33 +960,6 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
             Rankings
           </h2>
           <div className="flex items-center space-x-4">
-            {/* Batching Toggle */}
-            {!isLocked && (
-              <label className="flex items-center space-x-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={useBatching}
-                  onChange={(e) => {
-                    const newValue = e.target.checked;
-                    console.log(
-                      "Toggling useBatching from",
-                      useBatching,
-                      "to",
-                      newValue,
-                    );
-                    setUseBatching(newValue);
-                    console.log(
-                      "useBatching will be saved to localStorage as:",
-                      newValue,
-                    );
-                  }}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span>
-                  Use batch processing (recommended for large datasets)
-                </span>
-              </label>
-            )}
             <div className="flex space-x-2">
               {isEditing ? (
                 <>

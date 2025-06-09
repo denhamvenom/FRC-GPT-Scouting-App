@@ -100,12 +100,13 @@ OUTPUT FORMAT: You MUST respond with ONLY a valid JSON object in this exact form
 }}
 
 CRITICAL RULES:
-- Include ALL {team_count} teams exactly once
+- Include ALL {team_count} teams exactly once - NO DUPLICATES, NO MISSING TEAMS
 - Score from 0-100 (higher is better)
 - Keep reasons under 100 characters
 - Consider game-specific strategies
 - Account for your team's strengths/weaknesses
-- Return ONLY the JSON object, no other text"""
+- Return ONLY the JSON object, no other text
+- VERIFY: Your output must contain exactly {team_count} unique team numbers"""
 
     def create_user_prompt(
         self,

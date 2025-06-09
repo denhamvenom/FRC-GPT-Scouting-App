@@ -177,6 +177,17 @@ const PicklistNew: React.FC = () => {
   });
   // State for team to be excluded
   const [teamToExclude, setTeamToExclude] = useState<number | ''>('');
+  
+  // Batching control - persist in localStorage
+  const [useBatching, setUseBatching] = useState<boolean>(() => {
+    const saved = localStorage.getItem("useBatching");
+    return saved !== null ? JSON.parse(saved) : false; // Default to false
+  });
+
+  // Save useBatching to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("useBatching", JSON.stringify(useBatching));
+  }, [useBatching]);
 
   // Fetch dataset path and load dataset on load
   const fetchLockedPicklists = async () => {
@@ -746,7 +757,7 @@ const PicklistNew: React.FC = () => {
           pick_position: activeTab,
           priorities: simplePriorities,
           exclude_teams: teamsToExclude,
-          use_batching: true,
+          use_batching: useBatching,
           batch_size: 20,
           reference_teams_count: 3,
           reference_selection: "top_middle_bottom",
@@ -1961,7 +1972,35 @@ const PicklistNew: React.FC = () => {
                 )}
               </div>
               
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Batch Processing Checkbox */}
+                <label className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={useBatching}
+                    onChange={(e) => {
+                      const newValue = e.target.checked;
+                      console.log(
+                        "Toggling useBatching from",
+                        useBatching,
+                        "to",
+                        newValue,
+                      );
+                      setUseBatching(newValue);
+                      console.log(
+                        "useBatching will be saved to localStorage as:",
+                        newValue,
+                      );
+                    }}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    disabled={isGeneratingRankings}
+                  />
+                  <span className={isGeneratingRankings ? "text-gray-500" : ""}>
+                    Use batch processing (recommended for large datasets)
+                  </span>
+                </label>
+                
+                {/* Generate Button */}
                 <button
                   onClick={generateRankings}
                   disabled={getActivePriorities().length === 0 || isGeneratingRankings}
@@ -2198,6 +2237,7 @@ const PicklistNew: React.FC = () => {
                     onExcludeTeam={handleExcludeTeam}
                     isLocked={hasLockedPicklist}
                     onPicklistCleared={handlePicklistCleared}
+                    useBatching={useBatching}
                     // Create a stable key that doesn't change when navigating and returning
                     // Only change the key when actually switching tabs or when exclusions change
                     // Include a fixed timestamp based on the current rankings' existence
