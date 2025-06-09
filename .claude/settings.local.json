@@ -23,7 +23,8 @@
       "Bash(awk:*)",
       "Bash(echo:*)",
       "Bash(bandit:*)",
-      "Bash(pytest:*)"
+      "Bash(pytest:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   },

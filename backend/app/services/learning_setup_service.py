@@ -57,9 +57,18 @@ async def start_learning_setup(
     slimmed_team_data = []
 
     for team_key in sample_team_keys:
-        team_epa = get_team_epa(int(team_key), year)
-        # Always append team data, even if EPA is missing
-        slimmed_team_data.append(team_epa)
+        try:
+            team_epa = get_team_epa(int(team_key), year)
+            # Always append team data, even if EPA is missing
+            slimmed_team_data.append(team_epa)
+        except Exception as e:
+            print(f"Error getting EPA for team {team_key}: {e}")
+            # Fallback team data
+            slimmed_team_data.append({
+                "team_number": int(team_key),
+                "team_name": f"Team {team_key}",
+                "epa_total": None
+            })
 
     # 3. Process manual, with improved handling for existing manual data
     manual_info = {"manual_file_received": manual_file is not None}

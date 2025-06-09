@@ -1,4 +1,8 @@
 {
+  "110": "other",
+  "8808": "other",
+  "Timestamp": "other",
+  "Scout Name": "other",
   "Qual Number": "match_number",
   "Team Number": "team_number",
   "Alliance": "team_info",
@@ -24,9 +28,19 @@
   "Driver Skill": "teleop",
   "Strategies": "strategy",
   "Comments": "strategy",
-  "Was your robot disabled? If so, how? ": "strategy",
-  "Was Defended": "strategy",
+  "Was your robot disabled? If so, how? ": "other",
+  "Was Defended": "endgame",
   "Defense Bot": "strategy",
-  "Team": "team_number",
-  "Stratagies": "strategy"
+  "Team Event Match": "match_number",
+  "Event Key": "other",
+  "Match Key": "match_number",
+  "Team": "other",
+  "Stratagies": "strategy",
+  "Pit Scouting_Images/8808.Robot.135631.jpg": "other",
+  "": "other",
+  "Mid": "other",
+  "Move Out , Score Coral , Multiple Scores": "other",
+  "Swerve": "other",
+  "Medium (10-20)": "other",
+  "https://www.appsheet.com/Template/gettablefileurl?appname=Hivemind2024-327566633&tableName=PIT%20SCOUTING_IMAGES&filename=Pit%20Scouting_Images%2F8808.Robot.135631.jpg": "other"
 }

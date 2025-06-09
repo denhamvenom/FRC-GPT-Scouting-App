@@ -1194,796 +1194,130 @@ always be uniformly spherical, roll straight, or bounce as expected.
 
 
 
---- Section: 6.1 MATCH Overview (Page 41) ---
+--- Section: 5.8 AprilTags (Page 35) ---
  
-Section 6 Game Details 
-V13 
-41 of 164 
-6 Game Details 
-Figure 6-1 REEFSCAPE 
+Section 5 ARENA 
+V4 
+35 of 164 
+Figure 5-21 ALGAE Inflation Jig 
  
-In REEFSCAPE, 2 ALLIANCES (an ALLIANCE is a cooperative of up to 4 FIRST Robotics Competition teams) 
-play MATCHES, set up and implemented per the details described below.  
-6.1 MATCH Overview 
-MATCHES run on 7–10-minute cycles, which consist of pre-MATCH setup, the 2-minute and 30-second 
-MATCH, and the post-MATCH reset. 
-During the MATCH, ROBOTS collect CORAL and score on their REEF. ROBOTS also collect ALGAE and score in 
-their PROCESSOR or NET. HUMAN PLAYERS can score ALGAE in their NET once it has been passed to them 
-via their opponent’s PROCESSOR.  
-ROBOTS conclude the MATCH PARKING in their BARGE ZONE or suspending from a CAGE. 
-6.2 DRIVE TEAM 
-A DRIVE TEAM is a set of up to 5 people from the same FIRST Robotics Competition team responsible for 
-team performance for a specific MATCH. There are 4 specific roles on a DRIVE TEAM which ALLIANCES can 
-use to assist ROBOTS with REEFSCAPE, and no more than 1 member of the DRIVE TEAM may be a non-
-STUDENT.  
-The intent of the definition of DRIVE TEAM and DRIVE TEAM related rules is that, 
-barring extenuating circumstances, the DRIVE TEAM consists of people who 
-arrived at the event affiliated with that team and are responsible for their team’s 
-and ROBOT’S performance at the event (this means a person may be affiliated 
-
-
-
---- Section: 6.3.4 SCORING ELEMENTS (Page 45) ---
  
-Section 6 Game Details 
-V13 
-45 of 164 
-6.3.4 SCORING ELEMENTS 
-Before each MATCH begins, FIELD STAFF stage SCORING ELEMENTS.  
-Figure 6-2 CORAL MARK locations and SCORING ELEMENT staging positions 
- 
-6.3.4.1 CORAL 
-126 CORAL are staged for each MATCH as follows (reference Figure 6-2):  
-A. 1 CORAL is staged on each CORAL MARK (6 total, CORAL are staged such that each CORAL covers the 
-opposite ends of each CORAL MARK), 
-B. 1 CORAL may be preloaded in each ROBOT by the ROBOT’S DRIVE TEAM, such that the CORAL is fully 
-supported by the ROBOT (up to 6 total, a CORAL not pre-loaded in a ROBOT is staged with CORAL in the 
-corresponding ALLIANCE AREA), and  
-C. remaining CORAL are split evenly behind each CORAL STATION (57 to 60 per ALLIANCE, depending on 
-how many are preloaded in ROBOTS).  
-6.3.4.2 ALGAE 
-18 ALGAE are staged for each MATCH as follows (reference Figure 6-2):  
-A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) such that they are 
-placed lightly onto the REEF, and 
-B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
-Staged ALGAE will not contact CORAL placed on L4. 
-
-
-
---- Section: 6.3.4.1 CORAL (Page 45) ---
- 
-Section 6 Game Details 
-V13 
-45 of 164 
-6.3.4 SCORING ELEMENTS 
-Before each MATCH begins, FIELD STAFF stage SCORING ELEMENTS.  
-Figure 6-2 CORAL MARK locations and SCORING ELEMENT staging positions 
- 
-6.3.4.1 CORAL 
-126 CORAL are staged for each MATCH as follows (reference Figure 6-2):  
-A. 1 CORAL is staged on each CORAL MARK (6 total, CORAL are staged such that each CORAL covers the 
-opposite ends of each CORAL MARK), 
-B. 1 CORAL may be preloaded in each ROBOT by the ROBOT’S DRIVE TEAM, such that the CORAL is fully 
-supported by the ROBOT (up to 6 total, a CORAL not pre-loaded in a ROBOT is staged with CORAL in the 
-corresponding ALLIANCE AREA), and  
-C. remaining CORAL are split evenly behind each CORAL STATION (57 to 60 per ALLIANCE, depending on 
-how many are preloaded in ROBOTS).  
-6.3.4.2 ALGAE 
-18 ALGAE are staged for each MATCH as follows (reference Figure 6-2):  
-A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) such that they are 
-placed lightly onto the REEF, and 
-B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
-Staged ALGAE will not contact CORAL placed on L4. 
-
-
-
---- Section: 6.3.4.2 ALGAE (Page 45) ---
- 
-Section 6 Game Details 
-V13 
-45 of 164 
-6.3.4 SCORING ELEMENTS 
-Before each MATCH begins, FIELD STAFF stage SCORING ELEMENTS.  
-Figure 6-2 CORAL MARK locations and SCORING ELEMENT staging positions 
- 
-6.3.4.1 CORAL 
-126 CORAL are staged for each MATCH as follows (reference Figure 6-2):  
-A. 1 CORAL is staged on each CORAL MARK (6 total, CORAL are staged such that each CORAL covers the 
-opposite ends of each CORAL MARK), 
-B. 1 CORAL may be preloaded in each ROBOT by the ROBOT’S DRIVE TEAM, such that the CORAL is fully 
-supported by the ROBOT (up to 6 total, a CORAL not pre-loaded in a ROBOT is staged with CORAL in the 
-corresponding ALLIANCE AREA), and  
-C. remaining CORAL are split evenly behind each CORAL STATION (57 to 60 per ALLIANCE, depending on 
-how many are preloaded in ROBOTS).  
-6.3.4.2 ALGAE 
-18 ALGAE are staged for each MATCH as follows (reference Figure 6-2):  
-A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) such that they are 
-placed lightly onto the REEF, and 
-B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
-Staged ALGAE will not contact CORAL placed on L4. 
-
-
-
---- Section: 6.4 MATCH Phases (Page 46) ---
- 
-Section 6 Game Details 
-V13 
-46 of 164 
-Figure 6-3 Staging positions for ALGAE on a REEF 
- 
-6.3.5 CAGES 
-Each team can choose the height of the CAGE closest to their driver station. By default, all CAGES are left in 
-the state from the last match. At the start of each day, all CAGES are set as deep CAGES. If a team would like 
-to alter the CAGE height they must alert the FIELD STAFF during reset. Each team informs FIELD STAFF of their 
-preference for their corresponding CAGE height.  
-Figure 6-4 CAGE positions corresponding to DRIVER STATIONS 
- 
-6.4 MATCH Phases 
-The first phase of each MATCH is 15 seconds long and called the Autonomous Period (AUTO). During AUTO, 
-ROBOTS operate without any DRIVE TEAM control or input. ROBOTS attempt to leave their ROBOT STARTING 
-
-
-
---- Section: 6.5 Scoring (Page 47) ---
- 
-Section 6 Game Details 
-V13 
-47 of 164 
-LINE, score SCORING ELEMENTS, and retrieve SCORING ELEMENTS. There is a 3-second delay between AUTO 
-and TELEOP for scoring purposes as described in section 6.5 Scoring. 
-The second phase of each MATCH is the remaining 2 minutes and 15 seconds (2:15) and called the 
-Teleoperated Period (TELEOP). During TELEOP, DRIVERS remotely operate ROBOTS to retrieve and score 
-SCORING ELEMENTS and climb their CAGES. 
-6.5 Scoring  
-ALLIANCES are rewarded for accomplishing various actions throughout a MATCH, including LEAVING their 
-ROBOT STARTING LINE, scoring CORAL on their REEF, scoring ALGAE in their PROCESSOR and NET, climbing 
-CAGES, and winning or tying MATCHES. 
-Rewards are granted either via MATCH points, Coopertition points, or Ranking Points (often abbreviated to RP, 
-which increase the measure used to rank teams in the Qualification Tournament).  
-All scores are assessed and updated throughout the MATCH, except as follows:  
-A. assessment of CORAL scored on the REEF and ALGAE scored in the PROCESSOR or NET continues for 
-up to 3 seconds after the ARENA timer displays 0:00 following AUTO. 
-B. assessment of CORAL scored on the REEF and ALGAE scored in the PROCESSOR or NET continues for 
-up to 3 seconds after the ARENA timer displays 0:00 following TELEOP. 
-C. assessment of CAGE points is made 3 seconds after the ARENA timer displays 0:00 following TELEOP, 
-or when all ROBOTS have come to rest following the conclusion of the MATCH, whichever happens 
-first. 
-LEAVING the ROBOT STARTING LINE, CORAL scoring, ALGAE scoring in the NET, 
-PARKING and CAGE points are all evaluated and scored by human volunteers. 
-Teams are encouraged to make sure that it is obvious and unambiguous that the 
-criteria are met. 
-6.5.1 SCORING ELEMENT Scoring Criteria 
-A CORAL is scored in the trough (L1) of the REEF if it is not in contact with a ROBOT on that ALLIANCE, not 
-scored on any other level of the REEF, and 
-A. contacting the trough, or 
-B. directly supported (either fully or partially) by a CORAL in contact with the trough.  
+5.8 AprilTags 
+AprilTags are 8⅛ in. (~21 cm) square targets located above CAGES, PROCESSORS, CORAL STATIONS and on 
+REEFS. There are 22 unique markers on the FIELD, positioned as shown in Figure 5-22. 
+Figure 5-22 AprilTag locations 
  
 
  
-Section 6 Game Details 
-V13 
-48 of 164 
-Figure 6-5 Examples of CORAL scored in the trough (L1) 
+Section 5 ARENA 
+V4 
+36 of 164 
+All markers are from the 36h11 tag family, IDs 1-22. All AprilTags are mounted to and centered on a 10½ in. 
+(~27 cm) square polycarbonate panel. Each marker has an identifying text label. If AprilTags experience wear 
+and marking during MATCHES, they are repaired with gaffers tape.  
+Figure 5-23 AprilTag sizing 
  
-Figure 6-5 includes examples of CORAL on the REEF at the conclusion of a 
-MATCH.  
-A. CORAL A, C, F, and H are scored because they meet criteria A. 
-B. CORAL B and G are scored because they meet criteria B. 
-C. CORAL D and E do not meet any criteria for trough scoring. 
- 
-A CORAL is scored on L2-L4 BRANCH if the BRANCH is inside the volume of the CORAL and the CORAL is not 
-in contact with a ROBOT on that ALLIANCE or an ALGAE. Only 1 CORAL can be scored per BRANCH. 
-An ALGAE is scored in a PROCESSOR once it has passed through the opening of the PROCESSOR and by the 
-sensor array. An ALGAE is scored in a NET if it is above the NET and within the perimeter of the NET, 
-contacting the NET or ALGAE contacting the NET, and not in contact with a ROBOT on that ALLIANCE. 
-If a CORAL scored in AUTO gets removed from a BRANCH during TELEOP, the AUTO points are removed but 
-the CORAL will still count towards the AUTO RP. If a CORAL is scored in that location again, the AUTO points 
-associated with the original scored CORAL is restored. CORAL scored in the trough is not tracked by specific 
-location, if a CORAL is removed from the trough after AUTO, the points removed will correspond to the lowest 
-scoring CORAL (i.e. TELEOP CORAL removed first); if CORAL is re-scored in the trough, points will be re-added 
-in the reverse order (i.e. AUTO CORAL re-added first). 
-6.5.2 ROBOT Scoring Criteria 
-To qualify for LEAVE points, a ROBOT must move such that its BUMPERS no longer overlap its ROBOT 
-STARTING LINE at the end of AUTO.  
-To qualify for PARK points, a ROBOT’S BUMPERS must be partially or completely contained in their BARGE 
-ZONE at the end of the MATCH and does not meet the criteria for CAGE points. 
 
  
-Section 6 Game Details 
-V13 
-49 of 164 
-To qualify for CAGE points, a ROBOT must be contacting one and only one of their ALLIANCE’S CAGES (and 
-not touching any ANCHOR), not contacting the carpet, and may additionally contact only the following 
-elements: 
-A. SCORING ELEMENTS, 
-B. another ROBOT qualified for CAGE points,  
-C. a partner ROBOT contacted by an opponent in violation of G428, and 
-D. an opponent ROBOT. 
-6.5.3 Coopertition Bonus 
-In Qualification MATCHES, if at least 2 ALGAE are scored in each ALLIANCE’S PROCESSOR, all teams earn 1 
-Coopertition Point, and the threshold for the CORAL RP decreases as described in Table 6-2. 
-See section 10.5.3 Qualification Ranking for more information about Coopertition influence on Qualification 
-Ranking order. 
+Section 5 ARENA 
+V4 
+37 of 164 
+CORAL STATION AprilTags (IDs 1, 2, 12, and 13) are mounted to the CORAL STATION. The bottom of each 
+tag’s panel is 4 ft. 5¼ in. (~135 cm) above the carpet and centered on the CORAL STATION.   
+Figure 5-24: CORAL STATION AprilTags 
  
+PROCESSOR AprilTag panels (IDs 3 and 16) are 3 ft. 9⅞ in. (~117 cm) above the carpet and centered 
+horizontally above the opening in the PROCESSOR WALL.  
+
  
+Section 5 ARENA 
+V4 
+38 of 164 
+Figure 5-25: PROCESSOR AprilTags 
+ 
+REEF AprilTag plates (IDs 6-11 and 17-22) are 6⅞ in. (~17 cm) above the carpet and centered horizontally on 
+each of the faces REEF.  
+Figure 5-26: REEF AprilTags 
  
 
 
 
---- Section: 6.5.1 SCORING ELEMENT Scoring Criteria (Page 47) ---
+--- Section: 5.9 The FIELD Management System (Page 39) ---
  
-Section 6 Game Details 
-V13 
-47 of 164 
-LINE, score SCORING ELEMENTS, and retrieve SCORING ELEMENTS. There is a 3-second delay between AUTO 
-and TELEOP for scoring purposes as described in section 6.5 Scoring. 
-The second phase of each MATCH is the remaining 2 minutes and 15 seconds (2:15) and called the 
-Teleoperated Period (TELEOP). During TELEOP, DRIVERS remotely operate ROBOTS to retrieve and score 
-SCORING ELEMENTS and climb their CAGES. 
-6.5 Scoring  
-ALLIANCES are rewarded for accomplishing various actions throughout a MATCH, including LEAVING their 
-ROBOT STARTING LINE, scoring CORAL on their REEF, scoring ALGAE in their PROCESSOR and NET, climbing 
-CAGES, and winning or tying MATCHES. 
-Rewards are granted either via MATCH points, Coopertition points, or Ranking Points (often abbreviated to RP, 
-which increase the measure used to rank teams in the Qualification Tournament).  
-All scores are assessed and updated throughout the MATCH, except as follows:  
-A. assessment of CORAL scored on the REEF and ALGAE scored in the PROCESSOR or NET continues for 
-up to 3 seconds after the ARENA timer displays 0:00 following AUTO. 
-B. assessment of CORAL scored on the REEF and ALGAE scored in the PROCESSOR or NET continues for 
-up to 3 seconds after the ARENA timer displays 0:00 following TELEOP. 
-C. assessment of CAGE points is made 3 seconds after the ARENA timer displays 0:00 following TELEOP, 
-or when all ROBOTS have come to rest following the conclusion of the MATCH, whichever happens 
-first. 
-LEAVING the ROBOT STARTING LINE, CORAL scoring, ALGAE scoring in the NET, 
-PARKING and CAGE points are all evaluated and scored by human volunteers. 
-Teams are encouraged to make sure that it is obvious and unambiguous that the 
-criteria are met. 
-6.5.1 SCORING ELEMENT Scoring Criteria 
-A CORAL is scored in the trough (L1) of the REEF if it is not in contact with a ROBOT on that ALLIANCE, not 
-scored on any other level of the REEF, and 
-A. contacting the trough, or 
-B. directly supported (either fully or partially) by a CORAL in contact with the trough.  
+Section 5 ARENA 
+V4 
+39 of 164 
+BARGE AprilTag plates (IDs 4, 5, 14, 15) are 5 ft. 9 in. (~178 cm) above the carpet, approximately centered 
+above the middle CAGE, and angled 30° from vertical.  
+Figure 5-27: BARGE AprilTags 
  
+For further marker locating information please refer to the 2025 ARENA Layout and Marking Diagram. Printable 
+versions of the markers are available on the 2025 Playing FIELD webpage. 
+5.9 The FIELD Management System 
+The FIELD Management System (FMS) is all the electronics responsible for sensing and controlling the FIRST 
+Robotics Competition FIELD. The FMS encompasses all FIELD electronics, including computers, REFEREE 
+touchscreens, the wireless access point, sensors, stack lights, A-Stops and E-Stops, etc.  
+When a DRIVE TEAM connects the Ethernet cable from their assigned DRIVER STATION to their OPERATOR 
+CONSOLE, the Driver Station Software on the OPERATOR CONSOLE computer communicates with FMS. Once 
+connected, the open ports available are described in Table 8-5. 
+Note that ROBOT code cannot be deployed while connected to the FMS. Additional information about the FMS 
+may be found in the FMS Whitepaper. 
+The FMS alerts participants to milestones in the MATCH using audio cues detailed in Table 5-1. Please note 
+that audio cues are intended as a courtesy to participants and not intended as official MATCH markers. If 
+there is a discrepancy between an audio cue and the FIELD timers, the FIELD timers are the authority.  
+Table 5-1 Audio cues 
+Event 
+Timer Value 
+Audio Cue 
+MATCH start 
+0:15 (for AUTO) “Cavalry Charge” 
+AUTO ends 
+0:00 (for AUTO) “Buzzer” 
+TELEOP begins 
+2:15 
+“3 Bells” 
 
 
 
---- Section: 6.5.2 ROBOT Scoring Criteria (Page 48) ---
+--- Section: 5.10 FIELD STAFF (Page 40) ---
  
-Section 6 Game Details 
-V13 
-48 of 164 
-Figure 6-5 Examples of CORAL scored in the trough (L1) 
- 
-Figure 6-5 includes examples of CORAL on the REEF at the conclusion of a 
-MATCH.  
-A. CORAL A, C, F, and H are scored because they meet criteria A. 
-B. CORAL B and G are scored because they meet criteria B. 
-C. CORAL D and E do not meet any criteria for trough scoring. 
- 
-A CORAL is scored on L2-L4 BRANCH if the BRANCH is inside the volume of the CORAL and the CORAL is not 
-in contact with a ROBOT on that ALLIANCE or an ALGAE. Only 1 CORAL can be scored per BRANCH. 
-An ALGAE is scored in a PROCESSOR once it has passed through the opening of the PROCESSOR and by the 
-sensor array. An ALGAE is scored in a NET if it is above the NET and within the perimeter of the NET, 
-contacting the NET or ALGAE contacting the NET, and not in contact with a ROBOT on that ALLIANCE. 
-If a CORAL scored in AUTO gets removed from a BRANCH during TELEOP, the AUTO points are removed but 
-the CORAL will still count towards the AUTO RP. If a CORAL is scored in that location again, the AUTO points 
-associated with the original scored CORAL is restored. CORAL scored in the trough is not tracked by specific 
-location, if a CORAL is removed from the trough after AUTO, the points removed will correspond to the lowest 
-scoring CORAL (i.e. TELEOP CORAL removed first); if CORAL is re-scored in the trough, points will be re-added 
-in the reverse order (i.e. AUTO CORAL re-added first). 
-6.5.2 ROBOT Scoring Criteria 
-To qualify for LEAVE points, a ROBOT must move such that its BUMPERS no longer overlap its ROBOT 
-STARTING LINE at the end of AUTO.  
-To qualify for PARK points, a ROBOT’S BUMPERS must be partially or completely contained in their BARGE 
-ZONE at the end of the MATCH and does not meet the criteria for CAGE points. 
-
-
-
---- Section: 6.5.3 Coopertition Bonus (Page 49) ---
- 
-Section 6 Game Details 
-V13 
-49 of 164 
-To qualify for CAGE points, a ROBOT must be contacting one and only one of their ALLIANCE’S CAGES (and 
-not touching any ANCHOR), not contacting the carpet, and may additionally contact only the following 
-elements: 
-A. SCORING ELEMENTS, 
-B. another ROBOT qualified for CAGE points,  
-C. a partner ROBOT contacted by an opponent in violation of G428, and 
-D. an opponent ROBOT. 
-6.5.3 Coopertition Bonus 
-In Qualification MATCHES, if at least 2 ALGAE are scored in each ALLIANCE’S PROCESSOR, all teams earn 1 
-Coopertition Point, and the threshold for the CORAL RP decreases as described in Table 6-2. 
-See section 10.5.3 Qualification Ranking for more information about Coopertition influence on Qualification 
-Ranking order. 
- 
- 
- 
-
-
-
---- Section: 6.5.4 Point Values (Page 50) ---
- 
-Section 6 Game Details 
-V13 
-50 of 164 
-6.5.4 Point Values 
-Point values for tasks in REEFSCAPE are detailed in Table 6-2. 
-Table 6-2 REEFSCAPE point values 
- 
- 
-MATCH points 
-Ranking 
-Points 
-Coopertition 
-Points 
-AUTO  
-TELEOP 
-LEAVE 
-3 
- 
- 
-CORAL 
-CORAL scored in trough (L1) 
-3 
-2 
-CORAL scored on L2 BRANCH 
-4 
-3 
-CORAL scored on L3 BRANCH  
-6 
-4 
-CORAL scored on L4 BRANCH  
-7 
-5 
-ALGAE 
-scored in PROCESSOR 
-6 
-6 
-scored in NET 
-4 
-4 
-BARGE 
-PARK in the BARGE ZONE 
- 
-2 
-off-the-ground via shallow CAGE 
-6 
-off-the-ground via deep CAGE 
-12 
-Coopertition Bonus – at least 2 ALGAE scored in each PROCESSOR 
- 
-1 
-AUTO RP - all non-BYPASSED ROBOTS LEAVE and at least 1 CORAL scored 
-in AUTO 
-1 
- 
-*CORAL RP - If at least 7 CORAL scored on each level.  
-If Coopertition achieved, at least 7 CORAL must be scored on each of 3 
-levels. 
-1 
- 
-*BARGE RP - at least 16 BARGE points are scored 
-1 
- 
-Win 
-completing a MATCH with more MATCH points than your 
-opponent 
-3 
- 
-Tie 
-completing a MATCH with the same number of MATCH points 
-as your opponent 
-1 
- 
-*For District Championship and/or FIRST Championship events, the CORAL or BARGE RP requirement 
-may increase.  
-6.6 Violations 
-Unless otherwise noted, all violations are assigned for each instance of a rule violation. A description of the 
-penalties are listed in Table 6-3. All rules throughout the Game Rules section are called as perceived by a 
-REFEREE.  
-Table 6-3 Rule violations 
-Penalty 
-Description 
-MINOR FOUL 
-a credit of 2 points towards the opponent’s MATCH point total 
-MAJOR FOUL 
-a credit of 6 points towards the opponent’s MATCH point total 
-
-
-
---- Section: 6.6 Violations (Page 50) ---
- 
-Section 6 Game Details 
-V13 
-50 of 164 
-6.5.4 Point Values 
-Point values for tasks in REEFSCAPE are detailed in Table 6-2. 
-Table 6-2 REEFSCAPE point values 
- 
- 
-MATCH points 
-Ranking 
-Points 
-Coopertition 
-Points 
-AUTO  
-TELEOP 
-LEAVE 
-3 
- 
- 
-CORAL 
-CORAL scored in trough (L1) 
-3 
-2 
-CORAL scored on L2 BRANCH 
-4 
-3 
-CORAL scored on L3 BRANCH  
-6 
-4 
-CORAL scored on L4 BRANCH  
-7 
-5 
-ALGAE 
-scored in PROCESSOR 
-6 
-6 
-scored in NET 
-4 
-4 
-BARGE 
-PARK in the BARGE ZONE 
- 
-2 
-off-the-ground via shallow CAGE 
-6 
-off-the-ground via deep CAGE 
-12 
-Coopertition Bonus – at least 2 ALGAE scored in each PROCESSOR 
- 
-1 
-AUTO RP - all non-BYPASSED ROBOTS LEAVE and at least 1 CORAL scored 
-in AUTO 
-1 
- 
-*CORAL RP - If at least 7 CORAL scored on each level.  
-If Coopertition achieved, at least 7 CORAL must be scored on each of 3 
-levels. 
-1 
- 
-*BARGE RP - at least 16 BARGE points are scored 
-1 
- 
-Win 
-completing a MATCH with more MATCH points than your 
-opponent 
-3 
- 
-Tie 
-completing a MATCH with the same number of MATCH points 
-as your opponent 
-1 
- 
-*For District Championship and/or FIRST Championship events, the CORAL or BARGE RP requirement 
-may increase.  
-6.6 Violations 
-Unless otherwise noted, all violations are assigned for each instance of a rule violation. A description of the 
-penalties are listed in Table 6-3. All rules throughout the Game Rules section are called as perceived by a 
-REFEREE.  
-Table 6-3 Rule violations 
-Penalty 
-Description 
-MINOR FOUL 
-a credit of 2 points towards the opponent’s MATCH point total 
-MAJOR FOUL 
-a credit of 6 points towards the opponent’s MATCH point total 
-
- 
-Section 6 Game Details 
-V13 
-51 of 164 
-Penalty 
-Description 
-YELLOW 
-CARD 
-issued by the Head REFEREE for egregious ROBOT or team member 
-behavior or rule violations. A subsequent YELLOW CARD within the 
-same tournament phase results in a RED CARD. 
-RED CARD 
-issued by the Head REFEREE for egregious ROBOT or team member 
-behavior or rule violations which results in a team being DISQUALIFIED 
-for the MATCH.  
-DISABLED 
-the state in which a ROBOT is commanded to deactivate all outputs, 
-rendering the ROBOT inoperable for the remainder of the MATCH.  
-DISQUALIFIED 
-the state of a team in which they receive 0 MATCH points and 0 
-Ranking Points in a Qualification MATCH or causes their ALLIANCE to 
-receive 0 MATCH points in a Playoff MATCH 
-VERBAL 
-WARNING 
-a warning issued by event staff or the Head REFEREE.  
-ALLIANCE is 
-ineligible for 
-RP 
-An ALLIANCE is ineligible for the specified RP for that MATCH. This 
-overrides any RP awarded through normal MATCH play or other rule 
-violations. 
-6.6.1 YELLOW and RED CARDS 
-In addition to rule violations explicitly listed throughout this document, YELLOW CARDS and RED CARDS are 
-used in FIRST Robotics Competition to address team and ROBOT behavior that does not align with the mission, 
-values, and culture of FIRST. 
-The Head REFEREE may assign a YELLOW CARD as a warning, or a RED CARD for egregious behavior 
-inappropriate at a FIRST Robotics Competition event. 
-A YELLOW or RED CARD is indicated by the Head REFEREE holding a YELLOW and/or RED CARD in the air 
-while the Game Announcer describes the violation. 
-YELLOW CARDS are additive, meaning that a second YELLOW CARD is automatically converted to a RED 
-CARD. A team is issued a RED CARD for any subsequent incident in which they receive an additional YELLOW 
-CARD, including earning a second YELLOW CARD during a single MATCH. A second YELLOW CARD is 
-indicated by the Head REFEREE holding a YELLOW CARD and RED CARD in the air simultaneously after the 
-completion of the MATCH. A team that has received either a YELLOW CARD or a RED CARD carries a YELLOW 
-CARD into subsequent MATCHES, except as noted below.  
-Once a team receives a YELLOW or RED CARD, a yellow rectangle will show next to the team number on the 
-audience display during subsequent MATCHES, including any replays. 
-Figure 6-6 Example audience screen graphic showing YELLOW CARD indicators 
- 
-
- 
-Section 6 Game Details 
-V13 
-52 of 164 
-All YELLOW CARDS are cleared in FMS at the conclusion of Practice, Qualification, and division Playoff 
-MATCHES. VERBAL WARNINGS issued by the head REFEREE are cleared after Practice MATCHES and persist 
-from Qualification MATCHES through subsequent tournament phases.  
-6.6.2 YELLOW and RED CARD application 
-YELLOW and RED CARDS are applied based on the following: 
-Table 6-4 YELLOW and RED CARD application 
-Time YELLOW or RED CARDS earned: 
-MATCH to which CARD is applied: 
-Prior to Qualification MATCHES 
-REFEREES may or may not be present during Practice 
-MATCHES. With input from event staff, The Head 
-REFEREE may opt to perpetuate a VERBAL WARNING or 
-YELLOW CARD earned prior to Qualification MATCHES to 
-the first Qualification MATCH for particularly egregious 
-behavior. 
-during the Qualification MATCHES 
-team’s current (or just-completed) MATCH. In the case 
-where the team participated as a SURROGATE in the 
-current (or just completed) MATCH, the card is applied to 
-the team’s previous MATCH (i.e. the team’s second 
-Qualification MATCH) 
-between the end of Qualification 
-MATCHES and the start of Playoff 
-MATCHES 
-ALLIANCE’S first Playoff MATCH 
-during the Playoff MATCHES 
-ALLIANCE’S current (or just-completed) MATCH  
-Please see examples of the application of YELLOW and RED CARDS as shown in 
-section 6.6.4 Violation Details. 
-6.6.3 YELLOW and RED CARDS during Playoff MATCHES 
-During Playoff MATCHES, YELLOW and RED CARDS are assigned to the violating team’s entire ALLIANCE 
-instead of to only the violating team. If an ALLIANCE receives 2 YELLOW CARDS, the entire ALLIANCE is issued 
-a RED CARD which results in DISQUALIFICATION for the associated MATCH. If both ALLIANCES receive a RED 
-CARD, the ALLIANCE assessed the first RED CARD, chronologically, is DISQUALIFIED and loses the MATCH. 
-6.6.4 Violation Details 
-There are several styles of violation wording used in this manual. Below are some example violations and a 
-clarification of the way the violation would be assessed. The examples shown do not represent all possible 
-violations, but rather a representative set of combinations. 
-Table 6-5 Violation examples 
-Example Violation 
-Expanded Interpretation 
-MINOR FOUL 
-Upon violation, a MINOR FOUL is assessed against the 
-violating ALLIANCE. 
-
-
-
---- Section: 6.6.1 YELLOW and RED CARDS (Page 51) ---
- 
-Section 6 Game Details 
-V13 
-51 of 164 
-Penalty 
-Description 
-YELLOW 
-CARD 
-issued by the Head REFEREE for egregious ROBOT or team member 
-behavior or rule violations. A subsequent YELLOW CARD within the 
-same tournament phase results in a RED CARD. 
-RED CARD 
-issued by the Head REFEREE for egregious ROBOT or team member 
-behavior or rule violations which results in a team being DISQUALIFIED 
-for the MATCH.  
-DISABLED 
-the state in which a ROBOT is commanded to deactivate all outputs, 
-rendering the ROBOT inoperable for the remainder of the MATCH.  
-DISQUALIFIED 
-the state of a team in which they receive 0 MATCH points and 0 
-Ranking Points in a Qualification MATCH or causes their ALLIANCE to 
-receive 0 MATCH points in a Playoff MATCH 
-VERBAL 
-WARNING 
-a warning issued by event staff or the Head REFEREE.  
-ALLIANCE is 
-ineligible for 
-RP 
-An ALLIANCE is ineligible for the specified RP for that MATCH. This 
-overrides any RP awarded through normal MATCH play or other rule 
-violations. 
-6.6.1 YELLOW and RED CARDS 
-In addition to rule violations explicitly listed throughout this document, YELLOW CARDS and RED CARDS are 
-used in FIRST Robotics Competition to address team and ROBOT behavior that does not align with the mission, 
-values, and culture of FIRST. 
-The Head REFEREE may assign a YELLOW CARD as a warning, or a RED CARD for egregious behavior 
-inappropriate at a FIRST Robotics Competition event. 
-A YELLOW or RED CARD is indicated by the Head REFEREE holding a YELLOW and/or RED CARD in the air 
-while the Game Announcer describes the violation. 
-YELLOW CARDS are additive, meaning that a second YELLOW CARD is automatically converted to a RED 
-CARD. A team is issued a RED CARD for any subsequent incident in which they receive an additional YELLOW 
-CARD, including earning a second YELLOW CARD during a single MATCH. A second YELLOW CARD is 
-indicated by the Head REFEREE holding a YELLOW CARD and RED CARD in the air simultaneously after the 
-completion of the MATCH. A team that has received either a YELLOW CARD or a RED CARD carries a YELLOW 
-CARD into subsequent MATCHES, except as noted below.  
-Once a team receives a YELLOW or RED CARD, a yellow rectangle will show next to the team number on the 
-audience display during subsequent MATCHES, including any replays. 
-Figure 6-6 Example audience screen graphic showing YELLOW CARD indicators 
- 
-
-
-
---- Section: 6.6.2 YELLOW and RED CARD application (Page 52) ---
- 
-Section 6 Game Details 
-V13 
-52 of 164 
-All YELLOW CARDS are cleared in FMS at the conclusion of Practice, Qualification, and division Playoff 
-MATCHES. VERBAL WARNINGS issued by the head REFEREE are cleared after Practice MATCHES and persist 
-from Qualification MATCHES through subsequent tournament phases.  
-6.6.2 YELLOW and RED CARD application 
-YELLOW and RED CARDS are applied based on the following: 
-Table 6-4 YELLOW and RED CARD application 
-Time YELLOW or RED CARDS earned: 
-MATCH to which CARD is applied: 
-Prior to Qualification MATCHES 
-REFEREES may or may not be present during Practice 
-MATCHES. With input from event staff, The Head 
-REFEREE may opt to perpetuate a VERBAL WARNING or 
-YELLOW CARD earned prior to Qualification MATCHES to 
-the first Qualification MATCH for particularly egregious 
-behavior. 
-during the Qualification MATCHES 
-team’s current (or just-completed) MATCH. In the case 
-where the team participated as a SURROGATE in the 
-current (or just completed) MATCH, the card is applied to 
-the team’s previous MATCH (i.e. the team’s second 
-Qualification MATCH) 
-between the end of Qualification 
-MATCHES and the start of Playoff 
-MATCHES 
-ALLIANCE’S first Playoff MATCH 
-during the Playoff MATCHES 
-ALLIANCE’S current (or just-completed) MATCH  
-Please see examples of the application of YELLOW and RED CARDS as shown in 
-section 6.6.4 Violation Details. 
-6.6.3 YELLOW and RED CARDS during Playoff MATCHES 
-During Playoff MATCHES, YELLOW and RED CARDS are assigned to the violating team’s entire ALLIANCE 
-instead of to only the violating team. If an ALLIANCE receives 2 YELLOW CARDS, the entire ALLIANCE is issued 
-a RED CARD which results in DISQUALIFICATION for the associated MATCH. If both ALLIANCES receive a RED 
-CARD, the ALLIANCE assessed the first RED CARD, chronologically, is DISQUALIFIED and loses the MATCH. 
-6.6.4 Violation Details 
-There are several styles of violation wording used in this manual. Below are some example violations and a 
-clarification of the way the violation would be assessed. The examples shown do not represent all possible 
-violations, but rather a representative set of combinations. 
-Table 6-5 Violation examples 
-Example Violation 
-Expanded Interpretation 
-MINOR FOUL 
-Upon violation, a MINOR FOUL is assessed against the 
-violating ALLIANCE. 
-
-
-
---- Section: 6.6.3 YELLOW and RED CARDS during Playoff MATCHES (Page 52) ---
- 
-Section 6 Game Details 
-V13 
-52 of 164 
-All YELLOW CARDS are cleared in FMS at the conclusion of Practice, Qualification, and division Playoff 
-MATCHES. VERBAL WARNINGS issued by the head REFEREE are cleared after Practice MATCHES and persist 
-from Qualification MATCHES through subsequent tournament phases.  
-6.6.2 YELLOW and RED CARD application 
-YELLOW and RED CARDS are applied based on the following: 
-Table 6-4 YELLOW and RED CARD application 
-Time YELLOW or RED CARDS earned: 
-MATCH to which CARD is applied: 
-Prior to Qualification MATCHES 
-REFEREES may or may not be present during Practice 
-MATCHES. With input from event staff, The Head 
-REFEREE may opt to perpetuate a VERBAL WARNING or 
-YELLOW CARD earned prior to Qualification MATCHES to 
-the first Qualification MATCH for particularly egregious 
-behavior. 
-during the Qualification MATCHES 
-team’s current (or just-completed) MATCH. In the case 
-where the team participated as a SURROGATE in the 
-current (or just completed) MATCH, the card is applied to 
-the team’s previous MATCH (i.e. the team’s second 
-Qualification MATCH) 
-between the end of Qualification 
-MATCHES and the start of Playoff 
-MATCHES 
-ALLIANCE’S first Playoff MATCH 
-during the Playoff MATCHES 
-ALLIANCE’S current (or just-completed) MATCH  
-Please see examples of the application of YELLOW and RED CARDS as shown in 
-section 6.6.4 Violation Details. 
-6.6.3 YELLOW and RED CARDS during Playoff MATCHES 
-During Playoff MATCHES, YELLOW and RED CARDS are assigned to the violating team’s entire ALLIANCE 
-instead of to only the violating team. If an ALLIANCE receives 2 YELLOW CARDS, the entire ALLIANCE is issued 
-a RED CARD which results in DISQUALIFICATION for the associated MATCH. If both ALLIANCES receive a RED 
-CARD, the ALLIANCE assessed the first RED CARD, chronologically, is DISQUALIFIED and loses the MATCH. 
-6.6.4 Violation Details 
-There are several styles of violation wording used in this manual. Below are some example violations and a 
-clarification of the way the violation would be assessed. The examples shown do not represent all possible 
-violations, but rather a representative set of combinations. 
-Table 6-5 Violation examples 
-Example Violation 
-Expanded Interpretation 
-MINOR FOUL 
-Upon violation, a MINOR FOUL is assessed against the 
-violating ALLIANCE. 
-
-
-
---- Section: 6.6.4 Violation Details (Page 52) ---
- 
-Section 6 Game Details 
-V13 
-52 of 164 
-All YELLOW CARDS are cleared in FMS at the conclusion of Practice, Qualification, and division Playoff 
-MATCHES. VERBAL WARNINGS issued by the head REFEREE are cleared after Practice MATCHES and persist 
-from Qualification MATCHES through subsequent tournament phases.  
-6.6.2 YELLOW and RED CARD application 
-YELLOW and RED CARDS are applied based on the following: 
-Table 6-4 YELLOW and RED CARD application 
-Time YELLOW or RED CARDS earned: 
-MATCH to which CARD is applied: 
-Prior to Qualification MATCHES 
-REFEREES may or may not be present during Practice 
-MATCHES. With input from event staff, The Head 
-REFEREE may opt to perpetuate a VERBAL WARNING or 
-YELLOW CARD earned prior to Qualification MATCHES to 
-the first Qualification MATCH for particularly egregious 
-behavior. 
-during the Qualification MATCHES 
-team’s current (or just-completed) MATCH. In the case 
-where the team participated as a SURROGATE in the 
-current (or just completed) MATCH, the card is applied to 
-the team’s previous MATCH (i.e. the team’s second 
-Qualification MATCH) 
-between the end of Qualification 
-MATCHES and the start of Playoff 
-MATCHES 
-ALLIANCE’S first Playoff MATCH 
-during the Playoff MATCHES 
-ALLIANCE’S current (or just-completed) MATCH  
-Please see examples of the application of YELLOW and RED CARDS as shown in 
-section 6.6.4 Violation Details. 
-6.6.3 YELLOW and RED CARDS during Playoff MATCHES 
-During Playoff MATCHES, YELLOW and RED CARDS are assigned to the violating team’s entire ALLIANCE 
-instead of to only the violating team. If an ALLIANCE receives 2 YELLOW CARDS, the entire ALLIANCE is issued 
-a RED CARD which results in DISQUALIFICATION for the associated MATCH. If both ALLIANCES receive a RED 
-CARD, the ALLIANCE assessed the first RED CARD, chronologically, is DISQUALIFIED and loses the MATCH. 
-6.6.4 Violation Details 
-There are several styles of violation wording used in this manual. Below are some example violations and a 
-clarification of the way the violation would be assessed. The examples shown do not represent all possible 
-violations, but rather a representative set of combinations. 
-Table 6-5 Violation examples 
-Example Violation 
-Expanded Interpretation 
-MINOR FOUL 
-Upon violation, a MINOR FOUL is assessed against the 
-violating ALLIANCE.
+Section 5 ARENA 
+V4 
+40 of 164 
+Event 
+Timer Value 
+Audio Cue 
+Final 20 seconds 0:20 
+“Submarine Sonar Ping” 
+MATCH end 
+0:00 
+“Buzzer” 
+MATCH stopped 
+n/a 
+“Foghorn” 
+5.10 FIELD STAFF 
+FIELD STAFF are responsible for making sure the MATCHES are cycled through efficiently, fairly, safely, and 
+with a spirit of cooperation, Gracious Professionalism, and generosity of spirit. FIELD STAFF roles are filled by 
+volunteers from the community who prepare for the event with thorough training and certification. There are 3 
+FIELD-side key volunteer roles with whom teams should be familiar and are encouraged to use as resources to 
+make their event experience valuable (in whatever way the team defines “valuable”). 
+− 
+Head REFEREE – trains, directs, and supervises REFEREES. They oversee all scoring processes and 
+procedures in collaboration with the FIRST Technical Advisor (FTA). They interact with STUDENTS, 
+volunteers, and contracted/FIRST staff. The Head REFEREE is positioned between the FIELD and the 
+scoring table and wears a yellow shirt. The Head REFEREE has final authority for decisions regarding 
+MATCH scores, penalties, and YELLOW and RED CARD assignments. For additional details, please refer 
+to the Head REFEREE role description.  
+− 
+FIRST Technical Advisor (FTA) - ensures events run smoothly, safely, and in accordance with FIRST 
+requirements. The FTA collaborates with FIRST staff, event staff, and other event volunteers in many 
+different areas at events. The FTA is the liaison between FIRST HQ and the event for all things related 
+to the FIELD, ROBOTS, and game, acts as a team advocate for all teams competing at the event and is a 
+major point of escalation and conflict resolution for the event. For additional details, please refer to the 
+FTA role description. 
+− 
+FIELD Supervisor - directs activity on the FIELD to ensure efficient execution of the MATCHES, pacing 
+of the event, and smooth flow of MATCH play. FIELD Supervisors are responsible for ensuring the 
+FIELD is intact and lead FIELD Reset teams, who are responsible for resetting the FIELD after each 
+MATCH in preparation for the subsequent MATCH. For additional details, please refer to the FIELD 
+Supervisor role description.

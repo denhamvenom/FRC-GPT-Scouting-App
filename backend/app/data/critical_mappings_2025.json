@@ -1,9 +1,10 @@
 {
   "team_number": [
-    "Team Number",
-    "Team"
+    "Team Number"
   ],
   "match_number": [
-    "Qual Number"
+    "Qual Number",
+    "Team Event Match",
+    "Match Key"
   ]
 }
