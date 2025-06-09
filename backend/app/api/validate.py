@@ -22,7 +22,7 @@ from app.api.schemas import (
     VirtualScoutResponse,
 )
 from app.api.utils.response_formatters import format_error_response, format_success_response
-from app.services.data_validation_service import (
+from app.services.validation import (
     add_to_todo_list,
     apply_correction,
     create_virtual_scout,
