@@ -4,14 +4,14 @@ import os
 import json
 from fastapi import APIRouter, HTTPException, Request
 
-router = APIRouter(prefix="/api/schema", tags=["Schema"])
+router = APIRouter(prefix="/api/field-selection", tags=["Field Selection"])
 
 # Properly resolve the backend base path dynamically
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 
-@router.post("/save-selections")
+@router.post("/save")
 async def save_field_selections(request: Request):
     """
     Save field selection mappings, including critical fields and robot groups.
@@ -148,7 +148,7 @@ def validate_field_mapping(field_selections, critical_mappings, robot_groups):
     return {"issues": issues, "warnings": warnings, "is_valid": len(issues) == 0}
 
 
-@router.get("/field-selections/{year}")
+@router.get("/load")
 async def get_field_selections(year: int = 2025):
     """
     Get the current field selection configuration.
@@ -211,3 +211,47 @@ async def get_field_selections(year: int = 2025):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading field selections: {str(e)}")
+
+
+@router.get("/statbotics-fields")
+async def get_statbotics_fields(year: int = 2025):
+    """
+    Get available Statbotics fields for the given year.
+    """
+    try:
+        # Check for year-specific field mapping file
+        config_dir = os.path.join(BASE_DIR, "config")
+        field_map_path = os.path.join(config_dir, f"statbotics_field_map_{year}.json")
+        
+        # Fall back to default if year-specific file doesn't exist
+        if not os.path.exists(field_map_path):
+            field_map_path = os.path.join(config_dir, "statbotics_field_map_DEFAULT.json")
+        
+        if not os.path.exists(field_map_path):
+            return {
+                "status": "error",
+                "message": f"No Statbotics field mapping found for year {year}",
+                "fields": []
+            }
+        
+        # Load the field mapping
+        with open(field_map_path, "r", encoding="utf-8") as f:
+            field_mapping = json.load(f)
+        
+        # Convert to format expected by frontend
+        statbotics_fields = []
+        for display_name, api_path in field_mapping.items():
+            statbotics_fields.append({
+                "name": display_name,
+                "api_path": api_path,
+                "description": f"Statbotics {display_name.replace('_', ' ').title()}"
+            })
+        
+        return {
+            "status": "success",
+            "year": year,
+            "fields": statbotics_fields
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading Statbotics fields: {str(e)}")

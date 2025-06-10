@@ -12,7 +12,8 @@ router = APIRouter(prefix="/api/sheets", tags=["Sheets"])
 
 @router.get("/headers")
 async def get_headers(
-    tab: str = Query(..., description="Sheet tab name"),
+    tab: Optional[str] = Query(None, description="Sheet tab name"),
+    sheet_name: Optional[str] = Query(None, description="Sheet tab name (alias for tab)"),
     optional: bool = Query(
         False, description="If True, return empty headers instead of error for missing tabs"
     ),
@@ -26,6 +27,7 @@ async def get_headers(
 
     Args:
         tab: The name of the sheet tab (e.g., "Scouting", "SuperScouting")
+        sheet_name: Alias for tab parameter (for frontend compatibility)
         optional: If True, return empty headers instead of error for missing tabs
         spreadsheet_id: Optional spreadsheet ID (will use active config if not provided)
         db: Database session for getting active configuration
@@ -36,9 +38,15 @@ async def get_headers(
     try:
         import logging
 
+        # Use sheet_name if provided, otherwise use tab
+        actual_tab = sheet_name if sheet_name else tab
+        
+        if not actual_tab:
+            raise HTTPException(status_code=422, detail="Either 'tab' or 'sheet_name' parameter is required")
+
         logger = logging.getLogger("sheets_headers_endpoint")
         logger.debug(
-            f"Headers requested for tab={tab}, spreadsheet_id={spreadsheet_id}, optional={optional}"
+            f"Headers requested for tab={actual_tab}, spreadsheet_id={spreadsheet_id}, optional={optional}"
         )
 
         # Handle both required and optional tabs
@@ -47,7 +55,7 @@ async def get_headers(
             headers: List[str] = []
             try:
                 # Fetch first row (headers) from the specified tab
-                range_name = f"{tab}!A1:ZZ1"
+                range_name = f"{actual_tab}!A1:ZZ1"
 
                 # Only log at debug level
                 logger.debug(
@@ -63,23 +71,23 @@ async def get_headers(
 
                 if result and len(result) > 0:
                     headers = result[0]
-                    logger.debug(f"Found {len(headers)} headers for {tab}")
+                    logger.debug(f"Found {len(headers)} headers for {actual_tab}")
                 else:
-                    logger.warning(f"No headers found for {tab}")
+                    logger.warning(f"No headers found for {actual_tab}")
             except Exception as e:
                 # Log but don't raise for optional tabs
-                logger.warning(f"Error fetching optional tab '{tab}': {str(e)}")
+                logger.warning(f"Error fetching optional tab '{actual_tab}': {str(e)}")
 
             return {
                 "status": "success",
-                "tab": tab,
+                "tab": actual_tab,
                 "headers": headers,
                 "count": len(headers),
                 "is_empty": len(headers) == 0,
             }
         else:
             # For required tabs, use standard error handling
-            range_name = f"{tab}!A1:ZZ1"
+            range_name = f"{actual_tab}!A1:ZZ1"
 
             # Only log at debug level
             logger.debug(
@@ -96,21 +104,21 @@ async def get_headers(
             # Removed excessive logging
 
             if not result or len(result) == 0:
-                logger.warning(f"No headers found in {tab} tab")
-                return {"status": "error", "message": f"No headers found in {tab} tab"}
+                logger.warning(f"No headers found in {actual_tab} tab")
+                return {"status": "error", "message": f"No headers found in {actual_tab} tab"}
 
             # Return the headers (first row)
             headers = result[0]
-            logger.debug(f"Found {len(headers)} headers for {tab}")
+            logger.debug(f"Found {len(headers)} headers for {actual_tab}")
 
-            return {"status": "success", "tab": tab, "headers": headers, "count": len(headers)}
+            return {"status": "success", "tab": actual_tab, "headers": headers, "count": len(headers)}
 
     except Exception as e:
         if optional:
             # For optional tabs, return empty result rather than error
             return {
                 "status": "success",
-                "tab": tab,
+                "tab": actual_tab,
                 "headers": [],
                 "count": 0,
                 "is_empty": True,
@@ -119,7 +127,7 @@ async def get_headers(
         else:
             # For required tabs, raise error
             raise HTTPException(
-                status_code=500, detail=f"Error fetching headers from {tab}: {str(e)}"
+                status_code=500, detail=f"Error fetching headers from {actual_tab}: {str(e)}"
             )
 
 

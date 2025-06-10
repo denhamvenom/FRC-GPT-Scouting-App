@@ -48,7 +48,7 @@ export const useFieldSelection = () => {
     
     try {
       // First, get the active sheet configuration from setup
-      const setupResponse = await fetch('http://localhost:8000/api/setup/info');
+      const setupResponse = await fetch('/api/setup/info');
       let sheetConfig: SheetConfig | null = null;
 
       if (setupResponse.ok) {
@@ -76,7 +76,7 @@ export const useFieldSelection = () => {
       let pitScoutingTab = 'PitScouting';
 
       if (sheetConfig.id) {
-        const configResponse = await fetch(`http://localhost:8000/api/sheet-config/${sheetConfig.id}`);
+        const configResponse = await fetch(`/api/sheet-config/${sheetConfig.id}`);
 
         if (configResponse.ok) {
           const configData = await configResponse.json();
@@ -132,9 +132,9 @@ export const useFieldSelection = () => {
   // Get available tabs from the sheet
   const getAvailableTabs = async (sheetConfig: SheetConfig): Promise<string[]> => {
     const endpoints = [
-      `http://localhost:8000/api/sheets/sheets?spreadsheet_id=${encodeURIComponent(sheetConfig.spreadsheet_id)}`,
-      `http://localhost:8000/api/sheet-config/available-sheets?spreadsheet_id=${sheetConfig.spreadsheet_id}`,
-      `http://localhost:8000/api/sheets/available-tabs?spreadsheet_id=${sheetConfig.spreadsheet_id}`
+      `/api/sheets/sheets?spreadsheet_id=${encodeURIComponent(sheetConfig.spreadsheet_id)}`,
+      `/api/sheet-config/available-sheets?spreadsheet_id=${sheetConfig.spreadsheet_id}`,
+      `/api/sheets/available-tabs?spreadsheet_id=${sheetConfig.spreadsheet_id}`
     ];
 
     for (const endpoint of endpoints) {
@@ -158,7 +158,7 @@ export const useFieldSelection = () => {
   const fetchSheetHeaders = async (spreadsheetId: string, sheetName: string): Promise<string[]> => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/sheets/headers?spreadsheet_id=${encodeURIComponent(spreadsheetId)}&sheet_name=${encodeURIComponent(sheetName)}`
+        `/api/sheets/headers?spreadsheet_id=${encodeURIComponent(spreadsheetId)}&sheet_name=${encodeURIComponent(sheetName)}`
       );
       
       if (response.ok) {
@@ -177,7 +177,7 @@ export const useFieldSelection = () => {
   // Fetch Statbotics fields
   const fetchStatboticsFields = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/field-selection/statbotics-fields?year=${year}`);
+      const response = await fetch(`/api/field-selection/statbotics-fields?year=${year}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -263,7 +263,7 @@ export const useFieldSelection = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/field-selection/save', {
+      const response = await fetch('/api/field-selection/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -298,7 +298,7 @@ export const useFieldSelection = () => {
   // Load existing field selections
   const loadFieldSelections = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/field-selection/load?year=${year}`);
+      const response = await fetch(`/api/field-selection/load?year=${year}`);
       
       if (response.ok) {
         const data = await response.json();
