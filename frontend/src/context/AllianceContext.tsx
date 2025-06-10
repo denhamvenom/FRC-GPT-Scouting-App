@@ -303,25 +303,19 @@ export function AllianceProvider({ children }: AllianceProviderProps) {
   const [state, dispatch] = useReducer(allianceReducer, initialState);
   const { state: appState, showNotification } = useAppContext();
   
-  // Persist alliance settings
-  const [, setStoredSettings] = useLocalStorage('allianceSettings', {
-    autoAdvance: state.autoAdvance,
-    showTeamDetails: state.showTeamDetails,
-    compactView: state.compactView,
-  });
-  
-  // Load persisted settings on mount
-  const [storedSettings] = useLocalStorage('allianceSettings', {
+  // Persist alliance settings with a single useLocalStorage hook
+  const [storedSettings, setStoredSettings] = useLocalStorage('allianceSettings', {
     autoAdvance: true,
     showTeamDetails: true,
     compactView: false,
   });
   
+  // Load persisted settings on mount (only once)
   useEffect(() => {
     dispatch({ type: 'UPDATE_SETTINGS', payload: storedSettings });
-  }, [storedSettings]);
+  }, []); // Empty dependency array - only run on mount
   
-  // Update stored settings when state changes
+  // Update stored settings when relevant state changes
   useEffect(() => {
     setStoredSettings({
       autoAdvance: state.autoAdvance,

@@ -81,7 +81,7 @@ export type AppAction =
   | { type: 'UPDATE_WORKFLOW_STATE'; payload: Partial<WorkflowState> }
   | { type: 'UPDATE_DATASET_STATUS'; payload: Partial<DatasetStatus> }
   | { type: 'UPDATE_UI_STATE'; payload: Partial<UIState> }
-  | { type: 'ADD_NOTIFICATION'; payload: Omit<Notification, 'id' | 'timestamp'> }
+  | { type: 'ADD_NOTIFICATION'; payload: Omit<Notification, 'timestamp'> & { id?: string } }
   | { type: 'REMOVE_NOTIFICATION'; payload: string }
   | { type: 'CLEAR_NOTIFICATIONS' }
   | { type: 'RESET_STATE' };
@@ -196,7 +196,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'ADD_NOTIFICATION':
       const newNotification: Notification = {
         ...action.payload,
-        id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: action.payload.id || `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: Date.now(),
       };
       return {
@@ -277,7 +277,7 @@ export function AppProvider({ children }: AppProviderProps) {
   // Initialize state from localStorage on mount
   useEffect(() => {
     // Load AppStateService data
-    const appState = AppStateService.getAppState();
+    const appState = AppStateService.getState();
     
     // Update state with persisted values
     if (storedEventKey) {
@@ -308,7 +308,7 @@ export function AppProvider({ children }: AppProviderProps) {
   // Convenience methods
   const setEvent = (eventKey: string, year: number, metadata?: EventMetadata) => {
     dispatch({ type: 'SET_EVENT', payload: { eventKey, year, metadata } });
-    AppStateService.setCurrentEvent(eventKey, year);
+    AppStateService.resetForNewEvent(eventKey, year);
   };
   
   const setUserTeam = (teamNumber: string | null) => {
@@ -323,17 +323,17 @@ export function AppProvider({ children }: AppProviderProps) {
     dispatch({ type: 'UPDATE_WORKFLOW_STATE', payload: workflowState });
     
     // Sync with AppStateService
-    if (workflowState.setupCompleted !== undefined) {
-      AppStateService.markSetupCompleted(workflowState.setupCompleted);
+    if (workflowState.setupCompleted) {
+      AppStateService.completeStep('setupCompleted');
     }
-    if (workflowState.fieldSelectionCompleted !== undefined) {
-      AppStateService.markFieldSelectionCompleted(workflowState.fieldSelectionCompleted);
+    if (workflowState.fieldSelectionCompleted) {
+      AppStateService.completeStep('fieldSelectionCompleted');
     }
-    if (workflowState.datasetBuilt !== undefined) {
-      AppStateService.markDatasetBuilt(workflowState.datasetBuilt);
+    if (workflowState.datasetBuilt) {
+      AppStateService.completeStep('datasetBuilt');
     }
-    if (workflowState.validationCompleted !== undefined) {
-      AppStateService.markValidationCompleted(workflowState.validationCompleted);
+    if (workflowState.validationCompleted) {
+      AppStateService.completeStep('validationCompleted');
     }
   };
   
@@ -342,12 +342,15 @@ export function AppProvider({ children }: AppProviderProps) {
   };
   
   const showNotification = (notification: Omit<Notification, 'id' | 'timestamp'>) => {
-    dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
+    // Generate ID for auto-removal
+    const notificationId = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    dispatch({ type: 'ADD_NOTIFICATION', payload: { ...notification, id: notificationId } });
     
     // Auto-remove notifications after delay if autoClose is true (default)
     if (notification.autoClose !== false) {
       setTimeout(() => {
-        dispatch({ type: 'REMOVE_NOTIFICATION', payload: notification.id || '' });
+        dispatch({ type: 'REMOVE_NOTIFICATION', payload: notificationId });
       }, 5000);
     }
   };

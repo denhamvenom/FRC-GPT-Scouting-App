@@ -1,7 +1,3 @@
-// frontend/src/App.tsx (update)
-
-// Update to existing App.tsx file
-
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Setup from "./pages/Setup";

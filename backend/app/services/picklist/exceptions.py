@@ -57,6 +57,15 @@ class TeamNotFoundException(PicklistGenerationError):
         self.details = {"team_number": team_number}
 
 
+class DatasetLoadError(PicklistGenerationError):
+    """Raised when dataset loading fails."""
+
+    def __init__(self, message: str, file_path: Optional[str] = None):
+        super().__init__(message)
+        self.file_path = file_path
+        self.details = {"file_path": file_path}
+
+
 class CacheError(PicklistGenerationError):
     """Raised when cache operations fail."""
 

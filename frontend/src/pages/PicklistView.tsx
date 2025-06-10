@@ -1,7 +1,7 @@
 // frontend/src/pages/PicklistView.tsx
 
 import React, { useState, useEffect } from "react";
-import PicklistGenerator from "../components/PicklistGenerator";
+import { PicklistGenerator } from "./PicklistNew/components";
 
 interface Team {
   team_number: number;

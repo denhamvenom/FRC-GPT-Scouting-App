@@ -351,22 +351,15 @@ export function PicklistProvider({ children }: PicklistProviderProps) {
   const [state, dispatch] = useReducer(picklistReducer, initialState);
   const { state: appState, showNotification } = useAppContext();
   
-  // Persist generation settings
-  const [, setStoredSettings] = useLocalStorage('picklistSettings', state.generationSettings);
-  const [, setStoredUIState] = useLocalStorage('picklistUIState', {
-    pageSize: state.pageSize,
-    sortBy: state.sortBy,
-    sortDirection: state.sortDirection,
-  });
-  
-  // Load persisted settings on mount
-  const [storedSettings] = useLocalStorage('picklistSettings', initialGenerationSettings);
-  const [storedUIState] = useLocalStorage('picklistUIState', {
+  // Persist settings with single useLocalStorage hooks
+  const [storedSettings, setStoredSettings] = useLocalStorage('picklistSettings', initialGenerationSettings);
+  const [storedUIState, setStoredUIState] = useLocalStorage('picklistUIState', {
     pageSize: 25,
     sortBy: 'rank' as SortField,
     sortDirection: 'asc' as const,
   });
   
+  // Load persisted settings on mount (only once)
   useEffect(() => {
     dispatch({ type: 'UPDATE_GENERATION_SETTINGS', payload: storedSettings });
     dispatch({
@@ -377,7 +370,7 @@ export function PicklistProvider({ children }: PicklistProviderProps) {
         sortDirection: storedUIState.sortDirection,
       },
     });
-  }, [storedSettings, storedUIState]);
+  }, []); // Empty dependency array - only run on mount
   
   // Update stored settings when state changes
   useEffect(() => {

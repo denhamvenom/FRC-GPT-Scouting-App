@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 
 /**
  * Custom hook for managing localStorage with automatic serialization
@@ -69,7 +69,7 @@ export function useLocalStorage<T>(
     }
   }
 
-  const activeSerializer = serializer || defaultSerializer
+  const activeSerializer = useMemo(() => serializer || defaultSerializer, [serializer])
 
   // Get initial value from localStorage
   const getStoredValue = useCallback((): T => {
@@ -93,18 +93,21 @@ export function useLocalStorage<T>(
     (value: T | ((prev: T) => T)) => {
       try {
         // Allow value to be a function so we have the same API as useState
-        const valueToStore = value instanceof Function ? value(storedValue) : value
-        setStoredValue(valueToStore)
-
-        // Save to localStorage
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(key, activeSerializer.stringify(valueToStore))
-        }
+        setStoredValue(prevValue => {
+          const valueToStore = value instanceof Function ? value(prevValue) : value
+          
+          // Save to localStorage
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(key, activeSerializer.stringify(valueToStore))
+          }
+          
+          return valueToStore
+        })
       } catch (error) {
         onError?.(error as Error)
       }
     },
-    [key, storedValue, activeSerializer, onError]
+    [key, activeSerializer, onError]
   )
 
   // Remove from localStorage
@@ -142,12 +145,14 @@ export function useLocalStorage<T>(
   }, [key, initialValue, activeSerializer, onError, syncAcrossTabs])
 
   // Sync with localStorage on mount (in case it changed while component was unmounted)
+  const isInitialized = useRef(false)
   useEffect(() => {
-    const currentValue = getStoredValue()
-    if (JSON.stringify(currentValue) !== JSON.stringify(storedValue)) {
+    if (!isInitialized.current) {
+      const currentValue = getStoredValue()
       setStoredValue(currentValue)
+      isInitialized.current = true
     }
-  }, [getStoredValue, storedValue])
+  }, [getStoredValue])
 
   return [storedValue, setValue, removeValue]
 }

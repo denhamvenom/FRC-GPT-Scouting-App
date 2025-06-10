@@ -7,7 +7,6 @@ import { EventService } from '../services/EventService';
 import { ValidationService } from '../services/ValidationService';
 import { DatasetService } from '../services/DatasetService';
 import { useErrorContext } from '../context/ErrorContext';
-import { useAppContext } from '../context/AppContext';
 
 // Types for API provider
 export interface ApiContextType {
@@ -48,7 +47,6 @@ export function ApiProvider({
   apiClient: providedApiClient 
 }: ApiProviderProps) {
   const { reportNetworkError, reportApiError } = useErrorContext();
-  const { showNotification } = useAppContext();
   
   // Create API client with error handling
   const apiClient = useMemo(() => {
@@ -115,11 +113,11 @@ export function ApiProvider({
             recoverable: isUserError,
           });
           
-          // Show notification for server errors
+          // Log server errors (notifications will be handled by error context)
           if (isServerError) {
-            showNotification({
-              type: 'error',
-              title: 'Server Error',
+            console.error('Server Error:', {
+              status,
+              url: error.config?.url,
               message: data?.message || 'A server error occurred. Please try again.',
             });
           }
@@ -130,7 +128,7 @@ export function ApiProvider({
     );
     
     return client;
-  }, [baseURL, timeout, providedApiClient, reportNetworkError, reportApiError, showNotification]);
+  }, [baseURL, timeout, providedApiClient, reportNetworkError, reportApiError]);
   
   // Create service instances
   const services = useMemo(() => {
@@ -151,7 +149,7 @@ export function ApiProvider({
   // Perform health check
   const performHealthCheck = React.useCallback(async () => {
     try {
-      await apiClient.get('/health');
+      await apiClient.get('/health/');
       setIsHealthy(true);
       setLastHealthCheck(Date.now());
     } catch (error) {
@@ -160,14 +158,10 @@ export function ApiProvider({
       
       // Only show notification if we were previously healthy
       if (isHealthy) {
-        showNotification({
-          type: 'warning',
-          title: 'API Connection Lost',
-          message: 'Unable to connect to the server. Some features may not work properly.',
-        });
+        console.warn('API Connection Lost:', 'Unable to connect to the server. Some features may not work properly.');
       }
     }
-  }, [apiClient, isHealthy, showNotification]);
+  }, [apiClient, isHealthy]);
   
   // Initial health check and periodic monitoring
   useEffect(() => {
