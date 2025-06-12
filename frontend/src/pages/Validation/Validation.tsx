@@ -1,6 +1,7 @@
 // frontend/src/pages/Validation/Validation.tsx
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApiContext } from '../../providers/ApiProvider';
 import { useValidation } from './hooks/useValidation';
 import { useCorrections } from './hooks/useCorrections';
@@ -14,13 +15,13 @@ import {
 import { TeamMatch, ValidationIssue, TodoItem } from './types';
 
 const Validation: React.FC = () => {
+  // Get navigation hook
+  const navigate = useNavigate();
+  
   // Get API services from context
   const { apiClient } = useApiContext();
   
-  console.log('Validation component rendered, apiClient:', !!apiClient);
-  
   const validationHook = useValidation();
-  console.log('useValidation hook result:', Object.keys(validationHook));
   
   const {
     datasetPath,
@@ -115,16 +116,30 @@ const Validation: React.FC = () => {
     }
   }, [error, setError]);
 
-  console.log('Validation render - error:', error, 'loading:', loading, 'validationResult:', !!validationResult);
   
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Data Validation</h1>
-          <p className="mt-2 text-gray-600">
-            Review and correct data quality issues in your scouting dataset
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Data Validation</h1>
+              <p className="mt-2 text-gray-600">
+                Review and correct data quality issues in your scouting dataset
+              </p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => navigate('/picklist')}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Generate Picklist
+                <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Error and Success Messages */}

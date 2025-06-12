@@ -101,12 +101,6 @@ async def validate_enhanced(
             z_score_threshold=1 / request.confidence_threshold if request.confidence_threshold > 0 else 3.0
         )
         
-        # Debug logging
-        print(f"Validation service result keys: {list(result.keys())}")
-        print(f"Missing scouting count: {len(result.get('missing_scouting', []))}")
-        print(f"Missing superscouting count: {len(result.get('missing_superscouting', []))}")
-        print(f"Outliers count: {len(result.get('outliers', []))}")
-        
         # Transform result to match schema
         issues = []
         for outlier in result.get("outliers", []):

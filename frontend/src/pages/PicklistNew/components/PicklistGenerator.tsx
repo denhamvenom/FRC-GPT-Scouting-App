@@ -47,7 +47,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   useEffect(() => {
     pagination.actions.updateTotalPages(picklistGeneration.state.picklist.length);
     pagination.actions.resetToFirstPage();
-  }, [picklistGeneration.state.picklist.length, pagination.actions]);
+  }, [picklistGeneration.state.picklist.length]); // Remove pagination.actions from dependencies
 
   // Handle team position change in edit mode
   const handlePositionChange = (teamIndex: number, newPosition: number) => {

@@ -46,9 +46,6 @@ export const useValidation = () => {
         event_key: eventKey,
         confidence_threshold: 0.8 // Default confidence threshold
       });
-      console.log('Raw validation API response:', data);
-      console.log('Response type:', typeof data);
-      console.log('Response keys:', Object.keys(data));
       setValidationResult(data);
     } catch (err) {
       console.error('Error fetching validation data:', err);
