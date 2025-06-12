@@ -4,6 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useApiContext } from '../../../providers/ApiProvider';
 import { 
   LockedPicklist, 
   SelectionState, 
@@ -16,10 +17,11 @@ import {
 } from '../types';
 import { getTeamListFromPicklist } from '../utils';
 
-const API_BASE_URL = 'http://localhost:8000/api';
-
 export const useAllianceSelection = (): UseAllianceSelectionReturn => {
   const navigate = useNavigate();
+  
+  // Get API services from context
+  const { allianceService } = useApiContext();
   
   // State
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,28 +35,21 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
   const clearSuccessMessage = useCallback(() => setSuccessMessage(null), []);
 
   const fetchPicklistDetails = useCallback(async (picklistId: number): Promise<LockedPicklist> => {
-    const response = await fetch(`${API_BASE_URL}/alliance/picklist/${picklistId}`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch picklist details');
-    }
-    
-    const data: PicklistResponse = await response.json();
+    const data: PicklistResponse = await allianceService.getPicklistDetails(picklistId);
     
     if (data.status !== 'success' || !data.picklist) {
       throw new Error('Invalid picklist data');
     }
     
     return data.picklist;
-  }, []);
+  }, [allianceService]);
 
   const loadPicklists = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/alliance/picklists`);
-      const data: PicklistsResponse = await response.json();
+      const data: PicklistsResponse = await allianceService.getPicklists();
       
       if (data.status === 'success' && data.picklists && data.picklists.length > 0) {
         // Find the most recent picklist
@@ -63,16 +58,16 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
         })[0];
         
         // Check if there's an active selection for this picklist
-        const selectionResponse = await fetch(`${API_BASE_URL}/alliance/selection/${latestPicklist.id}`);
-        
-        if (selectionResponse.ok) {
-          const selectionData: SelectionResponse = await selectionResponse.json();
+        try {
+          const selectionData: SelectionResponse = await allianceService.getSelection(latestPicklist.id);
           
           if (selectionData.status === 'success' && selectionData.selection) {
             // Redirect to existing selection
             navigate(`/alliance-selection/${selectionData.selection.id}`);
             return;
           }
+        } catch (selectionErr) {
+          // No existing selection found - this is normal
         }
         
         // If no selection exists, load the picklist details
@@ -91,20 +86,14 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
     } finally {
       setLoading(false);
     }
-  }, [navigate, fetchPicklistDetails]);
+  }, [navigate, fetchPicklistDetails, allianceService]);
 
   const loadSelectionData = useCallback(async (id: number) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/alliance/selection/${id}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch alliance selection data');
-      }
-      
-      const data: SelectionResponse = await response.json();
+      const data: SelectionResponse = await allianceService.getSelection(id);
       
       if (data.status === 'success' && data.selection) {
         setSelection(data.selection);
@@ -123,8 +112,7 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
           
           // Fallback: Try to find the picklist from the list (if a picklist with this event_key exists)
           try {
-            const picklistsResponse = await fetch(`${API_BASE_URL}/alliance/picklists`);
-            const picklistsData: PicklistsResponse = await picklistsResponse.json();
+            const picklistsData: PicklistsResponse = await allianceService.getPicklists();
             
             if (picklistsData.status === 'success' && picklistsData.picklists && picklistsData.picklists.length > 0) {
               // Find a picklist for the same event
@@ -150,7 +138,7 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
     } finally {
       setLoading(false);
     }
-  }, [fetchPicklistDetails]);
+  }, [fetchPicklistDetails, allianceService]);
 
   const createNewSelection = useCallback(async () => {
     try {
@@ -165,8 +153,7 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
       // If we don't have a picklist ID but have a team number and event key, try to find a matching picklist
       if (!picklist_id) {
         try {
-          const picklistsResponse = await fetch(`${API_BASE_URL}/alliance/picklists`);
-          const picklistsData: PicklistsResponse = await picklistsResponse.json();
+          const picklistsData: PicklistsResponse = await allianceService.getPicklists();
           
           if (picklistsData.status === 'success' && picklistsData.picklists && picklistsData.picklists.length > 0) {
             // Find the latest picklist for the same event
@@ -200,20 +187,7 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
         team_list: teamList
       };
       
-      const response = await fetch(`${API_BASE_URL}/alliance/selection/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create alliance selection');
-      }
-      
-      const data: CreateSelectionResponse = await response.json();
+      const data: CreateSelectionResponse = await allianceService.createSelection(requestBody);
       
       // Navigate to the new selection
       navigate(`/alliance-selection/${data.id}`);
@@ -224,7 +198,7 @@ export const useAllianceSelection = (): UseAllianceSelectionReturn => {
     } finally {
       setLoading(false);
     }
-  }, [picklist, teamList, navigate, fetchPicklistDetails]);
+  }, [picklist, teamList, navigate, fetchPicklistDetails, allianceService]);
 
   return {
     // State

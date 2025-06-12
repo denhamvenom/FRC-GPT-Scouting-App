@@ -54,7 +54,8 @@ async def validate_event(
     try:
         # Use event key to determine dataset path if not provided
         if not unified_dataset_path:
-            unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+            from app.services.unified_event_data_service import get_unified_dataset_path
+            unified_dataset_path = get_unified_dataset_path(event_key)
             
         result = validate_event_completeness(unified_dataset_path)
         
@@ -86,8 +87,13 @@ async def validate_enhanced(
     - Business rule validation
     """
     try:
-        # Determine dataset path from event key
-        unified_dataset_path = f"app/cache/{request.event_key}_unified_dataset.json"
+        # Use the unified_dataset_path from request, or construct from event key if not provided
+        if hasattr(request, 'unified_dataset_path') and request.unified_dataset_path:
+            unified_dataset_path = request.unified_dataset_path
+        else:
+            # Use the same path construction as the dataset service
+            from app.services.unified_event_data_service import get_unified_dataset_path
+            unified_dataset_path = get_unified_dataset_path(request.event_key)
         
         # Perform validation with specified threshold
         result = validate_event_with_outliers(
@@ -95,20 +101,28 @@ async def validate_enhanced(
             z_score_threshold=1 / request.confidence_threshold if request.confidence_threshold > 0 else 3.0
         )
         
+        # Debug logging
+        print(f"Validation service result keys: {list(result.keys())}")
+        print(f"Missing scouting count: {len(result.get('missing_scouting', []))}")
+        print(f"Missing superscouting count: {len(result.get('missing_superscouting', []))}")
+        print(f"Outliers count: {len(result.get('outliers', []))}")
+        
         # Transform result to match schema
         issues = []
-        for issue in result.get("outliers", []):
-            issues.append({
-                "id": f"issue_{issue['team_number']}_{issue['match_number']}_{issue['field']}",
-                "match_key": f"{request.event_key}_qm{issue['match_number']}",
-                "team_number": issue["team_number"],
-                "issue_type": issue.get("type", "statistical"),
-                "severity": issue.get("severity", "warning"),
-                "field": issue["field"],
-                "current_value": issue.get("value"),
-                "suggested_value": issue.get("suggested_value"),
+        for outlier in result.get("outliers", []):
+            # Each outlier can have multiple issues
+            for issue in outlier.get("issues", []):
+                issues.append({
+                    "id": f"issue_{outlier['team_number']}_{outlier['match_number']}_{issue['metric']}",
+                    "match_key": f"{request.event_key}_qm{outlier['match_number']}",
+                    "team_number": outlier["team_number"],
+                    "issue_type": issue.get("type", "statistical"),
+                    "severity": issue.get("severity", "warning"),
+                    "field": issue["metric"],  # Use metric as field name
+                    "current_value": issue.get("value"),
+                    "suggested_value": issue.get("suggested_value"),
                 "details": {
-                    "field": issue["field"],
+                    "field": issue["metric"],  # Use metric as field name
                     "value": issue.get("value"),
                     "expected_range": issue.get("expected_range"),
                     "deviation": issue.get("z_score"),
@@ -127,6 +141,11 @@ async def validate_enhanced(
             issues_by_severity=result.get("issues_by_severity", {}),
             issues=issues,
             summary=result.get("summary", {}),
+            # Add missing data arrays that frontend expects
+            missing_scouting=result.get("missing_scouting", []),
+            missing_superscouting=result.get("missing_superscouting", []),
+            ignored_matches=result.get("ignored_matches", []),
+            outliers=result.get("outliers", []),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -145,7 +164,8 @@ async def get_suggested_corrections(
     based on team performance patterns and game rules.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         result = suggest_corrections(unified_dataset_path, team_number, match_number)
         
@@ -181,7 +201,8 @@ async def apply_corrections(
     future reference and rollback capability.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         # Extract team and match from issue_id if needed
         result = apply_correction(
@@ -211,7 +232,8 @@ async def ignore_match_endpoint(
     Ignored matches are excluded from analysis but preserved in dataset.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         result = ignore_match(
             unified_dataset_path,
@@ -245,7 +267,8 @@ async def create_virtual_scout_endpoint(
     and match context to generate realistic scout data.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         result = create_virtual_scout(
             unified_dataset_path,
@@ -280,7 +303,8 @@ async def preview_virtual_scout_endpoint(
     committing to the dataset.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         result = preview_virtual_scout(unified_dataset_path, team_number, match_key)
         
@@ -309,7 +333,8 @@ async def add_to_todo_endpoint(
     Creates a todo item for manual verification or data collection.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         result = add_to_todo_list(
             unified_dataset_path,
@@ -337,7 +362,9 @@ async def get_todo_list_endpoint(
     Returns all pending validation tasks sorted by priority.
     """
     try:
-        unified_dataset_path = f"app/cache/{event_key}_unified_dataset.json"
+        # Use the same path construction as the dataset service
+        from app.services.unified_event_data_service import get_unified_dataset_path
+        unified_dataset_path = get_unified_dataset_path(event_key)
         
         result = get_todo_list(unified_dataset_path)
         

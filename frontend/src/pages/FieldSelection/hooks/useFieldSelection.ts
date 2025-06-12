@@ -10,6 +10,7 @@ import {
   FIELD_CATEGORIES
 } from '../types';
 import { autoCategorizeField } from '../utils';
+import { datasetService } from '../../../services/DatasetService';
 
 export const useFieldSelection = () => {
   // Headers from different scouting spreadsheets
@@ -35,6 +36,7 @@ export const useFieldSelection = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2025);
+  const [currentEventKey, setCurrentEventKey] = useState<string | null>(null);
 
   // Statbotics integration
   const [statboticsFields, setStatboticsFields] = useState<StatboticsField[]>([]);
@@ -57,9 +59,12 @@ export const useFieldSelection = () => {
         if (setupData.status === 'success' && setupData.sheet_config) {
           sheetConfig = setupData.sheet_config;
 
-          // Also get year if available
+          // Also get year and event key if available
           if (setupData.year) {
             setYear(setupData.year);
+          }
+          if (setupData.event_key) {
+            setCurrentEventKey(setupData.event_key);
           }
         }
       }
@@ -231,10 +236,10 @@ export const useFieldSelection = () => {
     const warnings: string[] = [];
 
     // Check critical fields
-    if (criticalFieldMappings.team_number.length === 0) {
+    if (!criticalFieldMappings?.team_number || criticalFieldMappings.team_number.length === 0) {
       warnings.push('No team number field selected');
     }
-    if (criticalFieldMappings.match_number.length === 0) {
+    if (!criticalFieldMappings?.match_number || criticalFieldMappings.match_number.length === 0) {
       warnings.push('No match number field selected');
     }
 
@@ -270,8 +275,8 @@ export const useFieldSelection = () => {
         },
         body: JSON.stringify({
           year: year,
-          field_mappings: selectedFields,
-          critical_field_mappings: criticalFieldMappings,
+          field_selections: selectedFields,
+          critical_mappings: criticalFieldMappings,
           statbotics_fields: enableStatbotics ? selectedStatboticsFields : [],
           enable_statbotics: enableStatbotics
         }),
@@ -295,6 +300,70 @@ export const useFieldSelection = () => {
     }
   };
 
+  // Save field selections and trigger dataset building for validation workflow
+  const saveFieldSelectionsAndBuildDataset = async () => {
+    if (!validateSelections()) {
+      return false;
+    }
+
+    if (!currentEventKey) {
+      setError('No event key found. Please ensure Setup is completed first.');
+      return false;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // First save the field selections
+      const saveResponse = await fetch('/api/field-selection/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          year: year,
+          field_selections: selectedFields,
+          critical_mappings: criticalFieldMappings,
+          statbotics_fields: enableStatbotics ? selectedStatboticsFields : [],
+          enable_statbotics: enableStatbotics
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        setError('Failed to save field selections');
+        return false;
+      }
+
+      const saveData = await saveResponse.json();
+      if (saveData.status !== 'success') {
+        setError(saveData.message || 'Error saving field selections');
+        return false;
+      }
+
+      // Then trigger dataset building with the field mappings
+      const buildResponse = await datasetService.buildDataset({
+        event_key: currentEventKey,
+        force_rebuild: true,
+        field_mappings: selectedFields
+      });
+
+      if (buildResponse.status === 'pending' || buildResponse.status === 'in_progress') {
+        setSuccessMessage('Field selections saved and dataset building started!');
+        return true;
+      } else {
+        setError('Field selections saved but dataset building failed');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error saving field selections and building dataset:', err);
+      setError('Error saving field selections and building dataset');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Load existing field selections
   const loadFieldSelections = async () => {
     try {
@@ -302,21 +371,21 @@ export const useFieldSelection = () => {
       
       if (response.ok) {
         const data = await response.json();
-        if (data.status === 'success' && data.field_selections) {
-          const selections = data.field_selections;
-          
-          if (selections.field_mappings) {
-            setSelectedFields(selections.field_mappings);
+        if (data.status === 'success') {
+          // The backend returns field_selections directly as the field mappings
+          if (data.field_selections) {
+            setSelectedFields(data.field_selections);
           }
-          if (selections.critical_field_mappings) {
-            setCriticalFieldMappings(selections.critical_field_mappings);
+          // Critical mappings are returned as critical_mappings
+          if (data.critical_mappings) {
+            // Ensure critical_mappings has the correct structure
+            setCriticalFieldMappings({
+              team_number: data.critical_mappings?.team_number || [],
+              match_number: data.critical_mappings?.match_number || []
+            });
           }
-          if (selections.statbotics_fields) {
-            setSelectedStatboticsFields(selections.statbotics_fields);
-          }
-          if (selections.enable_statbotics !== undefined) {
-            setEnableStatbotics(selections.enable_statbotics);
-          }
+          // Note: Statbotics fields are not currently saved/loaded by the backend
+          // They would need to be stored and returned separately
         }
       }
     } catch (err) {
@@ -366,6 +435,7 @@ export const useFieldSelection = () => {
     fetchHeaders,
     fetchStatboticsFields,
     saveFieldSelections,
+    saveFieldSelectionsAndBuildDataset,
     autoCategorizeFields,
     validateSelections,
     loadFieldSelections,

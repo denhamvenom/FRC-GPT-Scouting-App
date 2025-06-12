@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useApiContext } from '../providers/ApiProvider';
 
 interface Team {
   team_number: number;
@@ -64,6 +65,9 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
   const [hasInitialAnalysis, setHasInitialAnalysis] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Get API services from context
+  const { picklistService } = useApiContext();
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -88,29 +92,15 @@ const TeamComparisonModal: React.FC<TeamComparisonModalProps> = ({
         timestamp: msg.timestamp.toISOString()
       })) : undefined;
       
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/compare-teams",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            unified_dataset_path: datasetPath,
-            team_numbers: teamNumbers,
-            your_team_number: yourTeamNumber,
-            pick_position: pickPosition,
-            priorities: simplePriorities,
-            question: question || undefined,
-            chat_history: chatHistoryForAPI,
-          }),
-        },
-      );
-      
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || "Failed to compare teams");
-      }
-      
-      const data = await response.json();
+      const data = await picklistService.compareTeams({
+        unified_dataset_path: datasetPath,
+        team_numbers: teamNumbers,
+        your_team_number: yourTeamNumber,
+        pick_position: pickPosition,
+        priorities: simplePriorities,
+        question: question || undefined,
+        chat_history: chatHistoryForAPI,
+      });
       
       console.log('Team comparison response:', data); // Debug logging
       

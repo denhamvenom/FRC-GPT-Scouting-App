@@ -84,9 +84,9 @@ export class EventService {
   async getArchivedEvents(
     page = 1,
     pageSize = 20
-  ): Promise<PaginatedResponse<ArchivedEventResponse>> {
-    return await apiClient.get<PaginatedResponse<ArchivedEventResponse>>(
-      `${this.archivePath}/events`,
+  ): Promise<{ status: string; archives: ArchivedEventResponse[] }> {
+    return await apiClient.get<{ status: string; archives: ArchivedEventResponse[] }>(
+      `${this.archivePath}/list`,
       {
         params: { page, page_size: pageSize },
       }

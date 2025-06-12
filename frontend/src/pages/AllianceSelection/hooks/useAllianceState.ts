@@ -9,7 +9,7 @@ import {
   ApiResponse
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// Removed hardcoded API_BASE_URL - now using centralized API client
 
 interface UseAllianceStateProps {
   selection: SelectionState | null;

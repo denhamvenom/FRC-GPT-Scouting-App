@@ -1,6 +1,7 @@
 // frontend/src/components/SheetConfigManager.tsx
 
 import React, { useState, useEffect } from 'react';
+import { useApiContext } from '../providers/ApiProvider';
 
 // Define interface for sheet configuration
 interface SheetConfig {
@@ -48,6 +49,9 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
   const [connectionStatus, setConnectionStatus] = useState<'none' | 'success' | 'error'>('none');
   const [connectionError, setConnectionError] = useState<string | null>(null);
   
+  // Get API services from context
+  const { apiClient } = useApiContext();
+  
   // Load configurations when the component mounts
   useEffect(() => {
     fetchConfigurations();
@@ -58,23 +62,12 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setError(null);
     
     try {
-      let url = 'http://localhost:8000/api/sheet-config/list';
+      // Build query parameters
+      const params: any = {};
+      if (currentEventKey) params.event_key = currentEventKey;
+      if (currentYear) params.year = currentYear;
       
-      // Add filters if provided
-      if (currentEventKey || currentYear) {
-        const params = new URLSearchParams();
-        if (currentEventKey) params.append('event_key', currentEventKey);
-        if (currentYear) params.append('year', currentYear.toString());
-        url += `?${params.toString()}`;
-      }
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch configurations: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
+      const data = await apiClient.get('/sheet-config/list', { params });
       
       if (data.status === 'success') {
         setConfigurations(data.configurations || []);
@@ -111,15 +104,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
         requestBody.sheet_name = matchScoutingSheet;
       }
 
-      const response = await fetch('http://localhost:8000/api/sheet-config/test-connection', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      const data = await response.json();
+      const data = await apiClient.post('/sheet-config/test-connection', requestBody);
 
       if (data.status === 'success') {
         setConnectionStatus('success');
@@ -168,24 +153,16 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/sheet-config/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: configName,
-          spreadsheet_id: spreadsheetId,
-          match_scouting_sheet: matchScoutingSheet,
-          pit_scouting_sheet: pitScoutingSheet || undefined,
-          super_scouting_sheet: superScoutingSheet || undefined,
-          event_key: currentEventKey,
-          year: currentYear,
-          set_active: true
-        })
+      const data = await apiClient.post('/sheet-config/create', {
+        name: configName,
+        spreadsheet_id: spreadsheetId,
+        match_scouting_sheet: matchScoutingSheet,
+        pit_scouting_sheet: pitScoutingSheet || undefined,
+        super_scouting_sheet: superScoutingSheet || undefined,
+        event_key: currentEventKey,
+        year: currentYear,
+        set_active: true
       });
-      
-      const data = await response.json();
       
       if (data.status === 'success') {
         setSuccess(`Successfully ${data.is_new ? 'created' : 'updated'} configuration "${configName}"`);
@@ -224,17 +201,9 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/sheet-config/set-active', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          config_id: configId
-        })
+      const data = await apiClient.post('/sheet-config/set-active', {
+        config_id: configId
       });
-      
-      const data = await response.json();
       
       if (data.status === 'success') {
         setSuccess(data.message || 'Successfully set active configuration');
@@ -267,11 +236,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/sheet-config/${configId}`, {
-        method: 'DELETE'
-      });
-      
-      const data = await response.json();
+      const data = await apiClient.delete(`/sheet-config/${configId}`);
       
       if (data.status === 'success') {
         setSuccess(data.message || 'Successfully deleted configuration');

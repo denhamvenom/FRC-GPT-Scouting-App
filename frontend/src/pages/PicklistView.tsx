@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { PicklistGenerator } from "./PicklistNew/components";
+import { useApiContext } from '../providers/ApiProvider';
 
 interface Team {
   team_number: number;
@@ -23,6 +24,9 @@ interface Metric {
 }
 
 const PicklistView: React.FC = () => {
+  // Get API services from context
+  const { datasetService, picklistService, apiClient } = useApiContext();
+  
   const [datasetPath, setDatasetPath] = useState<string>("");
   const [yourTeamNumber, setYourTeamNumber] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<"first" | "second" | "third">(
@@ -93,11 +97,8 @@ const PicklistView: React.FC = () => {
 
   const checkDatasetStatus = async () => {
     try {
-      // Check for unified dataset
-      const response = await fetch(
-        "http://localhost:8000/api/unified/status?event_key=2025arc&year=2025",
-      );
-      const data = await response.json();
+      // Check for unified dataset using modern service
+      const data = await datasetService.getDatasetStatus('2025arc');
 
       if (data.status === "exists" && data.path) {
         setDatasetPath(data.path);
@@ -113,20 +114,7 @@ const PicklistView: React.FC = () => {
 
   const fetchMetrics = async (path: string) => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/analyze",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ unified_dataset_path: path }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch metrics");
-      }
-
-      const data = await response.json();
+      const data = await picklistService.analyzePicklist({ unified_dataset_path: path });
 
       if (data.status === "success") {
         setUniversalMetrics(data.universal_metrics || []);
@@ -207,10 +195,7 @@ const PicklistView: React.FC = () => {
 
   const fetchLockedPicklists = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/alliance/picklists",
-      );
-      const data = await response.json();
+      const data = await apiClient.get('/picklist/locked');
 
       if (data.status === "success") {
         setPicklists(data.picklists || []);
@@ -225,14 +210,14 @@ const PicklistView: React.FC = () => {
 
         // Check if there's an active alliance selection
         if (currentPicklist) {
-          // Fetch alliance selections for this picklist
-          const selectionResponse = await fetch(
-            `http://localhost:8000/api/alliance/selection/${currentPicklist.id}`,
-          );
-          const selectionData = await selectionResponse.json();
-
-          if (selectionData.status === "success" && selectionData.selection) {
-            setActiveAllianceSelection(selectionData.selection.id);
+          // Use the modern alliance selection API
+          try {
+            const selectionData = await apiClient.get(`/alliance-selection/${currentPicklist.event_key}`);
+            if (selectionData && selectionData.id) {
+              setActiveAllianceSelection(selectionData.id);
+            }
+          } catch (err) {
+            console.log('No active alliance selection found');
           }
         }
       }
@@ -289,21 +274,7 @@ const PicklistView: React.FC = () => {
           : null,
       };
 
-      const response = await fetch(
-        "http://localhost:8000/api/alliance/lock-picklist",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to lock picklist");
-      }
-
-      const data = await response.json();
+      await apiClient.post('/picklist/lock', requestBody);
 
       // Update state with success message
       setSuccessMessage(

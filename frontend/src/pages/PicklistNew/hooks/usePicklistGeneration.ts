@@ -1,6 +1,7 @@
 // frontend/src/pages/PicklistNew/hooks/usePicklistGeneration.ts
 
 import { useState, useEffect, useCallback } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import { 
   UsePicklistGeneration, 
   PicklistGenerationState, 
@@ -36,6 +37,8 @@ export const usePicklistGeneration = ({
   onPicklistCleared,
   initialPicklist = [],
 }: UsePicklistGenerationParams): UsePicklistGeneration => {
+  // Get API services from context
+  const { picklistService, apiClient } = useApiContext();
   
   // Main generation state
   const [state, setState] = useState<PicklistGenerationState>({
@@ -89,21 +92,10 @@ export const usePicklistGeneration = ({
     if (batchState.batchProcessingActive && batchState.pollingCacheKey) {
       pollingInterval = setInterval(async () => {
         try {
-          const response = await fetch(
-            "http://localhost:8000/api/picklist/generate/status",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ cache_key: batchState.pollingCacheKey }),
-            },
-          );
+          const data = await apiClient.post('/picklist/generate/status', {
+            cache_key: batchState.pollingCacheKey
+          });
 
-          if (!response.ok) {
-            console.error("Error polling batch status:", response.status);
-            return;
-          }
-
-          const data = await response.json();
 
           if (data.batch_processing) {
             setBatchState(prev => ({ ...prev, batchProcessingInfo: data.batch_processing }));
@@ -151,20 +143,10 @@ export const usePicklistGeneration = ({
     if (!batchState.pollingCacheKey) return;
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/generate/status",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cache_key: batchState.pollingCacheKey }),
-        },
-      );
+      const data = await apiClient.post('/picklist/generate/status', {
+        cache_key: batchState.pollingCacheKey
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch completed picklist");
-      }
-
-      const data = await response.json();
 
       if (data.status === "success" && data.picklist) {
         setState(prev => ({
@@ -237,21 +219,8 @@ export const usePicklistGeneration = ({
 
       console.log("Generating picklist with request:", requestBody);
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/generate",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: requestBody,
-        },
-      );
+      const data: PicklistResult = await apiClient.post('/picklist/generate', JSON.parse(requestBody));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to generate picklist");
-      }
-
-      const data: PicklistResult = await response.json();
 
       if (data.status === "success" && data.batched) {
         console.log("Batch processing initiated", data);
@@ -340,25 +309,12 @@ export const usePicklistGeneration = ({
         nickname: team.nickname,
       }));
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/update",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            unified_dataset_path: datasetPath,
-            original_picklist: state.picklist,
-            user_rankings: userRankings,
-          }),
-        },
-      );
+      const data = await apiClient.post('/picklist/update', {
+        unified_dataset_path: datasetPath,
+        original_picklist: state.picklist,
+        user_rankings: userRankings,
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to update picklist");
-      }
-
-      const data = await response.json();
 
       if (data.status === "success") {
         setState(prev => ({ 
@@ -393,21 +349,9 @@ export const usePicklistGeneration = ({
     setTimeout(() => setState(prev => ({ ...prev, successMessage: null })), 3000);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/clear-cache",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        },
-      );
+      const result = await apiClient.post('/picklist/clear-cache', {});
 
-      if (!response.ok) {
-        console.error("Failed to clear backend cache");
-      } else {
-        const result = await response.json();
-        console.log("Cache cleared:", result.message);
-      }
+      console.log("Cache cleared:", result.message);
     } catch (error) {
       console.error("Error clearing cache:", error);
     }
@@ -439,28 +383,15 @@ export const usePicklistGeneration = ({
         reason: priority.reason || null,
       }));
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/rank-missing-teams",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            unified_dataset_path: datasetPath,
-            missing_team_numbers: state.missingTeamNumbers,
-            ranked_teams: state.picklist,
-            your_team_number: yourTeamNumber,
-            pick_position: pickPosition,
-            priorities: simplePriorities,
-          }),
-        },
-      );
+      const data: MissingTeamsResult = await apiClient.post('/picklist/rank-missing-teams', {
+        unified_dataset_path: datasetPath,
+        missing_team_numbers: state.missingTeamNumbers,
+        ranked_teams: state.picklist,
+        your_team_number: yourTeamNumber,
+        pick_position: pickPosition,
+        priorities: simplePriorities,
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to rank missing teams");
-      }
-
-      const data: MissingTeamsResult = await response.json();
 
       if (data.status === "success" && data.missing_team_rankings) {
         const rerankedTeamNumbers = data.missing_team_rankings.map(team => team.team_number);

@@ -1,6 +1,7 @@
 // frontend/src/pages/PicklistView/hooks/usePicklistView.ts
 
 import { useState, useEffect } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import { 
   Team, 
   Metric, 
@@ -10,6 +11,9 @@ import {
 } from '../types';
 
 export const usePicklistView = () => {
+  // Get API services from context
+  const { picklistService, datasetService, apiClient } = useApiContext();
+  
   // Dataset
   const [datasetPath, setDatasetPath] = useState<string>("");
   const [yourTeamNumber, setYourTeamNumber] = useState<number>(0);
@@ -76,10 +80,7 @@ export const usePicklistView = () => {
     
     try {
       // Check for unified dataset
-      const response = await fetch(
-        "http://localhost:8000/api/unified/status?event_key=2025arc&year=2025",
-      );
-      const data = await response.json();
+      const data = await datasetService.getDatasetStatus('2025arc');
 
       if (data.status === "exists" && data.path) {
         setDatasetPath(data.path);
@@ -97,20 +98,7 @@ export const usePicklistView = () => {
 
   const fetchMetrics = async (path: string) => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/analyze",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ unified_dataset_path: path }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch metrics");
-      }
-
-      const data = await response.json();
+      const data = await picklistService.analyzePicklist({ unified_dataset_path: path });
 
       if (data.status === "success") {
         setUniversalMetrics(data.universal_metrics || []);
@@ -129,14 +117,10 @@ export const usePicklistView = () => {
 
   const fetchLockedPicklists = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/picklist/locked");
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === "success") {
-          setPicklists(data.picklists || []);
-          setHasLockedPicklist(data.picklists && data.picklists.length > 0);
-        }
+      const data = await picklistService.getLockedPicklists();
+      if (data.status === "success") {
+        setPicklists(data.picklists || []);
+        setHasLockedPicklist(data.picklists && data.picklists.length > 0);
       }
     } catch (err) {
       console.error("Error fetching locked picklists:", err);
@@ -144,13 +128,9 @@ export const usePicklistView = () => {
 
     // Check for active alliance selection
     try {
-      const response = await fetch("http://localhost:8000/api/alliance-selection/status");
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === "success" && data.is_active) {
-          setActiveAllianceSelection(data.id);
-        }
+      const data = await apiClient.get('/alliance-selection/status');
+      if (data.status === "success" && data.is_active) {
+        setActiveAllianceSelection(data.id);
       }
     } catch (err) {
       console.error("Error checking alliance selection status:", err);
@@ -257,23 +237,13 @@ export const usePicklistView = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/api/picklist/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          unified_dataset_path: datasetPath,
-          position: activeTab,
-          team_number: yourTeamNumber,
-          priority_metrics: priorities,
-          excluded_teams: excludedTeams,
-        }),
+      const data = await picklistService.generatePicklist({
+        unified_dataset_path: datasetPath,
+        position: activeTab,
+        team_number: yourTeamNumber,
+        priority_metrics: priorities,
+        excluded_teams: excludedTeams,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to generate picklist");
-      }
-
-      const data = await response.json();
 
       if (data.status === "success") {
         setCurrentPicklist(data.picklist || []);
@@ -281,9 +251,9 @@ export const usePicklistView = () => {
       } else {
         setError(data.message || "Error generating picklist");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error generating picklist:", err);
-      setError("Error generating picklist");
+      setError(err.message || "Error generating picklist");
     } finally {
       setIsLoading(false);
     }
@@ -302,24 +272,14 @@ export const usePicklistView = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/api/picklist/lock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          position: activeTab,
-          team_number: yourTeamNumber,
-          excluded_teams: excludedTeams,
-          strategy_prompt: `${activeTab} pick strategy`,
-          priority_metrics: priorities,
-          picklist: picklist,
-        }),
+      const data = await picklistService.lockPicklist({
+        position: activeTab,
+        team_number: yourTeamNumber,
+        excluded_teams: excludedTeams,
+        strategy_prompt: `${activeTab} pick strategy`,
+        priority_metrics: priorities,
+        picklist: picklist,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to lock picklist");
-      }
-
-      const data = await response.json();
 
       if (data.status === "success") {
         setSuccessMessage(`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} pick picklist locked successfully!`);
@@ -327,9 +287,9 @@ export const usePicklistView = () => {
       } else {
         setError(data.message || "Error locking picklist");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error locking picklist:", err);
-      setError("Error locking picklist");
+      setError(err.message || "Error locking picklist");
     } finally {
       setIsLocking(false);
     }
@@ -340,15 +300,7 @@ export const usePicklistView = () => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/picklist/unlock/${activeTab}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to unlock picklist");
-      }
-
-      const data = await response.json();
+      const data = await apiClient.delete(`/picklist/unlock/${activeTab}`);
 
       if (data.status === "success") {
         setSuccessMessage(`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} pick picklist unlocked successfully!`);
@@ -356,9 +308,9 @@ export const usePicklistView = () => {
       } else {
         setError(data.message || "Error unlocking picklist");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error unlocking picklist:", err);
-      setError("Error unlocking picklist");
+      setError(err.message || "Error unlocking picklist");
     } finally {
       setIsLocking(false);
     }

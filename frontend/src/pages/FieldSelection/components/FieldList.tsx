@@ -99,7 +99,7 @@ export const FieldList: React.FC<FieldListProps> = ({
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={criticalFieldMappings.team_number.includes(header)}
+                  checked={criticalFieldMappings?.team_number?.includes(header) || false}
                   onChange={() => onCriticalFieldToggle(header, 'team_number')}
                   className="mr-2 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
@@ -109,7 +109,7 @@ export const FieldList: React.FC<FieldListProps> = ({
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={criticalFieldMappings.match_number.includes(header)}
+                  checked={criticalFieldMappings?.match_number?.includes(header) || false}
                   onChange={() => onCriticalFieldToggle(header, 'match_number')}
                   className="mr-2 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />

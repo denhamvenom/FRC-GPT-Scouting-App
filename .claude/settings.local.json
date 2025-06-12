@@ -24,7 +24,9 @@
       "Bash(echo:*)",
       "Bash(bandit:*)",
       "Bash(pytest:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": []
   },

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useApiContext } from '../providers/ApiProvider';
 
 interface EventInfo {
   event_key?: string;
@@ -10,20 +11,27 @@ interface EventInfo {
 }
 
 function Home() {
+  // Get API services from context
+  const { apiClient } = useApiContext();
+  
   const [health, setHealth] = useState<string>("Loading...");
   const [eventInfo, setEventInfo] = useState<EventInfo>({});
   const [isLoadingEvent, setIsLoadingEvent] = useState<boolean>(true);
 
   useEffect(() => {
     // Check backend health
-    fetch("http://localhost:8000/api/health/")
-      .then((res) => res.json())
-      .then((data) => setHealth(data.status))
-      .catch(() => setHealth("Error connecting to backend"));
+    apiClient.get('/health/')
+      .then((data) => {
+        console.debug('Health check response:', data);
+        setHealth(data.status);
+      })
+      .catch((err) => {
+        console.error('Health check failed:', err);
+        setHealth("Error connecting to backend");
+      });
     
     // Fetch current event info
-    fetch("http://localhost:8000/api/setup/info")
-      .then((res) => res.json())
+    apiClient.get('/setup/info')
       .then((data) => {
         if (data.status === "success") {
           setEventInfo({
@@ -35,7 +43,7 @@ function Home() {
       })
       .catch((err) => console.error("Error fetching event info:", err))
       .finally(() => setIsLoadingEvent(false));
-  }, []);
+  }, [apiClient]);
 
   return (
     <div className="max-w-5xl mx-auto p-8">

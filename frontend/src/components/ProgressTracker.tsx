@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useApiContext } from '../providers/ApiProvider';
 
 interface ProgressData {
   status: 'initializing' | 'active' | 'completed' | 'failed' | 'stalled';
@@ -26,21 +27,15 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   const [polling, setPolling] = useState<boolean>(true);
   const [hasStarted, setHasStarted] = useState<boolean>(false);
 
+  // Get API services from context
+  const { apiClient } = useApiContext();
+
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
     const fetchProgress = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/progress/${operationId}`);
-        if (!response.ok) {
-          if (response.status === 404 && !hasStarted) {
-            // Operation not found yet, this is expected at the start
-            return;
-          }
-          throw new Error('Failed to fetch progress');
-        }
-        
-        const data = await response.json();
+        const data = await apiClient.get(`/progress/${operationId}`);
         setProgress(data);
         setHasStarted(true);
         
@@ -51,7 +46,12 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
             onComplete(data.status === 'completed');
           }
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (err.status === 404 && !hasStarted) {
+          // Operation not found yet, this is expected at the start
+          return;
+        }
+        
         if (err instanceof Error) {
           setError(err.message);
         } else {

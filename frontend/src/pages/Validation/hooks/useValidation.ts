@@ -1,6 +1,7 @@
 // frontend/src/pages/Validation/hooks/useValidation.ts
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import { 
   ValidationState, 
   ValidationResult, 
@@ -14,6 +15,9 @@ import {
 } from '../types';
 
 export const useValidation = () => {
+  // Get API services from context
+  const { validationService, datasetService, apiClient } = useApiContext();
+  
   // State
   const [datasetPath, setDatasetPath] = useState<string>('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -31,65 +35,20 @@ export const useValidation = () => {
   const [ignoreReason, setIgnoreReason] = useState<IgnoreReason>('not_operational');
   const [customReason, setCustomReason] = useState<string>('');
 
-  // Check for existing datasets
-  useEffect(() => {
-    const fetchEventInfoAndCheckDatasets = async () => {
-      try {
-        // First, get current event info from setup
-        const setupResponse = await fetch("http://localhost:8000/api/setup/info");
-        let eventKey = "";
-        let yearValue = 2025; // Default
-
-        if (setupResponse.ok) {
-          const setupData = await setupResponse.json();
-
-          if (setupData.status === "success" && setupData.event_key) {
-            eventKey = setupData.event_key;
-            if (setupData.year) {
-              yearValue = setupData.year;
-            }
-          }
-        }
-
-        // If we couldn't get event info from setup, show an error message
-        if (!eventKey) {
-          console.warn("Could not retrieve event info from setup");
-          setError("No event selected. Please go to Setup page and select an event first.");
-          return;
-        }
-
-        // Now check for datasets with this event key
-        const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${yearValue}`);
-        const data = await response.json();
-
-        if (data.status === 'exists' && data.path) {
-          setDatasetPath(data.path);
-          fetchValidationData(data.path);
-          fetchTodoList(data.path);
-        } else {
-          setError(`No dataset found for event ${eventKey}. Please build the dataset first.`);
-        }
-      } catch (err) {
-        console.error('Error checking datasets:', err);
-        setError('Error checking for datasets');
-      }
-    };
-
-    fetchEventInfoAndCheckDatasets();
-  }, []);
-
-  const fetchValidationData = async (path: string) => {
+  // Define callback functions BEFORE useEffect that uses them
+  const fetchValidationData = useCallback(async (eventKey: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/enhanced?unified_dataset_path=${encodeURIComponent(path)}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch validation data');
-      }
-      
-      const data = await response.json();
+      // Use POST for enhanced validation with proper request body
+      const data = await apiClient.post('/validate/enhanced', {
+        event_key: eventKey,
+        confidence_threshold: 0.8 // Default confidence threshold
+      });
+      console.log('Raw validation API response:', data);
+      console.log('Response type:', typeof data);
+      console.log('Response keys:', Object.keys(data));
       setValidationResult(data);
     } catch (err) {
       console.error('Error fetching validation data:', err);
@@ -97,37 +56,34 @@ export const useValidation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiClient]);
   
-  const fetchTodoList = async (path: string) => {
+  const fetchTodoList = useCallback(async (eventKey: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/todo-list?unified_dataset_path=${encodeURIComponent(path)}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch to-do list');
-      }
-      
-      const data = await response.json();
+      // Use event_key parameter instead of unified_dataset_path
+      const data = await apiClient.get('/validate/todo', { 
+        params: { event_key: eventKey } 
+      });
       if (data.status === 'success') {
-        setTodoList(data.todo_list || []);
+        setTodoList(data.todos || []);
       }
     } catch (err) {
       console.error('Error fetching to-do list:', err);
     }
-  };
+  }, [apiClient]);
   
-  const fetchVirtualScoutPreview = async () => {
+  const fetchVirtualScoutPreview = useCallback(async () => {
     if (!selectedIssue) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/preview-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch virtual scout preview');
-      }
-      
-      const data = await response.json();
+      const data = await apiClient.get('/validate/preview-virtual-scout', { 
+        params: { 
+          event_key: datasetPath, // datasetPath is now the event key
+          team_number: selectedIssue.team_number,
+          match_key: `${datasetPath}_qm${selectedIssue.match_number}` // Convert match_number to match_key format
+        } 
+      });
       
       if (data.status === 'success') {
         setVirtualScoutPreview(data.virtual_scout_preview);
@@ -140,7 +96,7 @@ export const useValidation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedIssue, datasetPath, apiClient]);
 
   const handleActionModeChange = (mode: ActionMode) => {
     setActionMode(mode);
@@ -154,32 +110,20 @@ export const useValidation = () => {
     }
   };
 
-  const submitCorrection = async () => {
+  const submitCorrection = useCallback(async () => {
     if (!selectedIssue || !datasetPath) return;
 
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/validate/correct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          unified_dataset_path: datasetPath,
-          team_number: selectedIssue.team_number,
-          match_number: selectedIssue.match_number,
-          corrections: corrections,
-          reason: correctionReason
-        }),
+      const data = await apiClient.post('/validate/apply-correction', {
+        event_key: datasetPath, // datasetPath is now the event key
+        team_number: selectedIssue.team_number,
+        match_number: selectedIssue.match_number,
+        corrections: corrections,
+        reason: correctionReason
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit correction');
-      }
-
-      const data = await response.json();
       
       if (data.status === 'success') {
         setSuccessMessage('Correction submitted successfully');
@@ -198,9 +142,9 @@ export const useValidation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedIssue, datasetPath, corrections, correctionReason, apiClient, fetchValidationData]);
 
-  const submitIgnoreMatch = async () => {
+  const submitIgnoreMatch = useCallback(async () => {
     if (!selectedIssue || !datasetPath) return;
 
     setLoading(true);
@@ -209,25 +153,13 @@ export const useValidation = () => {
     try {
       const reasonText = ignoreReason === 'other' ? customReason : ignoreReason;
       
-      const response = await fetch('http://localhost:8000/api/validate/ignore', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          unified_dataset_path: datasetPath,
-          team_number: selectedIssue.team_number,
-          match_number: selectedIssue.match_number,
-          reason_category: ignoreReason,
-          reason: reasonText
-        }),
+      const data = await apiClient.post('/validate/ignore-match', {
+        event_key: datasetPath, // datasetPath is now the event key
+        team_number: selectedIssue.team_number,
+        match_number: selectedIssue.match_number,
+        reason_category: ignoreReason,
+        reason: reasonText
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to ignore match');
-      }
-
-      const data = await response.json();
       
       if (data.status === 'success') {
         setSuccessMessage('Match ignored successfully');
@@ -247,33 +179,21 @@ export const useValidation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedIssue, datasetPath, ignoreReason, customReason, apiClient, fetchValidationData, fetchTodoList]);
 
-  const submitVirtualScout = async () => {
+  const submitVirtualScout = useCallback(async () => {
     if (!selectedIssue || !datasetPath || !virtualScoutPreview) return;
 
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/validate/virtual-scout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          unified_dataset_path: datasetPath,
-          team_number: selectedIssue.team_number,
-          match_number: selectedIssue.match_number,
-          virtual_scout_data: virtualScoutPreview
-        }),
+      const data = await apiClient.post('/validate/virtual-scout', {
+        event_key: datasetPath, // datasetPath is now the event key
+        team_number: selectedIssue.team_number,
+        match_key: `${datasetPath}_qm${selectedIssue.match_number}`, // Convert match_number to match_key format
+        virtual_scout_data: virtualScoutPreview
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit virtual scout');
-      }
-
-      const data = await response.json();
       
       if (data.status === 'success') {
         setSuccessMessage('Virtual scout data submitted successfully');
@@ -293,7 +213,56 @@ export const useValidation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedIssue, datasetPath, virtualScoutPreview, apiClient, fetchValidationData, fetchTodoList]);
+
+  // Initial data loading when component mounts
+  useEffect(() => {
+    const fetchEventInfoAndCheckDatasets = async () => {
+      try {
+        // First, get current event info from setup
+        let eventKey = "";
+        let yearValue = 2025; // Default
+
+        try {
+          const setupData = await apiClient.get('/setup/info');
+
+          if (setupData.status === "success" && setupData.event_key) {
+            eventKey = setupData.event_key;
+            if (setupData.year) {
+              yearValue = setupData.year;
+            }
+          }
+        } catch (setupErr) {
+          // Handle setup error gracefully
+          console.warn("Error getting setup info:", setupErr);
+        }
+
+        // If we couldn't get event info from setup, show an error message
+        if (!eventKey) {
+          console.warn("Could not retrieve event info from setup");
+          setError("No event selected. Please go to Setup page and select an event first.");
+          return;
+        }
+
+        // Now check for datasets with this event key  
+        const data = await datasetService.getDatasetStatus(eventKey);
+
+        if (data.status === 'success' && data.exists) {
+          // Store the event key for validation - let backend handle path construction
+          setDatasetPath(eventKey);
+          fetchValidationData(eventKey);
+          fetchTodoList(eventKey);
+        } else {
+          setError(`No dataset found for event ${eventKey}. Please build the dataset first.`);
+        }
+      } catch (err) {
+        console.error('Error checking datasets:', err);
+        setError('Error checking for datasets');
+      }
+    };
+
+    fetchEventInfoAndCheckDatasets();
+  }, [apiClient, datasetService, fetchValidationData, fetchTodoList]);
 
   return {
     // State

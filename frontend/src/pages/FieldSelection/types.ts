@@ -109,6 +109,7 @@ export const FIELD_CATEGORIES: FieldCategory[] = [
   { key: 'endgame', label: 'Endgame', description: 'Robot actions during the endgame period' },
   { key: 'strategy', label: 'Strategy', description: 'Strategic assessment and qualitative observations' },
   { key: 'other', label: 'Other', description: 'Any additional fields that don\'t fit above categories' },
+  { key: 'ignore', label: 'Ignore', description: 'Fields to exclude from analysis and dataset building' },
 ];
 
 export interface Category {

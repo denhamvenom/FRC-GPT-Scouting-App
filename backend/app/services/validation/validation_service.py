@@ -280,10 +280,48 @@ class ValidationService:
     
     def _load_dataset(self, path: str) -> Dict:
         """Load dataset from file."""
+        import os
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        logger.debug(f"Attempting to load dataset from: {path}")
+        logger.debug(f"Path exists: {os.path.exists(path)}")
+        logger.debug(f"Absolute path: {os.path.abspath(path)}")
+        
         try:
             with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
+        except FileNotFoundError:
+            logger.error(f"Dataset file not found: {path}")
+            logger.error(f"Current working directory: {os.getcwd()}")
+            
+            # Try to provide helpful debugging information
+            parent_dir = os.path.dirname(path)
+            if os.path.exists(parent_dir):
+                files = os.listdir(parent_dir)
+                logger.error(f"Files in {parent_dir}: {files[:10]}")  # Show first 10 files
+            else:
+                logger.error(f"Parent directory does not exist: {parent_dir}")
+            
+            # Check common alternative locations
+            alternatives = [
+                os.path.join("app", "data", os.path.basename(path)),
+                os.path.join("/app", "app", "data", os.path.basename(path)),
+                os.path.join(os.getcwd(), "app", "data", os.path.basename(path)),
+            ]
+            
+            for alt_path in alternatives:
+                if os.path.exists(alt_path):
+                    logger.error(f"Found file at alternative location: {alt_path}")
+                    logger.error("Consider updating the path or configuration")
+                    break
+            
+            raise FileOperationError("read", path, f"File not found. Please ensure the dataset has been built for this event.")
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in dataset file {path}: {str(e)}")
+            raise FileOperationError("read", path, f"Invalid JSON format: {str(e)}")
         except Exception as e:
+            logger.error(f"Error loading dataset from {path}: {str(e)}")
             raise FileOperationError("read", path, str(e))
     
     def _save_dataset(self, path: str, dataset: Dict) -> None:

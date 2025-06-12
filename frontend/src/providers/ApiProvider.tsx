@@ -46,7 +46,8 @@ export function ApiProvider({
   timeout = 30000,
   apiClient: providedApiClient 
 }: ApiProviderProps) {
-  const { reportNetworkError, reportApiError } = useErrorContext();
+  
+  console.debug('ApiProvider initialized with baseURL:', baseURL);
   
   // Create API client with error handling
   const apiClient = useMemo(() => {
@@ -62,73 +63,20 @@ export function ApiProvider({
       },
     });
     
-    // Add request interceptor for logging
-    client.addRequestInterceptor(
-      (config) => {
-        console.debug(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
-        return config;
-      },
-      (error) => {
-        console.error('API Request Error:', error);
-        return Promise.reject(error);
-      }
-    );
+    // Add basic request logging
+    client.addRequestInterceptor((config) => {
+      console.debug(`API Request: ${config.method?.toUpperCase()}`);
+      return config;
+    });
     
-    // Add response interceptor for error handling
-    client.addResponseInterceptor(
-      (response) => {
-        console.debug(`API Response: ${response.status} ${response.config.url}`);
-        return response;
-      },
-      (error) => {
-        console.error('API Response Error:', error);
-        
-        // Report network errors
-        if (error.code === 'ECONNABORTED' || error.code === 'NETWORK_ERROR') {
-          reportNetworkError({
-            url: error.config?.url || 'unknown',
-            method: error.config?.method || 'unknown',
-            status: 0,
-            statusText: 'Network Error',
-            retryCount: 0,
-            maxRetries: 3,
-          });
-        }
-        
-        // Report API errors
-        if (error.response) {
-          const { status, data } = error.response;
-          const isUserError = status >= 400 && status < 500;
-          const isServerError = status >= 500;
-          
-          reportApiError({
-            endpoint: error.config?.url || 'unknown',
-            method: error.config?.method || 'unknown',
-            requestData: error.config?.data,
-            responseData: data,
-            statusCode: status,
-            errorCode: data?.error_code || data?.code,
-            userMessage: data?.message || data?.error || `Request failed with status ${status}`,
-            technicalMessage: data?.details || error.message,
-            recoverable: isUserError,
-          });
-          
-          // Log server errors (notifications will be handled by error context)
-          if (isServerError) {
-            console.error('Server Error:', {
-              status,
-              url: error.config?.url,
-              message: data?.message || 'A server error occurred. Please try again.',
-            });
-          }
-        }
-        
-        return Promise.reject(error);
-      }
-    );
+    // Add basic response logging
+    client.addResponseInterceptor((response) => {
+      console.debug(`API Response: ${response.status}`);
+      return response;
+    });
     
     return client;
-  }, [baseURL, timeout, providedApiClient, reportNetworkError, reportApiError]);
+  }, [baseURL, timeout, providedApiClient]);
   
   // Create service instances
   const services = useMemo(() => {

@@ -39,6 +39,7 @@ const FieldSelection: React.FC = () => {
     setSelectedStatboticsFields,
     setEnableStatbotics,
     saveFieldSelections,
+    saveFieldSelectionsAndBuildDataset,
     autoCategorizeFields,
     validateSelections,
   } = useFieldSelection();
@@ -54,17 +55,23 @@ const FieldSelection: React.FC = () => {
   // Handle critical field toggle
   const handleCriticalFieldToggle = (field: string, criticalType: 'team_number' | 'match_number') => {
     setCriticalFieldMappings(prev => {
-      const currentFields = prev[criticalType];
+      // Ensure prev has the correct structure
+      const safeState = {
+        team_number: prev?.team_number || [],
+        match_number: prev?.match_number || []
+      };
+      
+      const currentFields = safeState[criticalType];
       const isSelected = currentFields.includes(field);
       
       if (isSelected) {
         return {
-          ...prev,
+          ...safeState,
           [criticalType]: currentFields.filter(f => f !== field)
         };
       } else {
         return {
-          ...prev,
+          ...safeState,
           [criticalType]: [...currentFields, field]
         };
       }
@@ -73,6 +80,9 @@ const FieldSelection: React.FC = () => {
 
   // Check if we have valid selections
   const hasValidSelections = React.useMemo(() => {
+    if (!criticalFieldMappings || !criticalFieldMappings.team_number || !criticalFieldMappings.match_number) {
+      return false;
+    }
     return criticalFieldMappings.team_number.length > 0 && 
            criticalFieldMappings.match_number.length > 0;
   }, [criticalFieldMappings]);
@@ -234,6 +244,7 @@ const FieldSelection: React.FC = () => {
             isLoading={isLoading}
             hasValidSelections={hasValidSelections}
             onSave={saveFieldSelections}
+            onSaveAndContinue={saveFieldSelectionsAndBuildDataset}
             onAutoCategorize={autoCategorizeFields}
             onValidate={validateSelections}
           />

@@ -1,5 +1,7 @@
 // frontend/src/services/AppStateService.ts
 
+import { apiClient } from './ApiClient';
+
 interface AppState {
   setupCompleted: boolean;
   fieldSelectionCompleted: boolean;
@@ -188,22 +190,16 @@ export const AppStateService = {
       
       // Check if setup is completed by querying schema existence
       try {
-        const schemaResponse = await fetch('http://localhost:8000/api/schema/check');
-        if (schemaResponse.ok) {
-          const schemaData = await schemaResponse.json();
-          verifiedState.setupCompleted = schemaData.setup_completed;
-        }
+        const schemaData = await apiClient.get('/schema/check');
+        verifiedState.setupCompleted = schemaData.setup_completed;
       } catch (error) {
         console.error('Error checking schema status:', error);
       }
       
       // Check for field selection completion 
       try {
-        const fieldSelectionResponse = await fetch('http://localhost:8000/api/schema/fields');
-        if (fieldSelectionResponse.ok) {
-          const fieldData = await fieldSelectionResponse.json();
-          verifiedState.fieldSelectionCompleted = fieldData.exists;
-        }
+        const fieldData = await apiClient.get('/schema/fields');
+        verifiedState.fieldSelectionCompleted = fieldData.exists;
       } catch (error) {
         console.error('Error checking field selection status:', error);
       }
@@ -213,28 +209,24 @@ export const AppStateService = {
       // 2. Otherwise, check if any datasets exist at all
       try {
         if (currentState.currentEventKey && currentState.currentYear) {
-          const datasetResponse = await fetch(
-            `http://localhost:8000/api/unified/status?event_key=${currentState.currentEventKey}&year=${currentState.currentYear}`
-          );
-          if (datasetResponse.ok) {
-            const datasetData = await datasetResponse.json();
-            verifiedState.datasetBuilt = datasetData.dataset_built === true;
-          }
+          const datasetData = await apiClient.get(`/dataset/status/${currentState.currentEventKey}`);
+          verifiedState.datasetBuilt = datasetData.status === 'exists';
         } else {
-          // Check if any datasets exist
-          const allDatasetsResponse = await fetch('http://localhost:8000/api/unified/check-all');
-          if (allDatasetsResponse.ok) {
-            const allDatasetsData = await allDatasetsResponse.json();
-            verifiedState.datasetBuilt = allDatasetsData.datasets_exist === true;
+          // Check if any datasets exist using a fallback approach
+          try {
+            const allDatasetsData = await apiClient.get('/dataset/list');
+            verifiedState.datasetBuilt = allDatasetsData.datasets?.length > 0;
             
             // If datasets exist but we don't have current event info, get it from the first dataset
-            if (allDatasetsData.datasets_exist && allDatasetsData.datasets.length > 0 && 
+            if (allDatasetsData.datasets?.length > 0 && 
                 (!currentState.currentEventKey || !currentState.currentYear)) {
               const firstDataset = allDatasetsData.datasets[0];
               verifiedState.currentEventKey = firstDataset.event_key;
-              // Extract year from metadata if available, otherwise use current year
-              verifiedState.currentYear = currentState.currentYear || new Date().getFullYear();
+              verifiedState.currentYear = firstDataset.year || new Date().getFullYear();
             }
+          } catch (err) {
+            // Fallback if list endpoint doesn't exist
+            verifiedState.datasetBuilt = false;
           }
         }
       } catch (error) {
@@ -243,13 +235,10 @@ export const AppStateService = {
       
       // Check validation status
       try {
-        if (verifiedState.datasetBuilt) {
-          const validationResponse = await fetch('http://localhost:8000/api/validate/check-validation-status');
-          if (validationResponse.ok) {
-            const validationData = await validationResponse.json();
-            verifiedState.validationCompleted = validationData.validation_completed === true && 
-                                               !validationData.validation_has_issues;
-          }
+        if (verifiedState.datasetBuilt && currentState.currentEventKey) {
+          const validationData = await apiClient.get(`/validate/status/${currentState.currentEventKey}`);
+          verifiedState.validationCompleted = validationData.validation_completed === true && 
+                                             !validationData.validation_has_issues;
         }
       } catch (error) {
         console.error('Error checking validation status:', error);

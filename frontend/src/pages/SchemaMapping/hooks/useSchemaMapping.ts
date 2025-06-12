@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import type { SchemaMappingState, CriticalFieldsConfig, SchemaResponse, VariablesResponse } from '../types';
 import { DEFAULT_CRITICAL_MAPPINGS } from '../types';
 
@@ -14,6 +15,9 @@ const initialState: SchemaMappingState = {
 
 export const useSchemaMapping = () => {
   const [state, setState] = useState<SchemaMappingState>(initialState);
+  
+  // Get API services from context
+  const { apiClient } = useApiContext();
 
   useEffect(() => {
     fetchData();
@@ -22,8 +26,7 @@ export const useSchemaMapping = () => {
   const fetchData = async () => {
     try {
       // First, fetch schema headers
-      const schemaRes = await fetch("http://localhost:8000/api/schema/learn");
-      const schemaData: SchemaResponse = await schemaRes.json();
+      const schemaData: SchemaResponse = await apiClient.get('/schema/learn');
       
       if (schemaData.status === "success") {
         setState(prev => ({
@@ -59,8 +62,7 @@ export const useSchemaMapping = () => {
       
       // Then fetch variable suggestions from the prompt builder
       try {
-        const promptRes = await fetch("http://localhost:8000/api/prompt-builder/variables");
-        const promptData: VariablesResponse = await promptRes.json();
+        const promptData: VariablesResponse = await apiClient.get('/prompt-builder/variables');
         
         if (promptData.status === "success") {
           setState(prev => ({
@@ -181,20 +183,8 @@ export const useSchemaMapping = () => {
     }
     
     try {
-      const response = await fetch("http://localhost:8000/api/schema/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(state.mapping),
-      });
-      
-      if (response.ok) {
-        alert("Schema saved successfully.");
-      } else {
-        setState(prev => ({
-          ...prev,
-          error: "Failed to save schema"
-        }));
-      }
+      await apiClient.post('/schema/save', state.mapping);
+      alert("Schema saved successfully.");
     } catch (err) {
       setState(prev => ({
         ...prev,

@@ -60,11 +60,11 @@ export const FieldPreview: React.FC<FieldPreviewProps> = ({
         </div>
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
           <div className="text-purple-600 text-sm font-medium">Team Fields</div>
-          <div className="text-2xl font-bold text-purple-700">{criticalFieldMappings.team_number.length}</div>
+          <div className="text-2xl font-bold text-purple-700">{criticalFieldMappings?.team_number?.length || 0}</div>
         </div>
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
           <div className="text-orange-600 text-sm font-medium">Match Fields</div>
-          <div className="text-2xl font-bold text-orange-700">{criticalFieldMappings.match_number.length}</div>
+          <div className="text-2xl font-bold text-orange-700">{criticalFieldMappings?.match_number?.length || 0}</div>
         </div>
       </div>
 
@@ -74,9 +74,9 @@ export const FieldPreview: React.FC<FieldPreviewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="border border-purple-200 rounded-lg p-3 bg-purple-50">
             <div className="text-sm font-medium text-purple-800 mb-2">
-              Team Number Fields ({criticalFieldMappings.team_number.length})
+              Team Number Fields ({criticalFieldMappings?.team_number?.length || 0})
             </div>
-            {criticalFieldMappings.team_number.length > 0 ? (
+            {criticalFieldMappings?.team_number?.length > 0 ? (
               <div className="space-y-1">
                 {criticalFieldMappings.team_number.map((field, index) => (
                   <div key={index} className="text-xs text-purple-700 font-mono bg-white px-2 py-1 rounded">
@@ -91,9 +91,9 @@ export const FieldPreview: React.FC<FieldPreviewProps> = ({
           
           <div className="border border-orange-200 rounded-lg p-3 bg-orange-50">
             <div className="text-sm font-medium text-orange-800 mb-2">
-              Match Number Fields ({criticalFieldMappings.match_number.length})
+              Match Number Fields ({criticalFieldMappings?.match_number?.length || 0})
             </div>
-            {criticalFieldMappings.match_number.length > 0 ? (
+            {criticalFieldMappings?.match_number?.length > 0 ? (
               <div className="space-y-1">
                 {criticalFieldMappings.match_number.map((field, index) => (
                   <div key={index} className="text-xs text-orange-700 font-mono bg-white px-2 py-1 rounded">
@@ -149,7 +149,7 @@ export const FieldPreview: React.FC<FieldPreviewProps> = ({
       </div>
 
       {/* Validation Warnings */}
-      {(criticalFieldMappings.team_number.length === 0 || criticalFieldMappings.match_number.length === 0) && (
+      {(criticalFieldMappings?.team_number?.length === 0 || criticalFieldMappings?.match_number?.length === 0) && (
         <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -160,8 +160,8 @@ export const FieldPreview: React.FC<FieldPreviewProps> = ({
                 Missing Critical Fields
               </div>
               <div className="text-sm text-yellow-700 mt-1">
-                {criticalFieldMappings.team_number.length === 0 && "No team number field selected. "}
-                {criticalFieldMappings.match_number.length === 0 && "No match number field selected. "}
+                {criticalFieldMappings?.team_number?.length === 0 && "No team number field selected. "}
+                {criticalFieldMappings?.match_number?.length === 0 && "No match number field selected. "}
                 These fields are required for proper data validation.
               </div>
             </div>

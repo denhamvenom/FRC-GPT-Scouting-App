@@ -144,6 +144,7 @@ class VirtualScoutEntry(BaseModel):
 class ValidationRequest(BaseModel):
     """Request for validation operations"""
     event_key: str = Field(..., description="Event key to validate")
+    unified_dataset_path: Optional[str] = Field(None, description="Path to unified dataset file")
     validation_type: Literal["legacy", "enhanced"] = Field(
         "enhanced",
         description="Type of validation to perform"
@@ -157,6 +158,7 @@ class ValidationRequest(BaseModel):
         schema_extra = {
             "example": {
                 "event_key": "2025arc",
+                "unified_dataset_path": "/app/data/unified_event_2025arc.json",
                 "validation_type": "enhanced",
                 "include_missing": True,
                 "include_outliers": True,
@@ -247,6 +249,11 @@ class ValidationResponse(SuccessResponse):
     issues_by_severity: Dict[str, int] = Field(..., description="Issue count by severity")
     issues: List[ValidationIssue] = Field(..., description="List of validation issues")
     summary: Dict[str, Any] = Field(..., description="Validation summary statistics")
+    # Add missing data arrays that frontend expects
+    missing_scouting: List[Dict[str, Any]] = Field(default_factory=list, description="Missing scouting data")
+    missing_superscouting: List[Dict[str, Any]] = Field(default_factory=list, description="Missing superscouting data")
+    ignored_matches: List[Dict[str, Any]] = Field(default_factory=list, description="Ignored matches")
+    outliers: List[Dict[str, Any]] = Field(default_factory=list, description="Statistical outliers")
 
     class Config:
         schema_extra = {

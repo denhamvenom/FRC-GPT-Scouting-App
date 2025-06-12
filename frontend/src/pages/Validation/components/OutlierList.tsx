@@ -11,7 +11,7 @@ interface OutlierListProps {
 }
 
 export const OutlierList: React.FC<OutlierListProps> = ({
-  outliers,
+  outliers = [],  // Add default empty array
   onSelectIssue,
   selectedIssue,
 }) => {

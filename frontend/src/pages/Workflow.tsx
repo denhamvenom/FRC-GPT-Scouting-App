@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useApiContext } from '../providers/ApiProvider';
 
 interface DatasetStatus {
   status: 'exists' | 'not_found';
@@ -17,6 +18,9 @@ interface ValidationSummary {
 }
 
 function Workflow() {
+  // Get API services from context
+  const { datasetService, apiClient } = useApiContext();
+  
   const [year, setYear] = useState<number>(2025);
   const [eventKey, setEventKey] = useState<string>('2025arc');
   const [isBuilding, setIsBuilding] = useState<boolean>(false);
@@ -32,8 +36,7 @@ function Workflow() {
   // Check if dataset exists
   const checkDatasetStatus = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${year}`);
-      const data = await response.json();
+      const data = await datasetService.getDatasetStatus(eventKey);
       setDatasetStatus(data);
       
       // If dataset exists, get validation summary
@@ -51,8 +54,9 @@ function Workflow() {
   // Get validation summary
   const getValidationSummary = async (datasetPath: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/enhanced?unified_dataset_path=${encodeURIComponent(datasetPath)}`);
-      const data = await response.json();
+      const data = await apiClient.get('/validate/enhanced', {
+        params: { unified_dataset_path: datasetPath }
+      });
       
       if (data.summary) {
         setValidationSummary(data.summary);
@@ -69,26 +73,16 @@ function Workflow() {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/unified/build', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event_key: eventKey,
-          year: year,
-          force_rebuild: forceRebuild
-        })
+      await datasetService.buildDataset({
+        event_key: eventKey,
+        year: year,
+        force_rebuild: forceRebuild
       });
       
-      const data = await response.json();
-      
-      if (response.ok) {
-        await checkDatasetStatus();
-      } else {
-        setError(data.detail || 'Error building unified dataset');
-      }
-    } catch (err) {
+      await checkDatasetStatus();
+    } catch (err: any) {
       console.error('Error building dataset:', err);
-      setError('Error connecting to server');
+      setError(err.message || 'Error connecting to server');
     } finally {
       setIsBuilding(false);
     }

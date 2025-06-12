@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import type { TocItemType, CurrentManualInfo } from '../types';
 
 export const useEventData = (
@@ -6,6 +7,8 @@ export const useEventData = (
   selectedTocItems: Map<string, TocItemType>,
   onUpdateSelectedTocItems: (items: Map<string, TocItemType>) => void
 ) => {
+  // Get API services from context
+  const { apiClient } = useApiContext();
   const handleTocItemToggle = useCallback((item: TocItemType) => {
     const key = `${item.title}-${item.page}`;
     const isCurrentlySelected = selectedTocItems.has(key);
@@ -155,23 +158,12 @@ export const useEventData = (
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/manuals/process-sections", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        onSuccess(data);
-      } else {
-        onError(data.detail || "Failed to process selected sections.");
-      }
-    } catch (err) {
-      onError("Error connecting to server for section processing.");
+      const data = await apiClient.post('/manuals/process-sections', payload);
+      onSuccess(data);
+    } catch (err: any) {
+      const errorMessage = err instanceof Error ? err.message : 
+                          (typeof err === 'string' ? err : "Error connecting to server for section processing.");
+      onError(errorMessage);
       console.error("Error processing sections:", err);
     } finally {
       onEnd();

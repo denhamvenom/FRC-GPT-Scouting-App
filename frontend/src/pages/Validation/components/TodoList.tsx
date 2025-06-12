@@ -9,7 +9,7 @@ interface TodoListProps {
 }
 
 export const TodoList: React.FC<TodoListProps> = ({
-  todoList,
+  todoList = [],  // Add default empty array
   onUpdateStatus,
 }) => {
   const pendingItems = todoList.filter(item => item.status === 'pending');

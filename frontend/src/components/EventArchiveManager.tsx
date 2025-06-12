@@ -1,6 +1,8 @@
 // frontend/src/components/EventArchiveManager.tsx
 
 import React, { useState, useEffect } from 'react';
+import { useApiContext } from '../providers/ApiProvider';
+import { useAsync } from '../hooks/useAsync';
 
 // DEBUG flag to enable extra console output
 const DEBUG = true;
@@ -63,6 +65,9 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
   const [showRestoreConfirm, setShowRestoreConfirm] = useState<boolean>(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
   
+  // Get API services from context
+  const { eventService, apiClient } = useApiContext();
+  
   // Define fetchArchives function before using it in useEffect
   const fetchArchives = async () => {
     debugLog('🔄 Fetching archives...');
@@ -70,27 +75,22 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/list');
-      debugLog('📊 Archive list response status:', response.status);
+      const result = await eventService.getArchivedEvents();
+      debugLog('📋 Archive list response data:', result);
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        debugLog('❌ Failed to fetch archives:', errorText);
-        throw new Error(`Failed to fetch archives: ${response.status} ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      debugLog('📋 Archive list response data:', data);
-      
-      if (data.status === 'success') {
-        debugLog(`✅ Retrieved ${data.archives?.length || 0} archives`);
-        setArchives(data.archives || []);
-      } else {
-        debugLog('❌ Fetch archives failed:', data.message);
-        setError(data.message || 'Failed to fetch archives');
-      }
+      debugLog(`✅ Retrieved ${result.archives?.length || 0} archives`);
+      setArchives(result.archives || []);
     } catch (err: any) {
-      const errorMessage = 'Error: ' + (err.message || 'Unknown error');
+      let errorMessage = 'Unknown error occurred';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object' && err.message) {
+        errorMessage = typeof err.message === 'string' ? err.message : 'Request failed';
+      }
+      
       debugLog('⚠️ Fetch archives exception:', err);
       setError(errorMessage);
       console.error('Failed to fetch archives:', err);
@@ -139,33 +139,18 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
       
       console.log('Sending archive request:', requestData);
       
-      const response = await fetch('http://localhost:8000/api/archive/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
-      
-      console.log('Archive response status:', response.status);
-      
-      const data = await response.json();
+      const data = await eventService.archiveEvent(requestData);
       console.log('Archive response data:', data);
       
-      if (data.status === 'success') {
-        setSuccess(`Successfully archived event: ${archiveName}`);
-        // Reset form
-        setArchiveName('');
-        setArchiveNotes('');
-        setShowArchiveForm(false);
-        // Refresh the archives list
-        fetchArchives();
-        // Notify parent component
-        if (onArchiveSuccess) onArchiveSuccess();
-      } else {
-        setError(data.message || 'Failed to archive event');
-        console.error('Archive failed:', data);
-      }
+      setSuccess(`Successfully archived event: ${archiveName}`);
+      // Reset form
+      setArchiveName('');
+      setArchiveNotes('');
+      setShowArchiveForm(false);
+      // Refresh the archives list
+      fetchArchives();
+      // Notify parent component
+      if (onArchiveSuccess) onArchiveSuccess();
     } catch (err: any) {
       const errorMessage = 'Error: ' + (err.message || 'Unknown error');
       setError(errorMessage);
@@ -210,40 +195,26 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
       
       console.log('Sending archive and clear request:', requestData);
       
-      const response = await fetch('http://localhost:8000/api/archive/archive-and-clear', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
-      
-      console.log('Archive and clear response status:', response.status);
-      
-      const data = await response.json();
+      // Note: For archive and clear, we need to use the generic API client since this isn't in EventService
+      const data = await apiClient.post('/archive/archive-and-clear', requestData);
       console.log('Archive and clear response data:', data);
       
-      if (data.status === 'success' || data.status === 'partial') {
-        let message = `Successfully archived event: ${archiveName}`;
-        if (data.status === 'partial') {
-          message += ` (${data.message})`;
-        } else {
-          message += ' and cleared data';
-        }
-        
-        setSuccess(message);
-        // Reset form
-        setArchiveName('');
-        setArchiveNotes('');
-        setShowArchiveForm(false);
-        // Refresh the archives list
-        fetchArchives();
-        // Notify parent component
-        if (onArchiveSuccess) onArchiveSuccess();
+      let message = `Successfully archived event: ${archiveName}`;
+      if (data.status === 'partial') {
+        message += ` (${data.message})`;
       } else {
-        setError(data.message || 'Failed to archive and clear event');
-        console.error('Archive and clear failed:', data);
+        message += ' and cleared data';
       }
+      
+      setSuccess(message);
+      // Reset form
+      setArchiveName('');
+      setArchiveNotes('');
+      setShowArchiveForm(false);
+      // Refresh the archives list
+      fetchArchives();
+      // Notify parent component
+      if (onArchiveSuccess) onArchiveSuccess();
     } catch (err: any) {
       const errorMessage = 'Error: ' + (err.message || 'Unknown error');
       setError(errorMessage);
@@ -268,26 +239,15 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/clear', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          event_key: currentEventKey,
-          year: currentYear
-        })
+      // Note: For clear event, we need to use the generic API client since this isn't in EventService
+      const data = await apiClient.post('/archive/clear', {
+        event_key: currentEventKey,
+        year: currentYear
       });
       
-      const data = await response.json();
-      
-      if (data.status === 'success') {
-        setSuccess(`Successfully cleared event data`);
-        // Notify parent component
-        if (onArchiveSuccess) onArchiveSuccess();
-      } else {
-        setError(data.message || 'Failed to clear event');
-      }
+      setSuccess(`Successfully cleared event data`);
+      // Notify parent component
+      if (onArchiveSuccess) onArchiveSuccess();
     } catch (err: any) {
       setError('Error: ' + err.message);
       console.error(err);
@@ -304,28 +264,14 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/restore', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          archive_id: selectedArchive.id
-        })
-      });
+      const data = await eventService.restoreArchivedEvent(selectedArchive.id);
       
-      const data = await response.json();
-      
-      if (data.status === 'success') {
-        setSuccess(`Successfully restored archive: ${selectedArchive.name}`);
-        // Close the confirmation dialog
-        setShowRestoreConfirm(false);
-        setSelectedArchive(null);
-        // Notify parent component
-        if (onRestoreSuccess) onRestoreSuccess();
-      } else {
-        setError(data.message || 'Failed to restore archive');
-      }
+      setSuccess(`Successfully restored archive: ${selectedArchive.name}`);
+      // Close the confirmation dialog
+      setShowRestoreConfirm(false);
+      setSelectedArchive(null);
+      // Notify parent component
+      if (onRestoreSuccess) onRestoreSuccess();
     } catch (err: any) {
       setError('Error: ' + err.message);
       console.error(err);
@@ -342,28 +288,14 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          archive_id: selectedArchive.id
-        })
-      });
+      const data = await eventService.deleteArchivedEvent(selectedArchive.id);
       
-      const data = await response.json();
-      
-      if (data.status === 'success') {
-        setSuccess(`Successfully deleted archive: ${selectedArchive.name}`);
-        // Close the confirmation dialog
-        setShowDeleteConfirm(false);
-        setSelectedArchive(null);
-        // Refresh the archives list
-        fetchArchives();
-      } else {
-        setError(data.message || 'Failed to delete archive');
-      }
+      setSuccess(`Successfully deleted archive: ${selectedArchive.name}`);
+      // Close the confirmation dialog
+      setShowDeleteConfirm(false);
+      setSelectedArchive(null);
+      // Refresh the archives list
+      fetchArchives();
     } catch (err: any) {
       setError('Error: ' + err.message);
       console.error(err);

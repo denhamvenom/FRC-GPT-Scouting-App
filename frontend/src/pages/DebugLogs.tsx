@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useApiContext } from '../providers/ApiProvider';
 
 interface Log {
   status: string;
@@ -7,6 +8,9 @@ interface Log {
 }
 
 const DebugLogs: React.FC = () => {
+  // Get API services from context
+  const { apiClient } = useApiContext();
+  
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,13 +21,9 @@ const DebugLogs: React.FC = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/debug/logs/picklist?lines=${lineCount}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch logs: ${response.statusText}`);
-      }
-      
-      const data: Log = await response.json();
+      const data: Log = await apiClient.get('/debug/logs/picklist', {
+        params: { lines: lineCount }
+      });
       
       if (data.status === 'success') {
         setLogs(data.logs);

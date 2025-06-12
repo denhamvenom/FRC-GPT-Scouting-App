@@ -1,16 +1,19 @@
 // frontend/src/pages/SchemaSuperMapping.tsx
 
 import { useEffect, useState } from "react";
+import { useApiContext } from '../providers/ApiProvider';
 
 function SchemaSuperMapping() {
+  // Get API services from context
+  const { apiClient } = useApiContext();
+  
   const [headers, setHeaders] = useState<string[]>([]);
   const [mapping, setMapping] = useState<{ [key: string]: string }>({});
   const [offsets, setOffsets] = useState<{ [key: string]: string[] }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/schema/super/learn")
-      .then((res) => res.json())
+    apiClient.get('/schema/super/learn')
       .then((data) => {
         if (data.status === "success") {
           setHeaders(data.headers);
@@ -18,8 +21,11 @@ function SchemaSuperMapping() {
           setOffsets(data.offsets);
         }
       })
+      .catch((err) => {
+        console.error('Error loading super schema:', err);
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [apiClient]);
 
   const handleChange = (header: string, value: string) => {
     setMapping((prev) => ({
@@ -29,15 +35,16 @@ function SchemaSuperMapping() {
   };
 
   const handleSave = async () => {
-    await fetch("http://localhost:8000/api/schema/super/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await apiClient.post('/schema/super/save', {
         mapping: mapping,
         offsets: offsets
-      }),
-    });
-    alert("SuperScouting Schema saved.");
+      });
+      alert("SuperScouting Schema saved.");
+    } catch (err) {
+      console.error('Error saving super schema:', err);
+      alert("Error saving SuperScouting Schema.");
+    }
   };
 
   if (loading) return <div className="text-center p-8">Loading schema...</div>;

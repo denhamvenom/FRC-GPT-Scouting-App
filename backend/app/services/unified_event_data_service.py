@@ -27,13 +27,58 @@ def get_unified_dataset_path(event_key: str) -> str:
     Returns:
         str: The full path to the unified dataset JSON file
     """
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_dir = os.path.join(base_dir, "data")
-
-    # Ensure data directory exists
-    os.makedirs(data_dir, exist_ok=True)
-
-    return os.path.join(data_dir, f"unified_event_{event_key}.json")
+    filename = f"unified_event_{event_key}.json"
+    
+    # Try multiple path strategies to handle both local and Docker environments
+    possible_paths = []
+    
+    # Strategy 1: Relative to this file
+    try:
+        current_file = os.path.abspath(__file__)
+        services_dir = os.path.dirname(current_file)
+        app_dir = os.path.dirname(services_dir)
+        data_dir = os.path.join(app_dir, "data")
+        possible_paths.append(os.path.join(data_dir, filename))
+    except:
+        pass
+    
+    # Strategy 2: Relative to current working directory
+    possible_paths.extend([
+        os.path.join("app", "data", filename),
+        os.path.join("data", filename),
+        os.path.join(".", "app", "data", filename),
+    ])
+    
+    # Strategy 3: Absolute paths (for Docker)
+    possible_paths.extend([
+        os.path.join("/app", "app", "data", filename),
+        os.path.join("/app", "data", filename),
+    ])
+    
+    # Log for debugging
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.debug(f"Looking for unified dataset for {event_key}")
+    logger.debug(f"Current working directory: {os.getcwd()}")
+    
+    # Find the first existing path
+    for path in possible_paths:
+        abs_path = os.path.abspath(path)
+        if os.path.exists(abs_path):
+            logger.debug(f"Found dataset at: {abs_path}")
+            return abs_path
+    
+    # If no existing file found, use the default path and ensure directory exists
+    default_path = possible_paths[0] if possible_paths else os.path.join("app", "data", filename)
+    data_dir = os.path.dirname(default_path)
+    
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+    except (PermissionError, OSError) as e:
+        logger.warning(f"Could not create data directory {data_dir}: {e}")
+    
+    logger.warning(f"Dataset file not found, using default path: {default_path}")
+    return default_path
 
 
 def sanitize_for_json(obj: Any) -> Any:
@@ -63,6 +108,9 @@ async def build_unified_dataset(
     scouting_tab: str = "Scouting",
     superscout_tab: str = "SuperScouting",
     operation_id: Optional[str] = None,
+    include_practice: bool = False,
+    include_playoffs: bool = True,
+    field_mappings: Optional[Dict[str, str]] = None,
 ) -> str:
     """
     Build a unified dataset combining scouting data, TBA data, and Statbotics data.
@@ -74,6 +122,9 @@ async def build_unified_dataset(
         scouting_tab: Name of the scouting tab in Google Sheets
         superscout_tab: Name of the superscouting tab in Google Sheets
         operation_id: Optional unique identifier for progress tracking
+        include_practice: Whether to include practice match data
+        include_playoffs: Whether to include playoff match data
+        field_mappings: Optional custom field mappings
 
     Returns:
         str: Path to the unified dataset JSON file
@@ -343,7 +394,18 @@ async def build_unified_dataset(
     expected_matches = []
 
     for match in event_matches:
-        if match.get("comp_level") == "qm":  # Only qualification matches
+        comp_level = match.get("comp_level")
+        
+        # Filter matches based on parameters
+        should_include = False
+        if comp_level == "qm":  # Qualification matches - always included
+            should_include = True
+        elif comp_level == "p" and include_practice:  # Practice matches
+            should_include = True
+        elif comp_level in ["ef", "qf", "sf", "f"] and include_playoffs:  # Playoff matches
+            should_include = True
+            
+        if should_include:
             match_number = match.get("match_number")
             alliances = match.get("alliances", {})
 
@@ -492,7 +554,7 @@ async def build_unified_dataset(
                     all_matches.append(
                         {
                             "match_number": record.get("match_number"),
-                            "comp_level": "qm",  # Assuming all are qualification matches
+                            "comp_level": "qm",  # TODO: Determine actual comp_level from scouting data or TBA match mapping
                         }
                     )
 

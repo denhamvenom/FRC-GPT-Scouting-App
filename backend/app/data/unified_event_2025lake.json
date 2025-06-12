@@ -4,6 +4,66 @@
   "expected_matches": [
     {
       "match_number": 1,
+      "team_number": 34,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5653,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2992,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 16,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9787,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 2,
+      "team_number": 34,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 2,
+      "team_number": 5653,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 2,
+      "team_number": 2992,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 2,
+      "team_number": 16,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 2,
+      "team_number": 9787,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 2,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
       "team_number": 2973,
       "alliance_color": "blue"
     },
@@ -2490,6 +2550,396 @@
     {
       "match_number": 9,
       "team_number": 3039,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3102,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 456,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3753,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3526,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9067,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3468,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 34,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5653,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2992,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 16,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9787,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2036,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 1912,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2152,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3102,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 456,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3753,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3102,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 456,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3753,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 34,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5653,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2992,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 364,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 1421,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 4336,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 16,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9787,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2036,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 1912,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2152,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3102,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 456,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3753,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3616,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8808,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5013,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 34,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5653,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2992,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3526,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9067,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3468,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 7111,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 4087,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9717,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3102,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 456,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3753,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 364,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 1421,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 4336,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 7111,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 4087,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9717,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3616,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8808,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5013,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2036,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 1912,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2152,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 16,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9787,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3526,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9067,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3468,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 34,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5653,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2992,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3616,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 8808,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 5013,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2036,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 1912,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 2152,
       "alliance_color": "red"
     }
   ],
@@ -10764,7 +11214,7 @@
       "Comments",
       "Stratagies"
     ],
-    "created_timestamp": "2025-06-09T02:07:57.401828"
+    "created_timestamp": "2025-06-11T23:19:44.179733"
   },
   "matches": [
     {

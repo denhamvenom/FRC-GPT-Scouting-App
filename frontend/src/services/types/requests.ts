@@ -73,13 +73,9 @@ export interface VirtualScoutRequest {
 // Dataset Building Requests
 export interface BuildDatasetRequest {
   event_key: string;
-  fields: Record<string, any>;
-  sheet_config?: {
-    tab_name?: string;
-    has_headers?: boolean;
-    headers?: string[];
-  };
-  force_refresh?: boolean;
+  sources?: string[];
+  force_rebuild?: boolean;
+  field_mappings?: Record<string, string>;
 }
 
 export interface DatasetStatusRequest {

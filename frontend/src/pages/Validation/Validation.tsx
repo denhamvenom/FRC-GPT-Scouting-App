@@ -1,6 +1,7 @@
 // frontend/src/pages/Validation/Validation.tsx
 
 import React from 'react';
+import { useApiContext } from '../../providers/ApiProvider';
 import { useValidation } from './hooks/useValidation';
 import { useCorrections } from './hooks/useCorrections';
 import {
@@ -13,6 +14,14 @@ import {
 import { TeamMatch, ValidationIssue, TodoItem } from './types';
 
 const Validation: React.FC = () => {
+  // Get API services from context
+  const { apiClient } = useApiContext();
+  
+  console.log('Validation component rendered, apiClient:', !!apiClient);
+  
+  const validationHook = useValidation();
+  console.log('useValidation hook result:', Object.keys(validationHook));
+  
   const {
     datasetPath,
     validationResult,
@@ -46,7 +55,7 @@ const Validation: React.FC = () => {
     submitCorrection,
     submitIgnoreMatch,
     submitVirtualScout,
-  } = useValidation();
+  } = validationHook;
 
   const {
     fetchSuggestions,
@@ -75,29 +84,19 @@ const Validation: React.FC = () => {
   // Handle updating todo status
   const handleUpdateTodoStatus = async (item: TodoItem, status: 'completed' | 'cancelled') => {
     try {
-      const response = await fetch('http://localhost:8000/api/validate/todo-update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          unified_dataset_path: datasetPath,
-          team_number: item.team_number,
-          match_number: item.match_number,
-          status: status,
-        }),
+      await apiClient.post('/validate/todo-update', {
+        unified_dataset_path: datasetPath,
+        team_number: item.team_number,
+        match_number: item.match_number,
+        status: status,
       });
 
-      if (response.ok) {
-        // Refresh the todo list
-        await fetchTodoList(datasetPath);
-        setSuccessMessage(`Todo item marked as ${status}`);
-      } else {
-        setError(`Failed to update todo item status`);
-      }
-    } catch (err) {
+      // Refresh the todo list
+      await fetchTodoList(datasetPath);
+      setSuccessMessage(`Todo item marked as ${status}`);
+    } catch (err: any) {
       console.error('Error updating todo status:', err);
-      setError('Error updating todo item');
+      setError(err.message || 'Error updating todo item');
     }
   };
 
@@ -116,6 +115,8 @@ const Validation: React.FC = () => {
     }
   }, [error, setError]);
 
+  console.log('Validation render - error:', error, 'loading:', loading, 'validationResult:', !!validationResult);
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

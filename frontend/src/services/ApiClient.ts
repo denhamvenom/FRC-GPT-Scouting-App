@@ -49,6 +49,9 @@ export class ApiClient {
       'Content-Type': 'application/json',
       ...config.headers,
     };
+    
+    // Debug logging
+    console.debug('ApiClient initialized with baseURL:', this.baseURL);
   }
 
   /**
@@ -81,17 +84,55 @@ export class ApiClient {
    * Build URL with query parameters
    */
   private buildURL(endpoint: string, params?: Record<string, any>): string {
-    const url = new URL(endpoint, this.baseURL);
+    console.debug('Building URL with endpoint:', endpoint, 'baseURL:', this.baseURL);
     
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
-        }
-      });
+    if (!this.baseURL) {
+      throw new Error('ApiClient baseURL is not configured');
     }
     
-    return url.toString();
+    if (!endpoint) {
+      throw new Error('API endpoint is required');
+    }
+    
+    // Handle both absolute and relative base URLs
+    let fullURL: string;
+    try {
+      if (this.baseURL.startsWith('http')) {
+        // Absolute URL
+        fullURL = `${this.baseURL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+      } else {
+        // Relative URL - construct relative to current origin
+        if (typeof window === 'undefined' || !window.location) {
+          throw new Error('Cannot construct relative URL in non-browser environment');
+        }
+        const baseURL = `${window.location.origin}${this.baseURL.replace(/\/$/, '')}`;
+        fullURL = `${baseURL}/${endpoint.replace(/^\//, '')}`;
+      }
+      
+      console.debug('Built URL:', fullURL);
+      
+      if (params && Object.keys(params).length > 0) {
+        try {
+          const url = new URL(fullURL);
+          Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              url.searchParams.append(key, String(value));
+            }
+          });
+          const finalURL = url.toString();
+          console.debug('URL with params:', finalURL);
+          return finalURL;
+        } catch (urlError) {
+          console.error('Error constructing URL with params:', urlError);
+          throw new Error(`Invalid URL construction: ${fullURL}`);
+        }
+      }
+      
+      return fullURL;
+    } catch (error) {
+      console.error('Error building URL:', error);
+      throw new Error(`Failed to build URL for endpoint: ${endpoint}`);
+    }
   }
 
   /**
@@ -127,15 +168,37 @@ export class ApiClient {
     let errorData: any;
     
     try {
-      errorData = await response.json();
+      const text = await response.text();
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        // If not JSON, use the text as the message
+        errorData = { message: text || response.statusText || 'Unknown error' };
+      }
     } catch {
       errorData = { message: response.statusText || 'Unknown error' };
     }
     
-    const error: ApiError = {
-      message: errorData.detail || errorData.message || 'Request failed',
+    console.error('API Error Response:', {
       status: response.status,
-      code: errorData.code,
+      statusText: response.statusText,
+      url: response.url,
+      errorData
+    });
+    
+    // Extract error message with better fallback logic
+    let message = 'Request failed';
+    if (typeof errorData === 'string') {
+      message = errorData;
+    } else if (errorData && typeof errorData === 'object') {
+      message = errorData.detail || errorData.message || errorData.error || 
+               (Array.isArray(errorData) ? errorData.join(', ') : 'Request failed');
+    }
+    
+    const error: ApiError = {
+      message: message,
+      status: response.status,
+      code: errorData?.code || errorData?.error_code,
       details: errorData,
     };
     
@@ -149,12 +212,16 @@ export class ApiClient {
     const { params, retry = 0, ...fetchOptions } = options;
     
     const url = this.buildURL(endpoint, params);
+    
+    // Don't set Content-Type for FormData - browser will set it with boundary
+    const headers = { ...this.defaultHeaders, ...fetchOptions.headers };
+    if (fetchOptions.body instanceof FormData) {
+      delete headers['Content-Type'];
+    }
+    
     const config: RequestOptions = {
       ...fetchOptions,
-      headers: {
-        ...this.defaultHeaders,
-        ...fetchOptions.headers,
-      },
+      headers,
     };
     
     // Apply request interceptors
@@ -229,10 +296,18 @@ export class ApiClient {
    * POST request
    */
   async post<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
+    // Don't stringify FormData or Blob
+    let body: any;
+    if (data instanceof FormData || data instanceof Blob) {
+      body = data;
+    } else if (data) {
+      body = JSON.stringify(data);
+    }
+    
     return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body,
     });
   }
 
@@ -240,10 +315,18 @@ export class ApiClient {
    * PUT request
    */
   async put<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
+    // Don't stringify FormData or Blob
+    let body: any;
+    if (data instanceof FormData || data instanceof Blob) {
+      body = data;
+    } else if (data) {
+      body = JSON.stringify(data);
+    }
+    
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
+      body,
     });
   }
 
@@ -261,10 +344,18 @@ export class ApiClient {
    * PATCH request
    */
   async patch<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
+    // Don't stringify FormData or Blob
+    let body: any;
+    if (data instanceof FormData || data instanceof Blob) {
+      body = data;
+    } else if (data) {
+      body = JSON.stringify(data);
+    }
+    
     return this.request<T>(endpoint, {
       ...options,
       method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
+      body,
     });
   }
 }

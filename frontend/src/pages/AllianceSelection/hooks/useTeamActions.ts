@@ -12,7 +12,7 @@ import {
 } from '../types';
 import { isTeamSelectable, canBeCaptain } from '../utils';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// Removed hardcoded API_BASE_URL - now using centralized API client
 
 interface UseTeamActionsProps {
   selection: SelectionState | null;

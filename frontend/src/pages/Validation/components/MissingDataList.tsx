@@ -11,8 +11,8 @@ interface MissingDataListProps {
 }
 
 export const MissingDataList: React.FC<MissingDataListProps> = ({
-  missingMatches,
-  missingSuperscouting,
+  missingMatches = [],  // Add default empty array
+  missingSuperscouting = [],  // Add default empty array
   onSelectMissing,
   selectedIssue,
 }) => {

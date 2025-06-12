@@ -5,7 +5,6 @@ import FieldSelection from "./pages/FieldSelection";
 import Workflow from "./pages/Workflow";
 import Validation from "./pages/Validation";
 import PicklistNew from "./pages/PicklistNew";
-import UnifiedDatasetBuilder from "./pages/UnifiedDatasetBuilder";
 import DebugLogs from "./pages/DebugLogs";
 import AllianceSelection from "./pages/AllianceSelection";
 import Navbar from "./components/Navbar";
@@ -22,7 +21,6 @@ function App() {
             <Route path="/field-selection" element={<FieldSelection />} />
             <Route path="/validation" element={<Validation />} />
             <Route path="/picklist" element={<PicklistNew />} />
-            <Route path="/build-dataset" element={<UnifiedDatasetBuilder />} />
             <Route path="/alliance-selection" element={<AllianceSelection />} />
             <Route path="/alliance-selection/:selectionId" element={<AllianceSelection />} />
             

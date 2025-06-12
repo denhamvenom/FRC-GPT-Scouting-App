@@ -1,9 +1,13 @@
 // frontend/src/pages/Validation/hooks/useCorrections.ts
 
 import { useState } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import { CorrectionSuggestion, TeamMatch, ValidationIssue } from '../types';
 
 export const useCorrections = () => {
+  // Get API services from context
+  const { apiClient } = useApiContext();
+  
   const [suggestions, setSuggestions] = useState<CorrectionSuggestion[]>([]);
   const [corrections, setCorrections] = useState<{ [key: string]: number }>({});
   const [correctionReason, setCorrectionReason] = useState<string>('');
@@ -18,24 +22,22 @@ export const useCorrections = () => {
     setError(null);
     
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/validate/suggestions?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${issue.team_number}&match_number=${issue.match_number}`
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch correction suggestions');
-      }
-      
-      const data = await response.json();
+      const data = await apiClient.get('/validate/suggestions', {
+        params: {
+          unified_dataset_path: datasetPath,
+          team_number: issue.team_number,
+          match_number: issue.match_number
+        }
+      });
       
       if (data.status === 'success') {
         setSuggestions(data.suggestions || []);
       } else {
         setError(data.message || 'Error fetching suggestions');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching suggestions:', err);
-      setError('Error fetching correction suggestions');
+      setError(err.message || 'Error fetching correction suggestions');
     } finally {
       setLoading(false);
     }

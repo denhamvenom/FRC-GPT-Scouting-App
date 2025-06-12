@@ -268,7 +268,7 @@ const Setup: React.FC = () => {
               <h4 className="font-semibold">Sections Processed Successfully!</h4>
               <p className="text-sm">Saved to: {progressHook.processedSectionsResult.saved_text_path}</p>
               <p className="text-sm">Extracted Length: {progressHook.processedSectionsResult.extracted_text_length} chars</p>
-              <p className="text-xs mt-1">Sample: <pre className="whitespace-pre-wrap bg-gray-100 p-1 rounded text-xs">{progressHook.processedSectionsResult.sample_text}</pre></p>
+              <div className="text-xs mt-1">Sample: <pre className="whitespace-pre-wrap bg-gray-100 p-1 rounded text-xs">{progressHook.processedSectionsResult.sample_text}</pre></div>
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useApiContext } from '../../../providers/ApiProvider';
 import type { 
   SetupState, 
   Event, 
@@ -48,6 +49,9 @@ const initialState: SetupState = {
 
 export const useSetup = () => {
   const [state, setState] = useState<SetupState>(initialState);
+  
+  // Get API services from context
+  const { eventService, apiClient } = useApiContext();
 
   // Load current event info and events when the component mounts
   useEffect(() => {
@@ -65,8 +69,7 @@ export const useSetup = () => {
 
   const fetchCurrentEvent = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/setup/info");
-      const data = await response.json();
+      const data = await apiClient.get('/setup/info');
       
       if (data.status === "success" && data.event_key) {
         setState(prev => ({
@@ -89,15 +92,12 @@ export const useSetup = () => {
   const fetchManagedManuals = async () => {
     setState(prev => ({ ...prev, isLoadingManagedManuals: true, managedManualsError: null }));
     try {
-      const response = await fetch("http://localhost:8000/api/manuals");
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Failed to fetch manuals");
-      }
-      const data: GameManualResponse[] = await response.json();
+      const data: GameManualResponse[] = await apiClient.get('/manuals');
       setState(prev => ({ ...prev, managedManuals: data }));
     } catch (err: any) {
-      setState(prev => ({ ...prev, managedManualsError: err.message || "Error fetching manuals" }));
+      const errorMessage = err instanceof Error ? err.message : 
+                          (typeof err === 'string' ? err : "Error fetching manuals");
+      setState(prev => ({ ...prev, managedManualsError: errorMessage }));
       console.error(err);
     } finally {
       setState(prev => ({ ...prev, isLoadingManagedManuals: false }));
@@ -108,13 +108,7 @@ export const useSetup = () => {
     setState(prev => ({ ...prev, loadingEvents: true, eventsError: null }));
 
     try {
-      const response = await fetch(`http://localhost:8000/api/setup/events?year=${yearToFetch}`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch events");
-      }
-
-      const data = await response.json();
+      const data = await apiClient.get('/setup/events', { params: { year: yearToFetch } });
 
       if (data.status === "success") {
         setState(prev => ({
@@ -190,30 +184,27 @@ export const useSetup = () => {
       formData.append("year", state.year.toString());
       formData.append("manual_file", state.selectedManualFile);
       
-      const response = await fetch("http://localhost:8000/api/setup/start", {
-        method: "POST",
-        body: formData, 
+      const data = await apiClient.post('/setup/start', formData, {
+        headers: {
+          // Let the browser set the Content-Type for FormData
+        },
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setState(prev => ({
-          ...prev,
-          currentManualInfo: data.manual_info,
-          selectedManualFile: null,
-          selectedTocItems: new Map(),
-          processedSectionsResult: null,
-          processSectionsError: null,
-          completedSteps: new Set([...prev.completedSteps, 1])
-        }));
-        
-        await fetchManagedManuals();
-      } else {
-        setState(prev => ({ ...prev, manualUploadError: data.detail || "Failed to upload manual" }));
-      }
-    } catch (err) {
-      setState(prev => ({ ...prev, manualUploadError: "Error connecting to server" }));
+      
+      setState(prev => ({
+        ...prev,
+        currentManualInfo: data.manual_info,
+        selectedManualFile: null,
+        selectedTocItems: new Map(),
+        processedSectionsResult: null,
+        processSectionsError: null,
+        completedSteps: new Set([...prev.completedSteps, 1])
+      }));
+      
+      await fetchManagedManuals();
+    } catch (err: any) {
+      const errorMessage = err instanceof Error ? err.message : 
+                          (typeof err === 'string' ? err : "Error connecting to server");
+      setState(prev => ({ ...prev, manualUploadError: errorMessage }));
       console.error(err);
     } finally {
       setState(prev => ({ ...prev, isUploadingManual: false }));
@@ -223,12 +214,7 @@ export const useSetup = () => {
   const handleSelectManagedManual = async (manual: GameManualResponse) => {
     setState(prev => ({ ...prev, isLoadingSelectedManualId: manual.id, selectedManualError: null }));
     try {
-      const response = await fetch(`http://localhost:8000/api/manuals/${manual.id}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Failed to fetch details for manual ${manual.id}`);
-      }
-      const data: GameManualDetailResponse = await response.json();
+      const data: GameManualDetailResponse = await apiClient.get(`/manuals/${manual.id}`);
 
       const newManualInfo: CurrentManualInfo = {
         manual_db_id: data.id,
@@ -259,7 +245,9 @@ export const useSetup = () => {
       }));
 
     } catch (err: any) {
-      setState(prev => ({ ...prev, selectedManualError: err.message || `Error loading manual ${manual.id}` }));
+      const errorMessage = err instanceof Error ? err.message : 
+                          (typeof err === 'string' ? err : `Error loading manual ${manual.id}`);
+      setState(prev => ({ ...prev, selectedManualError: errorMessage }));
       console.error(err);
     } finally {
       setState(prev => ({ ...prev, isLoadingSelectedManualId: null }));
@@ -272,11 +260,7 @@ export const useSetup = () => {
     }
     setState(prev => ({ ...prev, activeDeletingManualId: manualId, deleteManualError: null }));
     try {
-      const response = await fetch(`http://localhost:8000/api/manuals/${manualId}`, { method: 'DELETE' });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Failed to delete manual ${manualId}`);
-      }
+      await apiClient.delete(`/manuals/${manualId}`);
       
       fetchManagedManuals();
 
@@ -293,7 +277,9 @@ export const useSetup = () => {
       });
 
     } catch (err: any) {
-      setState(prev => ({ ...prev, deleteManualError: err.message || `Error deleting manual ${manualId}` }));
+      const errorMessage = err instanceof Error ? err.message : 
+                          (typeof err === 'string' ? err : `Error deleting manual ${manualId}`);
+      setState(prev => ({ ...prev, deleteManualError: errorMessage }));
       console.error(err);
     } finally {
       setState(prev => ({ ...prev, activeDeletingManualId: null }));
@@ -349,30 +335,27 @@ export const useSetup = () => {
       formData.append("year", yearToUse.toString());
       formData.append("event_key", eventToUse);
 
-      const response = await fetch("http://localhost:8000/api/setup/start", {
-        method: "POST",
-        body: formData, 
+      const data = await apiClient.post('/setup/start', formData, {
+        headers: {
+          // Let the browser set the Content-Type for FormData
+        },
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setState(prev => ({
-          ...prev,
-          setupResult: data,
-          currentEvent: {
-            event_key: eventToUse,
-            event_name: prev.selectedEventName || eventToUse,
-            year: yearToUse
-          },
-          completedSteps: new Set([...prev.completedSteps, 2]),
-          pendingEventAction: null
-        }));
-      } else {
-        setState(prev => ({ ...prev, eventsError: data.detail || "Failed to set up event" }));
-      }
-    } catch (err) {
-      setState(prev => ({ ...prev, eventsError: "Error connecting to server" }));
+      
+      setState(prev => ({
+        ...prev,
+        setupResult: data,
+        currentEvent: {
+          event_key: eventToUse,
+          event_name: prev.selectedEventName || eventToUse,
+          year: yearToUse
+        },
+        completedSteps: new Set([...prev.completedSteps, 2]),
+        pendingEventAction: null
+      }));
+    } catch (err: any) {
+      const errorMessage = err instanceof Error ? err.message : 
+                          (typeof err === 'string' ? err : "Error connecting to server");
+      setState(prev => ({ ...prev, eventsError: errorMessage }));
       console.error(err);
     } finally {
       setState(prev => ({ ...prev, isSettingUpEvent: false }));

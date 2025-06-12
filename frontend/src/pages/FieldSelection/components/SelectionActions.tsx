@@ -7,6 +7,7 @@ interface SelectionActionsProps {
   isLoading: boolean;
   hasValidSelections: boolean;
   onSave: () => void;
+  onSaveAndContinue: () => Promise<boolean>;
   onAutoCategorize: () => void;
   onValidate: () => boolean;
 }
@@ -15,6 +16,7 @@ export const SelectionActions: React.FC<SelectionActionsProps> = ({
   isLoading,
   hasValidSelections,
   onSave,
+  onSaveAndContinue,
   onAutoCategorize,
   onValidate,
 }) => {
@@ -22,9 +24,11 @@ export const SelectionActions: React.FC<SelectionActionsProps> = ({
 
   const handleSaveAndContinue = async () => {
     if (onValidate()) {
-      await onSave();
-      // Navigate to next step after successful save
-      navigate('/unified-dataset-builder');
+      const success = await onSaveAndContinue();
+      if (success) {
+        // Navigate to validation after successful save and dataset build
+        navigate('/validation');
+      }
     }
   };
 

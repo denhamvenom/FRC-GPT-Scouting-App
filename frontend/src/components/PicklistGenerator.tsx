@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import TeamComparisonModal from "./TeamComparisonModal";
+import { useApiContext } from '../providers/ApiProvider';
 
 interface Team {
   team_number: number;
@@ -276,6 +277,9 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
   const [pollingCacheKey, setPollingCacheKey] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
 
+  // Get API services from context
+  const { picklistService, apiClient } = useApiContext();
+
 
   useEffect(() => {
     // Log when dependencies change
@@ -366,21 +370,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       // Poll every 5 seconds to reduce OPTIONS requests
       pollingInterval = setInterval(async () => {
         try {
-          const response = await fetch(
-            "http://localhost:8000/api/picklist/generate/status",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ cache_key: pollingCacheKey }),
-            },
-          );
-
-          if (!response.ok) {
-            console.error("Error polling batch status:", response.status);
-            return;
-          }
-
-          const data = await response.json();
+          const data = await picklistService.getStatus(pollingCacheKey);
 
           // Update batch processing info
           if (data.batch_processing) {
@@ -434,20 +424,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
 
     try {
       // Fetch the completed picklist using the cache key
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/generate/status",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cache_key: pollingCacheKey }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch completed picklist");
-      }
-
-      const data = await response.json();
+      const data = await picklistService.getStatus(pollingCacheKey);
 
       // If we have a complete result with picklist data, process it
       if (data.status === "success" && data.picklist) {
@@ -489,21 +466,8 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
 
     // Clear any cache on the backend
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/clear-cache",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        },
-      );
-
-      if (!response.ok) {
-        console.error("Failed to clear backend cache");
-      } else {
-        const result = await response.json();
-        console.log("Cache cleared:", result.message);
-      }
+      const result = await picklistService.clearCache();
+      console.log("Cache cleared:", result.message);
     } catch (error) {
       console.error("Error clearing cache:", error);
     }
@@ -573,7 +537,7 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         localStorage.getItem("useBatching"),
       );
 
-      const requestBody = JSON.stringify({
+      const requestData = {
         unified_dataset_path: datasetPath,
         your_team_number: yourTeamNumber,
         pick_position: pickPosition,
@@ -583,26 +547,12 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         batch_size: 20,
         reference_teams_count: 3,
         reference_selection: "top_middle_bottom",
-      });
+      };
 
-      console.log("Sending request:", requestBody);
+      console.log("Sending request:", requestData);
       console.log("useBatching value in request:", useBatching);
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/generate",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: requestBody,
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to generate picklist");
-      }
-
-      const data: PicklistResult = await response.json();
+      const data: PicklistResult = await picklistService.generatePicklist(requestData);
 
       // Check if this is a batched result
       if (data.status === "success" && data.batched) {
@@ -707,25 +657,12 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
         nickname: team.nickname,
       }));
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/update",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            unified_dataset_path: datasetPath,
-            original_picklist: picklist,
-            user_rankings: userRankings,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to update picklist");
-      }
-
-      const data = await response.json();
+      // Note: Update picklist endpoint not in PicklistService, use generic API client
+      const data = await apiClient.post('/picklist/update', {
+        unified_dataset_path: datasetPath,
+        original_picklist: picklist,
+        user_rankings: userRankings,
+      });
 
       if (data.status === "success") {
         setPicklist(data.picklist);
@@ -763,28 +700,15 @@ const PicklistGenerator: React.FC<PicklistGeneratorProps> = ({
       }
 
       // Make the API call to rank missing teams
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/rank-missing-teams",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            unified_dataset_path: datasetPath,
-            missing_team_numbers: missingTeamNumbers,
-            ranked_teams: picklist,
-            your_team_number: yourTeamNumber,
-            pick_position: pickPosition,
-            priorities: simplePriorities,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to rank missing teams");
-      }
-
-      const data: MissingTeamsResult = await response.json();
+      // Note: Rank missing teams endpoint not in PicklistService, use generic API client
+      const data: MissingTeamsResult = await apiClient.post('/picklist/rank-missing-teams', {
+        unified_dataset_path: datasetPath,
+        missing_team_numbers: missingTeamNumbers,
+        ranked_teams: picklist,
+        your_team_number: yourTeamNumber,
+        pick_position: pickPosition,
+        priorities: simplePriorities,
+      });
 
       if (data.status === "success" && data.missing_team_rankings) {
         // Filter out any fallback teams that were re-ranked
