@@ -9,6 +9,11 @@ app/data/*.json
 !frontend/package.json
 backend/logs
 
+# Ignore Backup Codebase
+/original_codebase
+/Old Refactor Data 
+
+
 backend/app/cache
 
 # 🐍 Python

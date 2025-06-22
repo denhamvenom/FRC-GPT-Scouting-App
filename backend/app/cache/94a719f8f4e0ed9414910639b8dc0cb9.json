@@ -1,5 +1,5 @@
 {
-  "timestamp": 1749047990.408848,
+  "timestamp": 1749741193.6351209,
   "data": [
     {
       "city": "\u0130stanbul",
@@ -3598,7 +3598,7 @@
       "event_code": "cafb",
       "event_type": 99,
       "key": "2025cafb",
-      "name": "Fairbotics",
+      "name": "Fairbotics Pacific Showdown",
       "start_date": "2025-06-18",
       "state_prov": "CA",
       "year": 2025
@@ -3617,6 +3617,19 @@
       "year": 2025
     },
     {
+      "city": "Carneys Point Township",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-06-21",
+      "event_code": "njdd",
+      "event_type": 99,
+      "key": "2025njdd",
+      "name": "Duel on the Delaware",
+      "start_date": "2025-06-20",
+      "state_prov": "NJ",
+      "year": 2025
+    },
+    {
       "city": "Cranberry Township",
       "country": "USA",
       "district": null,
@@ -3627,6 +3640,19 @@
       "name": "NC/RC 2025",
       "start_date": "2025-06-20",
       "state_prov": "PA",
+      "year": 2025
+    },
+    {
+      "city": "Rockford",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-06-21",
+      "event_code": "miro",
+      "event_type": 99,
+      "key": "2025miro",
+      "name": "That ONE Offseason",
+      "start_date": "2025-06-20",
+      "state_prov": "MI",
       "year": 2025
     },
     {
@@ -3734,6 +3760,19 @@
       "year": 2025
     },
     {
+      "city": "Mukwonago",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-07-27",
+      "event_code": "wimc",
+      "event_type": 99,
+      "key": "2025wimc",
+      "name": "Mukwonago Robotics Offseason Competition",
+      "start_date": "2025-07-26",
+      "state_prov": "WI",
+      "year": 2025
+    },
+    {
       "city": "Ann Arbor",
       "country": "USA",
       "district": null,
@@ -3744,6 +3783,19 @@
       "name": "Wolverine Robotics Competition",
       "start_date": "2025-08-01",
       "state_prov": "MI",
+      "year": 2025
+    },
+    {
+      "city": "Taipei City",
+      "country": "Taiwan",
+      "district": null,
+      "end_date": "2025-08-23",
+      "event_code": "tacy",
+      "event_type": 99,
+      "key": "2025tacy",
+      "name": "Taiwan Playoff",
+      "start_date": "2025-08-21",
+      "state_prov": "Taipei City",
       "year": 2025
     },
     {
@@ -3760,6 +3812,19 @@
       "year": 2025
     },
     {
+      "city": "Denham Springs",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-09-13",
+      "event_code": "rsr",
+      "event_type": 99,
+      "key": "2025rsr",
+      "name": "The DOW Red Stick Rumble",
+      "start_date": "2025-09-12",
+      "state_prov": "LA",
+      "year": 2025
+    },
+    {
       "city": "Glendale",
       "country": "USA",
       "district": null,
@@ -3770,6 +3835,32 @@
       "name": "Arizona Robotics League Qualifier 5",
       "start_date": "2025-09-19",
       "state_prov": "AZ",
+      "year": 2025
+    },
+    {
+      "city": "Toronto",
+      "country": "Canada",
+      "district": null,
+      "end_date": "2025-09-20",
+      "event_code": "onsca1",
+      "event_type": 99,
+      "key": "2025onsca1",
+      "name": "Robots@Mary Ward Day 1",
+      "start_date": "2025-09-20",
+      "state_prov": "ON",
+      "year": 2025
+    },
+    {
+      "city": "Toronto",
+      "country": "Canada",
+      "district": null,
+      "end_date": "2025-09-21",
+      "event_code": "onsca2",
+      "event_type": 99,
+      "key": "2025onsca2",
+      "name": "Robots@Mary Ward Day 2",
+      "start_date": "2025-09-21",
+      "state_prov": "ON",
       "year": 2025
     },
     {
@@ -3796,6 +3887,19 @@
       "name": "Robot Rumble at RoboCon New Jersey",
       "start_date": "2025-09-27",
       "state_prov": "NJ",
+      "year": 2025
+    },
+    {
+      "city": "Woodside",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-05",
+      "event_code": "cacg",
+      "event_type": 99,
+      "key": "2025cacg",
+      "name": "CalGames",
+      "start_date": "2025-10-03",
+      "state_prov": "CA",
       "year": 2025
     },
     {
@@ -3890,6 +3994,19 @@
       "year": 2025
     },
     {
+      "city": "Hickory",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-19",
+      "event_code": "ncth2",
+      "event_type": 99,
+      "key": "2025ncth2",
+      "name": "THOR West",
+      "start_date": "2025-10-19",
+      "state_prov": "NC",
+      "year": 2025
+    },
+    {
       "city": "Brainerd",
       "country": "USA",
       "district": null,
@@ -3939,6 +4056,19 @@
       "name": "RiverRage 28",
       "start_date": "2025-10-25",
       "state_prov": "NH",
+      "year": 2025
+    },
+    {
+      "city": "Fayetteville",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-11-01",
+      "event_code": "ncspr",
+      "event_type": 99,
+      "key": "2025ncspr",
+      "name": "THOR East",
+      "start_date": "2025-11-01",
+      "state_prov": "NC",
       "year": 2025
     }
   ]
