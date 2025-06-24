@@ -5,7 +5,13 @@
 This directory contains comprehensive documentation for the AI-assisted refactoring of the FRC GPT Scouting App. All documents are designed to work together to ensure safe, successful refactoring.
 
 ### Core Planning Documents
-- **[AI_REFACTORING_PLAN.md](AI_REFACTORING_PLAN.md)** - Master refactoring plan with timeline and objectives
+- **[MASTER_REFACTORING_GUIDE.md](MASTER_REFACTORING_GUIDE.md)** - ⭐ ACTIVE - The authoritative refactoring guide (USE THIS)
+- **[USER_EXECUTION_GUIDE.md](USER_EXECUTION_GUIDE.md)** - Simple step-by-step instructions for users
+- **[VISUAL_PRESERVATION_GUIDE.md](VISUAL_PRESERVATION_GUIDE.md)** - Critical requirements for interface preservation
+
+### Context Window Management (CRITICAL)
+- **[CONTEXT_WINDOW_PROTOCOL.md](CONTEXT_WINDOW_PROTOCOL.md)** - ⭐ CRITICAL - Baseline reference and intent communication
+- **[SESSION_INTENT_TEMPLATE.md](SESSION_INTENT_TEMPLATE.md)** - Template for preserving intent between sessions
 - **[AI_PROMPT_GUIDE.md](AI_PROMPT_GUIDE.md)** - Templates and best practices for AI interaction
 - **[SPRINT_EXECUTION_CHECKLIST.md](SPRINT_EXECUTION_CHECKLIST.md)** - Step-by-step sprint execution guide
 
@@ -20,11 +26,17 @@ This directory contains comprehensive documentation for the AI-assisted refactor
 
 ## 🚀 Quick Start Guide
 
+### For Users (Non-Technical)
+1. Read [USER_EXECUTION_GUIDE.md](USER_EXECUTION_GUIDE.md) - This is all you need!
+2. Follow the simple step-by-step instructions
+3. Paste prompts when instructed
+4. Test the application and report issues
+
 ### For Project Leads
-1. Review [AI_REFACTORING_PLAN.md](AI_REFACTORING_PLAN.md) for overall approach
-2. Approve timeline and resource allocation
+1. Review [MASTER_REFACTORING_GUIDE.md](MASTER_REFACTORING_GUIDE.md) for the approach
+2. Ensure user understands their limited role (prompts, testing, error reporting only)
 3. Set up baseline using [BASELINE_CREATION_GUIDE.md](BASELINE_CREATION_GUIDE.md)
-4. Begin Sprint 1 using [SPRINT_EXECUTION_CHECKLIST.md](SPRINT_EXECUTION_CHECKLIST.md)
+4. Begin Sprint 1 using user guide prompts
 
 ### For Developers
 1. Study [AI_PROMPT_GUIDE.md](AI_PROMPT_GUIDE.md) for AI interaction patterns
@@ -43,7 +55,11 @@ This directory contains comprehensive documentation for the AI-assisted refactor
 ```
 Refactor Documents/
 ├── README.md                        # This file
-├── AI_REFACTORING_PLAN.md          # Master plan
+├── MASTER_REFACTORING_GUIDE.md     # ⭐ ACTIVE - Main guide (USE THIS)
+├── USER_EXECUTION_GUIDE.md         # Simple user instructions
+├── VISUAL_PRESERVATION_GUIDE.md    # Visual preservation requirements
+├── CONTEXT_WINDOW_PROTOCOL.md     # ⭐ CRITICAL - Baseline reference & intent
+├── SESSION_INTENT_TEMPLATE.md     # Intent preservation between sessions
 ├── CLAUDE_CODE_SPRINT_TEMPLATE.md  # Claude Code sprint template
 ├── AI_PROMPT_GUIDE.md              # Claude Code specific prompts  
 ├── SPRINT_EXECUTION_CHECKLIST.md   # Sprint procedures
@@ -53,7 +69,12 @@ Refactor Documents/
 ├── ROLLBACK_PROCEDURES.md          # Emergency procedures
 ├── SUCCESS_METRICS_TRACKING.md     # Progress tracking
 ├── KICKOFF_CHECKLIST.md            # Pre-refactoring readiness
-└── scripts/                        # Supporting scripts
+├── CLAUDE_CODE_OPTIMIZATION_SUMMARY.md # Claude Code optimizations
+├── archived_plans/                 # ⚠️ DEPRECATED - Do not use
+│   ├── AI_REFACTORING_PLAN.md      # Old 10-sprint plan
+│   ├── IMPROVED_REFACTORING_PLAN.md # Old 30-sprint plan
+│   └── REVISED_REFACTORING_PLAN.md # Consolidated into MASTER guide
+└── scripts/                        # Supporting scripts (WSL-compatible)
     ├── setup_refactoring.sh        # Initial setup
     ├── emergency_rollback.sh       # Emergency procedures
     ├── collect_metrics.py          # Metrics collection

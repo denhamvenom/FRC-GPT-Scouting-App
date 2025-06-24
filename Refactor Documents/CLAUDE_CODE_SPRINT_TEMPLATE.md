@@ -40,7 +40,28 @@ Before making ANY changes, complete this checklist:
    git log -1 --oneline  # Note current commit
    ```
 
-3. **Verify Baseline Integrity**
+3. **MANDATORY: Establish Baseline Reference**
+   ```bash
+   # Verify baseline branch exists and is accessible
+   git checkout baseline
+   git log -1 --oneline  # Note baseline commit for reference
+   echo "BASELINE COMMIT: $(git rev-parse HEAD)" > sprint-context/baseline-ref.txt
+   
+   # Return to work branch and compare
+   git checkout refactor/sprint-[NUMBER] 2>/dev/null || git checkout -b refactor/sprint-[NUMBER]
+   git diff baseline --stat > sprint-context/changes-from-baseline.txt
+   echo "Current changes from baseline: $(wc -l < sprint-context/changes-from-baseline.txt) files modified"
+   ```
+
+4. **Create Session Intent Document**
+   ```bash
+   # Copy template and fill in session-specific intent
+   cp "Refactor Documents/SESSION_INTENT_TEMPLATE.md" "sprint-context/sprint-[NUMBER]-session-[X]-intent.md"
+   echo "CRITICAL: Fill out intent document before proceeding"
+   echo "Location: sprint-context/sprint-[NUMBER]-session-[X]-intent.md"
+   ```
+
+5. **Verify Baseline Integrity**
    ```bash
    # Run existing tests (if any)
    cd backend && python -m pytest --tb=short -q || echo "No tests found (expected)"
@@ -49,13 +70,7 @@ Before making ANY changes, complete this checklist:
    python -c "from app.main import app; print('✅ Backend imports successfully')"
    ```
 
-4. **Create Sprint Branch**
-   ```bash
-   git checkout -b refactor/sprint-[NUMBER]
-   echo "Sprint [NUMBER] started on $(date)" > sprint-logs/sprint-[NUMBER].md
-   ```
-
-5. **Generate Starting Checksums**
+6. **Generate Starting Checksums**
    ```bash
    find backend -name "*.py" -type f -exec sha1sum {} \; | sort > checksums/sprint-[NUMBER]-start.txt
    find frontend/src -name "*.ts" -o -name "*.tsx" -type f -exec sha1sum {} \; 2>/dev/null | sort >> checksums/sprint-[NUMBER]-start.txt
@@ -64,41 +79,64 @@ Before making ANY changes, complete this checklist:
 
 ## Sprint Execution Protocol
 
-### Step 1: Understand Current State
-- Use Read tool to examine target files
-- Use Glob tool to find related files
-- Use Grep tool to understand patterns
-- Document findings in sprint log
+### Step 1: Baseline Analysis (MANDATORY)
+```bash
+# REQUIRED: Read baseline version of target files FIRST
+git show baseline:backend/app/services/target_service.py > /tmp/baseline_version.py
+```
 
-### Step 2: Plan Changes
-- Identify specific files to modify
-- Plan modification sequence
-- Estimate scope and impact
-- Update sprint log with plan
+- **Read baseline version** of target files to understand original logic
+- **Document baseline behavior** that must be preserved
+- **Identify API contracts** that cannot change
+- **Note dependencies** and integration points
+- **Use Read tool** to examine current state and compare with baseline
 
-### Step 3: Implement Changes Incrementally
+### Step 2: Plan Changes with Baseline Preservation
+- **Identify specific files** to modify and their baseline versions
+- **Plan modification sequence** that preserves all baseline behavior
+- **Estimate scope and impact** on baseline compatibility
+- **Update sprint log** with plan and baseline preservation strategy
+- **Document intent** in session intent document
+
+### Step 3: Implement Changes with Baseline Validation
 For each file modification:
 
-1. **Pre-Modification Check**
+1. **Pre-Modification Baseline Check**
    ```bash
+   # REQUIRED: Compare with baseline version before editing
+   git show baseline:[FILE_PATH] | head -20  # See original logic
+   git diff baseline [FILE_PATH]  # See current changes
    sha1sum [FILE_PATH]  # Record current checksum
    ```
 
-2. **Make Changes**
-   - Use Edit or MultiEdit tool
-   - Add comprehensive docstrings per template
-   - Follow coding standards
+2. **Make Changes with Baseline Preservation**
+   - **Read baseline version** using Read tool first
+   - **Understand original logic** completely before modifying
+   - **Use Edit or MultiEdit tool** while preserving exact API interfaces
+   - **Add comprehensive docstrings** including baseline reference
+   - **Follow coding standards** from baseline
 
-3. **Post-Modification Verification**
+3. **Post-Modification Baseline Validation**
    ```bash
    # Verify syntax
    python -m py_compile [FILE_PATH]  # For Python files
+   
+   # CRITICAL: Test behavior matches baseline
+   python -c "
+   # Test that refactored code produces identical results to baseline
+   # Add specific validation for the modified functionality
+   print('✅ Behavior matches baseline')
+   "
    
    # Update checksum
    sha1sum [FILE_PATH] >> checksums/sprint-[NUMBER]-changes.txt
    
    # Run related tests
    cd backend && python -m pytest tests/[RELATED_TEST] -v
+   
+   # Compare with baseline behavior
+   echo 'Validating against baseline...'
+   git diff baseline [FILE_PATH] --stat
    ```
 
 ### Step 4: Continuous Validation
@@ -264,42 +302,66 @@ If anything goes wrong during the sprint:
 
 When ending a Claude Code session mid-sprint:
 
-```markdown
-## Sprint [NUMBER] Session Handoff
+### CRITICAL: Update Session Intent Document
+```bash
+# REQUIRED: Update the session intent document with results
+vi sprint-context/sprint-[NUMBER]-session-[X]-intent.md
+# Complete the "Session Execution Log" and "Next Session Requirements" sections
+```
 
-### Session Status
-- **Time**: [TIMESTAMP]
+### Session Handoff Checklist
+```markdown
+## Sprint [NUMBER] Session [X] Handoff
+
+### Baseline Preservation Status
+- [ ] All changes compared against baseline behavior
+- [ ] API contracts verified identical to baseline: `git diff baseline backend/app/api/`
+- [ ] Performance within 5% of baseline: [MEASUREMENT]
+- [ ] Visual interface unchanged: [VERIFICATION_METHOD]
+
+### Session Completion Status
+- **Time**: [TIMESTAMP]  
 - **Progress**: [X]% complete
 - **Current Task**: [SPECIFIC_TASK]
-- **Files Open**: [LIST]
+- **Files Modified**: [LIST_WITH_BASELINE_DIFFS]
 
-### What Just Happened
-[DESCRIPTION_OF_LAST_ACTIONS]
+### What Was Accomplished
+[DESCRIPTION_OF_COMPLETED_WORK]
 
-### Current File States
+### Baseline Comparisons Made
 ```bash
-# Run this to get current checksums
-find backend -name "*.py" -type f -exec sha1sum {} \; | sort > checksums/handoff-$(date +%H%M%S).txt
+# Document what baseline analysis was done
+git diff baseline --stat > handoff-baseline-comparison.txt
+git show baseline:[KEY_FILE] | head -10  # Original logic preserved
 ```
 
-### Exact Next Steps
-1. [SPECIFIC_COMMAND_TO_RUN]
-2. [SPECIFIC_FILE_TO_EDIT]
-3. [SPECIFIC_TEST_TO_RUN]
+### Critical Discoveries
+- **About Baseline**: [WHAT_WAS_LEARNED_ABOUT_ORIGINAL_CODE]
+- **Constraints Found**: [LIMITATIONS_DISCOVERED]
+- **Decisions Made**: [CHOICES_AND_RATIONALE]
 
-### Critical Context
-- **Important**: [KEY_DECISION_OR_CONSTRAINT]
-- **Warning**: [POTENTIAL_ISSUE_TO_WATCH]
-- **Remember**: [DON'T_FORGET_THIS]
+### Next Session Intent
+**Immediate Goal**: [SPECIFIC_NEXT_OBJECTIVE]
+**Baseline Reference**: [FILES_TO_COMPARE_WITH_BASELINE]
+**Preservation Requirements**: [BEHAVIORS_THAT_MUST_REMAIN_IDENTICAL]
 
-### Continuation Command
-To resume this sprint, new Claude Code session should run:
+### Handoff Validation Commands
 ```bash
+# Commands next session should run to verify state
 cd [REPO_PATH]
 git checkout refactor/sprint-[NUMBER]
-git status  # Should show current state
-# Verify checksums match handoff file
+git diff baseline --stat  # See all changes from original
+git show baseline:[CRITICAL_FILE] | head -20  # Review original logic
+
+# Verify system still works
+cd backend && python -c "from app.main import app; print('✅ System functional')"
 ```
+
+### Emergency Recovery
+**If next session encounters issues**:
+- Baseline reference: `git show baseline:[FILE]`
+- Last known good state: `git log --oneline -5`
+- Rollback command: `git reset --hard [SAFE_COMMIT]`
 ```
 
 ## Success Validation

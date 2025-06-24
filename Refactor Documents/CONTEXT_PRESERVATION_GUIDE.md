@@ -13,6 +13,8 @@ Context preservation is critical for successful AI-assisted refactoring. This gu
 - Sprint transitions
 - Extended time gaps
 
+**NOTE**: This guide focuses on code-level context preservation. For session-level context management, see [CONTEXT_WINDOW_PROTOCOL.md](CONTEXT_WINDOW_PROTOCOL.md) and [SESSION_INTENT_TEMPLATE.md](SESSION_INTENT_TEMPLATE.md).
+
 ## Core Principles
 
 1. **Explicit Over Implicit**: Document everything, assume nothing
@@ -34,6 +36,7 @@ Dependencies: [Required services, modules, or external resources]
 
 AI-Context:
 - Sprint: [Sprint number when last modified]
+- Baseline-Reference: [How this relates to baseline:file.py implementation]
 - Complexity: [Simple|Medium|Complex]
 - Patterns: [Design patterns used]
 - Gotchas: [Non-obvious behavior or constraints]

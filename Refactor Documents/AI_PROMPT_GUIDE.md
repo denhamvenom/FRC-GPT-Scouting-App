@@ -25,7 +25,9 @@ This guide provides Claude Code-specific templates and best practices for execut
 
 ### 3. Session Continuity
 - Each session is independent
-- Context must be re-established
+- Context must be re-established via CONTEXT_WINDOW_PROTOCOL.md
+- Baseline reference mandatory at session start
+- Session intent documents for context preservation
 - File states verified via checksums
 - TodoWrite/TodoRead for progress tracking
 
@@ -48,6 +50,13 @@ You are Claude Code executing Sprint <<SPRINT-NUMBER>> of the FRC GPT Scouting A
 - [ ] <<CRITERIA-1>>
 - [ ] <<CRITERIA-2>>  
 - [ ] <<CRITERIA-3>>
+
+## CRITICAL REQUIREMENTS
+Follow CONTEXT_WINDOW_PROTOCOL.md for:
+- Baseline reference before all changes
+- Session intent document creation
+- Decision documentation for next context window
+- Continuous validation against baseline behavior
 
 ## Pre-Execution Checklist
 MANDATORY: Complete these checks before ANY file modifications:

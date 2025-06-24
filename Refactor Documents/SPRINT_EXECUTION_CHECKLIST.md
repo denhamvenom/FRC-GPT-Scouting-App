@@ -15,11 +15,14 @@
 - [ ] Docker daemon running (if using Docker)
 - [ ] Git configured with correct user
 
-### Baseline Verification
+### Baseline Verification and Context Setup
 - [ ] On correct branch: `git branch --show-current`
 - [ ] Baseline branch exists: `git branch -r | grep baseline`
 - [ ] No uncommitted changes: `git status`
 - [ ] Latest code pulled: `git pull origin baseline`
+- [ ] **MANDATORY: Baseline reference established**: `git checkout baseline && git log -1 --oneline`
+- [ ] **Session intent document created**: Copy SESSION_INTENT_TEMPLATE.md
+- [ ] **Context window protocol followed**: CONTEXT_WINDOW_PROTOCOL.md reviewed
 
 ### Testing Infrastructure
 - [ ] Pytest installed: `pytest --version`
@@ -29,15 +32,28 @@
 
 ## Sprint Start Checklist
 
-### 1. Create Sprint Branch
+### 1. Establish Baseline Reference (MANDATORY)
 ```bash
-# Create new sprint branch from baseline
+# CRITICAL: Always start with baseline reference
 git checkout baseline
-git pull origin baseline
+git log -1 --oneline  # Note baseline commit
+echo "BASELINE COMMIT: $(git rev-parse HEAD)" > sprint-context/baseline-ref.txt
+
+# Create new sprint branch from baseline
 git checkout -b refactor/sprint-<<NUMBER>>
+git diff baseline --stat > sprint-context/changes-from-baseline.txt
 
 # Verify branch
 git branch --show-current
+```
+
+### 2. Create Session Intent Document
+```bash
+# Copy template for this session
+cp "Refactor Documents/SESSION_INTENT_TEMPLATE.md" \
+   "sprint-context/sprint-<<NUMBER>>-session-1-intent.md"
+
+echo "CRITICAL: Fill out intent document before proceeding"
 ```
 
 ### 2. Generate Initial Checksums

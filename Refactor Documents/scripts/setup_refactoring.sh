@@ -1,12 +1,21 @@
 #!/bin/bash
 # setup_refactoring.sh - Initial setup for FRC Scouting App refactoring
+# Compatible with WSL Ubuntu on Windows
 
 set -e  # Exit on any error
 
 echo "🚀 Setting up FRC Scouting App Refactoring Environment"
 echo "================================================"
 
-# Colors for output
+# Detect if running in WSL
+if grep -qi microsoft /proc/version; then
+    echo "Detected WSL environment"
+    IS_WSL=true
+else
+    IS_WSL=false
+fi
+
+# Colors for output (work in both Windows Terminal and standard terminals)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -43,6 +52,11 @@ check_command() {
 # Check if we're in the right directory
 if [ ! -f "ARCHITECTURE.md" ] || [ ! -d "backend" ] || [ ! -d "frontend" ]; then
     print_error "Please run this script from the FRC-GPT-Scouting-App root directory"
+    print_warning "Current directory: $(pwd)"
+    if [ "$IS_WSL" = true ]; then
+        print_warning "In WSL, make sure you're in the mounted Windows directory"
+        print_warning "Example: cd /mnt/c/Users/[YourUsername]/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App"
+    fi
     exit 1
 fi
 
@@ -106,13 +120,30 @@ print_success "Directory structure created"
 
 print_step "Setting up Python environment..."
 
-# Check Python version
-PYTHON_VERSION=$(python --version 2>&1 | awk '{print $2}')
+# Check Python version - handle both python and python3 commands
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    print_error "Python not found. Please install Python 3.9+"
+    exit 1
+fi
+
+PYTHON_VERSION=$($PYTHON_CMD --version 2>&1 | awk '{print $2}')
 if [[ $PYTHON_VERSION < "3.9" ]]; then
     print_error "Python 3.9+ required, found $PYTHON_VERSION"
     exit 1
 fi
-print_success "Python version: $PYTHON_VERSION"
+print_success "Python version: $PYTHON_VERSION (using $PYTHON_CMD)"
+
+# Ensure pip is available
+if ! command -v pip &> /dev/null && ! command -v pip3 &> /dev/null; then
+    print_warning "pip not found, installing..."
+    $PYTHON_CMD -m ensurepip --default-pip || apt-get install python3-pip -y
+fi
+
+PIP_CMD="$PYTHON_CMD -m pip"
 
 # Install Python dependencies
 cd backend
@@ -134,11 +165,11 @@ pre-commit>=3.0.0
 EOF
 fi
 
-pip install -r requirements-dev.txt
+$PIP_CMD install -r requirements-dev.txt
 print_success "Python development dependencies installed"
 
 # Install main dependencies
-pip install -r requirements.txt
+$PIP_CMD install -r requirements.txt
 print_success "Python main dependencies installed"
 
 cd ..
@@ -248,16 +279,20 @@ cd backend
 
 # Check if tests exist and run them
 if [ -d "tests" ] && [ "$(find tests -name '*.py' | wc -l)" -gt 0 ]; then
-    python -m pytest tests/ -x --tb=short || print_warning "Some backend tests failed"
+    $PYTHON_CMD -m pytest tests/ -x --tb=short || print_warning "Some backend tests failed"
 else
     print_warning "No backend tests found - this is expected before Sprint 1"
 fi
 
-# Test if backend starts
+# Test if backend starts - handle WSL port binding
 print_step "Testing backend startup..."
-timeout 10s uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+if [ "$IS_WSL" = true ]; then
+    print_warning "In WSL, make sure Windows Firewall allows port 8000"
+fi
+
+timeout 10s $PYTHON_CMD -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
 BACKEND_PID=$!
-sleep 3
+sleep 5  # Give more time in WSL
 
 if curl -s http://localhost:8000/health > /dev/null 2>&1; then
     print_success "Backend starts successfully"

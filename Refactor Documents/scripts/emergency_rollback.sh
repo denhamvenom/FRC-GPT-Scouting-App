@@ -1,12 +1,21 @@
 #!/bin/bash
 # emergency_rollback.sh - Emergency rollback to baseline
+# Compatible with WSL Ubuntu on Windows
 
 set -e
 
 echo "🚨 EMERGENCY ROLLBACK INITIATED"
 echo "==============================="
 
-# Colors for output
+# Detect if running in WSL
+if grep -qi microsoft /proc/version; then
+    echo "Running in WSL environment"
+    IS_WSL=true
+else
+    IS_WSL=false
+fi
+
+# Colors for output (work in both Windows Terminal and standard terminals)
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -115,7 +124,7 @@ print_step "Reinstalling dependencies..."
 # Backend dependencies
 cd backend
 if [ -f requirements.txt ]; then
-    pip install -r requirements.txt >> ../$EMERGENCY_LOG 2>&1
+    $PYTHON_CMD -m pip install -r requirements.txt >> ../$EMERGENCY_LOG 2>&1
     print_success "Backend dependencies installed"
 else
     print_warning "No requirements.txt found"
@@ -134,9 +143,19 @@ cd ..
 
 print_step "Verifying system health..."
 
+# Detect Python command
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    print_error "Python not found!"
+    PYTHON_CMD="python"  # Try anyway
+fi
+
 # Test backend
 cd backend
-python -c "
+$PYTHON_CMD -c "
 try:
     from app.main import app
     print('✅ Backend imports successfully')
