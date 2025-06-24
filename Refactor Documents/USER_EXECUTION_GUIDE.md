@@ -22,10 +22,10 @@ You will NOT need to:
 
 ### 2. Test Current Website
 1. Open your web browser
-2. Go to: `http://localhost:3000`
-3. Click through all pages
-4. Take screenshots of each page (save in a folder)
-5. Make note of how everything looks
+2. Go to: `http://localhost:3000` (or `http://localhost:5173` if using Vite)
+3. Click through all pages and workflows
+4. Note: Manual screenshots have already been captured and integrated into the safety system
+5. Make note of how everything looks - this is your reference
 
 ## Phase 1: Safety Setup (Day 1-2)
 
@@ -49,7 +49,19 @@ Create comprehensive safety systems before any code changes.
 When Claude Code says it's done:
 1. Look for any error messages
 2. If errors, copy and paste them back to Claude Code
-3. If no errors, move to Sprint 2
+3. If no errors, proceed to capture baselines (next step)
+
+**Step 4: Capture Baseline Data**
+IMPORTANT: You must start the application and capture baselines:
+1. Start the application: Run `docker-compose up` in terminal
+2. Wait for both services to start (backend on :8000, frontend on :3000 or :5173)
+3. Run these commands in terminal (copy one at a time):
+   ```bash
+   python safety/baseline_metrics.py --capture
+   python safety/data_integrity_validator.py --snapshot
+   ```
+4. Verify visual baselines are ready (manual screenshots already integrated)
+5. If successful, move to Sprint 2
 
 ### Sprint 2 - Prepare for Changes
 

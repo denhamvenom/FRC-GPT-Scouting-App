@@ -86,7 +86,11 @@ safety/
 ├── api_contract_tests.py
 ├── visual_regression_setup.py
 ├── data_integrity_validator.py
-└── emergency_rollback.sh (WSL-compatible)
+├── emergency_rollback.sh (WSL-compatible)
+├── screenshot_registry.json (workflow-aware visual testing)
+├── visual_baselines/ (15 comprehensive manual screenshots)
+├── update_baseline_metadata.py
+└── VISUAL_REGRESSION_SUMMARY.md
 
 tests/integration/
 ├── end_to_end_workflows.py
@@ -97,13 +101,14 @@ tests/integration/
 **Success Criteria**:
 - [ ] Baseline metrics captured
 - [ ] Rollback tested and working
-- [ ] Visual regression detects UI changes
+- [ ] Visual regression system operational with 15 manual screenshots
+- [ ] Screenshot registry maps workflows to visual states
 - [ ] Integration tests cover critical paths
 
 **Abort If**:
 - Cannot establish reliable baselines
 - Rollback procedures fail
-- Visual regression unreliable
+- Visual regression system cannot detect changes reliably
 
 #### Sprint 2: Canary Selection and Analysis
 **Duration**: 1 day

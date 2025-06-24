@@ -17,7 +17,7 @@ class VisualRegressionTester:
     def __init__(self, screenshots_dir="visual_baselines"):
         self.screenshots_dir = Path(__file__).parent / screenshots_dir
         self.screenshots_dir.mkdir(exist_ok=True)
-        self.frontend_url = "http://localhost:3000"
+        self.frontend_url = "http://localhost:5173/"
         self.test_results = []
         
     def setup_playwright(self):
@@ -104,7 +104,7 @@ echo ""
 """
         
         for route, filename in routes:
-            script_content += f'echo "1. Navigate to: http://localhost:3000{route}"\n'
+            script_content += f'echo "1. Navigate to: http://localhost:5173{route}"\n'
             script_content += f'echo "   Save screenshot as: {self.screenshots_dir}/{filename}"\n'
             script_content += 'echo "   Press Enter when done..."\n'
             script_content += 'read\n'
@@ -130,12 +130,20 @@ echo "Visual baseline capture complete!"
         with open(image_path, 'rb') as f:
             return hashlib.md5(f.read()).hexdigest()
     
+    def load_screenshot_registry(self):
+        """Load the screenshot registry to understand what we're comparing"""
+        registry_path = Path(__file__).parent / "screenshot_registry.json"
+        if registry_path.exists():
+            with open(registry_path) as f:
+                return json.load(f)
+        return None
+    
     def compare_screenshots(self, baseline_dir: str, current_dir: str):
-        """Compare two sets of screenshots"""
+        """Compare two sets of screenshots using registry information"""
         print("\n=== Visual Regression Comparison ===")
         
-        baseline_path = Path(baseline_dir)
-        current_path = Path(current_dir)
+        baseline_path = Path(baseline_dir) if isinstance(baseline_dir, str) else Path(baseline_dir)
+        current_path = Path(current_dir) if isinstance(current_dir, str) else Path(current_dir)
         
         if not baseline_path.exists():
             print(f"ERROR: Baseline directory not found: {baseline_dir}")
@@ -145,51 +153,118 @@ echo "Visual baseline capture complete!"
             print(f"ERROR: Current directory not found: {current_dir}")
             return False
         
+        # Load registry to understand screenshot importance
+        registry = self.load_screenshot_registry()
+        
         differences = []
+        critical_differences = []
+        
+        # Get all baseline screenshots
+        baseline_screenshots = list(baseline_path.glob("*.png"))
+        if not baseline_screenshots:
+            print("ERROR: No baseline screenshots found!")
+            return False
+        
+        print(f"Comparing {len(baseline_screenshots)} baseline screenshots...")
         
         # Compare all baseline images
-        for baseline_img in baseline_path.glob("*.png"):
+        for baseline_img in baseline_screenshots:
             current_img = current_path / baseline_img.name
             
+            # Check if screenshot is critical (from registry)
+            is_critical = True  # Default to critical
+            screenshot_info = None
+            if registry and "screenshots" in registry:
+                screenshot_info = registry["screenshots"].get(baseline_img.name)
+                if screenshot_info:
+                    is_critical = screenshot_info.get("critical", True)
+            
             if not current_img.exists():
-                differences.append(f"Missing screenshot: {baseline_img.name}")
+                diff_msg = f"Missing screenshot: {baseline_img.name}"
+                if is_critical:
+                    critical_differences.append(diff_msg)
+                else:
+                    differences.append(diff_msg)
                 continue
             
             # Compare file sizes first (quick check)
             baseline_size = baseline_img.stat().st_size
             current_size = current_img.stat().st_size
             
+            size_difference = False
             if baseline_size != current_size:
                 size_diff = abs(current_size - baseline_size)
                 diff_percent = (size_diff / baseline_size) * 100
                 
-                # Allow small differences (< 5%) due to rendering variations
-                if diff_percent > 5:
-                    differences.append(
+                # Allow small differences (< 2%) due to rendering variations, but only for non-critical
+                tolerance = 1 if is_critical else 2
+                if diff_percent > tolerance:
+                    size_difference = True
+                    diff_msg = (
                         f"{baseline_img.name}: Size difference {diff_percent:.1f}% "
                         f"(baseline: {baseline_size}, current: {current_size})"
                     )
+                    
+                    if is_critical:
+                        critical_differences.append(diff_msg)
+                    else:
+                        differences.append(diff_msg)
             
             # Compare hashes for exact match
             baseline_hash = self.compute_image_hash(baseline_img)
             current_hash = self.compute_image_hash(current_img)
             
             if baseline_hash != current_hash:
+                # Record the change
                 self.test_results.append({
                     "file": baseline_img.name,
                     "status": "changed",
                     "baseline_hash": baseline_hash,
-                    "current_hash": current_hash
+                    "current_hash": current_hash,
+                    "critical": is_critical,
+                    "description": screenshot_info.get("description", "Unknown") if screenshot_info else "Unknown",
+                    "workflow": screenshot_info.get("workflow", "Unknown") if screenshot_info else "Unknown"
+                })
+                
+                if not size_difference:  # If not already reported as size difference
+                    diff_msg = f"{baseline_img.name}: Content changed (hash mismatch)"
+                    if is_critical:
+                        critical_differences.append(diff_msg)
+                    else:
+                        differences.append(diff_msg)
+            else:
+                # Record successful match
+                self.test_results.append({
+                    "file": baseline_img.name,
+                    "status": "unchanged",
+                    "baseline_hash": baseline_hash,
+                    "current_hash": current_hash,
+                    "critical": is_critical,
+                    "description": screenshot_info.get("description", "Unknown") if screenshot_info else "Unknown",
+                    "workflow": screenshot_info.get("workflow", "Unknown") if screenshot_info else "Unknown"
                 })
         
+        # Report results
+        if critical_differences:
+            print("🚨 CRITICAL visual differences detected:")
+            for diff in critical_differences:
+                print(f"  - {diff}")
+        
         if differences:
-            print("Visual differences detected:")
+            print("⚠️  Non-critical visual differences detected:")
             for diff in differences:
                 print(f"  - {diff}")
+        
+        if not critical_differences and not differences:
+            print("✅ No visual differences detected - all screenshots match!")
+            return True
+        elif critical_differences:
+            print(f"\n❌ VALIDATION FAILED: {len(critical_differences)} critical differences found")
             return False
         else:
-            print("No visual differences detected")
-            return True
+            print(f"\n⚠️  MINOR ISSUES: {len(differences)} non-critical differences found")
+            # You might want to return True here if non-critical differences are acceptable
+            return False
     
     def create_comparison_report(self):
         """Create HTML report for visual comparison"""

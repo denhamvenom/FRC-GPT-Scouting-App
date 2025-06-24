@@ -78,21 +78,22 @@
 ### After Changes
 1. **Visual Regression Testing**
    ```bash
-   # Automated comparison
-   npm run test:visual
+   # Take new screenshots with exact same names as baselines
+   # Save to safety/visual_current/ directory
    
-   # Manual verification
-   - Open original and new side-by-side
-   - Check every view/page
-   - Test all interactions
-   - Verify responsive behavior
+   # Run automated comparison against baselines
+   python safety/visual_regression_setup.py --compare safety/visual_current
+   
+   # Generate detailed report
+   python safety/visual_regression_setup.py --compare safety/visual_current --report
    ```
 
-2. **Pixel-Perfect Validation**
-   - Overlay screenshots
-   - Check for any pixel shifts
-   - Verify identical rendering
-   - Test in multiple browsers
+2. **Comprehensive Validation Process**
+   - System compares against 15 baseline screenshots covering all workflows
+   - Zero tolerance for ANY visual difference in critical screenshots
+   - Workflow-aware validation (Setup, Picklist, Alliance Selection, etc.)
+   - Hash-based comparison ensures pixel-perfect matching
+   - Any detected change fails validation and requires rollback
 
 ## Common Pitfalls to Avoid
 

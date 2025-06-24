@@ -1,0 +1,97 @@
+{
+  "capture_time": "2025-06-24T10:41:21.689375",
+  "description": "Manual screenshot capture covering all critical workflows and states",
+  "total_screenshots": 15,
+  "screenshots": {
+    "AllianceSelection_BeforeChoice.png": {
+      "size": 505528,
+      "hash": "6776ef470bbdc2a97e3e82ed3cbdb5e4",
+      "modified": "2025-06-12T10:25:44.184720",
+      "captured_manually": true
+    },
+    "AllianceSelection_ChoosePick.png": {
+      "size": 516472,
+      "hash": "64f31aedf537919a957f9075a56809e8",
+      "modified": "2025-06-12T10:26:12.163210",
+      "captured_manually": true
+    },
+    "DataValidation_MissingData.png": {
+      "size": 343145,
+      "hash": "b1fbcdb458cfb1be80774cc775aa178c",
+      "modified": "2025-06-12T10:20:46.464532",
+      "captured_manually": true
+    },
+    "DataValidation_Outliers.png": {
+      "size": 352620,
+      "hash": "07e57064bf7a4103fa28e753c771736f",
+      "modified": "2025-06-12T10:21:16.515700",
+      "captured_manually": true
+    },
+    "DataValidation_ToDoList.png": {
+      "size": 221483,
+      "hash": "1a152b25ffce7f606894879fbb3d1360",
+      "modified": "2025-06-12T10:21:51.507466",
+      "captured_manually": true
+    },
+    "FieldSelection.png": {
+      "size": 343145,
+      "hash": "b1fbcdb458cfb1be80774cc775aa178c",
+      "modified": "2025-06-12T10:19:48.552197",
+      "captured_manually": true
+    },
+    "Home.png": {
+      "size": 317903,
+      "hash": "d1782986d1fe68938e96ba4a2cf0fc4c",
+      "modified": "2025-06-12T10:13:09.962812",
+      "captured_manually": true
+    },
+    "Picklist Builder.png": {
+      "size": 449586,
+      "hash": "2dd7a247146f1179f16688faa7a27ec2",
+      "modified": "2025-06-12T10:22:32.390187",
+      "captured_manually": true
+    },
+    "Picklist Builder_DuringPicklistGeneration.png": {
+      "size": 471597,
+      "hash": "1f8e889b1cf9f686f9b981efd22b8bc4",
+      "modified": "2025-06-12T10:24:19.800628",
+      "captured_manually": true
+    },
+    "PicklistBuilder_AfterPicklistDone.png": {
+      "size": 497332,
+      "hash": "e500a817a3c64a31d724dd975b5efab8",
+      "modified": "2025-06-12T10:24:44.845703",
+      "captured_manually": true
+    },
+    "PicklistBuilder_LockedPicklist.png": {
+      "size": 504210,
+      "hash": "87b9d140119561cfc694af6006694d55",
+      "modified": "2025-06-12T10:25:10.236034",
+      "captured_manually": true
+    },
+    "Setup1.png": {
+      "size": 253152,
+      "hash": "555945a4506f1a3a2aca24d0bb88f12e",
+      "modified": "2025-06-12T10:13:34.223586",
+      "captured_manually": true
+    },
+    "Setup2.png": {
+      "size": 260569,
+      "hash": "ffd6cb1ec9653450d2d472502450d52a",
+      "modified": "2025-06-12T10:14:28.660600",
+      "captured_manually": true
+    },
+    "Setup3.png": {
+      "size": 309623,
+      "hash": "00975428c1b709a04020b9e04ace108b",
+      "modified": "2025-06-12T10:14:53.888222",
+      "captured_manually": true
+    },
+    "Setup4.png": {
+      "size": 323781,
+      "hash": "437f09e1b3ae8520d955ea044959ab44",
+      "modified": "2025-06-12T10:15:17.232796",
+      "captured_manually": true
+    }
+  }
+}

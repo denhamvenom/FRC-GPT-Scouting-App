@@ -51,32 +51,36 @@ python safety/api_contract_tests.py
 - `/api/picklist/*` - Picklist generation
 
 ### 3. Visual Regression Testing (`visual_regression_setup.py`)
-Detects any visual changes in the UI.
+Detects any visual changes in the UI using comprehensive manual baselines.
+
+**Features:**
+- 15 manual screenshots covering all critical workflows
+- Workflow-aware validation using `screenshot_registry.json`
+- Hash-based comparison for pixel-perfect matching
+- Critical vs non-critical screenshot classification
 
 **Usage:**
 ```bash
-# Capture baseline screenshots
-python safety/visual_regression_setup.py --capture
+# Compare current UI against baselines (no capture needed - using manual screenshots)
+python safety/visual_regression_setup.py --compare path/to/current/screenshots
 
-# Compare current UI against baseline
-python safety/visual_regression_setup.py --compare visual_current
+# Generate detailed comparison report
+python safety/visual_regression_setup.py --compare path/to/current/screenshots --report
 
-# Generate comparison report
-python safety/visual_regression_setup.py --compare visual_current --report
+# Update metadata if screenshots change
+python safety/update_baseline_metadata.py
 ```
 
-**Critical Pages Monitored:**
-- Home page (/)
-- Setup page (/setup)
-- Event Manager (/event-manager)
-- Schema Mapping (/schema-mapping)
-- Validation (/validation)
-- Picklist (/picklist)
-- Alliance Selection (/alliance-selection)
-- Workflow (/workflow)
+**Comprehensive Coverage:**
+- **Navigation**: Home page
+- **Setup Workflow**: 4-step configuration process
+- **Schema Configuration**: Field selection interface
+- **Data Validation**: 3 validation states (todo, missing data, outliers)
+- **Picklist Generation**: 4 states (initial, generating, completed, locked)
+- **Alliance Selection**: 2 selection states
 
 **Zero Tolerance Policy:**
-ANY visual change detected will fail validation and require rollback.
+ANY visual change in ANY critical screenshot fails validation and requires rollback.
 
 ### 4. Emergency Rollback (`emergency_rollback.sh`)
 WSL-compatible script for immediate system restoration.
