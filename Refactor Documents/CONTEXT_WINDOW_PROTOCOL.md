@@ -277,6 +277,19 @@ git checkout refactor/sprint-N && git diff baseline path/to/file.py
 **Risks**: Circular import between model and service
 **Validation**: All API tests pass, performance unchanged
 **Future Intent**: Next session should extract comparison logic using this model
+
+## Decision: Sprint 8 Service Decomposition Approach
+**Context**: picklist_generator_service.py is 3,113 lines, largest service in codebase
+**Alternatives**:
+1. Gradual extraction over multiple sessions
+2. Complete decomposition in single session
+3. Partial refactoring with most critical areas first
+**Choice**: Complete decomposition with context window management
+**Rationale**: Service is too complex for partial refactoring, need clean boundaries
+**Baseline Impact**: Zero - must preserve exact API contracts and performance
+**Risks**: Context window limits, complex service interactions
+**Validation**: All picklist generation workflows identical to baseline
+**Future Intent**: If context window reached, continue with documented service boundaries
 ```
 
 ## Emergency Context Recovery

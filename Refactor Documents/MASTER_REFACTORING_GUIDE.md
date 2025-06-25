@@ -223,8 +223,22 @@ STOP Refactoring IF:
 
 **ONLY PROCEED IF CANARY 100% SUCCESSFUL**
 
-#### Sprint 6-8: Gradual Service Expansion
-Apply proven patterns from canary to 2-3 additional services/components.
+#### Sprint 6: Backend Service Refactoring - Sheets Service
+**Duration**: 2 days  
+**Target**: `backend/app/services/sheets_service.py` (654 lines)
+**Risk Level**: Medium
+
+#### Sprint 7: Frontend Component Refactoring - Picklist Generator  
+**Duration**: 3 days  
+**Target**: `frontend/src/components/PicklistGenerator.tsx` (1,440 lines)
+**Risk Level**: Medium-High
+
+#### Sprint 8: Critical Backend Refactoring - Picklist Generator Service
+**Duration**: 3 days  
+**Target**: `backend/app/services/picklist_generator_service.py` (3,113 lines)
+**Risk Level**: High - Largest monolithic service in codebase
+
+Apply proven patterns from canary to these high-value targets.
 
 ## User Execution Guide
 

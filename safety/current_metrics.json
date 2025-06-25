@@ -1,0 +1,129 @@
+{
+  "capture_time": "2025-06-24T10:58:58.039243",
+  "system_info": {
+    "python_version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]",
+    "capture_timestamp": "2025-06-24T10:58:57.942658",
+    "git_commit": "1ed0e77c12bc4e3bb39e3c5f08f8a86c1c31738f",
+    "branch": "refactor/sprint-1"
+  },
+  "api_endpoints": {
+    "/api/health": {
+      "status_code": 200,
+      "response_time": 0.006680488586425781,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "15",
+        "content-type": "application/json"
+      },
+      "response_size": 15,
+      "sample_response": {
+        "status": "ok"
+      }
+    },
+    "/api/sheets/headers": {
+      "status_code": 422,
+      "response_time": 0.0018169879913330078,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "89",
+        "content-type": "application/json"
+      },
+      "response_size": 89
+    },
+    "/api/schema": {
+      "status_code": 404,
+      "response_time": 0.0010035037994384766,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "22",
+        "content-type": "application/json"
+      },
+      "response_size": 22,
+      "sample_response": {
+        "detail": "Not Found"
+      }
+    },
+    "/api/schema/selections": {
+      "status_code": 404,
+      "response_time": 0.0015227794647216797,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "22",
+        "content-type": "application/json"
+      },
+      "response_size": 22
+    },
+    "/api/picklist/teams": {
+      "status_code": 404,
+      "response_time": 0.0013370513916015625,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "22",
+        "content-type": "application/json"
+      },
+      "response_size": 22
+    },
+    "/api/team-comparison/compare": {
+      "status_code": 404,
+      "response_time": 0.0010249614715576172,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "22",
+        "content-type": "application/json"
+      },
+      "response_size": 22
+    },
+    "/api/unified-dataset/events": {
+      "status_code": 404,
+      "response_time": 0.0009474754333496094,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "22",
+        "content-type": "application/json"
+      },
+      "response_size": 22
+    },
+    "/api/progress/status": {
+      "status_code": 404,
+      "response_time": 0.00102996826171875,
+      "headers": {
+        "date": "Tue, 24 Jun 2025 15:58:57 GMT",
+        "server": "uvicorn",
+        "content-length": "39",
+        "content-type": "application/json"
+      },
+      "response_size": 39
+    }
+  },
+  "performance_metrics": {
+    "health_check": {
+      "min": 0.0014774799346923828,
+      "max": 0.001730203628540039,
+      "avg": 0.0016179561614990234,
+      "iterations": 10
+    }
+  },
+  "database_state": {
+    "exists": false
+  },
+  "frontend_build": {
+    "dependencies": {
+      "react": "^18.2.0",
+      "react-beautiful-dnd": "^13.1.1",
+      "react-dom": "^18.2.0",
+      "react-router-dom": "^7.5.2"
+    },
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build",
+      "preview": "vite preview"
+    }
+  }
+}

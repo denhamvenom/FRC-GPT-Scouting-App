@@ -1,5 +1,5 @@
 {
-  "timestamp": 1749741193.6351209,
+  "timestamp": 1750807081.0906394,
   "data": [
     {
       "city": "\u0130stanbul",
@@ -3604,19 +3604,6 @@
       "year": 2025
     },
     {
-      "city": "Kocaeli",
-      "country": "T\u00fcrkiye",
-      "district": null,
-      "end_date": "2025-06-22",
-      "event_code": "trdar",
-      "event_type": 99,
-      "key": "2025trdar",
-      "name": "Dar\u0131ca Robocube Off-Season",
-      "start_date": "2025-06-20",
-      "state_prov": "Kocaeli",
-      "year": 2025
-    },
-    {
       "city": "Carneys Point Township",
       "country": "USA",
       "district": null,
@@ -3650,7 +3637,7 @@
       "event_code": "miro",
       "event_type": 99,
       "key": "2025miro",
-      "name": "That ONE Offseason",
+      "name": "That ONE Off-Season",
       "start_date": "2025-06-20",
       "state_prov": "MI",
       "year": 2025
@@ -3666,6 +3653,19 @@
       "name": "Arizona Robotics League Qualifier 2",
       "start_date": "2025-06-27",
       "state_prov": "AZ",
+      "year": 2025
+    },
+    {
+      "city": "Kocaeli",
+      "country": "T\u00fcrkiye",
+      "district": null,
+      "end_date": "2025-06-29",
+      "event_code": "trdar",
+      "event_type": 99,
+      "key": "2025trdar",
+      "name": "Dar\u0131ca Robocube Off-Season",
+      "start_date": "2025-06-27",
+      "state_prov": "Kocaeli",
       "year": 2025
     },
     {
@@ -3809,6 +3809,19 @@
       "name": "Arizona Robotics League Qualifier 4",
       "start_date": "2025-08-22",
       "state_prov": "AZ",
+      "year": 2025
+    },
+    {
+      "city": "Bentley",
+      "country": "Australia",
+      "district": null,
+      "end_date": "2025-08-24",
+      "event_code": "auwarp",
+      "event_type": 99,
+      "key": "2025auwarp",
+      "name": "West Australian Robotics Playoffs",
+      "start_date": "2025-08-22",
+      "state_prov": "WA",
       "year": 2025
     },
     {
@@ -4056,6 +4069,19 @@
       "name": "RiverRage 28",
       "start_date": "2025-10-25",
       "state_prov": "NH",
+      "year": 2025
+    },
+    {
+      "city": "Tremont",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-25",
+      "event_code": "iltrr",
+      "event_type": 99,
+      "key": "2025iltrr",
+      "name": "Roboteer Rumble",
+      "start_date": "2025-10-25",
+      "state_prov": "IL",
       "year": 2025
     },
     {

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-06-24T11:11:07.836096",
+  "database": {},
+  "files": {
+    "backend/app/config/statbotics_field_map_DEFAULT.json": {
+      "exists": true,
+      "hash": "1874b21ec7249a503fe03885bbfbfde1",
+      "size": 298
+    },
+    "frontend/package.json": {
+      "exists": true,
+      "hash": "c3989d68005d45eb5286bc6b12531b92",
+      "size": 694
+    },
+    "backend/requirements.txt": {
+      "exists": true,
+      "hash": "a29efcd2e3932490eb2a0cdb3761820a",
+      "size": 274
+    }
+  }
+}
