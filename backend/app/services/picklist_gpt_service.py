@@ -26,7 +26,15 @@ class PicklistGPTService:
     def __init__(self):
         """Initialize the picklist GPT service with original configuration."""
         self.client = AsyncOpenAI(api_key=OPENAI_API_KEY)
-        self.token_encoder = tiktoken.encoding_for_model(GPT_MODEL)
+        
+        # Handle tiktoken encoding with fallback for unsupported models like gpt-4.1
+        try:
+            self.token_encoder = tiktoken.encoding_for_model(GPT_MODEL)
+        except KeyError:
+            # Use fallback encoding for GPT-4+ models when tiktoken doesn't recognize the model
+            self.token_encoder = tiktoken.get_encoding("cl100k_base")
+            logger.info(f"Using fallback encoding 'cl100k_base' for model {GPT_MODEL}")
+        
         self.max_tokens_limit = 100000
         self.game_context = None  # Can be set by external services
 
