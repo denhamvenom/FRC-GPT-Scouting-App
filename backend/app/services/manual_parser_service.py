@@ -8,16 +8,14 @@ from typing import Any, Dict, List, Optional
 import fitz  # PyMuPDF
 import httpx
 from app.services.global_cache import cache
-from dotenv import load_dotenv
 from fastapi import UploadFile
 from openai import AsyncOpenAI
+from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
 
-load_dotenv()
-
-GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+GPT_MODEL = OPENAI_MODEL
 
 # Initialize OpenAI client
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
 async def extract_text_from_pdf(file_content: bytes) -> str:

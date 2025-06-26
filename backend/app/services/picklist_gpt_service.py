@@ -3,21 +3,19 @@
 import asyncio
 import json
 import logging
-import os
-import threading
-import time
 import re
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
-import tiktoken
-from dotenv import load_dotenv
-from openai import OpenAI
+from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
 
-load_dotenv()
+import tiktoken
+from openai import AsyncOpenAI
 
 logger = logging.getLogger("picklist_gpt_service")
 
-GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4-turbo")
+GPT_MODEL = OPENAI_MODEL
+
 
 class PicklistGPTService:
     """
@@ -27,23 +25,23 @@ class PicklistGPTService:
 
     def __init__(self):
         """Initialize the picklist GPT service with original configuration."""
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.token_encoder = tiktoken.encoding_for_model("gpt-4-turbo")
+        self.client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+        self.token_encoder = tiktoken.encoding_for_model(GPT_MODEL)
         self.max_tokens_limit = 100000
         self.game_context = None  # Can be set by external services
-        
+
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Prepare team data in a format optimized for GPT analysis.
-        
+
         Args:
             teams_data: Dictionary of team data from the unified dataset
-            
+
         Returns:
             List of team data formatted for GPT prompts
         """
         formatted_teams = []
-        
+
         for team_number, team_data in teams_data.items():
             if isinstance(team_data, dict) and "team_number" in team_data:
                 # Extract relevant metrics and format for GPT
@@ -51,50 +49,60 @@ class PicklistGPTService:
                     "team_number": team_data["team_number"],
                     "nickname": team_data.get("nickname", f"Team {team_data['team_number']}"),
                 }
-                
+
                 # Add performance metrics if available
                 if "metrics" in team_data and isinstance(team_data["metrics"], dict):
                     formatted_team["metrics"] = team_data["metrics"]
-                
+
                 # Add any additional relevant data
                 for key in ["autonomous", "teleop", "endgame", "defense", "reliability"]:
                     if key in team_data:
                         formatted_team[key] = team_data[key]
-                
+
                 formatted_teams.append(formatted_team)
-        
+
         return formatted_teams
-    
-    def check_token_count(self, system_prompt: str, user_prompt: str, max_tokens: int = None) -> None:
+
+    def check_token_count(
+        self, system_prompt: str, user_prompt: str, max_tokens: int = None
+    ) -> None:
         """ORIGINAL TOKEN VALIDATION - EXACT RESTORATION"""
         if max_tokens is None:
             max_tokens = self.max_tokens_limit
-            
+
         try:
             system_tokens = len(self.token_encoder.encode(system_prompt))
             user_tokens = len(self.token_encoder.encode(user_prompt))
             total_tokens = system_tokens + user_tokens
-            
-            logger.info(f"Token count: system={system_tokens}, user={user_tokens}, total={total_tokens}")
-            
+
+            logger.info(
+                f"Token count: system={system_tokens}, user={user_tokens}, total={total_tokens}"
+            )
+
             if total_tokens > max_tokens:
                 raise ValueError(
                     f"Prompt too large: {total_tokens} tokens exceeds limit of {max_tokens}. Consider batching teams or trimming fields."
                 )
         except Exception as e:
             logger.warning(f"Token counting failed: {str(e)}, proceeding without check")
-    
-    def create_system_prompt(self, pick_position: str, team_count: int, game_context: Optional[str] = None, use_ultra_compact: bool = True) -> str:
+
+    def create_system_prompt(
+        self,
+        pick_position: str,
+        team_count: int,
+        game_context: Optional[str] = None,
+        use_ultra_compact: bool = True,
+    ) -> str:
         """ORIGINAL SYSTEM PROMPT - EXACT RESTORATION"""
-        
+
         position_context = {
             "first": "First pick teams should be overall powerhouse teams that excel in multiple areas.",
             "second": "Second pick teams should complement the first pick and address specific needs.",
             "third": "Third pick teams are more specialized, often focusing on a single critical function.",
         }
-        
+
         context_note = position_context.get(pick_position, "")
-        
+
         if use_ultra_compact:
             # ORIGINAL ULTRA-COMPACT FORMAT - CRITICAL FOR TOKEN OPTIMIZATION
             prompt = f"""You are GPT-4 Turbo, an FRC alliance strategist.
@@ -110,18 +118,18 @@ CRITICAL RULES
 • If you cannot complete all teams due to length limits, respond only {{"s":"overflow"}}.
 
 {context_note}"""
-            
+
             if game_context:
                 prompt += f"\n\nGame Context:\n{game_context}\n"
-                
+
             prompt += f"""
 EXAMPLE: {{"p":[[1,8.5,"Strong auto: 2.8 avg"],[2,7.9,"Consistent defense"],[3,6.2,"Reliable endgame"]],"s":"ok"}}"""
-            
+
             return prompt
         else:
             # Fallback to standard format for smaller requests
             return self._create_standard_format_prompt(pick_position, team_count, game_context)
-    
+
     def create_user_prompt(
         self,
         your_team_number: int,
@@ -132,20 +140,20 @@ EXAMPLE: {{"p":[[1,8.5,"Strong auto: 2.8 avg"],[2,7.9,"Consistent defense"],[3,6
         force_index_mapping: bool = True,
     ) -> Tuple[str, Optional[Dict[int, int]]]:
         """ORIGINAL USER PROMPT WITH FORCED INDEX MAPPING - EXACT RESTORATION"""
-        
+
         # CRITICAL: Always create index mapping for consistency
         team_index_map = None
         if force_index_mapping:
             team_index_map = {}
             for index, team in enumerate(teams_data, start=1):
                 team_index_map[index] = team["team_number"]
-        
+
         # Find your team's data
         your_team_info = next(
             (team for team in teams_data if team["team_number"] == your_team_number),
             None,
         )
-        
+
         # EXACT RESTORATION OF ORIGINAL WARNING SYSTEM
         team_index_info = ""
         if team_index_map:
@@ -165,31 +173,36 @@ AVAILABLE_TEAMS = {json.dumps(self._prepare_teams_with_scores(teams_data, priori
 
 Please produce output following RULES.
 """
-        
+
         return prompt, team_index_map
-    
-    def _prepare_teams_with_scores(self, teams_data: List[Dict[str, Any]], priorities: List[Dict[str, Any]], team_index_map: Optional[Dict[int, int]] = None) -> List[Dict[str, Any]]:
+
+    def _prepare_teams_with_scores(
+        self,
+        teams_data: List[Dict[str, Any]],
+        priorities: List[Dict[str, Any]],
+        team_index_map: Optional[Dict[int, int]] = None,
+    ) -> List[Dict[str, Any]]:
         """ORIGINAL TEAM PREPARATION WITH WEIGHTED SCORES"""
-        
+
         teams_with_scores = []
-        
+
         if team_index_map:
             # Create reverse map for quick lookup
             team_to_index = {v: k for k, v in team_index_map.items()}
-            
+
             for team in teams_data:
                 weighted_score = self._calculate_weighted_score(team, priorities)
                 team_with_score = {
                     "index": team_to_index.get(team["team_number"], 0),
                     "team_number": team["team_number"],
                     "nickname": team.get("nickname", f"Team {team['team_number']}"),
-                    "weighted_score": weighted_score
+                    "weighted_score": weighted_score,
                 }
-                
+
                 # Add condensed metrics
                 if "metrics" in team and isinstance(team["metrics"], dict):
                     team_with_score["metrics"] = team["metrics"]
-                    
+
                 teams_with_scores.append(team_with_score)
         else:
             # Standard format without indices
@@ -198,46 +211,48 @@ Please produce output following RULES.
                 team_with_score = {
                     "team_number": team["team_number"],
                     "nickname": team.get("nickname", f"Team {team['team_number']}"),
-                    "weighted_score": weighted_score
+                    "weighted_score": weighted_score,
                 }
-                
+
                 if "metrics" in team and isinstance(team["metrics"], dict):
                     team_with_score["metrics"] = team["metrics"]
-                    
+
                 teams_with_scores.append(team_with_score)
-        
+
         return teams_with_scores
-    
-    def _calculate_weighted_score(self, team_data: Dict[str, Any], priorities: List[Dict[str, Any]]) -> float:
+
+    def _calculate_weighted_score(
+        self, team_data: Dict[str, Any], priorities: List[Dict[str, Any]]
+    ) -> float:
         """ORIGINAL WEIGHTED SCORING CALCULATION"""
-        
+
         if not priorities:
             return 0.0
-        
+
         total_score = 0.0
         total_weight = 0.0
-        
+
         for priority in priorities:
             field_name = priority.get("id", "")
             weight = priority.get("weight", 1.0)
-            
+
             # Extract field value using original logic
             field_value = self._extract_field_value(team_data, field_name)
-            
+
             if field_value is not None:
                 total_score += field_value * weight
                 total_weight += weight
-        
+
         return round(total_score / total_weight if total_weight > 0 else 0.0, 2)
-    
+
     def _extract_field_value(self, team_data: Dict[str, Any], field_name: str) -> Optional[float]:
         """ORIGINAL FIELD EXTRACTION LOGIC"""
-        
+
         # Try metrics first
         if "metrics" in team_data and isinstance(team_data["metrics"], dict):
             if field_name in team_data["metrics"]:
                 return float(team_data["metrics"][field_name])
-        
+
         # Try statbotics fields
         if "statbotics" in team_data and isinstance(team_data["statbotics"], dict):
             if field_name in team_data["statbotics"]:
@@ -246,16 +261,16 @@ Please produce output following RULES.
             statbotics_field = f"statbotics_{field_name}"
             if statbotics_field in team_data:
                 return float(team_data[statbotics_field])
-        
+
         # Try direct field access
         if field_name in team_data:
             try:
                 return float(team_data[field_name])
             except (ValueError, TypeError):
                 pass
-        
+
         return None
-    
+
     def create_missing_teams_system_prompt(self, pick_position: str, team_count: int) -> str:
         """Create system prompt for ranking missing teams."""
         return f"""You are an expert FRC scout analyzing teams NOT yet on the picklist.
@@ -272,7 +287,7 @@ Response format (JSON only):
 {{"p": [[team_number, score, "reasoning"], ...], "s": "ok"}}
 
 CRITICAL: Return only valid JSON."""
-    
+
     def create_missing_teams_user_prompt(
         self,
         missing_team_numbers: List[int],
@@ -284,39 +299,39 @@ CRITICAL: Return only valid JSON."""
         team_index_map: Optional[Dict[int, int]] = None,
     ) -> str:
         """Create user prompt for missing teams analysis."""
-        
+
         prompt = f"Team {your_team_number} - Adding teams to {pick_position} pick picklist.\n\n"
-        
+
         # Current picklist context
         prompt += "CURRENT PICKLIST (already ranked):\n"
         for i, team in enumerate(ranked_teams[:10], 1):  # Show top 10
             prompt += f"{i}. Team {team.get('team_number', 0)}: {team.get('nickname', 'Unknown')}\n"
         prompt += "\n"
-        
+
         # Priorities
         if priorities:
             prompt += "PRIORITIES:\n"
             for priority in priorities:
                 prompt += f"- {priority.get('name', 'Unknown')} (weight: {priority.get('weight', 0.0):.2f})\n"
             prompt += "\n"
-        
+
         # Missing teams to analyze
         prompt += "TEAMS TO RANK (not yet on picklist):\n"
         missing_teams_data = [t for t in teams_data if t.get("team_number") in missing_team_numbers]
-        
+
         for team in missing_teams_data:
             team_num = team.get("team_number", 0)
             prompt += f"Team {team_num}: {team.get('nickname', f'Team {team_num}')}\n"
-            
+
             if "metrics" in team and isinstance(team["metrics"], dict):
                 for metric, value in team["metrics"].items():
                     prompt += f"  {metric}: {value}\n"
             prompt += "\n"
-        
+
         prompt += "Rank these missing teams considering existing picklist and priorities."
-        
+
         return prompt
-    
+
     def create_user_prompt_with_reference_teams(
         self,
         your_team_number: int,
@@ -328,7 +343,7 @@ CRITICAL: Return only valid JSON."""
     ) -> str:
         """
         Create user prompt with reference teams for context.
-        
+
         Args:
             your_team_number: Analyzing team number
             pick_position: Pick position context
@@ -336,12 +351,14 @@ CRITICAL: Return only valid JSON."""
             teams_data: Teams to analyze
             reference_teams: High-performing reference teams
             team_index_map: Optional index mapping
-            
+
         Returns:
             User prompt with reference team context
         """
-        prompt = f"Team {your_team_number} - {pick_position} pick analysis with reference context.\n\n"
-        
+        prompt = (
+            f"Team {your_team_number} - {pick_position} pick analysis with reference context.\n\n"
+        )
+
         # Reference teams section
         prompt += "HIGH-PERFORMING REFERENCE TEAMS:\n"
         for team in reference_teams[:5]:  # Show top 5 reference teams
@@ -350,31 +367,31 @@ CRITICAL: Return only valid JSON."""
                 for metric, value in team["metrics"].items():
                     prompt += f"  {metric}: {value}\n"
             prompt += "\n"
-        
+
         # Priorities
         if priorities:
             prompt += "PRIORITIES:\n"
             for priority in priorities:
                 prompt += f"- {priority.get('name', 'Unknown')} (weight: {priority.get('weight', 0.0):.2f})\n"
             prompt += "\n"
-        
+
         # Teams to analyze
         prompt += "TEAMS TO ANALYZE:\n"
         for i, team in enumerate(teams_data):
             team_num = team.get("team_number", 0)
             display_ref = team_index_map.get(i, team_num) if team_index_map else team_num
-            
+
             prompt += f"Team {display_ref}: {team.get('nickname', f'Team {team_num}')}\n"
-            
+
             if "metrics" in team and isinstance(team["metrics"], dict):
                 for metric, value in team["metrics"].items():
                     prompt += f"  {metric}: {value}\n"
             prompt += "\n"
-        
+
         prompt += "Rank teams comparing against reference teams and considering priorities."
-        
+
         return prompt
-    
+
     def parse_response_with_index_mapping(
         self,
         response_data: Dict[str, Any],
@@ -383,40 +400,40 @@ CRITICAL: Return only valid JSON."""
     ) -> List[Dict[str, Any]]:
         """
         Parse GPT response and convert indices to team numbers if needed.
-        
+
         Args:
             response_data: Parsed JSON response from GPT
             teams_data: Team data for nickname lookups
             team_index_map: Optional mapping from indices to team numbers
-            
+
         Returns:
             List of teams with scores and reasoning
         """
         picklist = []
         seen_teams = set()
-        
+
         # Handle ultra-compact format {"p":[[team,score,"reason"]...],"s":"ok"}
         if "p" in response_data and isinstance(response_data["p"], list):
             for team_entry in response_data["p"]:
                 if len(team_entry) >= 3:
                     first_value = int(team_entry[0])
-                    
+
                     # Convert index to team number if mapping provided
                     if team_index_map and first_value in team_index_map:
                         team_number = team_index_map[first_value]
                         logger.debug(f"Mapped index {first_value} to team {team_number}")
                     else:
                         team_number = first_value
-                    
+
                     # Skip duplicates
                     if team_number in seen_teams:
                         logger.info(f"Skipping duplicate team {team_number}")
                         continue
-                    
+
                     seen_teams.add(team_number)
                     score = float(team_entry[1])
                     reason = team_entry[2]
-                    
+
                     # Get team nickname
                     team_data = next(
                         (t for t in teams_data if t.get("team_number") == team_number), None
@@ -426,16 +443,18 @@ CRITICAL: Return only valid JSON."""
                         if team_data
                         else f"Team {team_number}"
                     )
-                    
-                    picklist.append({
-                        "team_number": team_number,
-                        "nickname": nickname,
-                        "score": score,
-                        "reasoning": reason,
-                    })
-        
+
+                    picklist.append(
+                        {
+                            "team_number": team_number,
+                            "nickname": nickname,
+                            "score": score,
+                            "reasoning": reason,
+                        }
+                    )
+
         return picklist
-    
+
     async def analyze_teams(
         self,
         system_prompt: str,
@@ -446,14 +465,14 @@ CRITICAL: Return only valid JSON."""
     ) -> Dict[str, Any]:
         """
         Execute GPT analysis with retry logic.
-        
+
         Args:
             system_prompt: System prompt for GPT
             user_prompt: User prompt with team data
             teams_data: Team data for response parsing
             team_index_map: Optional index mapping
             max_retries: Maximum retry attempts
-            
+
         Returns:
             Analysis results with picklist and metadata
         """
@@ -461,21 +480,17 @@ CRITICAL: Return only valid JSON."""
         try:
             self.check_token_count(system_prompt, user_prompt)
         except ValueError as e:
-            return {
-                "status": "error",
-                "error": str(e),
-                "error_type": "token_limit_exceeded"
-            }
-        
+            return {"status": "error", "error": str(e), "error_type": "token_limit_exceeded"}
+
         # Use the proper exponential backoff retry method
         result = await self._execute_api_call_with_retry(system_prompt, user_prompt, max_retries)
-        
+
         if result["status"] == "success":
             # Parse response
             picklist = self.parse_response_with_index_mapping(
                 result["response_data"], teams_data, team_index_map
             )
-            
+
             return {
                 "status": "success",
                 "picklist": picklist,
@@ -485,24 +500,30 @@ CRITICAL: Return only valid JSON."""
             }
         else:
             return result
-    
-    async def _execute_api_call_with_retry(self, system_prompt: str, user_prompt: str, max_retries: int = 3) -> Dict[str, Any]:
+
+    async def _execute_api_call_with_retry(
+        self, system_prompt: str, user_prompt: str, max_retries: int = 3
+    ) -> Dict[str, Any]:
         """ORIGINAL EXPONENTIAL BACKOFF RETRY LOGIC - EXACT RESTORATION"""
         initial_delay = 1.0
         retry_count = 0
-        
+
         while retry_count < max_retries:
             try:
                 # Execute API call
                 result = await self._execute_api_call(system_prompt, user_prompt)
-                
+
                 # Check for rate limiting specifically
-                if result.get("error_type") == "rate_limit" or "429" in str(result.get("error", "")):
+                if result.get("error_type") == "rate_limit" or "429" in str(
+                    result.get("error", "")
+                ):
                     retry_count += 1
                     if retry_count < max_retries:
                         # ORIGINAL EXPONENTIAL BACKOFF: 2s, 4s, 8s
-                        delay = initial_delay * (2 ** retry_count)
-                        logger.warning(f"Rate limit hit, retrying in {delay}s (attempt {retry_count}/{max_retries})")
+                        delay = initial_delay * (2**retry_count)
+                        logger.warning(
+                            f"Rate limit hit, retrying in {delay}s (attempt {retry_count}/{max_retries})"
+                        )
                         await asyncio.sleep(delay)
                         continue
                     else:
@@ -511,19 +532,19 @@ CRITICAL: Return only valid JSON."""
                             "status": "error",
                             "error": f"Rate limit exceeded after {max_retries} attempts",
                             "error_type": "rate_limit_exhausted",
-                            "attempts": retry_count
+                            "attempts": retry_count,
                         }
                 else:
                     # Success or non-rate-limit error
                     result["attempt"] = retry_count + 1
                     return result
-                    
+
             except Exception as e:
                 retry_count += 1
                 logger.error(f"API call attempt {retry_count} failed: {str(e)}")
-                
+
                 if retry_count < max_retries:
-                    delay = initial_delay * (2 ** retry_count)
+                    delay = initial_delay * (2**retry_count)
                     logger.info(f"Retrying in {delay}s...")
                     await asyncio.sleep(delay)
                 else:
@@ -531,111 +552,77 @@ CRITICAL: Return only valid JSON."""
                         "status": "error",
                         "error": f"API call failed after {max_retries} attempts: {str(e)}",
                         "error_type": "api_failure",
-                        "attempts": retry_count
+                        "attempts": retry_count,
                     }
-        
+
         return {
             "status": "error",
             "error": "Unexpected retry loop exit",
             "error_type": "unknown",
-            "attempts": retry_count
+            "attempts": retry_count,
         }
-    
+
     async def _execute_api_call(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
-        """
-        Execute OpenAI API call with threading and timeout.
-        
-        Args:
-            system_prompt: System prompt
-            user_prompt: User prompt
-            
-        Returns:
-            API call result with status and data
-        """
+        """Execute a single OpenAI chat completion call."""
         start_time = time.time()
-        result = {"status": "error", "error": "Unknown error"}
-        
-        def make_api_call():
-            nonlocal result
+
+        try:
+            response = await self.client.chat.completions.create(
+                model=GPT_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.2,
+                max_tokens=4000,
+                response_format={"type": "json_object"},
+            )
+
+            content = response.choices[0].message.content
+            finish_reason = response.choices[0].finish_reason
+
+            if finish_reason == "length":
+                return {
+                    "status": "error",
+                    "error": "Response truncated due to length",
+                    "error_type": "response_truncated",
+                }
+
             try:
-                response = self.client.chat.completions.create(
-                    model=GPT_MODEL,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    temperature=0.2,
-                    max_tokens=4000,
-                    response_format={"type": "json_object"}
-                )
-                
-                content = response.choices[0].message.content
-                finish_reason = response.choices[0].finish_reason
-                
-                if finish_reason == "length":
-                    result = {
-                        "status": "error",
-                        "error": "Response truncated due to length",
-                        "error_type": "response_truncated"
-                    }
-                    return
-                
-                # Parse JSON response
-                try:
-                    response_data = json.loads(content)
-                    
-                    # Check for overflow status
-                    if response_data.get("s") == "overflow" or response_data.get("status") == "overflow":
-                        result = {
-                            "status": "error",
-                            "error": "GPT indicated data overflow",
-                            "error_type": "data_overflow"
-                        }
-                        return
-                    
-                    result = {
-                        "status": "success",
-                        "response_data": response_data,
-                        "processing_time": time.time() - start_time,
-                        "finish_reason": finish_reason,
-                    }
-                    
-                except json.JSONDecodeError as e:
-                    result = {
-                        "status": "error",
-                        "error": f"Invalid JSON response: {e}",
-                        "error_type": "json_parse_error",
-                        "raw_content": content
-                    }
-                    
-            except Exception as e:
-                error_str = str(e)
-                if "429" in error_str:
-                    result = {
-                        "status": "error",
-                        "error": f"Rate limit exceeded: {e}",
-                        "error_type": "rate_limit"
-                    }
-                else:
-                    result = {
-                        "status": "error",
-                        "error": f"API call failed: {e}",
-                        "error_type": "api_error"
-                    }
-        
-        # Execute in thread with timeout
-        thread = threading.Thread(target=make_api_call)
-        thread.start()
-        
-        # Wait for completion with timeout (30 seconds)
-        thread.join(timeout=30.0)
-        
-        if thread.is_alive():
-            # Timeout occurred
-            result = {
-                "status": "error",
-                "error": "API call timeout (30 seconds)",
-                "error_type": "timeout"
+                response_data = json.loads(content)
+            except json.JSONDecodeError as e:
+                return {
+                    "status": "error",
+                    "error": f"Invalid JSON response: {e}",
+                    "error_type": "json_parse_error",
+                    "raw_content": content,
+                }
+
+            if response_data.get("s") == "overflow" or response_data.get("status") == "overflow":
+                return {
+                    "status": "error",
+                    "error": "GPT indicated data overflow",
+                    "error_type": "data_overflow",
+                }
+
+            return {
+                "status": "success",
+                "response_data": response_data,
+                "processing_time": time.time() - start_time,
+                "finish_reason": finish_reason,
             }
-        
-        return result
+
+        except Exception as e:
+            error_str = str(e)
+            if "429" in error_str:
+                return {
+                    "status": "error",
+                    "error": f"Rate limit exceeded: {e}",
+                    "error_type": "rate_limit",
+                }
+
+            return {
+                "status": "error",
+                "error": f"API call failed: {e}",
+                "error_type": "api_error",
+            }

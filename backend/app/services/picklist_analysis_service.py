@@ -7,20 +7,18 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-from dotenv import load_dotenv
+from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
 from openai import OpenAI
 
-# Load environment variables
-load_dotenv()
-
-GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+# Use centralized OpenAI configuration
+GPT_MODEL = OPENAI_MODEL
 
 # Base directory setup for file operations
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 # Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 class PicklistAnalysisService:

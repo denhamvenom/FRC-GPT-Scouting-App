@@ -3,13 +3,10 @@
 import os
 from typing import Any, Dict, List, Tuple
 
-from dotenv import load_dotenv
 from openai import AsyncOpenAI
+from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
 
-load_dotenv()
-
-GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GPT_MODEL = OPENAI_MODEL
 client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 SUPER_TAGS = [
