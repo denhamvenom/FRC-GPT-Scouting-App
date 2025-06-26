@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List
 
-from openai import OpenAI
+from openai import AsyncOpenAI
 from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
 
 
@@ -13,7 +13,7 @@ class GPTAnalysisService:
     """Handles OpenAI GPT integration for team analysis."""
 
     def __init__(self):
-        self.client = OpenAI(api_key=OPENAI_API_KEY)
+        self.client = AsyncOpenAI(api_key=OPENAI_API_KEY)
         self.model = OPENAI_MODEL
 
     async def get_initial_analysis(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
@@ -25,7 +25,7 @@ class GPTAnalysisService:
         Returns:
             Parsed JSON response from GPT
         """
-        response = self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=0.2,
@@ -43,7 +43,7 @@ class GPTAnalysisService:
         Returns:
             GPT response text
         """
-        response = self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=0.2,

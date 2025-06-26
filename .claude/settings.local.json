@@ -32,7 +32,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npx tsc:*)",
       "Bash(cp:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(jq:*)"
     ],
     "deny": []
   },

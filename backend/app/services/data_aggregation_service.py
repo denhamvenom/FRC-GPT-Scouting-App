@@ -5,6 +5,9 @@ import logging
 import os
 from typing import Any, Dict, List, Optional
 
+from app.services.game_context_extractor_service import GameContextExtractorService
+from app.config.extraction_config import get_extraction_config
+
 logger = logging.getLogger("data_aggregation_service")
 
 
@@ -14,18 +17,37 @@ class DataAggregationService:
     Extracted from monolithic PicklistGeneratorService to improve maintainability.
     """
 
-    def __init__(self, unified_dataset_path: str):
+    def __init__(self, unified_dataset_path: str, use_extracted_context: bool = True):
         """
         Initialize the data aggregation service.
         
         Args:
             unified_dataset_path: Path to the unified dataset JSON file
+            use_extracted_context: Whether to use extracted context (True) or full manual (False)
         """
         self.dataset_path = unified_dataset_path
         self.dataset = self._load_dataset()
         self.teams_data = self.dataset.get("teams", {})
         self.year = self.dataset.get("year", 2025)
         self.event_key = self.dataset.get("event_key", f"{self.year}arc")
+        self.use_extracted_context = use_extracted_context
+        
+        # Initialize extraction service if using extracted context
+        if self.use_extracted_context:
+            try:
+                cache_dir = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "cache", "game_context"
+                )
+                self.extractor_service = GameContextExtractorService(cache_dir=cache_dir)
+                logger.info("Initialized game context extractor service")
+            except Exception as e:
+                logger.warning(f"Failed to initialize extractor service: {e}")
+                logger.warning("Falling back to full manual context")
+                self.use_extracted_context = False
+                self.extractor_service = None
+        else:
+            self.extractor_service = None
 
     def _load_dataset(self) -> Dict[str, Any]:
         """
@@ -51,10 +73,36 @@ class DataAggregationService:
 
     def load_game_context(self) -> Optional[str]:
         """
-        Load the game manual text for context.
+        Load the game context for picklist generation.
+        
+        If extraction is enabled, returns optimized extracted context.
+        Otherwise, returns the full manual text.
         
         Returns:
             Game context text or None if not available
+        """
+        try:
+            manual_data = self._load_manual_data()
+            if not manual_data:
+                return None
+                
+            # Use extracted context if available and enabled
+            if self.use_extracted_context and self.extractor_service:
+                return self._get_extracted_context(manual_data)
+            else:
+                # Fall back to full manual context
+                return self._get_full_manual_context(manual_data)
+                
+        except Exception as e:
+            logger.error(f"Error loading game context: {e}")
+            return None
+
+    def _load_manual_data(self) -> Optional[Dict[str, Any]]:
+        """
+        Load the raw manual data from JSON file.
+        
+        Returns:
+            Manual data dictionary or None if not available
         """
         try:
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -64,16 +112,334 @@ class DataAggregationService:
             if os.path.exists(manual_text_path):
                 with open(manual_text_path, "r", encoding="utf-8") as f:
                     manual_data = json.load(f)
-                    # Combine game name and relevant sections
-                    game_context = f"Game: {manual_data.get('game_name', '')}\n\n{manual_data.get('relevant_sections', '')}"
-                    logger.info(f"Loaded game context for {self.year}")
-                    return game_context
+                    logger.debug(f"Loaded manual data for {self.year}")
+                    return manual_data
             else:
                 logger.warning(f"Game manual not found: {manual_text_path}")
                 return None
         except Exception as e:
-            logger.error(f"Error loading game context: {e}")
+            logger.error(f"Error loading manual data: {e}")
             return None
+
+    def _get_extracted_context(self, manual_data: Dict[str, Any]) -> Optional[str]:
+        """
+        Get extracted game context using the extraction service.
+        
+        Args:
+            manual_data: Raw manual data dictionary
+            
+        Returns:
+            Extracted context string or None if extraction fails
+        """
+        try:
+            import asyncio
+            
+            # Check if we're already in an event loop
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # We're in an async context, create a new loop in a thread
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        future = executor.submit(self._run_extraction_sync, manual_data)
+                        extraction_result = future.result()
+                else:
+                    # Safe to run directly
+                    extraction_result = loop.run_until_complete(
+                        self.extractor_service.extract_game_context(manual_data)
+                    )
+            except RuntimeError:
+                # No event loop, create one
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    extraction_result = loop.run_until_complete(
+                        self.extractor_service.extract_game_context(manual_data)
+                    )
+                finally:
+                    loop.close()
+                    asyncio.set_event_loop(None)
+            
+            if extraction_result.success and extraction_result.extracted_context:
+                # Convert extracted context to string format for compatibility
+                extracted_data = extraction_result.extracted_context
+                
+                # Format extracted context for GPT consumption
+                context_parts = []
+                
+                # Game information
+                context_parts.append(f"Game: {extracted_data.get('game_name', '')} ({extracted_data.get('game_year', self.year)})")
+                
+                # Scoring summary
+                if 'scoring_summary' in extracted_data:
+                    context_parts.append("\nSCORING SUMMARY:")
+                    scoring = extracted_data['scoring_summary']
+                    
+                    for phase in ['autonomous', 'teleop', 'endgame']:
+                        if phase in scoring:
+                            phase_data = scoring[phase]
+                            context_parts.append(f"\n{phase.upper()} ({phase_data.get('duration_seconds', 0)}s):")
+                            context_parts.append(f"  Objectives: {', '.join(phase_data.get('key_objectives', []))}")
+                            context_parts.append(f"  Point Values: {phase_data.get('point_values', {})}")
+                            if phase_data.get('strategic_notes'):
+                                context_parts.append(f"  Strategy: {phase_data['strategic_notes']}")
+                
+                # Strategic elements
+                if 'strategic_elements' in extracted_data and extracted_data['strategic_elements']:
+                    context_parts.append("\nSTRATEGIC ELEMENTS:")
+                    for element in extracted_data['strategic_elements']:
+                        context_parts.append(f"- {element.get('name', '')}: {element.get('description', '')} (Impact: {element.get('alliance_impact', '')})")
+                
+                # Alliance considerations
+                if 'alliance_considerations' in extracted_data and extracted_data['alliance_considerations']:
+                    context_parts.append("\nALLIANCE CONSIDERATIONS:")
+                    for consideration in extracted_data['alliance_considerations']:
+                        context_parts.append(f"- {consideration}")
+                
+                # Key metrics
+                if 'key_metrics' in extracted_data and extracted_data['key_metrics']:
+                    context_parts.append("\nKEY METRICS:")
+                    for metric in extracted_data['key_metrics']:
+                        context_parts.append(f"- {metric.get('metric_name', '')}: {metric.get('description', '')} (Importance: {metric.get('importance', '')})")
+                
+                formatted_context = '\n'.join(context_parts)
+                
+                # Log token savings
+                original_size = len(manual_data.get('relevant_sections', ''))
+                extracted_size = len(formatted_context)
+                savings = 100 * (1 - extracted_size / original_size) if original_size > 0 else 0
+                
+                logger.info(f"Using extracted context for {self.year} (Size reduction: {savings:.1f}%)")
+                logger.info(f"Context size: {original_size} -> {extracted_size} characters")
+                
+                return formatted_context
+            else:
+                logger.warning(f"Extraction failed: {extraction_result.error}")
+                logger.warning("Falling back to full manual context")
+                return self._get_full_manual_context(manual_data)
+                
+        except Exception as e:
+            logger.error(f"Error in extracted context: {e}")
+            logger.warning("Falling back to full manual context")
+            return self._get_full_manual_context(manual_data)
+
+    def _get_full_manual_context(self, manual_data: Dict[str, Any]) -> str:
+        """
+        Get full manual context (original behavior).
+        
+        Args:
+            manual_data: Raw manual data dictionary
+            
+        Returns:
+            Full manual context string
+        """
+        game_context = f"Game: {manual_data.get('game_name', '')}\n\n{manual_data.get('relevant_sections', '')}"
+        logger.info(f"Using full manual context for {self.year}")
+        return game_context
+
+    def _run_extraction_sync(self, manual_data: Dict[str, Any]) -> Any:
+        """
+        Helper method to run extraction in a new event loop.
+        
+        Args:
+            manual_data: Manual data to extract from
+            
+        Returns:
+            ExtractionResult from the extraction process
+        """
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(
+                self.extractor_service.extract_game_context(manual_data)
+            )
+        finally:
+            loop.close()
+            asyncio.set_event_loop(None)
+
+    def _run_force_extraction_sync(self, manual_data: Dict[str, Any]) -> Any:
+        """
+        Helper method to run force extraction in a new event loop.
+        
+        Args:
+            manual_data: Manual data to extract from
+            
+        Returns:
+            ExtractionResult from the force extraction process
+        """
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(
+                self.extractor_service.extract_game_context(manual_data, force_refresh=True)
+            )
+        finally:
+            loop.close()
+            asyncio.set_event_loop(None)
+
+    def force_extract_game_context(self) -> Dict[str, Any]:
+        """
+        Force extraction of game context, bypassing cache.
+        
+        Returns:
+            Dictionary with extraction results and status
+        """
+        if not self.extractor_service:
+            return {
+                "success": False,
+                "error": "Extraction service not available",
+                "message": "Enable extracted context mode to use this feature"
+            }
+        
+        try:
+            manual_data = self._load_manual_data()
+            if not manual_data:
+                return {
+                    "success": False,
+                    "error": "Manual data not available",
+                    "message": f"Could not load manual data for year {self.year}"
+                }
+            
+            import asyncio
+            
+            # Check if we're already in an event loop
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # We're in an async context, create a new loop in a thread
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        future = executor.submit(self._run_force_extraction_sync, manual_data)
+                        extraction_result = future.result()
+                else:
+                    # Safe to run directly
+                    extraction_result = loop.run_until_complete(
+                        self.extractor_service.extract_game_context(manual_data, force_refresh=True)
+                    )
+            except RuntimeError:
+                # No event loop, create one
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    extraction_result = loop.run_until_complete(
+                        self.extractor_service.extract_game_context(manual_data, force_refresh=True)
+                    )
+                finally:
+                    loop.close()
+                    asyncio.set_event_loop(None)
+            
+            if extraction_result.success:
+                return {
+                    "success": True,
+                    "extraction_result": extraction_result.extracted_context,
+                    "processing_time": extraction_result.processing_time,
+                    "validation_score": extraction_result.validation_score,
+                    "token_usage": extraction_result.token_usage,
+                    "message": f"Successfully extracted context for {self.year}"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": extraction_result.error,
+                    "processing_time": extraction_result.processing_time,
+                    "message": "Extraction failed"
+                }
+                
+        except Exception as e:
+            logger.error(f"Error in force extraction: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": "Exception occurred during extraction"
+            }
+
+    def get_extraction_status(self) -> Dict[str, Any]:
+        """
+        Get status of game context extraction for current year.
+        
+        Returns:
+            Dictionary with extraction status information
+        """
+        status = {
+            "year": self.year,
+            "extraction_enabled": self.use_extracted_context,
+            "extractor_available": self.extractor_service is not None,
+            "manual_available": False,
+            "cached_extraction": False,
+            "cache_info": {}
+        }
+        
+        # Check manual availability
+        manual_data = self._load_manual_data()
+        status["manual_available"] = manual_data is not None
+        
+        if manual_data:
+            status["manual_size"] = len(manual_data.get('relevant_sections', ''))
+            status["game_name"] = manual_data.get('game_name', 'Unknown')
+        
+        # Check cache status if extractor available
+        if self.extractor_service:
+            try:
+                status["cache_info"] = self.extractor_service.get_cache_info()
+                
+                # Check if we have a cached extraction for current manual
+                if manual_data:
+                    cache_key = self.extractor_service._generate_cache_key(manual_data)
+                    cached_result = self.extractor_service._load_cached_extraction(cache_key)
+                    status["cached_extraction"] = cached_result is not None
+                    if cached_result:
+                        status["cache_validation_score"] = cached_result.validation_score
+                        
+            except Exception as e:
+                logger.warning(f"Error getting cache status: {e}")
+                status["cache_error"] = str(e)
+        
+        return status
+
+    def set_extraction_mode(self, use_extracted_context: bool) -> Dict[str, Any]:
+        """
+        Enable or disable extracted context mode.
+        
+        Args:
+            use_extracted_context: Whether to use extracted context
+            
+        Returns:
+            Dictionary with operation results
+        """
+        previous_mode = self.use_extracted_context
+        
+        try:
+            if use_extracted_context and not self.extractor_service:
+                # Initialize extraction service
+                cache_dir = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "cache", "game_context"
+                )
+                self.extractor_service = GameContextExtractorService(cache_dir=cache_dir)
+                logger.info("Initialized game context extractor service")
+            
+            self.use_extracted_context = use_extracted_context
+            
+            return {
+                "success": True,
+                "previous_mode": "extracted" if previous_mode else "full",
+                "current_mode": "extracted" if use_extracted_context else "full",
+                "message": f"Switched to {'extracted' if use_extracted_context else 'full'} context mode"
+            }
+            
+        except Exception as e:
+            # Revert on error
+            self.use_extracted_context = previous_mode
+            logger.error(f"Error setting extraction mode: {e}")
+            
+            return {
+                "success": False,
+                "error": str(e),
+                "current_mode": "extracted" if previous_mode else "full",
+                "message": "Failed to change extraction mode"
+            }
 
     def get_teams_data(self) -> Dict[str, Any]:
         """
@@ -96,7 +462,9 @@ class DataAggregationService:
             "event_key": self.event_key,
             "teams_count": len(self.teams_data),
             "dataset_path": self.dataset_path,
-            "has_game_context": self.load_game_context() is not None
+            "has_game_context": self.load_game_context() is not None,
+            "extraction_mode": "extracted" if self.use_extracted_context else "full",
+            "extraction_available": self.extractor_service is not None
         }
 
         # Analyze available data types

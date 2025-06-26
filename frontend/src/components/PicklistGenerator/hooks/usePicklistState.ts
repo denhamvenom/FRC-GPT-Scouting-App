@@ -59,7 +59,7 @@ export function usePicklistState(props: PicklistGeneratorProps): PicklistState {
   const [showMissingTeamsModal, setShowMissingTeamsModal] = useState<boolean>(false);
   const [isRankingMissingTeams, setIsRankingMissingTeams] = useState<boolean>(false);
 
-  const [useBatching, setUseBatching] = useLocalStorageState("useBatching", true);
+  const [useBatching, setUseBatching] = useLocalStorageState("useBatching", false);
 
   useEffect(() => {
     console.log("PicklistGenerator dependencies changed:", {

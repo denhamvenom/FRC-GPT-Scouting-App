@@ -863,9 +863,9 @@ class BatchProcessingService:
 ```yaml
 # Batch Processing Behavior Contract
 batch_configuration:
-  default_batch_size: 20
-  max_batch_size: 50
-  min_batch_size: 5
+  default_batch_size: 60
+  max_batch_size: 100
+  min_batch_size: 10
   max_parallel_batches: 3
   
 batch_strategies:
@@ -874,15 +874,15 @@ batch_strategies:
     strategy: "single_batch"
   
   medium_dataset:
-    threshold: "21-50 teams"
-    strategy: "small_batches"
-    batch_size: 15
+    threshold: "21-80 teams"
+    strategy: "single_processing"
+    user_configurable: true
   
   large_dataset:
-    threshold: "> 50 teams"
+    threshold: "> 80 teams"
     strategy: "reference_batches"
-    batch_size: 20
-    reference_teams: 5
+    batch_size: 60
+    reference_teams: 3
 
 progress_tracking:
   update_frequency: 10  # seconds
@@ -997,7 +997,7 @@ workflow_patterns:
       6. "Result caching and formatting"
     
     decision_points:
-      batch_processing_threshold: 50  # teams
+      batch_processing_threshold: 80  # teams (user configurable, default: false)
       cache_hit_early_return: true
       error_fallback_to_statistical: true
 

@@ -101,6 +101,15 @@ const PicklistNew: React.FC = () => {
   });
   const [isGeneratingRankings, setIsGeneratingRankings] = useState<boolean>(false);
   const [progressOperationId, setProgressOperationId] = useState<string | null>(null);
+  const [useBatching, setUseBatching] = useState<boolean>(() => {
+    const saved = localStorage.getItem('useBatching');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Save batching preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('useBatching', JSON.stringify(useBatching));
+  }, [useBatching]);
   // Initialize shouldShowGenerator based on whether rankings exist for the current tab
   const [shouldShowGenerator, setShouldShowGenerator] = useState<boolean>(() => {
     // Check localStorage for existing rankings
@@ -735,6 +744,7 @@ const PicklistNew: React.FC = () => {
       console.log("Using dataset path:", datasetPath);
       console.log("Team:", yourTeamNumber);
       console.log("Excluding teams:", teamsToExclude);
+      console.log("Batching enabled:", useBatching);
 
       // Directly make the API call instead of relying on the component
       const response = await fetch('http://localhost:8000/api/picklist/generate', {
@@ -746,8 +756,8 @@ const PicklistNew: React.FC = () => {
           pick_position: activeTab,
           priorities: simplePriorities,
           exclude_teams: teamsToExclude,
-          use_batching: true,
-          batch_size: 20,
+          use_batching: useBatching,
+          batch_size: 60,
           reference_teams_count: 3,
           reference_selection: "top_middle_bottom",
           cache_key: cacheKey  // Pass the cache key we generated

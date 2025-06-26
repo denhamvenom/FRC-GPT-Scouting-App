@@ -110,8 +110,11 @@ Documentation: http://localhost:8000/docs
   "exclude_teams": [9999, 8888],
   "team_numbers": null,
   "dataset_path": "app/data/unified_dataset.json",
+  "use_batching": false,
+  "batch_size": 60,
+  "reference_teams_count": 3,
+  "reference_selection": "top_middle_bottom",
   "options": {
-    "use_batch_processing": "auto",
     "include_reasoning": true,
     "max_teams": 100
   }
@@ -127,6 +130,10 @@ class PicklistGenerationRequest(BaseModel):
     exclude_teams: Optional[List[int]] = Field(default=None, description="Teams to exclude")
     team_numbers: Optional[List[int]] = Field(default=None, description="Specific teams to analyze")
     dataset_path: Optional[str] = Field(default=None, description="Custom dataset path")
+    use_batching: bool = Field(default=False, description="Enable batch processing (user configurable)")
+    batch_size: int = Field(default=60, ge=10, le=100, description="Teams per batch when batching enabled")
+    reference_teams_count: int = Field(default=3, ge=1, le=10, description="Reference teams between batches")
+    reference_selection: str = Field(default="top_middle_bottom", description="Reference team selection strategy")
     options: Optional[PicklistOptions] = Field(default_factory=PicklistOptions)
 
 class PriorityItem(BaseModel):
@@ -135,10 +142,18 @@ class PriorityItem(BaseModel):
     description: Optional[str] = Field(default=None, description="Human-readable description")
 
 class PicklistOptions(BaseModel):
-    use_batch_processing: str = Field(default="auto", regex="^(auto|force|never)$")
     include_reasoning: bool = Field(default=True)
     max_teams: int = Field(default=100, ge=1, le=1000)
 ```
+
+**Batch Processing Behavior**:
+- **Default**: `use_batching: false` - Single processing for most datasets
+- **Automatic Threshold**: System auto-enables batching for >80 teams regardless of user preference
+- **User Control**: Frontend UI toggle saves preference to localStorage (`"useBatching"`)
+- **Batch Size**: Default 60 teams per batch (increased from previous 20 for better efficiency)
+- **Processing Strategy**: 
+  - `false`: Single AI call for all teams (faster, more coherent ranking)
+  - `true`: Multiple batches with reference teams between batches (better for very large datasets)
 
 **Success Response (200)**:
 ```json
@@ -633,7 +648,7 @@ class PicklistOptions(BaseModel):
     ]
   },
   "batch_options": {
-    "batch_size": 20,
+    "batch_size": 60,
     "max_parallel_batches": 3,
     "timeout_per_batch": 120
   }

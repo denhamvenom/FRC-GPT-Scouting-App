@@ -80,7 +80,7 @@ class PicklistGeneratorService:
         exclude_teams: Optional[List[int]] = None,
         request_id: Optional[int] = None,
         cache_key: Optional[str] = None,
-        batch_size: int = 20,
+        batch_size: int = 60,
         reference_teams_count: int = 3,
         reference_selection: str = "top_middle_bottom",
         use_batching: bool = False,
@@ -100,36 +100,49 @@ class PicklistGeneratorService:
             logger.info(f"Returning cached result for key: {cache_key}")
             return cached_result
         
+        # Initialize progress tracking
+        from app.services.progress_tracker import ProgressTracker
+        progress_tracker = ProgressTracker.create_tracker(cache_key)
+        progress_tracker.update(5, "Initializing picklist generation...", "initialization")
+        
         self.performance_service.mark_cache_processing(cache_key)
         
         try:
             # Data preparation
+            progress_tracker.update(15, "Preparing team data...", "data_preparation")
             teams_data = self.data_service.get_teams_for_analysis(exclude_teams)
             normalized_priorities = self.priority_service.normalize_priorities(priorities)
             
             # ORIGINAL AUTOMATIC BATCHING DECISION - EXACT RESTORATION
+            progress_tracker.update(25, "Determining processing strategy...", "strategy_selection")
             should_batch, batching_reason = self._determine_processing_strategy(teams_data, use_batching)
             
             if should_batch:
-                # Calculate optimal batch size using original algorithm
-                optimal_batch_size = self._calculate_optimal_batch_size(len(teams_data), len(normalized_priorities))
+                # Use batch_size from request parameters, or calculate optimal if not provided
+                optimal_batch_size = batch_size if batch_size else self._calculate_optimal_batch_size(len(teams_data), len(normalized_priorities))
                 logger.info(f"Using batch processing for {len(teams_data)} teams with batch size {optimal_batch_size}")
+                progress_tracker.update(35, f"Starting batch processing ({len(teams_data)} teams)...", "batch_processing")
                 result = await self._orchestrate_batch_processing(
                     teams_data, your_team_number, pick_position, normalized_priorities,
-                    cache_key, optimal_batch_size, reference_teams_count, reference_selection, final_rerank
+                    cache_key, optimal_batch_size, reference_teams_count, reference_selection, final_rerank,
+                    progress_tracker
                 )
             else:
                 logger.info(f"Using single processing for {len(teams_data)} teams")
+                progress_tracker.update(35, f"Starting single processing ({len(teams_data)} teams)...", "single_processing")
                 result = await self._orchestrate_single_processing(
                     teams_data, your_team_number, pick_position, normalized_priorities, cache_key
                 )
+                progress_tracker.update(90, "Finalizing results...", "finalization")
             
             result["processing_time"] = time.time() - start_time
             self.performance_service.store_cached_result(cache_key, result)
+            progress_tracker.complete("Picklist generation completed successfully")
             return result
             
         except Exception as e:
             logger.error(f"Error in generate_picklist: {str(e)}")
+            progress_tracker.fail(f"Picklist generation failed: {str(e)}")
             error_result = {
                 "status": "error", "error": str(e), "cache_key": cache_key,
                 "processing_time": time.time() - start_time
@@ -274,7 +287,8 @@ class PicklistGeneratorService:
 
     async def _orchestrate_batch_processing(
         self, teams_data, your_team_number, pick_position, normalized_priorities,
-        cache_key, batch_size, reference_teams_count, reference_selection, final_rerank
+        cache_key, batch_size, reference_teams_count, reference_selection, final_rerank,
+        progress_tracker=None
     ) -> Dict[str, Any]:
         """Coordinate batch processing following baseline logic"""
         # Create simple batches like baseline
@@ -291,6 +305,15 @@ class PicklistGeneratorService:
         total_batches = len(team_batches)
         
         for batch_index, batch in enumerate(team_batches):
+            # Update progress for each batch
+            batch_progress = 35 + (batch_index / total_batches) * 50  # 35-85% for batch processing
+            if progress_tracker:
+                progress_tracker.update(
+                    batch_progress, 
+                    f"Processing batch {batch_index + 1}/{total_batches} ({len(batch)} teams)...", 
+                    f"batch_{batch_index + 1}"
+                )
+            
             logger.info(f"Processing batch {batch_index + 1}/{total_batches} with {len(batch)} teams")
             
             # Create batch-specific prompts using available methods
@@ -340,18 +363,53 @@ class PicklistGeneratorService:
         
         # Optional final reranking
         if final_rerank and len(combined_picklist) > 10:
+            if progress_tracker:
+                progress_tracker.update(85, "Performing final reranking...", "final_reranking")
             logger.info("Performing final reranking of combined results")
-            final_result = await self.gpt_service.analyze_teams(
-                system_prompt=self.gpt_service.create_system_prompt(
-                    pick_position, len(combined_picklist), self.game_context
-                ),
-                user_prompt=self.gpt_service.create_user_prompt(
-                    your_team_number, pick_position, normalized_priorities, combined_picklist
-                ),
-                teams_data=combined_picklist
-            )
-            if final_result.get("status") == "success":
-                combined_picklist = final_result["picklist"]
+            
+            # Convert combined_picklist back to raw team data format for final reranking
+            final_teams_data = []
+            for result in combined_picklist:
+                team_number = result.get("team_number")
+                if team_number:
+                    # Try both string and int keys since teams_data might use string keys
+                    team_key = str(team_number)
+                    if team_key in self.teams_data:
+                        final_teams_data.append(self.teams_data[team_key])
+                    elif team_number in self.teams_data:
+                        final_teams_data.append(self.teams_data[team_number])
+                    else:
+                        logger.warning(f"Team {team_number} not found in teams_data")
+            
+            # Only proceed with final reranking if we have teams
+            if len(final_teams_data) > 0:
+                # Create index mapping for final reranking
+                team_index_map = {}
+                for index, team in enumerate(final_teams_data, 1):
+                    team_index_map[index] = team["team_number"]
+                
+                user_prompt, _ = self.gpt_service.create_user_prompt(
+                    your_team_number, pick_position, normalized_priorities, final_teams_data,
+                    team_numbers=[t["team_number"] for t in final_teams_data],
+                    force_index_mapping=True
+                )
+                
+                final_result = await self.gpt_service.analyze_teams(
+                    system_prompt=self.gpt_service.create_system_prompt(
+                        pick_position, len(final_teams_data), self.game_context
+                    ),
+                    user_prompt=user_prompt,
+                    teams_data=final_teams_data,
+                    team_index_map=team_index_map
+                )
+                if final_result.get("status") == "success":
+                    combined_picklist = final_result["picklist"]
+            else:
+                logger.warning("No teams found for final reranking, skipping")
+        
+        # Final progress update
+        if progress_tracker:
+            progress_tracker.update(95, "Finalizing batch processing results...", "finalization")
         
         return {
             "status": "success", "picklist": combined_picklist,
@@ -364,20 +422,21 @@ class PicklistGeneratorService:
         
         team_count = len(teams_data)
         
-        # ORIGINAL LOGIC: Automatic batching for >20 teams
+        # UPDATED LOGIC: Automatic batching for >80 teams (more reasonable threshold)
         if use_batching is None:
-            # Auto-decide based on team count (ORIGINAL THRESHOLD)
-            should_batch = team_count > 20
-            reason = f"Auto-selected {'batching' if should_batch else 'single'} for {team_count} teams (threshold: 20)"
+            # Auto-decide based on team count (UPDATED THRESHOLD FOR MODERN GPT)
+            should_batch = team_count > 80
+            reason = f"Auto-selected {'batching' if should_batch else 'single'} for {team_count} teams (threshold: 80)"
         else:
-            # Respect explicit user choice but warn if suboptimal
+            # Respect explicit user choice - ALWAYS honor the user's decision
             should_batch = use_batching
             reason = f"User-specified {'batching' if should_batch else 'single'} for {team_count} teams"
             
-            if team_count > 20 and not use_batching:
-                logger.warning(f"Single processing forced for {team_count} teams - may encounter rate limits")
-            elif team_count <= 15 and use_batching:
-                logger.warning(f"Batching forced for only {team_count} teams - may be inefficient")
+            # Log information but don't override user choice
+            if team_count > 80 and not use_batching:
+                logger.info(f"Single processing requested for {team_count} teams")
+            elif team_count <= 30 and use_batching:
+                logger.info(f"Batching requested for {team_count} teams")
         
         logger.info(f"Processing strategy: {reason}")
         return should_batch, reason

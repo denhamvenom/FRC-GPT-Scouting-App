@@ -74,15 +74,52 @@ class TeamComparisonService:
                 # New format with detailed ranking and summary
                 ranking_data = data["ranking"]
                 ordered_teams = []
+                # Create a list to store teams with their GPT rankings
+                teams_with_ranks = []
+                
+                # Debug logging
+                print(f"DEBUG: team_index_map = {team_index_map}")
+                print(f"DEBUG: ranking_data = {ranking_data}")
+                
                 for rank_item in ranking_data:
+                    # Handle multiple possible formats: team_number, team_index, or index
+                    if "team_number" in rank_item:
+                        team_num = rank_item["team_number"]
+                    elif "team_index" in rank_item:
+                        # Convert team_index back to team_number using the map
+                        team_index = rank_item["team_index"]
+                        team_num = team_index_map.get(team_index)
+                        if team_num is None:
+                            print(f"WARNING: Could not find team_number for team_index {team_index}")
+                            continue
+                    elif "index" in rank_item:
+                        # Convert index back to team_number using the map
+                        team_index = rank_item["index"]
+                        team_num = team_index_map.get(team_index)
+                        print(f"DEBUG: Converting index {team_index} -> team_number {team_num}")
+                        if team_num is None:
+                            print(f"WARNING: Could not find team_number for index {team_index}")
+                            continue
+                    else:
+                        print(f"WARNING: No team_number, team_index, or index in rank_item: {rank_item}")
+                        continue
+                    
                     # Find the team data and add ranking info
-                    team_num = rank_item["team_number"]
                     team_data = next((t for t in teams_data if t["team_number"] == team_num), None)
                     if team_data:
                         team_with_ranking = team_data.copy()
                         team_with_ranking["score"] = rank_item.get("score", 0)
                         team_with_ranking["reasoning"] = rank_item.get("brief_reason", "")
-                        ordered_teams.append(team_with_ranking)
+                        team_with_ranking["gpt_rank"] = rank_item.get("rank", 999)  # Add GPT rank for sorting
+                        teams_with_ranks.append(team_with_ranking)
+                
+                # Sort teams by their GPT rank (1 = first, 2 = second, etc.)
+                ordered_teams = sorted(teams_with_ranks, key=lambda x: x.get("gpt_rank", 999))
+                
+                # Debug logging to verify correct ordering
+                print("DEBUG: Final team ordering:")
+                for i, team in enumerate(ordered_teams):
+                    print(f"  Position {i+1}: Team {team['team_number']} (GPT rank: {team.get('gpt_rank', 'N/A')}, Score: {team.get('score', 'N/A')})")
 
                 # Extract GPT-suggested key metrics
                 suggested_metrics = data.get("key_metrics", [])

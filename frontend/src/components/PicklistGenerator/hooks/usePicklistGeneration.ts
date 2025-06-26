@@ -285,10 +285,12 @@ export function usePicklistGeneration(
         priorities: simplePriorities,
         exclude_teams: teamsToExclude,
         use_batching: useBatching,
-        batch_size: 20,
+        batch_size: 60,
         reference_teams_count: 3,
         reference_selection: "top_middle_bottom",
       });
+
+      console.log("Full request body being sent:", requestBody);
 
       const response = await fetch(
         "http://localhost:8000/api/picklist/generate",
