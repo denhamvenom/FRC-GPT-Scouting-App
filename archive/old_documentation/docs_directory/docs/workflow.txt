@@ -1,0 +1,70 @@
+# Unified Scouting Assistant - Workflow (First Phase)
+
+## INITIAL SETUP (First Load or New Season)
+
+1. User loads app or selects "New Season Setup"
+2. App asks for Game Manual PDF upload
+3. App uses GPT to auto-generate full game schema:
+   - Scoring objectives
+   - Penalties
+   - Ranking tiebreakers
+   - Field elements
+4. App pulls official events from Blue Alliance API
+5. User selects active event (e.g., 2025neworleans)
+6. App connects to user's active Google Scouting Sheet
+7. App maps Scouting sheet headers via GPT (editable)
+8. If enabled, app maps SuperScouting sheet headers via GPT
+
+---
+
+## FULL EVENT DATASET BUILDING
+
+- Pull and parse Match Scouting Data (Google Sheets)
+- Pull and parse SuperScouting Data (if enabled)
+- Pull Static Blue Alliance Data:
+  - List of teams
+  - Full qualification match schedule
+- Pull Static Statbotics Data:
+  - EPA, OPR, DPR, CCWM at event start
+- Merge all datasets into a Unified Event Dataset
+
+---
+
+## DYNAMIC DATA HANDLING (During Event)
+
+- User can manually refresh "Fast Data" at any time:
+  - Blue Alliance:
+    - Team rankings
+    - Total Ranking Points
+    - Average Ranking Points
+    - Average Auto/Teleop/Endgame points
+    - Match scores per alliance
+    - Match-by-match RP results
+  - Statbotics:
+    - Updated EPA, OPR, DPR
+    - Auto EPA / Endgame EPA updates
+
+- Merged into Unified Event Dataset live
+- Push refreshed unified data back into Google Sheets (new tab)
+
+---
+
+## DATA TIERS
+
+| Data Tier | Examples | Source | Pull Frequency |
+|:---|:---|:---|:---|
+| Scouting Data | Match scouting form entries | Google Sheets | Manual by scouts |
+| SuperScouting Data | Defense, strategy notes, penalties | Google Sheets | Manual (optional) |
+| Static Event Data | Teams list, match schedule | Blue Alliance API | Once per event setup |
+| Dynamic Event Data | Team rankings, RP, scores | Blue Alliance API | Refreshable |
+| Dynamic Metrics | EPA, OPR, DPR, CCWM | Statbotics API | Refreshable |
+
+---
+
+## SYSTEM BEHAVIOR PRINCIPLES
+
+- New Game = New Schema (yearly)
+- New Event = New dynamic data pull
+- Google Sheets remains backup/source-of-truth
+- API data enhances but does not replace scouting
+- Unified Event Dataset always rebuildable manually

@@ -82,13 +82,13 @@ The summary should be comprehensive (200-400 words) and help strategists underst
         # Add chat history if this is a follow-up question
         if chat_history and question:
             # For follow-up questions, include the original analysis context
-            base_prompt = generator_service._create_user_prompt(
+            base_prompt = generator_service.gpt_service.create_user_prompt(
                 your_team_number,
                 pick_position,
                 priorities,
                 teams_data,
                 team_numbers,
-                team_index_map,
+                team_index_map
             )
             messages.append({"role": "user", "content": base_prompt})
 
@@ -105,7 +105,7 @@ The summary should be comprehensive (200-400 words) and help strategists underst
             messages.append({"role": "user", "content": f"FOLLOW-UP QUESTION: {question}"})
         else:
             # Initial analysis or standalone question
-            user_prompt = generator_service._create_user_prompt(
+            user_prompt = generator_service.gpt_service.create_user_prompt(
                 your_team_number,
                 pick_position,
                 priorities,

@@ -284,21 +284,22 @@ class DataAggregationService:
             aggregated["data_sources"].append("scouting")
             aggregated["match_count"] = len(team_data["scouting_data"])
 
-        # Add Statbotics data
-        if "statbotics" in team_data and isinstance(team_data["statbotics"], dict):
-            for metric, value in team_data["statbotics"].items():
+        # Add Statbotics data (check both 'statbotics' and 'statbotics_info' for compatibility)
+        statbotics_data = team_data.get("statbotics") or team_data.get("statbotics_info", {})
+        if statbotics_data and isinstance(statbotics_data, dict):
+            for metric, value in statbotics_data.items():
                 if isinstance(value, (int, float)):
                     aggregated["metrics"][f"statbotics_{metric}"] = value
             aggregated["data_sources"].append("statbotics")
 
-        # Add ranking data
-        if "ranking" in team_data and isinstance(team_data["ranking"], dict):
-            ranking = team_data["ranking"]
-            aggregated["rank"] = ranking.get("rank")
+        # Add ranking data (check both 'ranking' and 'ranking_info' for compatibility)
+        ranking_data = team_data.get("ranking") or team_data.get("ranking_info", {})
+        if ranking_data and isinstance(ranking_data, dict):
+            aggregated["rank"] = ranking_data.get("rank")
             aggregated["record"] = {
-                "wins": ranking.get("wins", 0),
-                "losses": ranking.get("losses", 0),
-                "ties": ranking.get("ties", 0)
+                "wins": ranking_data.get("wins", 0),
+                "losses": ranking_data.get("losses", 0),
+                "ties": ranking_data.get("ties", 0)
             }
             
             # Calculate win percentage

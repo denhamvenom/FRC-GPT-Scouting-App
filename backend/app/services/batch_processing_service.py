@@ -435,13 +435,13 @@ class BatchProcessingService:
         
         # Create progress tracker
         progress_tracker = ProgressTracker.create_tracker(cache_key)
-        progress_tracker.update_progress(0, f"Starting batch processing ({total_batches} batches)")
+        progress_tracker.update(0, f"Starting batch processing ({total_batches} batches)")
 
         for batch_idx, batch_teams in enumerate(batches):
             try:
                 # Update progress
                 progress_msg = f"Processing batch {batch_idx + 1} of {total_batches}"
-                progress_tracker.update_progress(
+                progress_tracker.update(
                     (batch_idx / total_batches) * 100, 
                     progress_msg
                 )

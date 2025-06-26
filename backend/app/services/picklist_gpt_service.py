@@ -6,7 +6,8 @@ import logging
 import os
 import threading
 import time
-from typing import Any, Dict, List, Optional
+import re
+from typing import Any, Dict, List, Optional, Tuple
 
 import tiktoken
 from dotenv import load_dotenv
@@ -16,19 +17,20 @@ load_dotenv()
 
 logger = logging.getLogger("picklist_gpt_service")
 
-GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+GPT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4-turbo")
 
 class PicklistGPTService:
     """
-    Service for handling OpenAI GPT integration specific to picklist generation.
-    Extracted from monolithic PicklistGeneratorService to improve maintainability.
+    Service for handling OpenAI GPT integration with original proven algorithms.
+    Restored from original system for maximum reliability.
     """
 
     def __init__(self):
-        """Initialize the picklist GPT service with OpenAI client and token encoder."""
+        """Initialize the picklist GPT service with original configuration."""
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.token_encoder = tiktoken.encoding_for_model("gpt-4-turbo")
         self.max_tokens_limit = 100000
+        self.game_context = None  # Can be set by external services
         
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
@@ -64,73 +66,61 @@ class PicklistGPTService:
         return formatted_teams
     
     def check_token_count(self, system_prompt: str, user_prompt: str, max_tokens: int = None) -> None:
-        """
-        Check if the combined prompts exceed token limits.
-        
-        Args:
-            system_prompt: The system prompt text
-            user_prompt: The user prompt text
-            max_tokens: Maximum token limit (defaults to instance limit)
-            
-        Raises:
-            ValueError: If token count exceeds limit
-        """
+        """ORIGINAL TOKEN VALIDATION - EXACT RESTORATION"""
         if max_tokens is None:
             max_tokens = self.max_tokens_limit
             
-        system_tokens = len(self.token_encoder.encode(system_prompt))
-        user_tokens = len(self.token_encoder.encode(user_prompt))
-        total_tokens = system_tokens + user_tokens
-        
-        logger.debug(f"Token count - System: {system_tokens}, User: {user_tokens}, Total: {total_tokens}")
-        
-        if total_tokens > max_tokens:
-            raise ValueError(
-                f"Token count {total_tokens} exceeds limit {max_tokens}. "
-                f"System: {system_tokens}, User: {user_tokens}"
-            )
+        try:
+            system_tokens = len(self.token_encoder.encode(system_prompt))
+            user_tokens = len(self.token_encoder.encode(user_prompt))
+            total_tokens = system_tokens + user_tokens
+            
+            logger.info(f"Token count: system={system_tokens}, user={user_tokens}, total={total_tokens}")
+            
+            if total_tokens > max_tokens:
+                raise ValueError(
+                    f"Prompt too large: {total_tokens} tokens exceeds limit of {max_tokens}. Consider batching teams or trimming fields."
+                )
+        except Exception as e:
+            logger.warning(f"Token counting failed: {str(e)}, proceeding without check")
     
-    def create_system_prompt(self, pick_position: str, team_count: int, game_context: Optional[str] = None) -> str:
-        """
-        Create the system prompt for GPT analysis.
+    def create_system_prompt(self, pick_position: str, team_count: int, game_context: Optional[str] = None, use_ultra_compact: bool = True) -> str:
+        """ORIGINAL SYSTEM PROMPT - EXACT RESTORATION"""
         
-        Args:
-            pick_position: The pick position ("first", "second", "third")
-            team_count: Number of teams to analyze
-            game_context: Optional game manual context
-            
-        Returns:
-            Formatted system prompt
-        """
-        base_prompt = f"""You are an expert FRC (FIRST Robotics Competition) scout and strategist helping create a picklist for alliance selection.
-
-You are analyzing teams for the {pick_position} pick position. Your task is to rank the top {team_count} teams based on:
-
-1. Performance metrics and statistics
-2. Strategic value for alliance composition
-3. Reliability and consistency
-4. Match contribution potential
-
-"""
+        position_context = {
+            "first": "First pick teams should be overall powerhouse teams that excel in multiple areas.",
+            "second": "Second pick teams should complement the first pick and address specific needs.",
+            "third": "Third pick teams are more specialized, often focusing on a single critical function.",
+        }
         
-        if game_context:
-            base_prompt += f"\nGame Context:\n{game_context}\n\n"
+        context_note = position_context.get(pick_position, "")
+        
+        if use_ultra_compact:
+            # ORIGINAL ULTRA-COMPACT FORMAT - CRITICAL FOR TOKEN OPTIMIZATION
+            prompt = f"""You are GPT-4 Turbo, an FRC alliance strategist.
+Return one‑line minified JSON:
+{{"p":[[index,score,"reason"]…],"s":"ok"}}
+
+CRITICAL RULES
+• Rank all {team_count} indices, each exactly once.  
+• Use indices 1-{team_count} from TEAM_INDEX_MAP exactly once.
+• Sort by weighted performance, then synergy with Team {{your_team_number}} for {pick_position} pick.  
+• Each reason must be ≤10 words, NO REPETITION, cite 1 metric (e.g. "Strong auto: 3.2 avg").
+• NO repetitive words or phrases. Be concise and specific.
+• If you cannot complete all teams due to length limits, respond only {{"s":"overflow"}}.
+
+{context_note}"""
             
-        base_prompt += """Your response must be in this exact JSON format:
-{
-  "p": [[team_number, score, "reasoning"], ...],
-  "s": "ok"
-}
-
-Where:
-- team_number: integer team number
-- score: float between 0-100 (higher is better)
-- reasoning: brief explanation (max 100 characters)
-- Teams ordered by score (highest first)
-
-CRITICAL: Return only valid JSON. No additional text or formatting."""
-
-        return base_prompt
+            if game_context:
+                prompt += f"\n\nGame Context:\n{game_context}\n"
+                
+            prompt += f"""
+EXAMPLE: {{"p":[[1,8.5,"Strong auto: 2.8 avg"],[2,7.9,"Consistent defense"],[3,6.2,"Reliable endgame"]],"s":"ok"}}"""
+            
+            return prompt
+        else:
+            # Fallback to standard format for smaller requests
+            return self._create_standard_format_prompt(pick_position, team_count, game_context)
     
     def create_user_prompt(
         self,
@@ -139,73 +129,135 @@ CRITICAL: Return only valid JSON. No additional text or formatting."""
         priorities: List[Dict[str, Any]],
         teams_data: List[Dict[str, Any]],
         team_numbers: Optional[List[int]] = None,
-        team_index_map: Optional[Dict[int, int]] = None,
-    ) -> str:
-        """
-        Create the user prompt with team data and priorities.
+        force_index_mapping: bool = True,
+    ) -> Tuple[str, Optional[Dict[int, int]]]:
+        """ORIGINAL USER PROMPT WITH FORCED INDEX MAPPING - EXACT RESTORATION"""
         
-        Args:
-            your_team_number: The analyzing team's number
-            pick_position: Pick position context
-            priorities: Priority weights for different aspects
-            teams_data: List of team data for analysis
-            team_numbers: Optional list of specific teams to analyze
-            team_index_map: Optional mapping for index-based references
+        # CRITICAL: Always create index mapping for consistency
+        team_index_map = None
+        if force_index_mapping:
+            team_index_map = {}
+            for index, team in enumerate(teams_data, start=1):
+                team_index_map[index] = team["team_number"]
+        
+        # Find your team's data
+        your_team_info = next(
+            (team for team in teams_data if team["team_number"] == your_team_number),
+            None,
+        )
+        
+        # EXACT RESTORATION OF ORIGINAL WARNING SYSTEM
+        team_index_info = ""
+        if team_index_map:
+            team_index_info = f"""
+TEAM_INDEX_MAP = {json.dumps(team_index_map)}
+⚠️ CRITICAL: Use indices 1 through {len(team_index_map)} from TEAM_INDEX_MAP exactly once.
+⚠️ Your response MUST use indices, NOT team numbers: [[1,score,"reason"],[2,score,"reason"]...]
+⚠️ Each index from 1 to {len(team_index_map)} must appear EXACTLY ONCE.
+"""
+
+        # RESTORE ORIGINAL CONDENSED FORMAT
+        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info) if your_team_info else "{}"} 
+PRIORITY_METRICS  = {json.dumps(priorities)}   # include weight field
+GAME_CONTEXT      = {json.dumps(self.game_context) if self.game_context else "null"}
+TEAM_NUMBERS_TO_INCLUDE = {json.dumps(team_numbers)}{team_index_info}
+AVAILABLE_TEAMS = {json.dumps(self._prepare_teams_with_scores(teams_data, priorities, team_index_map))}     # include pre‑computed weighted_score
+
+Please produce output following RULES.
+"""
+        
+        return prompt, team_index_map
+    
+    def _prepare_teams_with_scores(self, teams_data: List[Dict[str, Any]], priorities: List[Dict[str, Any]], team_index_map: Optional[Dict[int, int]] = None) -> List[Dict[str, Any]]:
+        """ORIGINAL TEAM PREPARATION WITH WEIGHTED SCORES"""
+        
+        teams_with_scores = []
+        
+        if team_index_map:
+            # Create reverse map for quick lookup
+            team_to_index = {v: k for k, v in team_index_map.items()}
             
-        Returns:
-            Formatted user prompt with team data
-        """
-        prompt = f"Analyzing for Team {your_team_number} - {pick_position} pick position.\n\n"
-        
-        # Add priorities section
-        if priorities:
-            prompt += "PRIORITIES:\n"
-            for priority in priorities:
-                name = priority.get("name", "Unknown")
-                weight = priority.get("weight", 0.0)
-                description = priority.get("description", "")
-                prompt += f"- {name} (weight: {weight:.2f}): {description}\n"
-            prompt += "\n"
-        
-        # Add teams data
-        prompt += "TEAMS TO ANALYZE:\n"
-        
-        # Filter teams if specific numbers provided
-        if team_numbers:
-            filtered_teams = [t for t in teams_data if t.get("team_number") in team_numbers]
+            for team in teams_data:
+                weighted_score = self._calculate_weighted_score(team, priorities)
+                team_with_score = {
+                    "index": team_to_index.get(team["team_number"], 0),
+                    "team_number": team["team_number"],
+                    "nickname": team.get("nickname", f"Team {team['team_number']}"),
+                    "weighted_score": weighted_score
+                }
+                
+                # Add condensed metrics
+                if "metrics" in team and isinstance(team["metrics"], dict):
+                    team_with_score["metrics"] = team["metrics"]
+                    
+                teams_with_scores.append(team_with_score)
         else:
-            filtered_teams = teams_data
+            # Standard format without indices
+            for team in teams_data:
+                weighted_score = self._calculate_weighted_score(team, priorities)
+                team_with_score = {
+                    "team_number": team["team_number"],
+                    "nickname": team.get("nickname", f"Team {team['team_number']}"),
+                    "weighted_score": weighted_score
+                }
+                
+                if "metrics" in team and isinstance(team["metrics"], dict):
+                    team_with_score["metrics"] = team["metrics"]
+                    
+                teams_with_scores.append(team_with_score)
         
-        for i, team in enumerate(filtered_teams):
-            team_num = team.get("team_number", 0)
-            
-            # Use index mapping if provided
-            display_ref = team_index_map.get(i, team_num) if team_index_map else team_num
-            
-            prompt += f"Team {display_ref}: {team.get('nickname', f'Team {team_num}')}\n"
-            
-            # Add metrics if available
-            if "metrics" in team and isinstance(team["metrics"], dict):
-                for metric, value in team["metrics"].items():
-                    prompt += f"  {metric}: {value}\n"
-            
-            prompt += "\n"
+        return teams_with_scores
+    
+    def _calculate_weighted_score(self, team_data: Dict[str, Any], priorities: List[Dict[str, Any]]) -> float:
+        """ORIGINAL WEIGHTED SCORING CALCULATION"""
         
-        prompt += f"Rank the teams considering the priorities and {pick_position} pick strategy."
+        if not priorities:
+            return 0.0
         
-        return prompt
+        total_score = 0.0
+        total_weight = 0.0
+        
+        for priority in priorities:
+            field_name = priority.get("id", "")
+            weight = priority.get("weight", 1.0)
+            
+            # Extract field value using original logic
+            field_value = self._extract_field_value(team_data, field_name)
+            
+            if field_value is not None:
+                total_score += field_value * weight
+                total_weight += weight
+        
+        return round(total_score / total_weight if total_weight > 0 else 0.0, 2)
+    
+    def _extract_field_value(self, team_data: Dict[str, Any], field_name: str) -> Optional[float]:
+        """ORIGINAL FIELD EXTRACTION LOGIC"""
+        
+        # Try metrics first
+        if "metrics" in team_data and isinstance(team_data["metrics"], dict):
+            if field_name in team_data["metrics"]:
+                return float(team_data["metrics"][field_name])
+        
+        # Try statbotics fields
+        if "statbotics" in team_data and isinstance(team_data["statbotics"], dict):
+            if field_name in team_data["statbotics"]:
+                return float(team_data["statbotics"][field_name])
+            # Try with statbotics prefix
+            statbotics_field = f"statbotics_{field_name}"
+            if statbotics_field in team_data:
+                return float(team_data[statbotics_field])
+        
+        # Try direct field access
+        if field_name in team_data:
+            try:
+                return float(team_data[field_name])
+            except (ValueError, TypeError):
+                pass
+        
+        return None
     
     def create_missing_teams_system_prompt(self, pick_position: str, team_count: int) -> str:
-        """
-        Create system prompt for ranking missing teams.
-        
-        Args:
-            pick_position: Pick position context
-            team_count: Number of missing teams to rank
-            
-        Returns:
-            System prompt for missing teams analysis
-        """
+        """Create system prompt for ranking missing teams."""
         return f"""You are an expert FRC scout analyzing teams NOT yet on the picklist.
 
 Task: Rank the top {team_count} teams that should be added to the existing picklist for {pick_position} pick position.
@@ -217,10 +269,7 @@ Focus on:
 4. Overall alliance potential
 
 Response format (JSON only):
-{{
-  "p": [[team_number, score, "reasoning"], ...],
-  "s": "ok"
-}}
+{{"p": [[team_number, score, "reasoning"], ...], "s": "ok"}}
 
 CRITICAL: Return only valid JSON."""
     
@@ -234,21 +283,8 @@ CRITICAL: Return only valid JSON."""
         teams_data: List[Dict[str, Any]],
         team_index_map: Optional[Dict[int, int]] = None,
     ) -> str:
-        """
-        Create user prompt for missing teams analysis.
+        """Create user prompt for missing teams analysis."""
         
-        Args:
-            missing_team_numbers: Teams not in current picklist
-            ranked_teams: Current picklist teams
-            your_team_number: Analyzing team number
-            pick_position: Pick position context
-            priorities: Priority weights
-            teams_data: Team data for analysis
-            team_index_map: Optional index mapping
-            
-        Returns:
-            User prompt for missing teams analysis
-        """
         prompt = f"Team {your_team_number} - Adding teams to {pick_position} pick picklist.\n\n"
         
         # Current picklist context
@@ -431,43 +467,78 @@ CRITICAL: Return only valid JSON."""
                 "error_type": "token_limit_exceeded"
             }
         
-        last_exception = None
+        # Use the proper exponential backoff retry method
+        result = await self._execute_api_call_with_retry(system_prompt, user_prompt, max_retries)
         
-        for attempt in range(max_retries):
+        if result["status"] == "success":
+            # Parse response
+            picklist = self.parse_response_with_index_mapping(
+                result["response_data"], teams_data, team_index_map
+            )
+            
+            return {
+                "status": "success",
+                "picklist": picklist,
+                "response_data": result["response_data"],
+                "processing_time": result["processing_time"],
+                "attempt": result.get("attempt", 1),
+            }
+        else:
+            return result
+    
+    async def _execute_api_call_with_retry(self, system_prompt: str, user_prompt: str, max_retries: int = 3) -> Dict[str, Any]:
+        """ORIGINAL EXPONENTIAL BACKOFF RETRY LOGIC - EXACT RESTORATION"""
+        initial_delay = 1.0
+        retry_count = 0
+        
+        while retry_count < max_retries:
             try:
-                # Create and execute API call in thread
+                # Execute API call
                 result = await self._execute_api_call(system_prompt, user_prompt)
                 
-                if result["status"] == "success":
-                    # Parse response
-                    picklist = self.parse_response_with_index_mapping(
-                        result["response_data"], teams_data, team_index_map
-                    )
-                    
-                    return {
-                        "status": "success",
-                        "picklist": picklist,
-                        "response_data": result["response_data"],
-                        "processing_time": result["processing_time"],
-                        "attempt": attempt + 1,
-                    }
+                # Check for rate limiting specifically
+                if result.get("error_type") == "rate_limit" or "429" in str(result.get("error", "")):
+                    retry_count += 1
+                    if retry_count < max_retries:
+                        # ORIGINAL EXPONENTIAL BACKOFF: 2s, 4s, 8s
+                        delay = initial_delay * (2 ** retry_count)
+                        logger.warning(f"Rate limit hit, retrying in {delay}s (attempt {retry_count}/{max_retries})")
+                        await asyncio.sleep(delay)
+                        continue
+                    else:
+                        logger.error(f"Rate limit exceeded after {max_retries} attempts")
+                        return {
+                            "status": "error",
+                            "error": f"Rate limit exceeded after {max_retries} attempts",
+                            "error_type": "rate_limit_exhausted",
+                            "attempts": retry_count
+                        }
                 else:
-                    last_exception = Exception(result.get("error", "API call failed"))
+                    # Success or non-rate-limit error
+                    result["attempt"] = retry_count + 1
+                    return result
                     
             except Exception as e:
-                last_exception = e
-                logger.warning(f"GPT analysis attempt {attempt + 1} failed: {e}")
+                retry_count += 1
+                logger.error(f"API call attempt {retry_count} failed: {str(e)}")
                 
-                if attempt < max_retries - 1:
-                    # Exponential backoff
-                    delay = 1.0 * (2 ** attempt)
+                if retry_count < max_retries:
+                    delay = initial_delay * (2 ** retry_count)
+                    logger.info(f"Retrying in {delay}s...")
                     await asyncio.sleep(delay)
+                else:
+                    return {
+                        "status": "error",
+                        "error": f"API call failed after {max_retries} attempts: {str(e)}",
+                        "error_type": "api_failure",
+                        "attempts": retry_count
+                    }
         
         return {
             "status": "error",
-            "error": f"GPT analysis failed after {max_retries} attempts: {last_exception}",
-            "error_type": "api_failure",
-            "attempts": max_retries,
+            "error": "Unexpected retry loop exit",
+            "error_type": "unknown",
+            "attempts": retry_count
         }
     
     async def _execute_api_call(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:

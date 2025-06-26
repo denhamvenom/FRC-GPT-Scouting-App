@@ -1,0 +1,18 @@
+2025-06-25 12:03:31,231 - data_aggregation_service - INFO - Loaded dataset from /tmp/tmp01cc8o6w.json
+2025-06-25 12:03:31,440 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 12:03:31,441 - picklist_generator - INFO - Merged picklist: 1 + 1 = 2 teams
+2025-06-25 13:55:04,479 - data_aggregation_service - INFO - Loaded dataset from test_dataset.json
+2025-06-25 13:55:05,517 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 13:55:05,518 - picklist_generator - INFO - Merged picklist: 2 + 2 = 3 teams
+2025-06-25 13:55:55,167 - data_aggregation_service - INFO - Loaded dataset from test_dataset.json
+2025-06-25 13:55:55,308 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 13:55:55,309 - picklist_generator - INFO - Merged picklist: 1 + 1 = 2 teams
+2025-06-25 13:55:55,309 - picklist_generator - ERROR - Error merging picklists: existing_picklist must be a list
+2025-06-25 14:53:31,627 - data_aggregation_service - INFO - Loaded dataset from /tmp/test_dataset.json
+2025-06-25 14:53:31,844 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 14:53:46,795 - data_aggregation_service - INFO - Loaded dataset from /tmp/tmp_sdgzqna.json
+2025-06-25 14:53:46,953 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 14:53:46,954 - data_aggregation_service - INFO - Filtered teams: 2 -> 2
+2025-06-25 14:53:46,954 - data_aggregation_service - INFO - Prepared 2 teams for analysis
+2025-06-25 14:53:46,954 - picklist_generator - INFO - Using single processing for 2 teams
+2025-06-25 14:53:50,658 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"

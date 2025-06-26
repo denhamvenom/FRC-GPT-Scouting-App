@@ -16,12 +16,12 @@ class PriorityCalculationService:
         """Initialize the priority calculation service."""
         pass
 
-    def normalize_priorities(self, priorities: Dict[str, float]) -> List[Dict[str, Any]]:
+    def normalize_priorities(self, priorities: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Normalize priority weights and convert to standard format.
         
         Args:
-            priorities: Dictionary of priority names to weights
+            priorities: List of priority dictionaries with 'metric' and 'weight' keys
             
         Returns:
             List of normalized priority dictionaries
@@ -29,20 +29,23 @@ class PriorityCalculationService:
         if not priorities:
             return []
 
-        total_weight = sum(priorities.values())
+        # Extract weights and calculate total
+        total_weight = sum(p.get("weight", 0) for p in priorities)
         if total_weight <= 0:
             logger.warning("Total priority weight is zero or negative")
             return []
 
         normalized_priorities = []
-        for name, weight in priorities.items():
-            if weight > 0:
+        for priority in priorities:
+            weight = priority.get("weight", 0)
+            metric = priority.get("metric", "")
+            if weight > 0 and metric:
                 normalized_weight = weight / total_weight
                 normalized_priorities.append({
-                    "name": name,
+                    "metric": metric,
                     "weight": normalized_weight,
                     "original_weight": weight,
-                    "description": self._get_priority_description(name)
+                    "description": self._get_priority_description(metric)
                 })
 
         # Sort by weight (highest first)
@@ -415,12 +418,12 @@ class PriorityCalculationService:
 
         return base_priorities
 
-    def validate_priorities(self, priorities: Dict[str, float]) -> Dict[str, Any]:
+    def validate_priorities(self, priorities: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Validate priority weights for correctness and consistency.
         
         Args:
-            priorities: Priority weights to validate
+            priorities: List of priority dictionaries to validate
             
         Returns:
             Validation result with any issues found
@@ -438,33 +441,36 @@ class PriorityCalculationService:
             return validation_result
 
         # Check for negative weights
-        negative_weights = [name for name, weight in priorities.items() if weight < 0]
+        negative_weights = [p.get("metric", "unknown") for p in priorities if p.get("weight", 0) < 0]
         if negative_weights:
             validation_result["valid"] = False
             validation_result["errors"].append(f"Negative weights found: {negative_weights}")
 
         # Check for zero total weight
-        total_weight = sum(priorities.values())
+        total_weight = sum(p.get("weight", 0) for p in priorities)
         if total_weight <= 0:
             validation_result["valid"] = False
             validation_result["errors"].append("Total weight is zero or negative")
 
         # Warn about extreme weights
         if total_weight > 0:
-            for name, weight in priorities.items():
+            for priority in priorities:
+                metric = priority.get("metric", "unknown")
+                weight = priority.get("weight", 0)
                 percentage = (weight / total_weight) * 100
                 if percentage > 70:
                     validation_result["warnings"].append(
-                        f"Priority '{name}' has very high weight ({percentage:.1f}%)"
+                        f"Priority '{metric}' has very high weight ({percentage:.1f}%)"
                     )
                 elif percentage < 5 and weight > 0:
                     validation_result["warnings"].append(
-                        f"Priority '{name}' has very low weight ({percentage:.1f}%)"
+                        f"Priority '{metric}' has very low weight ({percentage:.1f}%)"
                     )
 
         # Suggest common priorities if missing
         common_priorities = {"autonomous", "teleop", "endgame", "defense", "reliability"}
-        missing_common = common_priorities - set(priorities.keys())
+        provided_metrics = {p.get("metric", "") for p in priorities}
+        missing_common = common_priorities - provided_metrics
         if missing_common:
             validation_result["suggestions"].append(
                 f"Consider adding common priorities: {missing_common}"

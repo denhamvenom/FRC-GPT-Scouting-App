@@ -3,6 +3,7 @@
 import hashlib
 import logging
 import time
+import statistics
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("performance_optimization_service")
@@ -10,445 +11,314 @@ logger = logging.getLogger("performance_optimization_service")
 
 class PerformanceOptimizationService:
     """
-    Service for handling caching, optimization, and resource management.
-    Extracted from monolithic PicklistGeneratorService to improve maintainability.
+    Service for optimizing team data and token usage.
+    Restored from original system algorithms.
     """
-
-    def __init__(self, shared_cache: Dict[str, Any]):
-        """
-        Initialize the performance optimization service.
+    
+    def __init__(self, cache_instance=None):
+        """Initialize with cache reference for result storage."""
+        self._cache = cache_instance or {}
         
-        Args:
-            shared_cache: Shared cache dictionary for storing results
-        """
-        self.cache = shared_cache
-        self.cache_stats = {
-            "hits": 0,
-            "misses": 0,
-            "invalidations": 0,
-            "total_requests": 0
+    def condense_team_data_for_gpt(self, teams_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """ORIGINAL TEAM DATA CONDENSATION - EXACT RESTORATION"""
+        
+        condensed_teams = []
+        
+        for team_data in teams_data:
+            condensed_team = {
+                "team_number": team_data["team_number"],
+                "nickname": team_data.get("nickname", f"Team {team_data['team_number']}")
+            }
+            
+            # ORIGINAL METRICS CONDENSATION
+            if "scouting_data" in team_data and team_data["scouting_data"]:
+                condensed_team["metrics"] = self._condense_metrics(team_data["scouting_data"])
+            elif "metrics" in team_data:
+                # Already condensed metrics
+                condensed_team["metrics"] = team_data["metrics"]
+            
+            # ORIGINAL STATBOTICS INTEGRATION
+            if "statbotics" in team_data and isinstance(team_data["statbotics"], dict):
+                for key, value in team_data["statbotics"].items():
+                    condensed_team[f"statbotics_{key}"] = value
+            
+            # ORIGINAL SUPERSCOUTING LIMITATION (1 note max)
+            if "superscouting" in team_data and team_data["superscouting"]:
+                notes = team_data["superscouting"]
+                if isinstance(notes, list) and notes:
+                    condensed_team["superscouting"] = notes[0][:100]  # Take only first note, limit to 100 chars
+                elif isinstance(notes, str):
+                    condensed_team["superscouting"] = notes[:100]  # Limit to 100 chars
+            
+            condensed_teams.append(condensed_team)
+        
+        logger.debug(f"Condensed {len(teams_data)} teams for GPT processing")
+        return condensed_teams
+
+    def _condense_metrics(self, scouting_data: List[Dict[str, Any]]) -> Dict[str, float]:
+        """ORIGINAL METRICS AVERAGING - EXACT RESTORATION"""
+        
+        if not scouting_data:
+            return {}
+        
+        # ORIGINAL ESSENTIAL FIELDS ONLY
+        essential_fields = [
+            "auto_points", "teleop_points", "endgame_points",
+            "auto_mobility", "auto_docking", "teleop_scoring_rate",
+            "defense_rating", "driver_skill", "consistency_rating",
+            "auto_gamepieces", "teleop_gamepieces", "endgame_climb",
+            "penalty_count", "foul_count", "tech_foul_count"
+        ]
+        
+        metrics = {}
+        for field in essential_fields:
+            values = []
+            for match in scouting_data:
+                if isinstance(match.get(field), (int, float)):
+                    values.append(match[field])
+            
+            if values:
+                # Use median for more robust average with outliers
+                if len(values) >= 3:
+                    metrics[field] = round(statistics.median(values), 2)
+                else:
+                    metrics[field] = round(sum(values) / len(values), 2)
+        
+        return metrics
+
+    def calculate_weighted_score(self, team_data: Dict[str, Any], priorities: List[Dict[str, Any]]) -> float:
+        """ORIGINAL WEIGHTED SCORING - EXACT RESTORATION"""
+        
+        if not priorities:
+            return 0.0
+        
+        total_score = 0.0
+        total_weight = 0.0
+        
+        for priority in priorities:
+            field_name = priority.get("id", "")
+            weight = priority.get("weight", 1.0)
+            
+            # ORIGINAL FIELD MAPPING
+            field_value = self._extract_field_value(team_data, field_name)
+            
+            if field_value is not None:
+                total_score += field_value * weight
+                total_weight += weight
+        
+        return round(total_score / total_weight if total_weight > 0 else 0.0, 2)
+
+    def _extract_field_value(self, team_data: Dict[str, Any], field_name: str) -> Optional[float]:
+        """ORIGINAL FIELD EXTRACTION LOGIC - EXACT RESTORATION"""
+        
+        # Try metrics first (most common location)
+        if "metrics" in team_data and isinstance(team_data["metrics"], dict):
+            if field_name in team_data["metrics"]:
+                try:
+                    return float(team_data["metrics"][field_name])
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try statbotics fields
+        if "statbotics" in team_data and isinstance(team_data["statbotics"], dict):
+            if field_name in team_data["statbotics"]:
+                try:
+                    return float(team_data["statbotics"][field_name])
+                except (ValueError, TypeError):
+                    pass
+        
+        # Try statbotics with prefix
+        statbotics_field = f"statbotics_{field_name}"
+        if statbotics_field in team_data:
+            try:
+                return float(team_data[statbotics_field])
+            except (ValueError, TypeError):
+                pass
+        
+        # Try direct field access
+        if field_name in team_data:
+            try:
+                return float(team_data[field_name])
+            except (ValueError, TypeError):
+                pass
+        
+        # Handle common field mappings
+        field_mappings = {
+            "auto": "auto_points",
+            "teleop": "teleop_points", 
+            "endgame": "endgame_points",
+            "defense": "defense_rating",
+            "consistency": "consistency_rating"
         }
+        
+        if field_name in field_mappings:
+            return self._extract_field_value(team_data, field_mappings[field_name])
+        
+        return None
+
+    def estimate_token_usage(
+        self, 
+        teams_count: int, 
+        priorities_count: int, 
+        use_ultra_compact: bool = True,
+        has_game_context: bool = False
+    ) -> Dict[str, int]:
+        """ORIGINAL TOKEN ESTIMATION - EXACT RESTORATION"""
+        
+        # ORIGINAL TOKEN ESTIMATION FORMULAS
+        base_system_tokens = 200 if use_ultra_compact else 400
+        base_user_tokens = 150
+        
+        # ORIGINAL PER-TEAM TOKEN COSTS
+        tokens_per_team = 25 if use_ultra_compact else 45
+        tokens_per_priority = 15
+        
+        # Game context adds tokens
+        game_context_tokens = 100 if has_game_context else 0
+        
+        estimated_input = (
+            base_system_tokens + 
+            base_user_tokens + 
+            (teams_count * tokens_per_team) + 
+            (priorities_count * tokens_per_priority) +
+            game_context_tokens
+        )
+        
+        # ORIGINAL OUTPUT ESTIMATION
+        estimated_output = teams_count * (8 if use_ultra_compact else 15)
+        
+        total_tokens = estimated_input + estimated_output
+        
+        # Add safety margin
+        total_with_margin = int(total_tokens * 1.1)
+        
+        return {
+            "input_tokens": estimated_input,
+            "output_tokens": estimated_output,
+            "total_tokens": total_tokens,
+            "total_with_margin": total_with_margin,
+            "optimization_used": "ultra_compact" if use_ultra_compact else "standard",
+            "within_limits": total_with_margin < 100000
+        }
+
+    def should_use_batching(self, teams_count: int, priorities_count: int) -> bool:
+        """ORIGINAL BATCHING DECISION LOGIC"""
+        
+        # Estimate token usage
+        estimation = self.estimate_token_usage(teams_count, priorities_count, use_ultra_compact=True)
+        
+        # ORIGINAL DECISION FACTORS
+        # 1. Team count threshold (primary)
+        if teams_count > 20:
+            return True
+        
+        # 2. Token limit threshold (secondary) 
+        if estimation["total_with_margin"] > 80000:  # 80% of limit
+            return True
+        
+        # 3. Priority complexity (tertiary)
+        if priorities_count > 6:
+            return True
+        
+        return False
+
+    def get_optimal_processing_strategy(
+        self, 
+        teams_count: int, 
+        priorities_count: int,
+        user_preference: Optional[bool] = None
+    ) -> Dict[str, Any]:
+        """COMPREHENSIVE PROCESSING STRATEGY RECOMMENDATION"""
+        
+        # Calculate recommendations
+        auto_batch_recommended = self.should_use_batching(teams_count, priorities_count)
+        token_estimation = self.estimate_token_usage(teams_count, priorities_count)
+        
+        # Determine final strategy
+        if user_preference is not None:
+            use_batching = user_preference
+            strategy_source = "user_specified"
+        else:
+            use_batching = auto_batch_recommended
+            strategy_source = "auto_determined"
+        
+        # Calculate batch parameters if batching
+        batch_size = 20
+        if use_batching:
+            # Adjust batch size based on priorities
+            if priorities_count > 5:
+                batch_size = 18
+            elif priorities_count > 3:
+                batch_size = 19
+            else:
+                batch_size = 20
+        
+        return {
+            "use_batching": use_batching,
+            "strategy_source": strategy_source,
+            "batch_size": batch_size,
+            "estimated_batches": (teams_count // batch_size) + (1 if teams_count % batch_size else 0) if use_batching else 1,
+            "token_estimation": token_estimation,
+            "recommendations": {
+                "auto_batch_recommended": auto_batch_recommended,
+                "reason": self._get_strategy_reason(teams_count, priorities_count, auto_batch_recommended)
+            }
+        }
+
+    def _get_strategy_reason(self, teams_count: int, priorities_count: int, recommended_batching: bool) -> str:
+        """Explain why a strategy was recommended"""
+        
+        if recommended_batching:
+            reasons = []
+            if teams_count > 20:
+                reasons.append(f"team count ({teams_count}) exceeds threshold (20)")
+            
+            estimation = self.estimate_token_usage(teams_count, priorities_count)
+            if estimation["total_with_margin"] > 80000:
+                reasons.append(f"token usage ({estimation['total_with_margin']}) near limit")
+            
+            if priorities_count > 6:
+                reasons.append(f"high priority complexity ({priorities_count})")
+            
+            return f"Batching recommended: {', '.join(reasons)}"
+        else:
+            return f"Single processing optimal: {teams_count} teams with {priorities_count} priorities fits comfortably"
 
     def generate_cache_key(
         self,
         your_team_number: int,
         pick_position: str,
-        priorities: Dict[str, float],
+        priorities: List[Dict[str, Any]],
         exclude_teams: Optional[List[int]] = None,
         team_count: Optional[int] = None,
         **kwargs
     ) -> str:
-        """
-        Generate a deterministic cache key based on input parameters.
-        
-        Args:
-            your_team_number: Team number making the request
-            pick_position: Pick position context
-            priorities: Priority weights
-            exclude_teams: Teams to exclude from analysis
-            team_count: Number of teams to include
-            **kwargs: Additional parameters
-            
-        Returns:
-            Unique cache key string
-        """
-        # Create a stable representation of the parameters
-        cache_components = {
+        """Generate deterministic cache key."""
+        import json
+        sorted_params = json.dumps({
             "team": your_team_number,
             "position": pick_position,
-            "priorities": sorted(priorities.items()) if priorities else [],
-            "exclude": sorted(exclude_teams) if exclude_teams else [],
-            "count": team_count,
-        }
-        
-        # Add relevant kwargs
-        for key in ["batch_size", "use_batching", "reference_teams_count"]:
-            if key in kwargs:
-                cache_components[key] = kwargs[key]
-
-        # Convert to string and hash
-        cache_string = str(cache_components)
-        cache_hash = hashlib.md5(cache_string.encode()).hexdigest()
-        
-        # Create human-readable prefix
-        prefix = f"picklist_{your_team_number}_{pick_position}"
-        
-        return f"{prefix}_{cache_hash[:12]}"
+            "priorities": priorities,
+            "exclude": exclude_teams or [],
+            "count": team_count
+        }, sort_keys=True)
+        return hashlib.md5(sorted_params.encode()).hexdigest()[:16]
 
     def get_cached_result(self, cache_key: str) -> Optional[Dict[str, Any]]:
-        """
-        Retrieve a cached result if available and not expired.
-        
-        Args:
-            cache_key: Cache key to look up
-            
-        Returns:
-            Cached result or None if not found/expired
-        """
-        self.cache_stats["total_requests"] += 1
-        
-        if cache_key not in self.cache:
-            self.cache_stats["misses"] += 1
-            return None
+        """Retrieve cached result"""
+        if self._cache is not None and cache_key in self._cache:
+            logger.debug(f"Retrieved cached result for key: {cache_key}")
+            return self._cache[cache_key]
+        return None
 
-        cached_data = self.cache[cache_key]
-        
-        # Handle different cache data types
-        if isinstance(cached_data, float):
-            # Timestamp-based cache entry (still processing)
-            self.cache_stats["hits"] += 1
-            return {"status": "processing", "timestamp": cached_data}
-        
-        elif isinstance(cached_data, dict):
-            # Check if it's a batch processing entry
-            if "batch_processing" in cached_data:
-                self.cache_stats["hits"] += 1
-                return cached_data
-            
-            # Check expiration if timestamp is available
-            timestamp = cached_data.get("timestamp")
-            if timestamp and self._is_cache_expired(timestamp):
-                self._invalidate_cache_key(cache_key)
-                self.cache_stats["misses"] += 1
-                return None
-            
-            self.cache_stats["hits"] += 1
-            return cached_data
-        
-        else:
-            # Unknown cache format, invalidate
-            self._invalidate_cache_key(cache_key)
-            self.cache_stats["misses"] += 1
-            return None
-
-    def store_cached_result(
-        self, 
-        cache_key: str, 
-        result: Dict[str, Any],
-        ttl_seconds: Optional[int] = None
-    ) -> None:
-        """
-        Store a result in the cache with optional TTL.
-        
-        Args:
-            cache_key: Cache key to store under
-            result: Result data to cache
-            ttl_seconds: Time-to-live in seconds (optional)
-        """
-        cached_data = result.copy()
-        
-        # Add timestamp for expiration tracking
-        cached_data["timestamp"] = time.time()
-        
-        if ttl_seconds:
-            cached_data["expires_at"] = time.time() + ttl_seconds
-        
-        self.cache[cache_key] = cached_data
-        logger.debug(f"Cached result for key: {cache_key}")
+    def store_cached_result(self, cache_key: str, result: Dict[str, Any]) -> None:
+        """Store result in performance cache"""
+        if self._cache is not None:
+            self._cache[cache_key] = result
+            logger.debug(f"Cached result for key: {cache_key}")
 
     def mark_cache_processing(self, cache_key: str) -> None:
-        """
-        Mark a cache key as currently being processed.
-        
-        Args:
-            cache_key: Cache key to mark
-        """
-        self.cache[cache_key] = time.time()
-        logger.debug(f"Marked cache key as processing: {cache_key}")
-
-    def _is_cache_expired(self, timestamp: float, default_ttl: int = 3600) -> bool:
-        """
-        Check if a cached entry has expired.
-        
-        Args:
-            timestamp: Cache entry timestamp
-            default_ttl: Default TTL in seconds
-            
-        Returns:
-            True if expired
-        """
-        expiration_time = timestamp + default_ttl
-        return time.time() > expiration_time
-
-    def _invalidate_cache_key(self, cache_key: str) -> None:
-        """
-        Remove a specific cache key.
-        
-        Args:
-            cache_key: Cache key to remove
-        """
-        if cache_key in self.cache:
-            del self.cache[cache_key]
-            self.cache_stats["invalidations"] += 1
-            logger.debug(f"Invalidated cache key: {cache_key}")
-
-    def invalidate_cache_pattern(self, pattern: str) -> int:
-        """
-        Invalidate all cache keys matching a pattern.
-        
-        Args:
-            pattern: Pattern to match (simple string contains)
-            
-        Returns:
-            Number of keys invalidated
-        """
-        keys_to_remove = []
-        
-        for cache_key in self.cache.keys():
-            if pattern in cache_key:
-                keys_to_remove.append(cache_key)
-        
-        for key in keys_to_remove:
-            self._invalidate_cache_key(key)
-        
-        logger.info(f"Invalidated {len(keys_to_remove)} cache keys matching pattern: {pattern}")
-        return len(keys_to_remove)
-
-    def get_cache_statistics(self) -> Dict[str, Any]:
-        """
-        Get cache performance statistics.
-        
-        Returns:
-            Dictionary with cache statistics
-        """
-        total_requests = self.cache_stats["total_requests"]
-        hit_rate = (
-            self.cache_stats["hits"] / total_requests * 100 
-            if total_requests > 0 else 0.0
-        )
-        
-        return {
-            "cache_size": len(self.cache),
-            "total_requests": total_requests,
-            "cache_hits": self.cache_stats["hits"],
-            "cache_misses": self.cache_stats["misses"],
-            "hit_rate_percent": round(hit_rate, 2),
-            "invalidations": self.cache_stats["invalidations"],
-            "memory_usage_estimate": self._estimate_cache_memory_usage()
-        }
-
-    def _estimate_cache_memory_usage(self) -> Dict[str, int]:
-        """
-        Estimate cache memory usage.
-        
-        Returns:
-            Dictionary with memory usage estimates
-        """
-        total_entries = len(self.cache)
-        
-        # Simple estimation - in reality you'd use more sophisticated methods
-        estimated_bytes_per_entry = 1024  # 1KB average per cache entry
-        estimated_total_bytes = total_entries * estimated_bytes_per_entry
-        
-        return {
-            "total_entries": total_entries,
-            "estimated_bytes": estimated_total_bytes,
-            "estimated_mb": round(estimated_total_bytes / (1024 * 1024), 2)
-        }
-
-    def cleanup_expired_cache(self, max_age_seconds: int = 3600) -> int:
-        """
-        Remove expired cache entries.
-        
-        Args:
-            max_age_seconds: Maximum age for cache entries
-            
-        Returns:
-            Number of entries removed
-        """
-        current_time = time.time()
-        keys_to_remove = []
-        
-        for cache_key, cached_data in self.cache.items():
-            should_remove = False
-            
-            if isinstance(cached_data, float):
-                # Timestamp-only entries (processing markers)
-                if current_time - cached_data > max_age_seconds:
-                    should_remove = True
-            elif isinstance(cached_data, dict):
-                # Check explicit expiration
-                if "expires_at" in cached_data:
-                    if current_time > cached_data["expires_at"]:
-                        should_remove = True
-                # Check timestamp-based expiration
-                elif "timestamp" in cached_data:
-                    if current_time - cached_data["timestamp"] > max_age_seconds:
-                        should_remove = True
-            
-            if should_remove:
-                keys_to_remove.append(cache_key)
-        
-        for key in keys_to_remove:
-            self._invalidate_cache_key(key)
-        
-        logger.info(f"Cleaned up {len(keys_to_remove)} expired cache entries")
-        return len(keys_to_remove)
-
-    def optimize_memory_usage(self, max_cache_size: int = 1000) -> Dict[str, Any]:
-        """
-        Optimize memory usage by removing old cache entries if needed.
-        
-        Args:
-            max_cache_size: Maximum number of cache entries to keep
-            
-        Returns:
-            Optimization report
-        """
-        current_size = len(self.cache)
-        
-        if current_size <= max_cache_size:
-            return {
-                "action": "no_cleanup_needed",
-                "current_size": current_size,
-                "max_size": max_cache_size,
-                "removed_entries": 0
-            }
-        
-        # Sort cache entries by timestamp (oldest first)
-        cache_items = []
-        for key, data in self.cache.items():
-            timestamp = None
-            
-            if isinstance(data, float):
-                timestamp = data
-            elif isinstance(data, dict) and "timestamp" in data:
-                timestamp = data["timestamp"]
-            
-            cache_items.append((key, timestamp or 0))
-        
-        cache_items.sort(key=lambda x: x[1])
-        
-        # Remove oldest entries
-        entries_to_remove = current_size - max_cache_size
-        removed_keys = []
-        
-        for i in range(entries_to_remove):
-            key = cache_items[i][0]
-            self._invalidate_cache_key(key)
-            removed_keys.append(key)
-        
-        return {
-            "action": "cleanup_performed",
-            "current_size": len(self.cache),
-            "max_size": max_cache_size,
-            "removed_entries": len(removed_keys),
-            "removed_keys": removed_keys[:10]  # Show first 10 for debugging
-        }
-
-    def get_cache_health_report(self) -> Dict[str, Any]:
-        """
-        Generate a comprehensive cache health report.
-        
-        Returns:
-            Cache health analysis
-        """
-        stats = self.get_cache_statistics()
-        current_time = time.time()
-        
-        # Analyze cache entry ages
-        entry_ages = []
-        processing_entries = 0
-        expired_entries = 0
-        
-        for cached_data in self.cache.values():
-            if isinstance(cached_data, float):
-                age = current_time - cached_data
-                entry_ages.append(age)
-                processing_entries += 1
-            elif isinstance(cached_data, dict) and "timestamp" in cached_data:
-                age = current_time - cached_data["timestamp"]
-                entry_ages.append(age)
-                
-                # Check if expired
-                if self._is_cache_expired(cached_data["timestamp"]):
-                    expired_entries += 1
-        
-        # Calculate age statistics
-        if entry_ages:
-            avg_age = sum(entry_ages) / len(entry_ages)
-            max_age = max(entry_ages)
-            min_age = min(entry_ages)
-        else:
-            avg_age = max_age = min_age = 0
-        
-        health_score = 100.0
-        recommendations = []
-        
-        # Evaluate health factors
-        if stats["hit_rate_percent"] < 50:
-            health_score -= 20
-            recommendations.append("Low cache hit rate - consider adjusting cache strategy")
-        
-        if expired_entries > len(self.cache) * 0.1:  # More than 10% expired
-            health_score -= 15
-            recommendations.append("Many expired entries - run cache cleanup")
-        
-        if processing_entries > len(self.cache) * 0.2:  # More than 20% processing
-            health_score -= 10
-            recommendations.append("Many processing entries - check for stuck operations")
-        
-        if len(self.cache) > 1000:
-            health_score -= 10
-            recommendations.append("Large cache size - consider memory optimization")
-        
-        return {
-            "health_score": max(0, round(health_score, 1)),
-            "statistics": stats,
-            "entry_analysis": {
-                "total_entries": len(self.cache),
-                "processing_entries": processing_entries,
-                "expired_entries": expired_entries,
-                "average_age_seconds": round(avg_age, 1),
-                "max_age_seconds": round(max_age, 1),
-                "min_age_seconds": round(min_age, 1)
-            },
-            "recommendations": recommendations,
-            "timestamp": current_time
-        }
-
-    def precompute_common_scenarios(
-        self, 
-        common_team_numbers: List[int],
-        common_positions: List[str],
-        common_priorities: List[Dict[str, float]]
-    ) -> Dict[str, Any]:
-        """
-        Prepare cache entries for common scenarios to improve response times.
-        
-        Args:
-            common_team_numbers: Frequently analyzed teams
-            common_positions: Common pick positions
-            common_priorities: Common priority configurations
-            
-        Returns:
-            Precomputation report
-        """
-        precompute_report = {
-            "scenarios_identified": 0,
-            "cache_keys_generated": [],
-            "estimated_coverage": 0.0
-        }
-        
-        # Generate cache keys for common scenarios
-        for team_number in common_team_numbers:
-            for position in common_positions:
-                for priorities in common_priorities:
-                    cache_key = self.generate_cache_key(
-                        your_team_number=team_number,
-                        pick_position=position,
-                        priorities=priorities
-                    )
-                    
-                    precompute_report["cache_keys_generated"].append(cache_key)
-                    precompute_report["scenarios_identified"] += 1
-        
-        # Calculate estimated coverage
-        # This would require analysis of actual request patterns in practice
-        precompute_report["estimated_coverage"] = min(
-            precompute_report["scenarios_identified"] / 100.0, 1.0
-        )
-        
-        logger.info(f"Identified {precompute_report['scenarios_identified']} scenarios for precomputation")
-        
-        return precompute_report
+        """Mark a cache key as currently being processed."""
+        if self._cache is not None:
+            self._cache[cache_key] = time.time()
+            logger.debug(f"Marked cache key as processing: {cache_key}")

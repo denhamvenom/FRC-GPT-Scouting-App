@@ -51,7 +51,7 @@ class TeamComparisonService:
 
         # Token count validation (preserve existing behavior)
         total_content = system_prompt + "\n".join([msg["content"] for msg in messages[1:]])
-        self.generator._check_token_count(system_prompt, total_content)
+        self.generator.gpt_service.check_token_count(system_prompt, total_content)
 
         # Get GPT analysis
         if chat_history and question:
@@ -101,7 +101,7 @@ class TeamComparisonService:
                 }
             else:
                 # Fallback to old format if needed
-                ordered = self.generator._parse_response_with_index_mapping(
+                ordered = self.generator.gpt_service.parse_response_with_index_mapping(
                     data, teams_data, team_index_map
                 )
                 return {

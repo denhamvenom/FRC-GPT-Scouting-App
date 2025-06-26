@@ -25,7 +25,8 @@ class TeamDataService:
         Raises:
             ValueError: If any teams are not found in dataset
         """
-        teams_data_all = self.generator._prepare_team_data_for_gpt()
+        # Use the new orchestrator's data aggregation service
+        teams_data_all = self.generator.data_service.get_teams_for_analysis()
         teams_data = [t for t in teams_data_all if t["team_number"] in team_numbers]
         
         # Validate all teams found

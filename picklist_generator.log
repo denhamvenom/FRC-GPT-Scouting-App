@@ -1,0 +1,107 @@
+2025-06-25 17:08:44,707 - reconstruction_validation - INFO - 🚀 Starting Picklist Reconstruction Validation Tests
+2025-06-25 17:08:44,714 - data_aggregation_service - INFO - Loaded dataset from backend/app/data/unified_event_2025lake.json
+2025-06-25 17:08:44,936 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 17:08:44,937 - reconstruction_validation - INFO - 🧪 Running test_55_teams_auto_strategy
+2025-06-25 17:08:44,938 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,939 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,939 - picklist_generator - INFO - Processing strategy: Auto-selected batching for 55 teams (threshold: 20)
+2025-06-25 17:08:44,940 - picklist_generator - INFO - Using batch processing for 55 teams with batch size 20
+2025-06-25 17:08:44,940 - picklist_generator - INFO - Split teams into 3 batches
+2025-06-25 17:08:44,940 - picklist_generator - INFO - Processing batch 1/3 with 20 teams
+2025-06-25 17:08:44,940 - picklist_generator - ERROR - Error in generate_picklist: PicklistGPTService.create_system_prompt() got an unexpected keyword argument 'use_index_mapping'
+2025-06-25 17:08:44,941 - reconstruction_validation - INFO - ❌ test_55_teams_auto_strategy: FAILED
+2025-06-25 17:08:44,941 - reconstruction_validation - INFO -    ⏱️  Processing time: 0.00s
+2025-06-25 17:08:44,941 - reconstruction_validation - INFO -    👥 Teams returned: 0
+2025-06-25 17:08:44,941 - reconstruction_validation - INFO - 🧪 Running test_55_teams_forced_batching
+2025-06-25 17:08:44,942 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,943 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,943 - picklist_generator - INFO - Processing strategy: User-specified batching for 55 teams
+2025-06-25 17:08:44,943 - picklist_generator - INFO - Using batch processing for 55 teams with batch size 20
+2025-06-25 17:08:44,943 - picklist_generator - INFO - Split teams into 3 batches
+2025-06-25 17:08:44,944 - picklist_generator - INFO - Processing batch 1/3 with 20 teams
+2025-06-25 17:08:44,944 - picklist_generator - ERROR - Error in generate_picklist: PicklistGPTService.create_system_prompt() got an unexpected keyword argument 'use_index_mapping'
+2025-06-25 17:08:44,944 - reconstruction_validation - INFO - ❌ test_55_teams_forced_batching: FAILED
+2025-06-25 17:08:44,944 - reconstruction_validation - INFO -    ⏱️  Processing time: 0.00s
+2025-06-25 17:08:44,945 - reconstruction_validation - INFO -    👥 Teams returned: 0
+2025-06-25 17:08:44,945 - reconstruction_validation - INFO - 🧪 Running test_token_usage_measurement
+2025-06-25 17:08:44,945 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,946 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,946 - reconstruction_validation - INFO - ✅ test_token_usage_measurement: PASSED
+2025-06-25 17:08:44,947 - reconstruction_validation - INFO -    🔤 Estimated tokens: 2,574
+2025-06-25 17:08:44,947 - reconstruction_validation - INFO - 🧪 Running test_duplicate_prevention
+2025-06-25 17:08:44,947 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,948 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,948 - picklist_generator - WARNING - Single processing forced for 55 teams - may encounter rate limits
+2025-06-25 17:08:44,949 - picklist_generator - INFO - Processing strategy: User-specified single for 55 teams
+2025-06-25 17:08:44,949 - picklist_generator - INFO - Using single processing for 55 teams
+2025-06-25 17:08:44,949 - picklist_generator - INFO - Single processing 55 teams with index mapping to prevent duplicates
+2025-06-25 17:08:44,949 - picklist_generator - ERROR - Error in generate_picklist: 'PicklistGPTService' object has no attribute '_prepare_teams_with_scores'
+2025-06-25 17:08:44,950 - reconstruction_validation - INFO - ✅ test_duplicate_prevention: PASSED
+2025-06-25 17:08:44,950 - reconstruction_validation - INFO - 🧪 Running test_missing_team_detection
+2025-06-25 17:08:44,950 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,951 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,951 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,952 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,952 - picklist_generator - WARNING - Single processing forced for 55 teams - may encounter rate limits
+2025-06-25 17:08:44,953 - picklist_generator - INFO - Processing strategy: User-specified single for 55 teams
+2025-06-25 17:08:44,953 - picklist_generator - INFO - Using single processing for 55 teams
+2025-06-25 17:08:44,953 - picklist_generator - INFO - Single processing 55 teams with index mapping to prevent duplicates
+2025-06-25 17:08:44,953 - picklist_generator - ERROR - Error in generate_picklist: 'PicklistGPTService' object has no attribute '_prepare_teams_with_scores'
+2025-06-25 17:08:44,954 - reconstruction_validation - INFO - ❌ test_missing_team_detection: FAILED
+2025-06-25 17:08:44,954 - reconstruction_validation - INFO - 🧪 Running test_processing_time
+2025-06-25 17:08:44,954 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:08:44,955 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:08:44,956 - picklist_generator - WARNING - Single processing forced for 55 teams - may encounter rate limits
+2025-06-25 17:08:44,956 - picklist_generator - INFO - Processing strategy: User-specified single for 55 teams
+2025-06-25 17:08:44,956 - picklist_generator - INFO - Using single processing for 55 teams
+2025-06-25 17:08:44,956 - picklist_generator - INFO - Single processing 55 teams with index mapping to prevent duplicates
+2025-06-25 17:08:44,956 - picklist_generator - ERROR - Error in generate_picklist: 'PicklistGPTService' object has no attribute '_prepare_teams_with_scores'
+2025-06-25 17:08:44,957 - reconstruction_validation - INFO - ❌ test_processing_time: FAILED
+2025-06-25 17:10:08,965 - reconstruction_validation - INFO - 🚀 Starting Picklist Reconstruction Validation Tests
+2025-06-25 17:10:08,971 - data_aggregation_service - INFO - Loaded dataset from backend/app/data/unified_event_2025lake.json
+2025-06-25 17:10:09,127 - data_aggregation_service - INFO - Loaded game context for 2025
+2025-06-25 17:10:09,128 - reconstruction_validation - INFO - 🧪 Running test_55_teams_auto_strategy
+2025-06-25 17:10:09,128 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-06-25 17:10:09,129 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-06-25 17:10:09,129 - picklist_generator - INFO - Processing strategy: Auto-selected batching for 55 teams (threshold: 20)
+2025-06-25 17:10:09,130 - picklist_generator - INFO - Using batch processing for 55 teams with batch size 20
+2025-06-25 17:10:09,130 - picklist_generator - INFO - Split teams into 3 batches
+2025-06-25 17:10:09,130 - picklist_generator - INFO - Processing batch 1/3 with 20 teams
+2025-06-25 17:10:09,138 - picklist_gpt_service - INFO - Token count: system=24613, user=2028, total=26641
+2025-06-25 17:10:18,084 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-25 17:10:18,095 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-06-25 17:10:18,096 - picklist_generator - INFO - Processing batch 2/3 with 20 teams
+2025-06-25 17:10:18,105 - picklist_gpt_service - INFO - Token count: system=24613, user=1267, total=25880
+2025-06-25 17:10:18,508 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:10:18,508 - openai._base_client - INFO - Retrying request to /chat/completions in 34.200000 seconds
+2025-06-25 17:10:48,496 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:10:48,497 - openai._base_client - INFO - Retrying request to /chat/completions in 4.206000 seconds
+2025-06-25 17:10:57,802 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-25 17:10:58,144 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-25 17:10:58,145 - picklist_gpt_service - INFO - Skipping duplicate team 3616
+2025-06-25 17:10:58,145 - picklist_generator - INFO - Selected 3 reference teams for next batch
+2025-06-25 17:10:58,146 - picklist_generator - INFO - Processing batch 3/3 with 15 teams
+2025-06-25 17:10:58,152 - picklist_gpt_service - INFO - Token count: system=24613, user=984, total=25597
+2025-06-25 17:10:58,305 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:10:58,305 - openai._base_client - INFO - Retrying request to /chat/completions in 47.318000 seconds
+2025-06-25 17:11:28,418 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:11:28,418 - openai._base_client - INFO - Retrying request to /chat/completions in 47.318000 seconds
+2025-06-25 17:11:45,877 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:11:45,877 - openai._base_client - INFO - Retrying request to /chat/completions in 47.318000 seconds
+2025-06-25 17:11:58,469 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:11:58,470 - openai._base_client - INFO - Retrying request to /chat/completions in 38.732000 seconds
+2025-06-25 17:12:28,154 - picklist_generator - ERROR - Batch 3 failed: GPT analysis failed after 3 attempts: API call timeout (30 seconds)
+2025-06-25 17:12:28,155 - picklist_generator - INFO - Performing final reranking of combined results
+2025-06-25 17:12:28,161 - picklist_gpt_service - WARNING - Token counting failed: expected string or buffer, proceeding without check
+2025-06-25 17:12:28,401 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:12:28,402 - openai._base_client - INFO - Retrying request to /chat/completions in 23.418000 seconds
+2025-06-25 17:12:33,343 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:12:33,738 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-25 17:12:37,347 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:12:37,347 - openai._base_client - INFO - Retrying request to /chat/completions in 47.318000 seconds
+2025-06-25 17:12:52,055 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:12:52,056 - openai._base_client - INFO - Retrying request to /chat/completions in 4.128000 seconds
+2025-06-25 17:12:56,367 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-06-25 17:12:56,487 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-06-25 17:12:56,609 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-25 17:12:56,610 - openai._base_client - INFO - Retrying request to /chat/completions in 48.338000 seconds

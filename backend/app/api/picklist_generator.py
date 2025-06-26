@@ -244,10 +244,6 @@ async def generate_picklist(request: PicklistRequest):
         # Use the cache on the service to prevent duplicate work
         # The generator_service has internal caching that should prevent duplicate work
 
-        # TEMPORARY: Force batching off to test one-shot processing
-        logger.info(f"API Layer - Original use_batching={request.use_batching}")
-        logger.info("FORCING use_batching to False for testing")
-
         result = await generator_service.generate_picklist(
             your_team_number=request.your_team_number,
             pick_position=request.pick_position,
@@ -258,7 +254,7 @@ async def generate_picklist(request: PicklistRequest):
             batch_size=request.batch_size,
             reference_teams_count=request.reference_teams_count,
             reference_selection=request.reference_selection,
-            use_batching=False,  # FORCING TO FALSE FOR TESTING
+            use_batching=request.use_batching,  # Use the actual request value
         )
 
         if result.get("status") == "error":
@@ -307,7 +303,7 @@ async def update_picklist(request: UpdatePicklistRequest):
 
         # Merge and update the picklist
         updated_picklist = generator_service.merge_and_update_picklist(
-            picklist=request.original_picklist, user_rankings=user_rankings
+            existing_picklist=request.original_picklist, new_rankings=user_rankings
         )
 
         return {"status": "success", "picklist": updated_picklist}
@@ -379,11 +375,11 @@ async def rank_missing_teams(request: RankMissingTeamsRequest):
 
         # Rank the missing teams
         result = await generator_service.rank_missing_teams(
-            missing_team_numbers=request.missing_team_numbers,
-            ranked_teams=request.ranked_teams,
+            existing_picklist=request.ranked_teams,
             your_team_number=request.your_team_number,
             pick_position=request.pick_position,
             priorities=priorities,
+            exclude_teams=None,
             request_id=request_id,  # Pass the request ID for logging
             cache_key=cache_key,  # Pass the cache key for deduplication
         )
