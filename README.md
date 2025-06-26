@@ -79,6 +79,7 @@ cd FRC-GPT-Scouting-App
 # Environment setup
 cp backend/.env.example backend/.env
 # Edit backend/.env and add your OPENAI_API_KEY
+# Optional: set OPENAI_MODEL to change the GPT model (default is gpt-4o)
 
 # Start with Docker (recommended)
 docker-compose up -d
