@@ -66,7 +66,14 @@ class PicklistGeneratorService:
         self.year = self.data_service.year
         self.event_key = self.data_service.event_key
         self.game_context = self.data_service.load_game_context()
-        self.token_encoder = self.gpt_service.token_encoder
+        
+        # Handle tiktoken encoding with fallback for unsupported models like gpt-4.1
+        try:
+            self.token_encoder = tiktoken.encoding_for_model(GPT_MODEL)
+        except KeyError:
+            # Use fallback encoding for GPT-4+ models when tiktoken doesn't recognize the model
+            self.token_encoder = tiktoken.get_encoding("cl100k_base")
+            logger.info(f"Using fallback encoding 'cl100k_base' for model {GPT_MODEL}")
 
     async def generate_picklist(
         self,
