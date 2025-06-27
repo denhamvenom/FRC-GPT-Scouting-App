@@ -7,6 +7,7 @@ import {
   PicklistAnalysis,
 } from "../types";
 import { useBatchProcessing } from "./useBatchProcessing";
+import { apiUrl, fetchWithNgrokHeaders } from "../../../config";
 
 interface PicklistGenerationState {
   batchProcessing: ReturnType<typeof useBatchProcessing>;
@@ -104,8 +105,8 @@ export function usePicklistGeneration(
     if (batchProcessingActive && pollingCacheKey) {
       pollingInterval = setInterval(async () => {
         try {
-          const response = await fetch(
-            "http://localhost:8000/api/picklist/generate/status",
+          const response = await fetchWithNgrokHeaders(
+            apiUrl("/api/picklist/generate/status"),
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -162,8 +163,8 @@ export function usePicklistGeneration(
     if (!pollingCacheKey) return;
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/generate/status",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/generate/status"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -209,8 +210,8 @@ export function usePicklistGeneration(
     setAnalysis(null);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/clear-cache",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/clear-cache"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -292,8 +293,8 @@ export function usePicklistGeneration(
 
       console.log("Full request body being sent:", requestBody);
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/generate",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/generate"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -395,8 +396,8 @@ export function usePicklistGeneration(
         nickname: team.nickname,
       }));
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/update",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/update"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -447,8 +448,8 @@ export function usePicklistGeneration(
         });
       }
 
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/rank-missing-teams",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/rank-missing-teams"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

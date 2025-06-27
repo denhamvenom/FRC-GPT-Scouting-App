@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import PicklistGenerator from '../components/PicklistGenerator';
 import ProgressTracker from '../components/ProgressTracker';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 // Type definitions
 interface Team {
@@ -191,7 +192,7 @@ const PicklistNew: React.FC = () => {
   const fetchLockedPicklists = async () => {
     try {
       // First get current event info from setup
-      const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+      const setupResponse = await fetchWithNgrokHeaders(apiUrl("/api/setup/info"));
       let eventKey = "";
 
       if (setupResponse.ok) {
@@ -216,7 +217,7 @@ const PicklistNew: React.FC = () => {
         setCurrentEventKey(eventKey); // Update state with default
       }
 
-      const response = await fetch('http://localhost:8000/api/alliance/picklists');
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/alliance/picklists'));
       const data = await response.json();
 
       if (data.status === 'success') {
@@ -233,7 +234,7 @@ const PicklistNew: React.FC = () => {
         if (currentPicklist) {
           // Fetch alliance selections for this picklist
           try {
-            const selectionResponse = await fetch(`http://localhost:8000/api/alliance/selection/${currentPicklist.id}`);
+            const selectionResponse = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/selection/${currentPicklist.id}`));
             const selectionData = await selectionResponse.json();
             
             if (selectionData.status === 'success' && selectionData.selection) {
@@ -253,7 +254,7 @@ const PicklistNew: React.FC = () => {
     const initializeData = async () => {
       try {
         // First, get current event info from setup
-        const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+        const setupResponse = await fetchWithNgrokHeaders(apiUrl("/api/setup/info"));
         let eventKey = "";
         let yearValue = 2025; // Default
 
@@ -281,7 +282,7 @@ const PicklistNew: React.FC = () => {
         }
 
         // Now check for dataset with the current event key
-        const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${yearValue}`);
+        const response = await fetchWithNgrokHeaders(apiUrl(`/api/unified/status?event_key=${eventKey}&year=${yearValue}`));
         const data = await response.json();
 
         if (data.status === 'exists' && data.path) {
@@ -290,7 +291,7 @@ const PicklistNew: React.FC = () => {
           // Load full dataset to get team rankings
           try {
             // Try to load dataset by event_key instead of path to avoid path encoding issues
-            const response = await fetch(`http://localhost:8000/api/unified/dataset?event_key=${eventKey}`);
+            const response = await fetchWithNgrokHeaders(apiUrl(`/api/unified/dataset?event_key=${eventKey}`));
             if (response.ok) {
               const fullDataset = await response.json();
               setDataset(fullDataset);
@@ -298,7 +299,7 @@ const PicklistNew: React.FC = () => {
             } else {
               // Fallback to path-based loading if event_key fails
               console.log("Trying fallback dataset loading with path...");
-              const pathResponse = await fetch(`http://localhost:8000/api/unified/dataset?path=${encodeURIComponent(data.path)}`);
+              const pathResponse = await fetchWithNgrokHeaders(apiUrl(`/api/unified/dataset?path=${encodeURIComponent(data.path)}`));
               if (pathResponse.ok) {
                 const pathDataset = await pathResponse.json();
                 setDataset(pathDataset);
@@ -331,7 +332,7 @@ const PicklistNew: React.FC = () => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/picklist/analyze', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/picklist/analyze'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ unified_dataset_path: path })
@@ -384,7 +385,7 @@ const PicklistNew: React.FC = () => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/picklist/analyze', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/picklist/analyze'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -698,7 +699,7 @@ const PicklistNew: React.FC = () => {
     // Clear the picklist cache before generating new picklist
     if (existingPicklist) {
       try {
-        const response = await fetch('http://localhost:8000/api/picklist/clear-cache', {
+        const response = await fetchWithNgrokHeaders(apiUrl('/api/picklist/clear-cache'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({})
@@ -747,7 +748,7 @@ const PicklistNew: React.FC = () => {
       console.log("Batching enabled:", useBatching);
 
       // Directly make the API call instead of relying on the component
-      const response = await fetch('http://localhost:8000/api/picklist/generate', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/picklist/generate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -791,7 +792,7 @@ const PicklistNew: React.FC = () => {
             await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds between polls
 
             try {
-              const statusResponse = await fetch('http://localhost:8000/api/picklist/generate/status', {
+              const statusResponse = await fetchWithNgrokHeaders(apiUrl('/api/picklist/generate/status'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cache_key: data.cache_key })
@@ -1114,7 +1115,7 @@ const PicklistNew: React.FC = () => {
         strategy_prompts: allStrategyPrompts
       };
       
-      const response = await fetch('http://localhost:8000/api/alliance/lock-picklist', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/alliance/lock-picklist'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
@@ -1148,7 +1149,7 @@ const PicklistNew: React.FC = () => {
       
       try {
         // Create a new alliance selection
-        const createResponse = await fetch('http://localhost:8000/api/alliance/selection/create', {
+        const createResponse = await fetchWithNgrokHeaders(apiUrl('/api/alliance/selection/create'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1203,7 +1204,7 @@ const PicklistNew: React.FC = () => {
       setIsLocking(true); // Reuse the loading state
       setError(null);
       
-      const response = await fetch(`http://localhost:8000/api/alliance/picklist/${currentPicklist.id}`, {
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/picklist/${currentPicklist.id}`), {
         method: 'DELETE'
       });
       

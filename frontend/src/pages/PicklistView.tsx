@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import PicklistGenerator from "../components/PicklistGenerator";
+import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 interface Team {
   team_number: number;
@@ -94,8 +95,8 @@ const PicklistView: React.FC = () => {
   const checkDatasetStatus = async () => {
     try {
       // Check for unified dataset
-      const response = await fetch(
-        "http://localhost:8000/api/unified/status?event_key=2025arc&year=2025",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/unified/status?event_key=2025arc&year=2025"),
       );
       const data = await response.json();
 
@@ -113,8 +114,8 @@ const PicklistView: React.FC = () => {
 
   const fetchMetrics = async (path: string) => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/analyze",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/analyze"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -207,8 +208,8 @@ const PicklistView: React.FC = () => {
 
   const fetchLockedPicklists = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/alliance/picklists",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/alliance/picklists"),
       );
       const data = await response.json();
 
@@ -226,8 +227,8 @@ const PicklistView: React.FC = () => {
         // Check if there's an active alliance selection
         if (currentPicklist) {
           // Fetch alliance selections for this picklist
-          const selectionResponse = await fetch(
-            `http://localhost:8000/api/alliance/selection/${currentPicklist.id}`,
+          const selectionResponse = await fetchWithNgrokHeaders(
+            apiUrl(`/api/alliance/selection/${currentPicklist.id}`),
           );
           const selectionData = await selectionResponse.json();
 
@@ -289,8 +290,8 @@ const PicklistView: React.FC = () => {
           : null,
       };
 
-      const response = await fetch(
-        "http://localhost:8000/api/alliance/lock-picklist",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/alliance/lock-picklist"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

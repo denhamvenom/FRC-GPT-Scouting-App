@@ -1,6 +1,7 @@
 // frontend/src/pages/Validation.tsx
 
 import React, { useState, useEffect } from 'react';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface TeamMatch {
   team_number: number;
@@ -84,7 +85,7 @@ function Validation() {
     const fetchEventInfoAndCheckDatasets = async () => {
       try {
         // First, get current event info from setup
-        const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+        const setupResponse = await fetchWithNgrokHeaders(apiUrl("/api/setup/info"));
         let eventKey = "";
         let yearValue = 2025; // Default
 
@@ -107,7 +108,7 @@ function Validation() {
         }
 
         // Now check for datasets with this event key
-        const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${yearValue}`);
+        const response = await fetchWithNgrokHeaders(apiUrl(`/api/unified/status?event_key=${eventKey}&year=${yearValue}`));
         const data = await response.json();
 
         if (data.status === 'exists' && data.path) {
@@ -131,7 +132,7 @@ function Validation() {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/enhanced?unified_dataset_path=${encodeURIComponent(path)}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/enhanced?unified_dataset_path=${encodeURIComponent(path)}`));
       
       if (!response.ok) {
         throw new Error('Failed to fetch validation data');
@@ -149,7 +150,7 @@ function Validation() {
   
   const fetchTodoList = async (path: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/todo-list?unified_dataset_path=${encodeURIComponent(path)}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/todo-list?unified_dataset_path=${encodeURIComponent(path)}`));
       
       if (!response.ok) {
         throw new Error('Failed to fetch to-do list');
@@ -169,7 +170,7 @@ function Validation() {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/preview-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/preview-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`));
       
       if (!response.ok) {
         throw new Error('Failed to fetch virtual scout preview');
@@ -214,8 +215,8 @@ function Validation() {
     // If this is an outlier, fetch suggestions
     if ('issues' in issue) {
       try {
-        const response = await fetch(
-          `http://localhost:8000/api/validate/suggest-corrections?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${issue.team_number}&match_number=${issue.match_number}`
+        const response = await fetchWithNgrokHeaders(
+          apiUrl(`/api/validate/suggest-corrections?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${issue.team_number}&match_number=${issue.match_number}`)
         );
         
         if (!response.ok) {
@@ -249,7 +250,7 @@ function Validation() {
     setSuccessMessage(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/apply-correction?unified_dataset_path=${encodeURIComponent(datasetPath)}`, {
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/apply-correction?unified_dataset_path=${encodeURIComponent(datasetPath)}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -297,19 +298,19 @@ function Validation() {
       
       switch (actionMode) {
         case 'watch-video':
-          response = await fetch(`http://localhost:8000/api/validate/add-to-todo?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`, {
+          response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/add-to-todo?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`), {
             method: 'POST'
           });
           break;
         
         case 'virtual-scout':
-          response = await fetch(`http://localhost:8000/api/validate/create-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`, {
+          response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/create-virtual-scout?unified_dataset_path=${encodeURIComponent(datasetPath)}&team_number=${selectedIssue.team_number}&match_number=${selectedIssue.match_number}`), {
             method: 'POST'
           });
           break;
         
         case 'ignore-match':
-          response = await fetch(`http://localhost:8000/api/validate/ignore-match?unified_dataset_path=${encodeURIComponent(datasetPath)}`, {
+          response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/ignore-match?unified_dataset_path=${encodeURIComponent(datasetPath)}`), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

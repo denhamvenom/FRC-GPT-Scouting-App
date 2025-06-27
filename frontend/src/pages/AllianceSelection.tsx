@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 // TypeScript interfaces
 interface Team {
@@ -77,7 +78,7 @@ const AllianceSelection: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await fetch('http://localhost:8000/api/alliance/picklists');
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/alliance/picklists'));
       const data = await response.json();
       
       if (data.status === 'success' && data.picklists && data.picklists.length > 0) {
@@ -87,7 +88,7 @@ const AllianceSelection: React.FC = () => {
         })[0];
         
         // Check if there's an active selection for this picklist
-        const selectionResponse = await fetch(`http://localhost:8000/api/alliance/selection/${latestPicklist.id}`);
+        const selectionResponse = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/selection/${latestPicklist.id}`));
         
         if (selectionResponse.ok) {
           const selectionData = await selectionResponse.json();
@@ -124,7 +125,7 @@ const AllianceSelection: React.FC = () => {
   };
   
   const fetchPicklistDetails = async (picklistId: number): Promise<LockedPicklist> => {
-    const response = await fetch(`http://localhost:8000/api/alliance/picklist/${picklistId}`);
+    const response = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/picklist/${picklistId}`));
     
     if (!response.ok) {
       throw new Error('Failed to fetch picklist details');
@@ -143,7 +144,7 @@ const AllianceSelection: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`http://localhost:8000/api/alliance/selection/${id}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/selection/${id}`));
       
       if (!response.ok) {
         throw new Error('Failed to fetch alliance selection data');
@@ -172,7 +173,7 @@ const AllianceSelection: React.FC = () => {
           // Fallback: Let's try to find the picklist from the list (if a picklist with this event_key exists)
           try {
             console.log("Attempting to fallback to finding picklist by event_key");
-            const picklistsResponse = await fetch('http://localhost:8000/api/alliance/picklists');
+            const picklistsResponse = await fetchWithNgrokHeaders(apiUrl('/api/alliance/picklists'));
             const picklistsData = await picklistsResponse.json();
             
             if (picklistsData.status === 'success' && picklistsData.picklists && picklistsData.picklists.length > 0) {
@@ -253,7 +254,7 @@ const AllianceSelection: React.FC = () => {
         }
       }
       
-      const response = await fetch('http://localhost:8000/api/alliance/selection/create', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/alliance/selection/create'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -307,7 +308,7 @@ const AllianceSelection: React.FC = () => {
         requestBody.alliance_number = selectedAlliance;
       }
       
-      const response = await fetch('http://localhost:8000/api/alliance/selection/team-action', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/alliance/selection/team-action'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -357,7 +358,7 @@ const AllianceSelection: React.FC = () => {
     try {
       setLoading(true);
 
-      const response = await fetch('http://localhost:8000/api/alliance/selection/team-action', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/alliance/selection/team-action'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -398,7 +399,7 @@ const AllianceSelection: React.FC = () => {
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:8000/api/alliance/selection/${selection.id}/next-round`, {
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/selection/${selection.id}/next-round`), {
         method: 'POST'
       });
 
@@ -444,7 +445,7 @@ const AllianceSelection: React.FC = () => {
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:8000/api/alliance/selection/${selection.id}/reset`, {
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/alliance/selection/${selection.id}/reset`), {
         method: 'POST'
       });
 
