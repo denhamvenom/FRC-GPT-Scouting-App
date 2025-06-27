@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface ProgressData {
   status: 'initializing' | 'active' | 'completed' | 'failed' | 'stalled';
@@ -31,7 +32,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
 
     const fetchProgress = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/progress/${operationId}`);
+        const response = await fetchWithNgrokHeaders(apiUrl(`/api/progress/${operationId}`));
         if (!response.ok) {
           if (response.status === 404 && !hasStarted) {
             // Operation not found yet, this is expected at the start

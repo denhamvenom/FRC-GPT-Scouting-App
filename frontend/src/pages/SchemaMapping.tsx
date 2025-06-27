@@ -1,6 +1,7 @@
 // frontend/src/pages/SchemaMapping.tsx
 
 import { useEffect, useState } from "react";
+import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 function SchemaMapping() {
   const [headers, setHeaders] = useState<string[]>([]);
@@ -20,7 +21,7 @@ function SchemaMapping() {
     async function fetchData() {
       try {
         // First, fetch schema headers
-        const schemaRes = await fetch("http://localhost:8000/api/schema/learn");
+        const schemaRes = await fetchWithNgrokHeaders(apiUrl("/api/schema/learn"));
         const schemaData = await schemaRes.json();
         
         if (schemaData.status === "success") {
@@ -48,7 +49,7 @@ function SchemaMapping() {
         
         // Then fetch variable suggestions from the prompt builder
         try {
-          const promptRes = await fetch("http://localhost:8000/api/prompt-builder/variables");
+          const promptRes = await fetchWithNgrokHeaders(apiUrl("/api/prompt-builder/variables"));
           const promptData = await promptRes.json();
           
           if (promptData.status === "success") {
@@ -151,7 +152,7 @@ function SchemaMapping() {
     }
     
     try {
-      const response = await fetch("http://localhost:8000/api/schema/save", {
+      const response = await fetchWithNgrokHeaders(apiUrl("/api/schema/save"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mapping),

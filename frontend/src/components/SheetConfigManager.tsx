@@ -1,6 +1,7 @@
 // frontend/src/components/SheetConfigManager.tsx
 
 import React, { useState, useEffect } from 'react';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 // Define interface for sheet configuration
 interface SheetConfig {
@@ -58,7 +59,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setError(null);
     
     try {
-      let url = 'http://localhost:8000/api/sheet-config/list';
+      let url = apiUrl('/api/sheet-config/list');
       
       // Add filters if provided
       if (currentEventKey || currentYear) {
@@ -68,7 +69,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
         url += `?${params.toString()}`;
       }
       
-      const response = await fetch(url);
+      const response = await fetchWithNgrokHeaders(url);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch configurations: ${response.status} ${response.statusText}`);
@@ -111,7 +112,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
         requestBody.sheet_name = matchScoutingSheet;
       }
 
-      const response = await fetch('http://localhost:8000/api/sheet-config/test-connection', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/sheet-config/test-connection'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -168,7 +169,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/sheet-config/create', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/sheet-config/create'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -224,7 +225,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/sheet-config/set-active', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/sheet-config/set-active'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -267,7 +268,7 @@ const SheetConfigManager: React.FC<SheetConfigManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/sheet-config/${configId}`, {
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/sheet-config/${configId}`), {
         method: 'DELETE'
       });
       

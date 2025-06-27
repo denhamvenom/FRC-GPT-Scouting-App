@@ -108,7 +108,14 @@ def parse_scouting_row(row: List[str], headers: List[str]) -> Dict[str, Any]:
     # Try to convert team_number to integer if it's a string
     if isinstance(team_number, str):
         try:
-            scouting_data["team_number"] = int(team_number)
+            # Remove emojis and non-digit characters, keeping only numbers
+            import re
+            clean_team_number = re.sub(r'[^\d]', '', team_number)
+            if clean_team_number:
+                scouting_data["team_number"] = int(clean_team_number)
+            else:
+                # If no digits found, keep original value
+                pass
         except ValueError:
             # Keep as string if integer conversion fails
             pass

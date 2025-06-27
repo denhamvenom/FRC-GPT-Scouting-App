@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface Log {
   status: string;
@@ -17,7 +18,7 @@ const DebugLogs: React.FC = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/debug/logs/picklist?lines=${lineCount}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/debug/logs/picklist?lines=${lineCount}`));
       
       if (!response.ok) {
         throw new Error(`Failed to fetch logs: ${response.statusText}`);

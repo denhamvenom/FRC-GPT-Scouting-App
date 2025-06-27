@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface Team {
   team_number: number;
@@ -67,8 +68,8 @@ export const useTeamComparisonAPI = ({
         timestamp: msg.timestamp.toISOString()
       })) : undefined;
       
-      const response = await fetch(
-        "http://localhost:8000/api/picklist/compare-teams",
+      const response = await fetchWithNgrokHeaders(
+        apiUrl("/api/picklist/compare-teams"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

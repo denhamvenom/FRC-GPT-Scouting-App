@@ -1,5 +1,7 @@
 // frontend/src/services/AppStateService.ts
 
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
+
 interface AppState {
   setupCompleted: boolean;
   fieldSelectionCompleted: boolean;
@@ -188,7 +190,7 @@ export const AppStateService = {
       
       // Check if setup is completed by querying schema existence
       try {
-        const schemaResponse = await fetch('http://localhost:8000/api/schema/check');
+        const schemaResponse = await fetchWithNgrokHeaders(apiUrl('/api/schema/check'));
         if (schemaResponse.ok) {
           const schemaData = await schemaResponse.json();
           verifiedState.setupCompleted = schemaData.setup_completed;
@@ -199,7 +201,7 @@ export const AppStateService = {
       
       // Check for field selection completion 
       try {
-        const fieldSelectionResponse = await fetch('http://localhost:8000/api/schema/fields');
+        const fieldSelectionResponse = await fetchWithNgrokHeaders(apiUrl('/api/schema/fields'));
         if (fieldSelectionResponse.ok) {
           const fieldData = await fieldSelectionResponse.json();
           verifiedState.fieldSelectionCompleted = fieldData.exists;
@@ -213,8 +215,8 @@ export const AppStateService = {
       // 2. Otherwise, check if any datasets exist at all
       try {
         if (currentState.currentEventKey && currentState.currentYear) {
-          const datasetResponse = await fetch(
-            `http://localhost:8000/api/unified/status?event_key=${currentState.currentEventKey}&year=${currentState.currentYear}`
+          const datasetResponse = await fetchWithNgrokHeaders(
+            apiUrl(`/api/unified/status?event_key=${currentState.currentEventKey}&year=${currentState.currentYear}`)
           );
           if (datasetResponse.ok) {
             const datasetData = await datasetResponse.json();
@@ -222,7 +224,7 @@ export const AppStateService = {
           }
         } else {
           // Check if any datasets exist
-          const allDatasetsResponse = await fetch('http://localhost:8000/api/unified/check-all');
+          const allDatasetsResponse = await fetchWithNgrokHeaders(apiUrl('/api/unified/check-all'));
           if (allDatasetsResponse.ok) {
             const allDatasetsData = await allDatasetsResponse.json();
             verifiedState.datasetBuilt = allDatasetsData.datasets_exist === true;
@@ -244,7 +246,7 @@ export const AppStateService = {
       // Check validation status
       try {
         if (verifiedState.datasetBuilt) {
-          const validationResponse = await fetch('http://localhost:8000/api/validate/check-validation-status');
+          const validationResponse = await fetchWithNgrokHeaders(apiUrl('/api/validate/check-validation-status'));
           if (validationResponse.ok) {
             const validationData = await validationResponse.json();
             verifiedState.validationCompleted = validationData.validation_completed === true && 

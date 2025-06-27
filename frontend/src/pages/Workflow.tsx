@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface DatasetStatus {
   status: 'exists' | 'not_found';
@@ -32,7 +33,7 @@ function Workflow() {
   // Check if dataset exists
   const checkDatasetStatus = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/unified/status?event_key=${eventKey}&year=${year}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/unified/status?event_key=${eventKey}&year=${year}`));
       const data = await response.json();
       setDatasetStatus(data);
       
@@ -51,7 +52,7 @@ function Workflow() {
   // Get validation summary
   const getValidationSummary = async (datasetPath: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/validate/enhanced?unified_dataset_path=${encodeURIComponent(datasetPath)}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/validate/enhanced?unified_dataset_path=${encodeURIComponent(datasetPath)}`));
       const data = await response.json();
       
       if (data.summary) {
@@ -69,7 +70,7 @@ function Workflow() {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/unified/build', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/unified/build'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

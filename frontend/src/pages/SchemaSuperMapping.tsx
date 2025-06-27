@@ -1,6 +1,7 @@
 // frontend/src/pages/SchemaSuperMapping.tsx
 
 import { useEffect, useState } from "react";
+import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 function SchemaSuperMapping() {
   const [headers, setHeaders] = useState<string[]>([]);
@@ -9,7 +10,7 @@ function SchemaSuperMapping() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/schema/super/learn")
+    fetchWithNgrokHeaders(apiUrl("/api/schema/super/learn"))
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "success") {
@@ -29,7 +30,7 @@ function SchemaSuperMapping() {
   };
 
   const handleSave = async () => {
-    await fetch("http://localhost:8000/api/schema/super/save", {
+    await fetchWithNgrokHeaders(apiUrl("/api/schema/super/save"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

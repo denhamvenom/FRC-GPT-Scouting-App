@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CategoryTabs, { Category } from '../components/CategoryTabs';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface FieldCategory {
   key: string;
@@ -139,7 +140,7 @@ function FieldSelection() {
       setIsLoading(true);
       try {
         // First, get the active sheet configuration from setup
-        const setupResponse = await fetch('http://localhost:8000/api/setup/info');
+        const setupResponse = await fetchWithNgrokHeaders(apiUrl('/api/setup/info'));
         let sheetConfig = null;
 
         console.log("Setup response status:", setupResponse.status);
@@ -169,7 +170,7 @@ function FieldSelection() {
         let pitScoutingTab = 'PitScouting';
 
         if (sheetConfig && sheetConfig.id) {
-          const configResponse = await fetch(`http://localhost:8000/api/sheet-config/${sheetConfig.id}`);
+          const configResponse = await fetchWithNgrokHeaders(apiUrl(`/api/sheet-config/${sheetConfig.id}`));
 
           if (configResponse.ok) {
             const configData = await configResponse.json();
@@ -214,7 +215,7 @@ function FieldSelection() {
         // Try multiple endpoints to get available sheets, with fallbacks
         const tryEndpoints = async () => {
           // Build up the URL with query parameters
-          const setupData = await fetch('http://localhost:8000/api/setup/info').then(res => res.json());
+          const setupData = await fetchWithNgrokHeaders(apiUrl('/api/setup/info')).then(res => res.json());
           // Use event_key from setupData if available, otherwise try to get it from sheetConfig
           let eventKey = null;
           if (setupData.status === 'success' && setupData.event_key) {
@@ -260,17 +261,17 @@ function FieldSelection() {
           const endpoints = [
             // Direct access endpoint - simplest, just uses spreadsheet ID directly
             {
-              url: `http://localhost:8000/api/sheets/sheets?spreadsheet_id=${encodeURIComponent(spreadsheetId)}`,
+              url: apiUrl(`/api/sheets/sheets?spreadsheet_id=${encodeURIComponent(spreadsheetId)}`),
               name: "Direct sheets API"
             },
             // Primary endpoint - most reliable but more complex
             {
-              url: buildUrl('http://localhost:8000/api/sheet-config/available-sheets'),
+              url: buildUrl(apiUrl('/api/sheet-config/available-sheets')),
               name: "sheet-config API"
             },
             // Fallback endpoint - for backward compatibility
             {
-              url: buildUrl('http://localhost:8000/api/sheets/available-tabs'),
+              url: buildUrl(apiUrl('/api/sheets/available-tabs')),
               name: "sheets API"
             }
           ];
@@ -279,7 +280,7 @@ function FieldSelection() {
           for (const endpoint of endpoints) {
             try {
               console.log(`Fetching available tabs from ${endpoint.name}:`, endpoint.url);
-              const response = await fetch(endpoint.url);
+              const response = await fetchWithNgrokHeaders(endpoint.url);
 
               if (response.ok) {
                 const data = await response.json();
@@ -368,21 +369,21 @@ function FieldSelection() {
 
         // Always try to fetch Match Scouting data (main tab)
         if (hasMatchTab) {
-          fetchPromises.push(fetch(`http://localhost:8000/api/sheets/headers?tab=${matchScoutingTab}${spreadsheetIdParam}`));
+          fetchPromises.push(fetchWithNgrokHeaders(apiUrl(`/api/sheets/headers?tab=${matchScoutingTab}${spreadsheetIdParam}`)));
           tabTypes.push('scout');
         } else {
           console.log(`Match scouting tab '${matchScoutingTab}' not found in Google Sheet`);
           // Try fallback to "Scouting" if the configured tab doesn't exist
           if (matchScoutingTab !== 'Scouting' && (availableTabs.length === 0 || availableTabs.includes('Scouting'))) {
             console.log("Trying fallback to 'Scouting' tab");
-            fetchPromises.push(fetch(`http://localhost:8000/api/sheets/headers?tab=Scouting${spreadsheetIdParam}`));
+            fetchPromises.push(fetchWithNgrokHeaders(apiUrl(`/api/sheets/headers?tab=Scouting${spreadsheetIdParam}`)));
             tabTypes.push('scout');
           }
         }
 
         // Only fetch SuperScouting if the tab exists or we're using fallback
         if (hasSuperTab || availableTabs.length === 0) {
-          fetchPromises.push(fetch(`http://localhost:8000/api/sheets/headers?tab=${superScoutingTab}&optional=true${spreadsheetIdParam}`));
+          fetchPromises.push(fetchWithNgrokHeaders(apiUrl(`/api/sheets/headers?tab=${superScoutingTab}&optional=true${spreadsheetIdParam}`)));
           tabTypes.push('super');
         } else {
           console.log(`Super scouting tab '${superScoutingTab}' not found in Google Sheet`);
@@ -390,7 +391,7 @@ function FieldSelection() {
 
         // Only fetch PitScouting if the tab exists or we're using fallback
         if (hasPitTab || availableTabs.length === 0) {
-          fetchPromises.push(fetch(`http://localhost:8000/api/sheets/headers?tab=${pitScoutingTab}&optional=true${spreadsheetIdParam}`));
+          fetchPromises.push(fetchWithNgrokHeaders(apiUrl(`/api/sheets/headers?tab=${pitScoutingTab}&optional=true${spreadsheetIdParam}`)));
           tabTypes.push('pit');
         } else {
           console.log(`Pit scouting tab '${pitScoutingTab}' not found in Google Sheet`);
@@ -602,7 +603,7 @@ function FieldSelection() {
         critical_mappings: criticalFieldMappings
       };
       
-      const response = await fetch('http://localhost:8000/api/schema/save-selections', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/schema/save-selections'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(schema)
@@ -618,7 +619,7 @@ function FieldSelection() {
       // Trigger schema mapping for regular scouting
       try {
         // Learn regular scouting schema
-        await fetch('http://localhost:8000/api/schema/learn');
+        await fetchWithNgrokHeaders(apiUrl('/api/schema/learn'));
         
         // Show building dataset message
         setSuccessMessage('Field selections and schema mappings saved successfully! Building dataset...');
@@ -626,7 +627,7 @@ function FieldSelection() {
         // Trigger dataset build
         try {
           // Get current event key from setup API
-          const setupResponse = await fetch("http://localhost:8000/api/setup/info");
+          const setupResponse = await fetchWithNgrokHeaders(apiUrl("/api/setup/info"));
           let eventKey = null;
           let yearValue = 2025; // Default
 
@@ -648,7 +649,7 @@ function FieldSelection() {
           }
 
           // Build the dataset
-          const buildResponse = await fetch("http://localhost:8000/api/unified/build", {
+          const buildResponse = await fetchWithNgrokHeaders(apiUrl("/api/unified/build"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

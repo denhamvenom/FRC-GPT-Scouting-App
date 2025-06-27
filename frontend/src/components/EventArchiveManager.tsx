@@ -1,6 +1,7 @@
 // frontend/src/components/EventArchiveManager.tsx
 
 import React, { useState, useEffect } from 'react';
+import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 // DEBUG flag to enable extra console output
 const DEBUG = true;
@@ -70,7 +71,7 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/list');
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/archive/list'));
       debugLog('📊 Archive list response status:', response.status);
       
       if (!response.ok) {
@@ -139,7 +140,7 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
       
       console.log('Sending archive request:', requestData);
       
-      const response = await fetch('http://localhost:8000/api/archive/create', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/archive/create'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -210,7 +211,7 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
       
       console.log('Sending archive and clear request:', requestData);
       
-      const response = await fetch('http://localhost:8000/api/archive/archive-and-clear', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/archive/archive-and-clear'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -268,7 +269,7 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/clear', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/archive/clear'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -304,7 +305,7 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/restore', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/archive/restore'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -342,7 +343,7 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
     setSuccess(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/archive/delete', {
+      const response = await fetchWithNgrokHeaders(apiUrl('/api/archive/delete'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

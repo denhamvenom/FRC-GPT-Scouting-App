@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ProgressTracker from "../components/ProgressTracker";
+import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 function UnifiedDatasetBuilder() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ function UnifiedDatasetBuilder() {
       setIsFetchingEventData(true);
       try {
         // Try to get active event info from setup API
-        const response = await fetch("http://localhost:8000/api/setup/info");
+        const response = await fetchWithNgrokHeaders(apiUrl("/api/setup/info"));
 
         if (response.ok) {
           const data = await response.json();
@@ -58,7 +59,7 @@ function UnifiedDatasetBuilder() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/api/unified/build", {
+      const response = await fetchWithNgrokHeaders(apiUrl("/api/unified/build"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

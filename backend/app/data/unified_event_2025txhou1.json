@@ -1899,39 +1899,48 @@
       "nickname": "REBELLION",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 10014,
           "match_number": 6,
           "qual_number": 6,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 10014,
           "match_number": 11,
           "qual_number": 11,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 10014,
           "match_number": 16,
           "qual_number": 16,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 10014,
           "match_number": 22,
           "qual_number": 22,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 10014,
+          "match_number": 31,
+          "qual_number": 31,
+          "auto": 1,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -1985,30 +1994,39 @@
       "nickname": "Robonauts EveryBot",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 10118,
           "match_number": 7,
           "qual_number": 7,
           "auto": 1,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 10118,
           "match_number": 12,
           "qual_number": 12,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 10118,
           "match_number": 20,
           "qual_number": 20,
           "auto": 1.5,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 10118,
+          "match_number": 27,
+          "qual_number": 27,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -2062,30 +2080,39 @@
       "nickname": "Cycle-Breakers",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 10385,
           "match_number": 4,
           "qual_number": 4,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 10385,
           "match_number": 13,
           "qual_number": 13,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 10385,
           "match_number": 21,
           "qual_number": 21,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 10385,
+          "match_number": 27,
+          "qual_number": 27,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -2139,39 +2166,48 @@
       "nickname": "Robonauts",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 118,
           "match_number": 3,
           "qual_number": 3,
           "auto": 3,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 118,
           "match_number": 8,
           "qual_number": 8,
           "auto": 4,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 118,
           "match_number": 15,
           "qual_number": 15,
           "auto": 3,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 118,
           "match_number": 24,
           "qual_number": 24,
           "auto": 4,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 118,
+          "match_number": 30,
+          "qual_number": 30,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -2225,30 +2261,39 @@
       "nickname": "Texas Torque",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 1477,
           "match_number": 2,
           "qual_number": 2,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 1477,
           "match_number": 13,
           "qual_number": 13,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 1477,
           "match_number": 20,
           "qual_number": 20,
           "auto": 1,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 1477,
+          "match_number": 27,
+          "qual_number": 27,
+          "auto": 1,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -2302,30 +2347,39 @@
       "nickname": "PantherBots",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 2582,
           "match_number": 1,
           "qual_number": 1,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 2582,
           "match_number": 8,
           "qual_number": 8,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 2582,
           "match_number": 21,
           "qual_number": 21,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 2582,
+          "match_number": 26,
+          "qual_number": 26,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -2379,30 +2433,30 @@
       "nickname": "DiscoBots",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 2587,
           "match_number": 2,
           "qual_number": 2,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 2587,
           "match_number": 10,
           "qual_number": 10,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 2587,
           "match_number": 23,
           "qual_number": 23,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -2456,30 +2510,39 @@
       "nickname": "Team OKC e'possums (\u03a3 1/n! x 10^3)",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 2718,
           "match_number": 5,
           "qual_number": 5,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 2718,
           "match_number": 10,
           "qual_number": 10,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 2718,
           "match_number": 15,
           "qual_number": 15,
           "auto": 1,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 2718,
+          "match_number": 25,
+          "qual_number": 25,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -2533,30 +2596,48 @@
       "nickname": "Rangers",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 2848,
           "match_number": 4,
           "qual_number": 4,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 2848,
           "match_number": 9,
           "qual_number": 9,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 2848,
           "match_number": 16,
           "qual_number": 16,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 2848,
+          "match_number": 25,
+          "qual_number": 25,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 2848,
+          "match_number": 31,
+          "qual_number": 31,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -2610,30 +2691,48 @@
       "nickname": "Lady Cans",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 2881,
           "match_number": 2,
           "qual_number": 2,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 2881,
           "match_number": 9,
           "qual_number": 9,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 2881,
           "match_number": 17,
           "qual_number": 17,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 2881,
+          "match_number": 20,
+          "qual_number": 20,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 2881,
+          "match_number": 27,
+          "qual_number": 27,
+          "auto": 3,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -2687,21 +2786,21 @@
       "nickname": "Nuts n' Boltz",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 2882,
           "match_number": 5,
           "qual_number": 5,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 2882,
           "match_number": 14,
           "qual_number": 14,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -2755,30 +2854,39 @@
       "nickname": "RoboChargers",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 3005,
           "match_number": 1,
           "qual_number": 1,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 3005,
           "match_number": 8,
           "qual_number": 8,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 3005,
           "match_number": 19,
           "qual_number": 19,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 3005,
+          "match_number": 28,
+          "qual_number": 28,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -2832,30 +2940,39 @@
       "nickname": "Lights Out",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 323,
           "match_number": 3,
           "qual_number": 3,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 323,
           "match_number": 12,
           "qual_number": 12,
           "auto": 1,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 323,
           "match_number": 21,
           "qual_number": 21,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 323,
+          "match_number": 28,
+          "qual_number": 28,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -2909,39 +3026,39 @@
       "nickname": "Chips",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 324,
           "match_number": 7,
           "qual_number": 7,
           "auto": 1.5,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 324,
           "match_number": 12,
           "qual_number": 12,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 324,
           "match_number": 17,
           "qual_number": 17,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 324,
           "match_number": 22,
           "qual_number": 22,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -2995,39 +3112,48 @@
       "nickname": "Spectrum   -\u25b3\u25c5",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 3847,
           "match_number": 4,
           "qual_number": 4,
           "auto": 3,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 3847,
           "match_number": 12,
           "qual_number": 12,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 3847,
           "match_number": 17,
           "qual_number": 17,
           "auto": 2,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 3847,
           "match_number": 22,
           "qual_number": 22,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 3847,
+          "match_number": 29,
+          "qual_number": 29,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -3081,30 +3207,48 @@
       "nickname": "Purple Haze",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 418,
           "match_number": 5,
           "qual_number": 5,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 418,
           "match_number": 14,
           "qual_number": 14,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 418,
           "match_number": 19,
           "qual_number": 19,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 418,
+          "match_number": 25,
+          "qual_number": 25,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 418,
+          "match_number": 30,
+          "qual_number": 30,
+          "auto": 1.5,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -3158,30 +3302,39 @@
       "nickname": "Jaguar Robotics",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 4192,
           "match_number": 7,
           "qual_number": 7,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 4192,
           "match_number": 14,
           "qual_number": 14,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 4192,
           "match_number": 21,
           "qual_number": 21,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 4192,
+          "match_number": 28,
+          "qual_number": 28,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -3235,30 +3388,39 @@
       "nickname": "Ramageddon Robotics",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 4336,
           "match_number": 6,
           "qual_number": 6,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 4336,
           "match_number": 13,
           "qual_number": 13,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 4336,
           "match_number": 20,
           "qual_number": 20,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 4336,
+          "match_number": 28,
+          "qual_number": 28,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -3312,30 +3474,39 @@
       "nickname": "Jersey Voltage",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 4587,
           "match_number": 2,
           "qual_number": 2,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 4587,
           "match_number": 11,
           "qual_number": 11,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 4587,
           "match_number": 18,
           "qual_number": 18,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 4587,
+          "match_number": 24,
+          "qual_number": 24,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -3389,30 +3560,39 @@
       "nickname": "The RoboSpartans",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 4639,
           "match_number": 4,
           "qual_number": 4,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 4639,
           "match_number": 10,
           "qual_number": 10,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 4639,
           "match_number": 19,
           "qual_number": 19,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 4639,
+          "match_number": 26,
+          "qual_number": 26,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -3466,30 +3646,39 @@
       "nickname": "Gearnotics",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 5070,
           "match_number": 6,
           "qual_number": 6,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 5070,
           "match_number": 14,
           "qual_number": 14,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5070,
           "match_number": 21,
           "qual_number": 21,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 5070,
+          "match_number": 27,
+          "qual_number": 27,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -3543,30 +3732,39 @@
       "nickname": "Pearadox",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 5414,
           "match_number": 4,
           "qual_number": 4,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 5414,
           "match_number": 10,
           "qual_number": 10,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 5414,
           "match_number": 15,
           "qual_number": 15,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 5414,
+          "match_number": 28,
+          "qual_number": 28,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -3620,39 +3818,48 @@
       "nickname": "Steel Talons",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 5427,
           "match_number": 5,
           "qual_number": 5,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 5427,
           "match_number": 11,
           "qual_number": 11,
           "auto": 3,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5427,
           "match_number": 18,
           "qual_number": 18,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 5427,
           "match_number": 23,
           "qual_number": 23,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 5427,
+          "match_number": 29,
+          "qual_number": 29,
+          "auto": 1,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -3706,30 +3913,48 @@
       "nickname": "Titan Robotics",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 5431,
           "match_number": 3,
           "qual_number": 3,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5431,
           "match_number": 9,
           "qual_number": 9,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5431,
           "match_number": 15,
           "qual_number": 15,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 5431,
+          "match_number": 26,
+          "qual_number": 26,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 5431,
+          "match_number": 26,
+          "qual_number": 26,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -3783,30 +4008,48 @@
       "nickname": "Smithville Tiger Trons",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 5503,
           "match_number": 4,
           "qual_number": 4,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5503,
           "match_number": 12,
           "qual_number": 12,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5503,
           "match_number": 20,
           "qual_number": 20,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 5503,
+          "match_number": 26,
+          "qual_number": 26,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 5503,
+          "match_number": 31,
+          "qual_number": 31,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -3860,39 +4103,48 @@
       "nickname": "AwtyBots",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 5829,
           "match_number": 7,
           "qual_number": 7,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5829,
           "match_number": 14,
           "qual_number": 14,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5829,
           "match_number": 19,
           "qual_number": 19,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5829,
           "match_number": 24,
           "qual_number": 24,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 5829,
+          "match_number": 31,
+          "qual_number": 31,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -3946,39 +4198,48 @@
       "nickname": "Energy HEROs",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 5892,
           "match_number": 3,
           "qual_number": 3,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 5892,
           "match_number": 8,
           "qual_number": 8,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 5892,
           "match_number": 17,
           "qual_number": 17,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 5892,
           "match_number": 23,
           "qual_number": 23,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 5892,
+          "match_number": 29,
+          "qual_number": 29,
+          "auto": 3,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -4032,30 +4293,39 @@
       "nickname": "Spartans",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 5908,
           "match_number": 3,
           "qual_number": 3,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 5908,
           "match_number": 11,
           "qual_number": 11,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 5908,
           "match_number": 19,
           "qual_number": 19,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 5908,
+          "match_number": 27,
+          "qual_number": 27,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -4109,30 +4379,48 @@
       "nickname": "CRyptonite",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 624,
           "match_number": 7,
           "qual_number": 7,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 624,
           "match_number": 13,
           "qual_number": 13,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 624,
           "match_number": 19,
           "qual_number": 19,
           "auto": 3,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 624,
+          "match_number": 24,
+          "qual_number": 24,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 624,
+          "match_number": 29,
+          "qual_number": 29,
+          "auto": 3,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -4186,30 +4474,48 @@
       "nickname": "The Spring Konstant",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 6357,
           "match_number": 5,
           "qual_number": 5,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 6357,
           "match_number": 13,
           "qual_number": 13,
           "auto": 1.5,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 6357,
           "match_number": 21,
           "qual_number": 21,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 6357,
+          "match_number": 26,
+          "qual_number": 26,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 6357,
+          "match_number": 31,
+          "qual_number": 31,
+          "auto": 1,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -4263,39 +4569,48 @@
       "nickname": "Howdy Bots",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 6377,
           "match_number": 1,
           "qual_number": 1,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 6377,
           "match_number": 9,
           "qual_number": 9,
           "auto": 0,
           "strategy": 1,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 6377,
           "match_number": 15,
           "qual_number": 15,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 6377,
           "match_number": 23,
           "qual_number": 23,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 6377,
+          "match_number": 31,
+          "qual_number": 31,
+          "auto": 0.5,
+          "strategy": 1,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -4349,30 +4664,39 @@
       "nickname": "Valor",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 6800,
           "match_number": 6,
           "qual_number": 6,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 6800,
           "match_number": 11,
           "qual_number": 11,
           "auto": 3,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 6800,
           "match_number": 16,
           "qual_number": 16,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 6800,
+          "match_number": 24,
+          "qual_number": 24,
+          "auto": 3,
+          "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -4426,39 +4750,48 @@
       "nickname": "CavBots",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 7492,
           "match_number": 1,
           "qual_number": 1,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 7492,
           "match_number": 10,
           "qual_number": 10,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 7492,
           "match_number": 18,
           "qual_number": 18,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 7492,
           "match_number": 24,
           "qual_number": 24,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 7492,
+          "match_number": 29,
+          "qual_number": 29,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -4512,30 +4845,39 @@
       "nickname": "TSA All Stars",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 7691,
           "match_number": 3,
           "qual_number": 3,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 7691,
           "match_number": 9,
           "qual_number": 9,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 7691,
           "match_number": 18,
           "qual_number": 18,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 7691,
+          "match_number": 28,
+          "qual_number": 28,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -4589,39 +4931,39 @@
       "nickname": "Denham Venom",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 8044,
           "match_number": 2,
           "qual_number": 2,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 8044,
           "match_number": 9,
           "qual_number": 9,
           "auto": 2,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Golf Tees",
           "team_number": 8044,
           "match_number": 17,
           "qual_number": 17,
           "auto": 2,
           "strategy": 0,
+          "other": "Golf Tees",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 8044,
           "match_number": 22,
           "qual_number": 22,
           "auto": 2.5,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -4675,39 +5017,48 @@
       "nickname": "Glow With The Flow",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 8370,
           "match_number": 7,
           "qual_number": 7,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 8370,
           "match_number": 13,
           "qual_number": 13,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 8370,
           "match_number": 18,
           "qual_number": 18,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 8370,
           "match_number": 23,
           "qual_number": 23,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
+          "teleop": 0
+        },
+        {
+          "team_number": 8370,
+          "match_number": 30,
+          "qual_number": 30,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -4761,30 +5112,39 @@
       "nickname": "Photon",
       "scouting_data": [
         {
-          "other": "Center",
           "team_number": 8515,
           "match_number": 6,
           "qual_number": 6,
           "auto": 0,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 8515,
           "match_number": 11,
           "qual_number": 11,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 8515,
           "match_number": 17,
           "qual_number": 17,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 8515,
+          "match_number": 25,
+          "qual_number": 25,
+          "auto": 1,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -4838,39 +5198,39 @@
       "nickname": "The Robobots",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 9140,
           "match_number": 1,
           "qual_number": 1,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 9140,
           "match_number": 8,
           "qual_number": 8,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 9140,
           "match_number": 15,
           "qual_number": 15,
           "auto": 1,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 9140,
           "match_number": 22,
           "qual_number": 22,
           "auto": 1,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -4924,39 +5284,48 @@
       "nickname": "Pastabots",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 9418,
           "match_number": 6,
           "qual_number": 6,
           "auto": 2,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 9418,
           "match_number": 12,
           "qual_number": 12,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 9418,
           "match_number": 18,
           "qual_number": 18,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 9418,
           "match_number": 22,
           "qual_number": 22,
           "auto": 0,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 9418,
+          "match_number": 30,
+          "qual_number": 30,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -5010,30 +5379,48 @@
       "nickname": "Off-Season Demo Team 9986",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 9986,
           "match_number": 1,
           "qual_number": 1,
           "auto": 1,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 9986,
           "match_number": 14,
           "qual_number": 14,
           "auto": 3,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Left",
           "team_number": 9986,
           "match_number": 20,
           "qual_number": 20,
           "auto": 3,
           "strategy": 0,
+          "other": "Left",
+          "teleop": 0
+        },
+        {
+          "team_number": 9986,
+          "match_number": 25,
+          "qual_number": 25,
+          "auto": 2,
+          "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 9986,
+          "match_number": 30,
+          "qual_number": 30,
+          "auto": 3,
+          "strategy": 0,
+          "other": "Right",
           "teleop": 0
         }
       ],
@@ -5081,39 +5468,48 @@
       "nickname": "Off-Season Demo Team 9991",
       "scouting_data": [
         {
-          "other": "Left",
           "team_number": 9991,
           "match_number": 5,
           "qual_number": 5,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Left",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 9991,
           "match_number": 10,
           "qual_number": 10,
           "auto": 1.5,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Center",
           "team_number": 9991,
           "match_number": 16,
           "qual_number": 16,
           "auto": 0.5,
           "strategy": 0,
+          "other": "Center",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 9991,
           "match_number": 22,
           "qual_number": 22,
           "auto": 1,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 9991,
+          "match_number": 29,
+          "qual_number": 29,
+          "auto": 1,
+          "strategy": 1,
+          "other": "Left",
           "teleop": 0
         }
       ],
@@ -5167,30 +5563,39 @@
       "nickname": "Off-Season Demo Team 9994",
       "scouting_data": [
         {
-          "other": "Right",
           "team_number": 9994,
           "match_number": 2,
           "qual_number": 2,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 9994,
           "match_number": 8,
           "qual_number": 8,
           "auto": 0,
           "strategy": 0,
+          "other": "Right",
           "teleop": 0
         },
         {
-          "other": "Right",
           "team_number": 9994,
           "match_number": 16,
           "qual_number": 16,
           "auto": 1.5,
           "strategy": 0,
+          "other": "Right",
+          "teleop": 0
+        },
+        {
+          "team_number": 9994,
+          "match_number": 25,
+          "qual_number": 25,
+          "auto": 0,
+          "strategy": 0,
+          "other": "Center",
           "teleop": 0
         }
       ],
@@ -5262,7 +5667,7 @@
       "Notes"
     ],
     "superscouting_headers": [],
-    "created_timestamp": "2025-06-27T21:27:52.699098"
+    "created_timestamp": "2025-06-27T22:30:28.707820"
   },
   "matches": [
     {
@@ -5282,6 +5687,10 @@
       "comp_level": "qm"
     },
     {
+      "match_number": 31,
+      "comp_level": "qm"
+    },
+    {
       "match_number": 7,
       "comp_level": "qm"
     },
@@ -5291,6 +5700,10 @@
     },
     {
       "match_number": 20,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 27,
       "comp_level": "qm"
     },
     {
@@ -5322,11 +5735,19 @@
       "comp_level": "qm"
     },
     {
+      "match_number": 30,
+      "comp_level": "qm"
+    },
+    {
       "match_number": 2,
       "comp_level": "qm"
     },
     {
       "match_number": 1,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 26,
       "comp_level": "qm"
     },
     {
@@ -5339,6 +5760,10 @@
     },
     {
       "match_number": 5,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 25,
       "comp_level": "qm"
     },
     {
@@ -5355,6 +5780,14 @@
     },
     {
       "match_number": 19,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 28,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 29,
       "comp_level": "qm"
     },
     {
@@ -5364,1254 +5797,1659 @@
   ],
   "scouting": [
     {
-      "other": "Left",
       "team_number": 10014,
       "match_number": 6,
       "qual_number": 6,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 10014,
       "match_number": 11,
       "qual_number": 11,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 10014,
       "match_number": 16,
       "qual_number": 16,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 10014,
       "match_number": 22,
       "qual_number": 22,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 10014,
+      "match_number": 31,
+      "qual_number": 31,
+      "auto": 1,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 10118,
       "match_number": 7,
       "qual_number": 7,
       "auto": 1,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 10118,
       "match_number": 12,
       "qual_number": 12,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 10118,
       "match_number": 20,
       "qual_number": 20,
       "auto": 1.5,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 10118,
+      "match_number": 27,
+      "qual_number": 27,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 10385,
       "match_number": 4,
       "qual_number": 4,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 10385,
       "match_number": 13,
       "qual_number": 13,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 10385,
       "match_number": 21,
       "qual_number": 21,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 10385,
+      "match_number": 27,
+      "qual_number": 27,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 118,
       "match_number": 3,
       "qual_number": 3,
       "auto": 3,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 118,
       "match_number": 8,
       "qual_number": 8,
       "auto": 4,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 118,
       "match_number": 15,
       "qual_number": 15,
       "auto": 3,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 118,
       "match_number": 24,
       "qual_number": 24,
       "auto": 4,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
+      "team_number": 118,
+      "match_number": 30,
+      "qual_number": 30,
+      "auto": 0,
+      "strategy": 0,
       "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 1477,
       "match_number": 2,
       "qual_number": 2,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 1477,
       "match_number": 13,
       "qual_number": 13,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 1477,
       "match_number": 20,
       "qual_number": 20,
       "auto": 1,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 1477,
+      "match_number": 27,
+      "qual_number": 27,
+      "auto": 1,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 2582,
       "match_number": 1,
       "qual_number": 1,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2582,
       "match_number": 8,
       "qual_number": 8,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2582,
       "match_number": 21,
       "qual_number": 21,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 2582,
+      "match_number": 26,
+      "qual_number": 26,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 2587,
       "match_number": 2,
       "qual_number": 2,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 2587,
       "match_number": 10,
       "qual_number": 10,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 2587,
       "match_number": 23,
       "qual_number": 23,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2718,
       "match_number": 5,
       "qual_number": 5,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2718,
       "match_number": 10,
       "qual_number": 10,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 2718,
       "match_number": 15,
       "qual_number": 15,
       "auto": 1,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 2718,
+      "match_number": 25,
+      "qual_number": 25,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 2848,
       "match_number": 4,
       "qual_number": 4,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2848,
       "match_number": 9,
       "qual_number": 9,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2848,
       "match_number": 16,
       "qual_number": 16,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
+      "team_number": 2848,
+      "match_number": 25,
+      "qual_number": 25,
+      "auto": 0,
+      "strategy": 0,
       "other": "Left",
+      "teleop": 0
+    },
+    {
+      "team_number": 2848,
+      "match_number": 31,
+      "qual_number": 31,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 2881,
       "match_number": 2,
       "qual_number": 2,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 2881,
       "match_number": 9,
       "qual_number": 9,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 2881,
       "match_number": 17,
       "qual_number": 17,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 2881,
+      "match_number": 20,
+      "qual_number": 20,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
+      "team_number": 2881,
+      "match_number": 27,
+      "qual_number": 27,
+      "auto": 3,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 2882,
       "match_number": 5,
       "qual_number": 5,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 2882,
       "match_number": 14,
       "qual_number": 14,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 3005,
       "match_number": 1,
       "qual_number": 1,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 3005,
       "match_number": 8,
       "qual_number": 8,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 3005,
       "match_number": 19,
       "qual_number": 19,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
+      "team_number": 3005,
+      "match_number": 28,
+      "qual_number": 28,
+      "auto": 0,
+      "strategy": 0,
       "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 323,
       "match_number": 3,
       "qual_number": 3,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 323,
       "match_number": 12,
       "qual_number": 12,
       "auto": 1,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 323,
       "match_number": 21,
       "qual_number": 21,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 323,
+      "match_number": 28,
+      "qual_number": 28,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 324,
       "match_number": 7,
       "qual_number": 7,
       "auto": 1.5,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 324,
       "match_number": 12,
       "qual_number": 12,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 324,
       "match_number": 17,
       "qual_number": 17,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 324,
       "match_number": 22,
       "qual_number": 22,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 3847,
       "match_number": 4,
       "qual_number": 4,
       "auto": 3,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 3847,
       "match_number": 12,
       "qual_number": 12,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 3847,
       "match_number": 17,
       "qual_number": 17,
       "auto": 2,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 3847,
       "match_number": 22,
       "qual_number": 22,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 3847,
+      "match_number": 29,
+      "qual_number": 29,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 418,
       "match_number": 5,
       "qual_number": 5,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 418,
       "match_number": 14,
       "qual_number": 14,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 418,
       "match_number": 19,
       "qual_number": 19,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 418,
+      "match_number": 25,
+      "qual_number": 25,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
+      "team_number": 418,
+      "match_number": 30,
+      "qual_number": 30,
+      "auto": 1.5,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 4192,
       "match_number": 7,
       "qual_number": 7,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 4192,
       "match_number": 14,
       "qual_number": 14,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 4192,
       "match_number": 21,
       "qual_number": 21,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
+      "team_number": 4192,
+      "match_number": 28,
+      "qual_number": 28,
+      "auto": 0,
+      "strategy": 0,
       "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 4336,
       "match_number": 6,
       "qual_number": 6,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 4336,
       "match_number": 13,
       "qual_number": 13,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 4336,
       "match_number": 20,
       "qual_number": 20,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 4336,
+      "match_number": 28,
+      "qual_number": 28,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 4587,
       "match_number": 2,
       "qual_number": 2,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 4587,
       "match_number": 11,
       "qual_number": 11,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 4587,
       "match_number": 18,
       "qual_number": 18,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 4587,
+      "match_number": 24,
+      "qual_number": 24,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 4639,
       "match_number": 4,
       "qual_number": 4,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 4639,
       "match_number": 10,
       "qual_number": 10,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 4639,
       "match_number": 19,
       "qual_number": 19,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 4639,
+      "match_number": 26,
+      "qual_number": 26,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 5070,
       "match_number": 6,
       "qual_number": 6,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 5070,
       "match_number": 14,
       "qual_number": 14,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5070,
       "match_number": 21,
       "qual_number": 21,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
+      "team_number": 5070,
+      "match_number": 27,
+      "qual_number": 27,
+      "auto": 0,
+      "strategy": 0,
       "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 5414,
       "match_number": 4,
       "qual_number": 4,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 5414,
       "match_number": 10,
       "qual_number": 10,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 5414,
       "match_number": 15,
       "qual_number": 15,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 5414,
+      "match_number": 28,
+      "qual_number": 28,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 5427,
       "match_number": 5,
       "qual_number": 5,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 5427,
       "match_number": 11,
       "qual_number": 11,
       "auto": 3,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5427,
       "match_number": 18,
       "qual_number": 18,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 5427,
       "match_number": 23,
       "qual_number": 23,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
+      "team_number": 5427,
+      "match_number": 29,
+      "qual_number": 29,
+      "auto": 1,
+      "strategy": 0,
       "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 5431,
       "match_number": 3,
       "qual_number": 3,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5431,
       "match_number": 9,
       "qual_number": 9,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5431,
       "match_number": 15,
       "qual_number": 15,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
+      "team_number": 5431,
+      "match_number": 26,
+      "qual_number": 26,
+      "auto": 0,
+      "strategy": 0,
       "other": "Center",
+      "teleop": 0
+    },
+    {
+      "team_number": 5431,
+      "match_number": 26,
+      "qual_number": 26,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 5503,
       "match_number": 4,
       "qual_number": 4,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5503,
       "match_number": 12,
       "qual_number": 12,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5503,
       "match_number": 20,
       "qual_number": 20,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
+      "team_number": 5503,
+      "match_number": 26,
+      "qual_number": 26,
+      "auto": 0,
+      "strategy": 0,
       "other": "Right",
+      "teleop": 0
+    },
+    {
+      "team_number": 5503,
+      "match_number": 31,
+      "qual_number": 31,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 5829,
       "match_number": 7,
       "qual_number": 7,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5829,
       "match_number": 14,
       "qual_number": 14,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5829,
       "match_number": 19,
       "qual_number": 19,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5829,
       "match_number": 24,
       "qual_number": 24,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 5829,
+      "match_number": 31,
+      "qual_number": 31,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 5892,
       "match_number": 3,
       "qual_number": 3,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 5892,
       "match_number": 8,
       "qual_number": 8,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 5892,
       "match_number": 17,
       "qual_number": 17,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 5892,
       "match_number": 23,
       "qual_number": 23,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 5892,
+      "match_number": 29,
+      "qual_number": 29,
+      "auto": 3,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 5908,
       "match_number": 3,
       "qual_number": 3,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 5908,
       "match_number": 11,
       "qual_number": 11,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 5908,
       "match_number": 19,
       "qual_number": 19,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 5908,
+      "match_number": 27,
+      "qual_number": 27,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 624,
       "match_number": 7,
       "qual_number": 7,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 624,
       "match_number": 13,
       "qual_number": 13,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 624,
       "match_number": 19,
       "qual_number": 19,
       "auto": 3,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 624,
+      "match_number": 24,
+      "qual_number": 24,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
+      "team_number": 624,
+      "match_number": 29,
+      "qual_number": 29,
+      "auto": 3,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 6357,
       "match_number": 5,
       "qual_number": 5,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 6357,
       "match_number": 13,
       "qual_number": 13,
       "auto": 1.5,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 6357,
       "match_number": 21,
       "qual_number": 21,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 6357,
+      "match_number": 26,
+      "qual_number": 26,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
+      "team_number": 6357,
+      "match_number": 31,
+      "qual_number": 31,
+      "auto": 1,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 6377,
       "match_number": 1,
       "qual_number": 1,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 6377,
       "match_number": 9,
       "qual_number": 9,
       "auto": 0,
       "strategy": 1,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 6377,
       "match_number": 15,
       "qual_number": 15,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 6377,
       "match_number": 23,
       "qual_number": 23,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 6377,
+      "match_number": 31,
+      "qual_number": 31,
+      "auto": 0.5,
+      "strategy": 1,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 6800,
       "match_number": 6,
       "qual_number": 6,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 6800,
       "match_number": 11,
       "qual_number": 11,
       "auto": 3,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 6800,
       "match_number": 16,
       "qual_number": 16,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
+      "team_number": 6800,
+      "match_number": 24,
+      "qual_number": 24,
+      "auto": 3,
+      "strategy": 0,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 7492,
       "match_number": 1,
       "qual_number": 1,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 7492,
       "match_number": 10,
       "qual_number": 10,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 7492,
       "match_number": 18,
       "qual_number": 18,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 7492,
       "match_number": 24,
       "qual_number": 24,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 7492,
+      "match_number": 29,
+      "qual_number": 29,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 7691,
       "match_number": 3,
       "qual_number": 3,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 7691,
       "match_number": 9,
       "qual_number": 9,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 7691,
       "match_number": 18,
       "qual_number": 18,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 7691,
+      "match_number": 28,
+      "qual_number": 28,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 8044,
       "match_number": 2,
       "qual_number": 2,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 8044,
       "match_number": 9,
       "qual_number": 9,
       "auto": 2,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Golf Tees",
       "team_number": 8044,
       "match_number": 17,
       "qual_number": 17,
       "auto": 2,
       "strategy": 0,
+      "other": "Golf Tees",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 8044,
       "match_number": 22,
       "qual_number": 22,
       "auto": 2.5,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 8370,
       "match_number": 7,
       "qual_number": 7,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 8370,
       "match_number": 13,
       "qual_number": 13,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 8370,
       "match_number": 18,
       "qual_number": 18,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 8370,
       "match_number": 23,
       "qual_number": 23,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
+      "team_number": 8370,
+      "match_number": 30,
+      "qual_number": 30,
+      "auto": 0,
+      "strategy": 0,
       "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 8515,
       "match_number": 6,
       "qual_number": 6,
       "auto": 0,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 8515,
       "match_number": 11,
       "qual_number": 11,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 8515,
       "match_number": 17,
       "qual_number": 17,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 8515,
+      "match_number": 25,
+      "qual_number": 25,
+      "auto": 1,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 9140,
       "match_number": 1,
       "qual_number": 1,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 9140,
       "match_number": 8,
       "qual_number": 8,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 9140,
       "match_number": 15,
       "qual_number": 15,
       "auto": 1,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9140,
       "match_number": 22,
       "qual_number": 22,
       "auto": 1,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9418,
       "match_number": 6,
       "qual_number": 6,
       "auto": 2,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9418,
       "match_number": 12,
       "qual_number": 12,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9418,
       "match_number": 18,
       "qual_number": 18,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9418,
       "match_number": 22,
       "qual_number": 22,
       "auto": 0,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 9418,
+      "match_number": 30,
+      "qual_number": 30,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
+      "teleop": 0
+    },
+    {
       "team_number": 9986,
       "match_number": 1,
       "qual_number": 1,
       "auto": 1,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9986,
       "match_number": 14,
       "qual_number": 14,
       "auto": 3,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
       "team_number": 9986,
       "match_number": 20,
       "qual_number": 20,
       "auto": 3,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Left",
+      "team_number": 9986,
+      "match_number": 25,
+      "qual_number": 25,
+      "auto": 2,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
+      "team_number": 9986,
+      "match_number": 30,
+      "qual_number": 30,
+      "auto": 3,
+      "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
       "team_number": 9991,
       "match_number": 5,
       "qual_number": 5,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Left",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 9991,
       "match_number": 10,
       "qual_number": 10,
       "auto": 1.5,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Center",
       "team_number": 9991,
       "match_number": 16,
       "qual_number": 16,
       "auto": 0.5,
       "strategy": 0,
+      "other": "Center",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 9991,
       "match_number": 22,
       "qual_number": 22,
       "auto": 1,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
+      "team_number": 9991,
+      "match_number": 29,
+      "qual_number": 29,
+      "auto": 1,
+      "strategy": 1,
+      "other": "Left",
+      "teleop": 0
+    },
+    {
       "team_number": 9994,
       "match_number": 2,
       "qual_number": 2,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 9994,
       "match_number": 8,
       "qual_number": 8,
       "auto": 0,
       "strategy": 0,
+      "other": "Right",
       "teleop": 0
     },
     {
-      "other": "Right",
       "team_number": 9994,
       "match_number": 16,
       "qual_number": 16,
       "auto": 1.5,
       "strategy": 0,
+      "other": "Right",
+      "teleop": 0
+    },
+    {
+      "team_number": 9994,
+      "match_number": 25,
+      "qual_number": 25,
+      "auto": 0,
+      "strategy": 0,
+      "other": "Center",
       "teleop": 0
     }
   ]
