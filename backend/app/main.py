@@ -48,13 +48,26 @@ from app.api import team_comparison  # New team comparison API
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
-# Allow frontend (localhost:5173) to call backend (localhost:8000)
+# Configure CORS
+# Allow multiple origins including localhost and ngrok domains
+allowed_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:5174",
+    "https://*.ngrok.io",
+    "https://*.ngrok-free.app",
+    "https://*.ngrok.app"
+]
+
+# For development, you can use allow_origins=["*"] to allow all origins
+# But for production, specify exact origins for security
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 

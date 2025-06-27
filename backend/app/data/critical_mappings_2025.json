@@ -1,10 +1,8 @@
 {
   "team_number": [
-    "Team Number"
+    "Robot #"
   ],
   "match_number": [
-    "Qual Number",
-    "Team Event Match",
-    "Match Key"
+    "Match #"
   ]
 }

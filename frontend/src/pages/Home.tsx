@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 interface EventInfo {
   event_key?: string;
@@ -16,13 +17,13 @@ function Home() {
 
   useEffect(() => {
     // Check backend health
-    fetch("http://localhost:8000/api/health/")
+    fetchWithNgrokHeaders(apiUrl("/api/health/"))
       .then((res) => res.json())
       .then((data) => setHealth(data.status))
       .catch(() => setHealth("Error connecting to backend"));
     
     // Fetch current event info
-    fetch("http://localhost:8000/api/setup/info")
+    fetchWithNgrokHeaders(apiUrl("/api/setup/info"))
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "success") {

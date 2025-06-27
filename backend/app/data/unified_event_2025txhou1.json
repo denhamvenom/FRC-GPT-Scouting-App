@@ -1,0 +1,6618 @@
+{
+  "event_key": "2025txhou1",
+  "year": 2025,
+  "expected_matches": [
+    {
+      "match_number": 1,
+      "team_number": 2582,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 3005,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9986,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 1,
+      "team_number": 7492,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 9140,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 1,
+      "team_number": 6377,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 10,
+      "team_number": 5414,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 10,
+      "team_number": 4639,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 10,
+      "team_number": 7492,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 10,
+      "team_number": 2587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 10,
+      "team_number": 2718,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 10,
+      "team_number": 9991,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 11,
+      "team_number": 10014,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 11,
+      "team_number": 4587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 11,
+      "team_number": 5908,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 11,
+      "team_number": 8515,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 11,
+      "team_number": 6800,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 11,
+      "team_number": 5427,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 12,
+      "team_number": 3847,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 12,
+      "team_number": 324,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 12,
+      "team_number": 10118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 12,
+      "team_number": 5503,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 12,
+      "team_number": 9418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 12,
+      "team_number": 323,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 13,
+      "team_number": 10385,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 13,
+      "team_number": 6357,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 13,
+      "team_number": 1477,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 13,
+      "team_number": 4336,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 13,
+      "team_number": 8370,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 13,
+      "team_number": 624,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 14,
+      "team_number": 4192,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 14,
+      "team_number": 2882,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 14,
+      "team_number": 418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 14,
+      "team_number": 9986,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 14,
+      "team_number": 5829,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 14,
+      "team_number": 5070,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 15,
+      "team_number": 5414,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 15,
+      "team_number": 2718,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 15,
+      "team_number": 9140,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 15,
+      "team_number": 118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 15,
+      "team_number": 5431,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 15,
+      "team_number": 6377,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 16,
+      "team_number": 10014,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 16,
+      "team_number": 2587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 16,
+      "team_number": 6800,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 16,
+      "team_number": 9991,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 16,
+      "team_number": 2848,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 16,
+      "team_number": 9994,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 17,
+      "team_number": 8044,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 17,
+      "team_number": 8515,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 17,
+      "team_number": 324,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 17,
+      "team_number": 2881,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 17,
+      "team_number": 3847,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 17,
+      "team_number": 5892,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 18,
+      "team_number": 4587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 18,
+      "team_number": 8370,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 18,
+      "team_number": 7492,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 18,
+      "team_number": 5427,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 18,
+      "team_number": 7691,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 18,
+      "team_number": 9418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 19,
+      "team_number": 5829,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 19,
+      "team_number": 418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 19,
+      "team_number": 624,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 19,
+      "team_number": 3005,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 19,
+      "team_number": 4639,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 19,
+      "team_number": 5908,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 2,
+      "team_number": 2881,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 2,
+      "team_number": 9994,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 2,
+      "team_number": 4587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 2,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 2,
+      "team_number": 1477,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 2,
+      "team_number": 2587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 20,
+      "team_number": 2882,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 20,
+      "team_number": 4336,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 20,
+      "team_number": 9986,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 20,
+      "team_number": 1477,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 20,
+      "team_number": 10118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 20,
+      "team_number": 5503,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 21,
+      "team_number": 6357,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 21,
+      "team_number": 5070,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 21,
+      "team_number": 323,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 21,
+      "team_number": 10385,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 21,
+      "team_number": 4192,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 21,
+      "team_number": 2582,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 22,
+      "team_number": 9140,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 22,
+      "team_number": 9991,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 22,
+      "team_number": 324,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 22,
+      "team_number": 3847,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 22,
+      "team_number": 10014,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 22,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 23,
+      "team_number": 6377,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 23,
+      "team_number": 9418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 23,
+      "team_number": 8370,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 23,
+      "team_number": 5892,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 23,
+      "team_number": 5427,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 23,
+      "team_number": 2587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 24,
+      "team_number": 7492,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 24,
+      "team_number": 624,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 24,
+      "team_number": 118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 24,
+      "team_number": 6800,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 24,
+      "team_number": 4587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 24,
+      "team_number": 5829,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 25,
+      "team_number": 2848,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 25,
+      "team_number": 2718,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 25,
+      "team_number": 8515,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 25,
+      "team_number": 9986,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 25,
+      "team_number": 9994,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 25,
+      "team_number": 418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 26,
+      "team_number": 6357,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 26,
+      "team_number": 2582,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 26,
+      "team_number": 4639,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 26,
+      "team_number": 5431,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 26,
+      "team_number": 2882,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 26,
+      "team_number": 5503,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 27,
+      "team_number": 5070,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 27,
+      "team_number": 10118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 27,
+      "team_number": 10385,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 27,
+      "team_number": 1477,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 27,
+      "team_number": 5908,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 27,
+      "team_number": 2881,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 28,
+      "team_number": 4336,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 28,
+      "team_number": 3005,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 28,
+      "team_number": 7691,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 28,
+      "team_number": 5414,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 28,
+      "team_number": 323,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 28,
+      "team_number": 4192,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 29,
+      "team_number": 5427,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 29,
+      "team_number": 624,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 29,
+      "team_number": 3847,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 29,
+      "team_number": 5892,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 29,
+      "team_number": 7492,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 29,
+      "team_number": 9991,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 3,
+      "team_number": 5908,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 3,
+      "team_number": 5892,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 3,
+      "team_number": 118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 3,
+      "team_number": 5431,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 3,
+      "team_number": 323,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 3,
+      "team_number": 7691,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 30,
+      "team_number": 418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 30,
+      "team_number": 118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 30,
+      "team_number": 9418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 30,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 30,
+      "team_number": 9986,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 30,
+      "team_number": 8370,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 31,
+      "team_number": 5829,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 31,
+      "team_number": 6377,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 31,
+      "team_number": 10014,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 31,
+      "team_number": 2848,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 31,
+      "team_number": 5503,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 31,
+      "team_number": 6357,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 32,
+      "team_number": 9994,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 32,
+      "team_number": 5908,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 32,
+      "team_number": 8515,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 32,
+      "team_number": 4587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 32,
+      "team_number": 10118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 32,
+      "team_number": 2582,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 33,
+      "team_number": 323,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 33,
+      "team_number": 9140,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 33,
+      "team_number": 2881,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 33,
+      "team_number": 2718,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 33,
+      "team_number": 4639,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 33,
+      "team_number": 4336,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 34,
+      "team_number": 2587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 34,
+      "team_number": 4192,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 34,
+      "team_number": 5431,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 34,
+      "team_number": 2882,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 34,
+      "team_number": 10385,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 34,
+      "team_number": 3005,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 35,
+      "team_number": 5070,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 35,
+      "team_number": 6800,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 35,
+      "team_number": 1477,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 35,
+      "team_number": 324,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 35,
+      "team_number": 7691,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 35,
+      "team_number": 5414,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 36,
+      "team_number": 118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 36,
+      "team_number": 9986,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 36,
+      "team_number": 3847,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 36,
+      "team_number": 10014,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 36,
+      "team_number": 6357,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 36,
+      "team_number": 624,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 37,
+      "team_number": 5503,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 37,
+      "team_number": 6377,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 37,
+      "team_number": 9994,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 37,
+      "team_number": 8370,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 37,
+      "team_number": 9991,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 37,
+      "team_number": 5908,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 38,
+      "team_number": 418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 38,
+      "team_number": 2582,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 38,
+      "team_number": 5427,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 38,
+      "team_number": 10118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 38,
+      "team_number": 2881,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 38,
+      "team_number": 4336,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 39,
+      "team_number": 4639,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 39,
+      "team_number": 5892,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 39,
+      "team_number": 2848,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 39,
+      "team_number": 4192,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 39,
+      "team_number": 4587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 39,
+      "team_number": 3005,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 4,
+      "team_number": 2848,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 4,
+      "team_number": 5414,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 4,
+      "team_number": 10385,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 4,
+      "team_number": 4639,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 4,
+      "team_number": 5503,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 4,
+      "team_number": 3847,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 40,
+      "team_number": 2882,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 40,
+      "team_number": 323,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 40,
+      "team_number": 1477,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 40,
+      "team_number": 9418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 40,
+      "team_number": 5414,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 40,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 41,
+      "team_number": 10385,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 41,
+      "team_number": 5431,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 41,
+      "team_number": 5829,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 41,
+      "team_number": 2718,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 41,
+      "team_number": 324,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 41,
+      "team_number": 6800,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 42,
+      "team_number": 7691,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 42,
+      "team_number": 7492,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 42,
+      "team_number": 8515,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 42,
+      "team_number": 2587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 42,
+      "team_number": 5070,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 42,
+      "team_number": 9140,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 43,
+      "team_number": 9991,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 43,
+      "team_number": 2582,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 43,
+      "team_number": 10014,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 43,
+      "team_number": 10118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 43,
+      "team_number": 118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 43,
+      "team_number": 8370,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 44,
+      "team_number": 624,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 44,
+      "team_number": 2881,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 44,
+      "team_number": 4639,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 44,
+      "team_number": 9994,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 44,
+      "team_number": 4192,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 44,
+      "team_number": 5427,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 45,
+      "team_number": 9418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 45,
+      "team_number": 5892,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 45,
+      "team_number": 6357,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 45,
+      "team_number": 3005,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 45,
+      "team_number": 1477,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 45,
+      "team_number": 5414,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 46,
+      "team_number": 6800,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 46,
+      "team_number": 6377,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 46,
+      "team_number": 9986,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 46,
+      "team_number": 323,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 46,
+      "team_number": 5829,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 46,
+      "team_number": 8044,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 47,
+      "team_number": 9140,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 47,
+      "team_number": 7691,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 47,
+      "team_number": 5503,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 47,
+      "team_number": 8515,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 47,
+      "team_number": 10385,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 47,
+      "team_number": 418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 48,
+      "team_number": 4587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 48,
+      "team_number": 3847,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 48,
+      "team_number": 2587,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 48,
+      "team_number": 5070,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 48,
+      "team_number": 5431,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 48,
+      "team_number": 2718,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 49,
+      "team_number": 324,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 49,
+      "team_number": 4336,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 49,
+      "team_number": 2848,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 49,
+      "team_number": 7492,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 49,
+      "team_number": 5908,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 49,
+      "team_number": 2882,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 5,
+      "team_number": 9991,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 5,
+      "team_number": 5427,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 5,
+      "team_number": 2882,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 5,
+      "team_number": 418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 5,
+      "team_number": 6357,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 5,
+      "team_number": 2718,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 50,
+      "team_number": 2582,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 50,
+      "team_number": 1477,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 50,
+      "team_number": 9418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 50,
+      "team_number": 4192,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 50,
+      "team_number": 118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 50,
+      "team_number": 4639,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 51,
+      "team_number": 5829,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 51,
+      "team_number": 5427,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 51,
+      "team_number": 2881,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 51,
+      "team_number": 9986,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 51,
+      "team_number": 5414,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 51,
+      "team_number": 10014,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 52,
+      "team_number": 9994,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 52,
+      "team_number": 6800,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 52,
+      "team_number": 10118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 52,
+      "team_number": 7691,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 52,
+      "team_number": 10385,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 52,
+      "team_number": 5892,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 53,
+      "team_number": 5503,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 53,
+      "team_number": 8044,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 53,
+      "team_number": 2718,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 53,
+      "team_number": 624,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 53,
+      "team_number": 5070,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 53,
+      "team_number": 3005,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 54,
+      "team_number": 8370,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 54,
+      "team_number": 418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 54,
+      "team_number": 2848,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 54,
+      "team_number": 323,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 54,
+      "team_number": 7492,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 54,
+      "team_number": 324,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 55,
+      "team_number": 6377,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 55,
+      "team_number": 2882,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 55,
+      "team_number": 6357,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 55,
+      "team_number": 9140,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 55,
+      "team_number": 8515,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 55,
+      "team_number": 4587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 56,
+      "team_number": 5431,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 56,
+      "team_number": 3847,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 56,
+      "team_number": 9991,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 56,
+      "team_number": 5908,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 56,
+      "team_number": 2587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 56,
+      "team_number": 4336,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 57,
+      "team_number": 2582,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 57,
+      "team_number": 5829,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 57,
+      "team_number": 5414,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 57,
+      "team_number": 9418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 57,
+      "team_number": 9994,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 57,
+      "team_number": 10385,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 58,
+      "team_number": 4639,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 58,
+      "team_number": 10014,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 58,
+      "team_number": 7691,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 58,
+      "team_number": 2718,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 58,
+      "team_number": 9986,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 58,
+      "team_number": 5892,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 59,
+      "team_number": 324,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 59,
+      "team_number": 5503,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 59,
+      "team_number": 5070,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 59,
+      "team_number": 5427,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 59,
+      "team_number": 2848,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 59,
+      "team_number": 118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 6,
+      "team_number": 4336,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 6,
+      "team_number": 9418,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 6,
+      "team_number": 6800,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 6,
+      "team_number": 8515,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 6,
+      "team_number": 10014,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 6,
+      "team_number": 5070,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 60,
+      "team_number": 3005,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 60,
+      "team_number": 8370,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 60,
+      "team_number": 9140,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 60,
+      "team_number": 6800,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 60,
+      "team_number": 2881,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 60,
+      "team_number": 2882,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 61,
+      "team_number": 624,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 61,
+      "team_number": 9991,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 61,
+      "team_number": 323,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 61,
+      "team_number": 1477,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 61,
+      "team_number": 8515,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 61,
+      "team_number": 5431,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 62,
+      "team_number": 3847,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 62,
+      "team_number": 4336,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 62,
+      "team_number": 4192,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 62,
+      "team_number": 6377,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 62,
+      "team_number": 418,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 62,
+      "team_number": 4587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 63,
+      "team_number": 5908,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 63,
+      "team_number": 8044,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 63,
+      "team_number": 10118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 63,
+      "team_number": 6357,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 63,
+      "team_number": 2587,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 63,
+      "team_number": 7492,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 7,
+      "team_number": 10118,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 7,
+      "team_number": 624,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 7,
+      "team_number": 4192,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 7,
+      "team_number": 8370,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 7,
+      "team_number": 324,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 7,
+      "team_number": 5829,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 8,
+      "team_number": 5892,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 8,
+      "team_number": 3005,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 8,
+      "team_number": 9994,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 8,
+      "team_number": 118,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 8,
+      "team_number": 9140,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 8,
+      "team_number": 2582,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 9,
+      "team_number": 2881,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 9,
+      "team_number": 8044,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 9,
+      "team_number": 5431,
+      "alliance_color": "blue"
+    },
+    {
+      "match_number": 9,
+      "team_number": 7691,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 9,
+      "team_number": 2848,
+      "alliance_color": "red"
+    },
+    {
+      "match_number": 9,
+      "team_number": 6377,
+      "alliance_color": "red"
+    }
+  ],
+  "teams": {
+    "10014": {
+      "team_number": 10014,
+      "nickname": "REBELLION",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 10014,
+          "match_number": 6,
+          "qual_number": 6,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 10014,
+          "match_number": 11,
+          "qual_number": 11,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 10014,
+          "match_number": 16,
+          "qual_number": 16,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 10014,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Prosper",
+        "country": "USA",
+        "key": "frc10014",
+        "name": "NASA/Texas Workforce Commission/Gene Haas Foundation/M.B. Ryan/Honeywell/American Filament/Inverters-R-US/ePlastics/LMNT/Slack&Family/Community",
+        "nickname": "REBELLION",
+        "state_prov": "Texas",
+        "team_number": 10014
+      },
+      "statbotics_info": {
+        "team_number": 10014,
+        "team_name": "REBELLION",
+        "epa_total": 47.41,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          2
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 27,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          2.0,
+          0.0,
+          84.0,
+          19.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc10014"
+      }
+    },
+    "10118": {
+      "team_number": 10118,
+      "nickname": "Robonauts EveryBot",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 10118,
+          "match_number": 7,
+          "qual_number": 7,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 10118,
+          "match_number": 12,
+          "qual_number": 12,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 10118,
+          "match_number": 20,
+          "qual_number": 20,
+          "auto": 1.5,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc10118",
+        "name": "S&K Engineering & Research/NASA - Johnson Space Center/Clear Creek Independent School District&Family/Community",
+        "nickname": "Robonauts EveryBot",
+        "state_prov": "Texas",
+        "team_number": 10118
+      },
+      "statbotics_info": {
+        "team_number": 10118,
+        "team_name": "Robonauts Everybot",
+        "epa_total": 28.06,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 38,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0.0,
+          0.0,
+          124.0,
+          27.0,
+          6.0,
+          0.0
+        ],
+        "team_key": "frc10118"
+      }
+    },
+    "10385": {
+      "team_number": 10385,
+      "nickname": "Cycle-Breakers",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 10385,
+          "match_number": 4,
+          "qual_number": 4,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 10385,
+          "match_number": 13,
+          "qual_number": 13,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 10385,
+          "match_number": 21,
+          "qual_number": 21,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "McAllen",
+        "country": "USA",
+        "key": "frc10385",
+        "name": "NASA&Texas Robotics Alliance",
+        "nickname": "Cycle-Breakers",
+        "state_prov": "Texas",
+        "team_number": 10385
+      },
+      "statbotics_info": {
+        "team_number": 10385,
+        "team_name": "Cycle-Breakers",
+        "epa_total": 21.92,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          4
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 18,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          4.0,
+          0.0,
+          96.0,
+          37.0,
+          4.0,
+          0.0
+        ],
+        "team_key": "frc10385"
+      }
+    },
+    "118": {
+      "team_number": 118,
+      "nickname": "Robonauts",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 118,
+          "match_number": 3,
+          "qual_number": 3,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 118,
+          "match_number": 8,
+          "qual_number": 8,
+          "auto": 4,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 118,
+          "match_number": 15,
+          "qual_number": 15,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 118,
+          "match_number": 24,
+          "qual_number": 24,
+          "auto": 4,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc118",
+        "name": "NASA-Johnson Space Center/Clear Creek Independent School District&Clear Creek Independent School District",
+        "nickname": "Robonauts",
+        "state_prov": "Texas",
+        "team_number": 118
+      },
+      "statbotics_info": {
+        "team_number": 118,
+        "team_name": "Robonauts",
+        "epa_total": 104.76,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          12
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 1,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          171.5,
+          49.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc118"
+      }
+    },
+    "1477": {
+      "team_number": 1477,
+      "nickname": "Texas Torque",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 1477,
+          "match_number": 2,
+          "qual_number": 2,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 1477,
+          "match_number": 13,
+          "qual_number": 13,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 1477,
+          "match_number": 20,
+          "qual_number": 20,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Conroe",
+        "country": "USA",
+        "key": "frc1477",
+        "name": "Halliburton/Conroe ISD/DS SolidWorks/Texas Workforce Commission/FIRST in Texas/RJMJR Consultants/Gene Haas Foundation/Laird Plastics/Healing Hearts/The Wright Family&The Woodlands-College Park HS",
+        "nickname": "Texas Torque",
+        "state_prov": "Texas",
+        "team_number": 1477
+      },
+      "statbotics_info": {
+        "team_number": 1477,
+        "team_name": "Texas Torque",
+        "epa_total": 61.01,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 2,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          163.0,
+          37.0,
+          24.0,
+          0.0
+        ],
+        "team_key": "frc1477"
+      }
+    },
+    "2582": {
+      "team_number": 2582,
+      "nickname": "PantherBots",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 2582,
+          "match_number": 1,
+          "qual_number": 1,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 2582,
+          "match_number": 8,
+          "qual_number": 8,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 2582,
+          "match_number": 21,
+          "qual_number": 21,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Lufkin",
+        "country": "USA",
+        "key": "frc2582",
+        "name": "Lufkin ISD CTE/Boeing/Lockheed Martin/Optimum/Last Anvil Innovations/Mastercam&Lufkin High School",
+        "nickname": "PantherBots",
+        "state_prov": "Texas",
+        "team_number": 2582
+      },
+      "statbotics_info": {
+        "team_number": 2582,
+        "team_name": "PantherBots",
+        "epa_total": 46.64,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          11
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 8,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [
+          5.5,
+          0.0,
+          157.0,
+          37.0,
+          20.0,
+          0.0
+        ],
+        "team_key": "frc2582"
+      }
+    },
+    "2587": {
+      "team_number": 2587,
+      "nickname": "DiscoBots",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 2587,
+          "match_number": 2,
+          "qual_number": 2,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 2587,
+          "match_number": 10,
+          "qual_number": 10,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 2587,
+          "match_number": 23,
+          "qual_number": 23,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc2587",
+        "name": "Shell/Bechtel/ExxonMobil/Gene Haas Foundation/Texas Workforce Commission/EPO Houston/Argosy Foundation&Lamar High School&Carnegie-Vanguard High School&Westside High School",
+        "nickname": "DiscoBots",
+        "state_prov": "Texas",
+        "team_number": 2587
+      },
+      "statbotics_info": {
+        "team_number": 2587,
+        "team_name": "DiscoBots",
+        "epa_total": 39.62,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          8
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 15,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          4.0,
+          0.0,
+          130.5,
+          28.0,
+          19.0,
+          0.0
+        ],
+        "team_key": "frc2587"
+      }
+    },
+    "2718": {
+      "team_number": 2718,
+      "nickname": "Team OKC e'possums (\u03a3 1/n! x 10^3)",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 2718,
+          "match_number": 5,
+          "qual_number": 5,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 2718,
+          "match_number": 10,
+          "qual_number": 10,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 2718,
+          "match_number": 15,
+          "qual_number": 15,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Oklahoma City",
+        "country": "USA",
+        "key": "frc2718",
+        "name": "Science Museum Oklahoma/DODSTEM/The Boeing Company/Gene Haas Foundation/Argosy Foundation/Intuitive Foundation/RTX/NASA/The Nessler and Harris Families&4-H",
+        "nickname": "Team OKC e'possums (\u03a3 1/n! x 10^3)",
+        "state_prov": "Oklahoma",
+        "team_number": 2718
+      },
+      "statbotics_info": {
+        "team_number": 2718,
+        "team_name": "Team OKC e'possums (\u03a3 1/n! x 10^3)",
+        "epa_total": 44.15,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          7
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 19,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          3.5,
+          0.0,
+          120.0,
+          26.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc2718"
+      }
+    },
+    "2848": {
+      "team_number": 2848,
+      "nickname": "Rangers",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 2848,
+          "match_number": 4,
+          "qual_number": 4,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 2848,
+          "match_number": 9,
+          "qual_number": 9,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 2848,
+          "match_number": 16,
+          "qual_number": 16,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Dallas",
+        "country": "USA",
+        "key": "frc2848",
+        "name": "Jesuit College Prep of Dallas&Jesuit College Prep School",
+        "nickname": "Rangers",
+        "state_prov": "Texas",
+        "team_number": 2848
+      },
+      "statbotics_info": {
+        "team_number": 2848,
+        "team_name": "Rangers",
+        "epa_total": 51.33,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 24,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          2.5,
+          0.0,
+          84.5,
+          27.0,
+          4.0,
+          0.0
+        ],
+        "team_key": "frc2848"
+      }
+    },
+    "2881": {
+      "team_number": 2881,
+      "nickname": "Lady Cans",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 2881,
+          "match_number": 2,
+          "qual_number": 2,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 2881,
+          "match_number": 9,
+          "qual_number": 9,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 2881,
+          "match_number": 17,
+          "qual_number": 17,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Austin",
+        "country": "USA",
+        "key": "frc2881",
+        "name": "Girl Scouts of Central Texas/John Deere/Apple/Gene Haas Foundation/CWS Corporate Leasing, LLC/Texas instruments/BAE Systems Inc./i-Pex USA LLC/Qualcomm, Inc/Duck Tape ShureTape/Cruise Automation/National Instruments/Mitas Electronics/Dell/SolidWorks&Girl Scouts of Central Texas Troop 3993",
+        "nickname": "Lady Cans",
+        "state_prov": "Texas",
+        "team_number": 2881
+      },
+      "statbotics_info": {
+        "team_number": 2881,
+        "team_name": "Lady Cans",
+        "epa_total": 54.8,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          8
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 16,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          4.0,
+          0.0,
+          119.5,
+          26.5,
+          20.0,
+          0.0
+        ],
+        "team_key": "frc2881"
+      }
+    },
+    "2882": {
+      "team_number": 2882,
+      "nickname": "Nuts n' Boltz",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 2882,
+          "match_number": 5,
+          "qual_number": 5,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 2882,
+          "match_number": 14,
+          "qual_number": 14,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Katy",
+        "country": "USA",
+        "key": "frc2882",
+        "name": "Bechtel/Texas Workforce Commission/Gene Haas Foundation/Argosy Foundation&Morton Ranch High School",
+        "nickname": "Nuts n' Boltz",
+        "state_prov": "Texas",
+        "team_number": 2882
+      },
+      "statbotics_info": {
+        "team_number": 2882,
+        "team_name": "Nuts n' Boltz",
+        "epa_total": 10.93,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 34,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          1.0,
+          0.0,
+          65.0,
+          12.0,
+          6.0,
+          0.0
+        ],
+        "team_key": "frc2882"
+      }
+    },
+    "3005": {
+      "team_number": 3005,
+      "nickname": "RoboChargers",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 3005,
+          "match_number": 1,
+          "qual_number": 1,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 3005,
+          "match_number": 8,
+          "qual_number": 8,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 3005,
+          "match_number": 19,
+          "qual_number": 19,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Dallas",
+        "country": "USA",
+        "key": "frc3005",
+        "name": "Liberty Mutual/Texas Instruments/REV Robotics/Vickery Meadows Foundation/The Boeing Company&Emmett J Conrad High School",
+        "nickname": "RoboChargers",
+        "state_prov": "Texas",
+        "team_number": 3005
+      },
+      "statbotics_info": {
+        "team_number": 3005,
+        "team_name": "RoboChargers",
+        "epa_total": 92.38,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 23,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          3.0,
+          0.0,
+          102.0,
+          16.0,
+          15.0,
+          0.0
+        ],
+        "team_key": "frc3005"
+      }
+    },
+    "323": {
+      "team_number": 323,
+      "nickname": "Lights Out",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 323,
+          "match_number": 3,
+          "qual_number": 3,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 323,
+          "match_number": 12,
+          "qual_number": 12,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 323,
+          "match_number": 21,
+          "qual_number": 21,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Mountain Home",
+        "country": "USA",
+        "key": "frc323",
+        "name": "Argosy Foundation/John and Meredith Novak/ArcBest/Gene Haas Foundation/JETFIN Innovations LLC/Arkansas First&Family/Community",
+        "nickname": "Lights Out",
+        "state_prov": "Arkansas",
+        "team_number": 323
+      },
+      "statbotics_info": {
+        "team_number": 323,
+        "team_name": "Lights Out",
+        "epa_total": 48.8,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 36,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          1.0,
+          0.0,
+          46.0,
+          12.0,
+          6.0,
+          0.0
+        ],
+        "team_key": "frc323"
+      }
+    },
+    "324": {
+      "team_number": 324,
+      "nickname": "Chips",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 324,
+          "match_number": 7,
+          "qual_number": 7,
+          "auto": 1.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 324,
+          "match_number": 12,
+          "qual_number": 12,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 324,
+          "match_number": 17,
+          "qual_number": 17,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 324,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Friendswood",
+        "country": "USA",
+        "key": "frc324",
+        "name": "NASA Johnson Space Center/Clear Creek Independent School District/Boeing/All Points/Aerodyne Industries/Roy Anderson Memorial/Southeast Dermatology/Texas Children's Urgent Care/Texas Workforce Commision/Gene Haas Foundation&Clear Brook High School",
+        "nickname": "Chips",
+        "state_prov": "Texas",
+        "team_number": 324
+      },
+      "statbotics_info": {
+        "team_number": 324,
+        "team_name": "Chips",
+        "epa_total": 61.37,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 14,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          5.0,
+          0.0,
+          109.0,
+          12.0,
+          26.0,
+          0.0
+        ],
+        "team_key": "frc324"
+      }
+    },
+    "3847": {
+      "team_number": 3847,
+      "nickname": "Spectrum   -\u25b3\u25c5",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 3847,
+          "match_number": 4,
+          "qual_number": 4,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 3847,
+          "match_number": 12,
+          "qual_number": 12,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 3847,
+          "match_number": 17,
+          "qual_number": 17,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 3847,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc3847",
+        "name": "DOW/Apple/Analog Devices/Rev Robotics/Gene Haas Foundation/TE Connectivity/BAE/QADWorks/Intuitive Foundation/Solarcraft, Inc/Texas Workforce Commission/NI/Emerson/PTC/Fabworks/SendCutSend&St Agnes Academy&Strake Jesuit College Prep Sch",
+        "nickname": "Spectrum   -\u25b3\u25c5",
+        "state_prov": "Texas",
+        "team_number": 3847
+      },
+      "statbotics_info": {
+        "team_number": 3847,
+        "team_name": "Spectrum   -\u25b3\u25c5",
+        "epa_total": 61.64,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 41,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0.0,
+          0.0,
+          63.0,
+          27.0,
+          12.0,
+          0.0
+        ],
+        "team_key": "frc3847"
+      }
+    },
+    "418": {
+      "team_number": 418,
+      "nickname": "Purple Haze",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 418,
+          "match_number": 5,
+          "qual_number": 5,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 418,
+          "match_number": 14,
+          "qual_number": 14,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 418,
+          "match_number": 19,
+          "qual_number": 19,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Austin",
+        "country": "USA",
+        "key": "frc418",
+        "name": "Liberal Arts & Science Academy",
+        "nickname": "Purple Haze",
+        "state_prov": "Texas",
+        "team_number": 418
+      },
+      "statbotics_info": {
+        "team_number": 418,
+        "team_name": "Purple Haze",
+        "epa_total": 57.04,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 9,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          5.0,
+          0.0,
+          142.0,
+          33.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc418"
+      }
+    },
+    "4192": {
+      "team_number": 4192,
+      "nickname": "Jaguar Robotics",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 4192,
+          "match_number": 7,
+          "qual_number": 7,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 4192,
+          "match_number": 14,
+          "qual_number": 14,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 4192,
+          "match_number": 21,
+          "qual_number": 21,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Flower Mound",
+        "country": "USA",
+        "key": "frc4192",
+        "name": "Gene Haas Foundation/RTX/Lockheed Martin/The Evolver's Group&Flower Mound High School",
+        "nickname": "Jaguar Robotics",
+        "state_prov": "Texas",
+        "team_number": 4192
+      },
+      "statbotics_info": {
+        "team_number": 4192,
+        "team_name": "Jaguar Robotics",
+        "epa_total": 42.81,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 40,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0.0,
+          0.0,
+          124.0,
+          27.0,
+          6.0,
+          0.0
+        ],
+        "team_key": "frc4192"
+      }
+    },
+    "4336": {
+      "team_number": 4336,
+      "nickname": "Ramageddon Robotics",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 4336,
+          "match_number": 6,
+          "qual_number": 6,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 4336,
+          "match_number": 13,
+          "qual_number": 13,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 4336,
+          "match_number": 20,
+          "qual_number": 20,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Lafayette",
+        "country": "USA",
+        "key": "frc4336",
+        "name": "Lafayette Parish School System/Talos Energy, LLC/University of Louisiana - College of Engineering/Gene Haas Foundation&W D & Mary Smith Career Center&Acadiana High School&Carencro High School&Ovey Comeaux High School&Lafayette High School&Thibodaux STEM Magnet Acad&Family/Community&Southside High School",
+        "nickname": "Ramageddon Robotics",
+        "state_prov": "Louisiana",
+        "team_number": 4336
+      },
+      "statbotics_info": {
+        "team_number": 4336,
+        "team_name": "Ramageddon Robotics",
+        "epa_total": 35.96,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 5,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          145.0,
+          30.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc4336"
+      }
+    },
+    "4587": {
+      "team_number": 4587,
+      "nickname": "Jersey Voltage",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 4587,
+          "match_number": 2,
+          "qual_number": 2,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 4587,
+          "match_number": 11,
+          "qual_number": 11,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 4587,
+          "match_number": 18,
+          "qual_number": 18,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Jersey Village",
+        "country": "USA",
+        "key": "frc4587",
+        "name": "Jersey Village High School/FRC Registration Grant/Gene Haas Foundation/the Softsmiths Cloud/Texas Workforce Commission/ARC Specialties/National Instruments/United Airlines & Jersey Village High School",
+        "nickname": "Jersey Voltage",
+        "state_prov": "Texas",
+        "team_number": 4587
+      },
+      "statbotics_info": {
+        "team_number": 4587,
+        "team_name": "Jersey Voltage 4587",
+        "epa_total": 15.72,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          2
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 30,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          2.0,
+          0.0,
+          82.0,
+          16.0,
+          16.0,
+          0.0
+        ],
+        "team_key": "frc4587"
+      }
+    },
+    "4639": {
+      "team_number": 4639,
+      "nickname": "The RoboSpartans",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 4639,
+          "match_number": 4,
+          "qual_number": 4,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 4639,
+          "match_number": 10,
+          "qual_number": 10,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 4639,
+          "match_number": 19,
+          "qual_number": 19,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Katy",
+        "country": "USA",
+        "key": "frc4639",
+        "name": "Nalco Water/Honeywell/Boeing/Bechtel&Seven Lakes High School",
+        "nickname": "The RoboSpartans",
+        "state_prov": "Texas",
+        "team_number": 4639
+      },
+      "statbotics_info": {
+        "team_number": 4639,
+        "team_name": "The RoboSpartans",
+        "epa_total": 37.48,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          4
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 26,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          2.0,
+          0.0,
+          86.5,
+          25.0,
+          8.0,
+          0.0
+        ],
+        "team_key": "frc4639"
+      }
+    },
+    "5070": {
+      "team_number": 5070,
+      "nickname": "Gearnotics",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 5070,
+          "match_number": 6,
+          "qual_number": 6,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 5070,
+          "match_number": 14,
+          "qual_number": 14,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5070,
+          "match_number": 21,
+          "qual_number": 21,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc5070",
+        "name": "DOW/Leidos Foundation/Gene Haas Foundation/Argosy Foundation/Texas Workforce Commission/New Beginning STEM Youth Initiative/Innovation Impact Lab&Neighborhood Group",
+        "nickname": "Gearnotics",
+        "state_prov": "Texas",
+        "team_number": 5070
+      },
+      "statbotics_info": {
+        "team_number": 5070,
+        "team_name": "Gearnotics",
+        "epa_total": 15.55,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          2
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 29,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          2.0,
+          0.0,
+          84.0,
+          19.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc5070"
+      }
+    },
+    "5414": {
+      "team_number": 5414,
+      "nickname": "Pearadox",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 5414,
+          "match_number": 4,
+          "qual_number": 4,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 5414,
+          "match_number": 10,
+          "qual_number": 10,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 5414,
+          "match_number": 15,
+          "qual_number": 15,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Pearland",
+        "country": "USA",
+        "key": "frc5414",
+        "name": "NASA/DOW/Texas Workforce Commission/Ascend Cares Foundation/Gene Haas Foundation/BNY Mellon/Intuitive Foundation/STEM Savvy Brew/Pearland Lions Club/Boeing/Conoco Phillips/Chevron/Pearland Police Officers Association/Endress & Hauser/AYLUS&Pearland High School&Glenda Dawson High School&Robert Turner Colege-Career HS",
+        "nickname": "Pearadox",
+        "state_prov": "Texas",
+        "team_number": 5414
+      },
+      "statbotics_info": {
+        "team_number": 5414,
+        "team_name": "Pearadox",
+        "epa_total": 47.64,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          8
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 17,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [
+          4.0,
+          0.0,
+          103.0,
+          30.0,
+          4.0,
+          0.0
+        ],
+        "team_key": "frc5414"
+      }
+    },
+    "5427": {
+      "team_number": 5427,
+      "nickname": "Steel Talons",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 5427,
+          "match_number": 5,
+          "qual_number": 5,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 5427,
+          "match_number": 11,
+          "qual_number": 11,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5427,
+          "match_number": 18,
+          "qual_number": 18,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 5427,
+          "match_number": 23,
+          "qual_number": 23,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Katy",
+        "country": "USA",
+        "key": "frc5427",
+        "name": "La Quinta Inn & Suites - Brookshire/West Katy/AISPEX Inc./KatyISD/Phoenix Compact Valves, Inc./Technical Control Solutions, Inc./Texas Workforce Commission/Gene Haas Foundation&Obra D. Tompkins High School",
+        "nickname": "Steel Talons",
+        "state_prov": "Texas",
+        "team_number": 5427
+      },
+      "statbotics_info": {
+        "team_number": 5427,
+        "team_name": "Steel Talons",
+        "epa_total": 44.52,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 33,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          1.0,
+          0.0,
+          65.0,
+          12.0,
+          6.0,
+          0.0
+        ],
+        "team_key": "frc5427"
+      }
+    },
+    "5431": {
+      "team_number": 5431,
+      "nickname": "Titan Robotics",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 5431,
+          "match_number": 3,
+          "qual_number": 3,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5431,
+          "match_number": 9,
+          "qual_number": 9,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5431,
+          "match_number": 15,
+          "qual_number": 15,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Plano",
+        "country": "USA",
+        "key": "frc5431",
+        "name": "Plano ISD/Plano ISD Education Foundation/Titan Robotics Booster Club/FIRST In Texas/SOLIDWorks/Boeing/Texas Instruments/HAAS/Texas Workforce Commission/Poop 911&Plano Isd Academy High School",
+        "nickname": "Titan Robotics",
+        "state_prov": "Texas",
+        "team_number": 5431
+      },
+      "statbotics_info": {
+        "team_number": 5431,
+        "team_name": "Titan Robotics",
+        "epa_total": 44.88,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          7
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 21,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          3.5,
+          0.0,
+          101.5,
+          24.5,
+          15.0,
+          0.0
+        ],
+        "team_key": "frc5431"
+      }
+    },
+    "5503": {
+      "team_number": 5503,
+      "nickname": "Smithville Tiger Trons",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 5503,
+          "match_number": 4,
+          "qual_number": 4,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5503,
+          "match_number": 12,
+          "qual_number": 12,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5503,
+          "match_number": 20,
+          "qual_number": 20,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Smithville",
+        "country": "USA",
+        "key": "frc5503",
+        "name": "SMC woodworking technology/Calbri Logistics, LLC/Local 286 Plumbers & Pipefitters/Smithville Noon Lions Club/TEXAS WORKFORCE COMMISSION/DV Laser Works/Smithville UMC Men's Club/SHS Robotics Boosters/FIRST in Texas & Smithville High School",
+        "nickname": "Smithville Tiger Trons",
+        "state_prov": "Texas",
+        "team_number": 5503
+      },
+      "statbotics_info": {
+        "team_number": 5503,
+        "team_name": "Smithville Tiger Trons",
+        "epa_total": 16.11,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 42,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0.0,
+          0.0,
+          63.0,
+          27.0,
+          12.0,
+          0.0
+        ],
+        "team_key": "frc5503"
+      }
+    },
+    "5829": {
+      "team_number": 5829,
+      "nickname": "AwtyBots",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 5829,
+          "match_number": 7,
+          "qual_number": 7,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5829,
+          "match_number": 14,
+          "qual_number": 14,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5829,
+          "match_number": 19,
+          "qual_number": 19,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5829,
+          "match_number": 24,
+          "qual_number": 24,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc5829",
+        "name": "CountryWatch/XTS Energy LLC/A/C Plastics&Awty International School",
+        "nickname": "AwtyBots",
+        "state_prov": "Texas",
+        "team_number": 5829
+      },
+      "statbotics_info": {
+        "team_number": 5829,
+        "team_name": "AwtyBots",
+        "epa_total": 31.81,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 12,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          5.0,
+          0.0,
+          109.0,
+          12.0,
+          26.0,
+          0.0
+        ],
+        "team_key": "frc5829"
+      }
+    },
+    "5892": {
+      "team_number": 5892,
+      "nickname": "Energy HEROs",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 5892,
+          "match_number": 3,
+          "qual_number": 3,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 5892,
+          "match_number": 8,
+          "qual_number": 8,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 5892,
+          "match_number": 17,
+          "qual_number": 17,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 5892,
+          "match_number": 23,
+          "qual_number": 23,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc5892",
+        "name": "Woodside Energy/KPMG/Exxon/Bechtel/Rod Shampine/Texas Workforce Commision/A/R/T/H/M&Energy Institute High School",
+        "nickname": "Energy HEROs",
+        "state_prov": "Texas",
+        "team_number": 5892
+      },
+      "statbotics_info": {
+        "team_number": 5892,
+        "team_name": "Energy HEROs",
+        "epa_total": 52.97,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          7
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 20,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          3.5,
+          0.0,
+          116.5,
+          28.0,
+          9.0,
+          0.0
+        ],
+        "team_key": "frc5892"
+      }
+    },
+    "5908": {
+      "team_number": 5908,
+      "nickname": "Spartans",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 5908,
+          "match_number": 3,
+          "qual_number": 3,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 5908,
+          "match_number": 11,
+          "qual_number": 11,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 5908,
+          "match_number": 19,
+          "qual_number": 19,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Stafford",
+        "country": "USA",
+        "key": "frc5908",
+        "name": "Spartans Robotics/Hunting Company/Rudolph Medical Associates/Texas Workforce Commission/Lena Tax Services/Best Burgers/Stafford MSD/FIRST in Texas/HEB/Quoc Hai-Van Charity Foundation/Smart Financial/The George Foundation&Stafford High School",
+        "nickname": "Spartans",
+        "state_prov": "Texas",
+        "team_number": 5908
+      },
+      "statbotics_info": {
+        "team_number": 5908,
+        "team_name": "Spartans",
+        "epa_total": 27.47,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 4,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          145.0,
+          40.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc5908"
+      }
+    },
+    "624": {
+      "team_number": 624,
+      "nickname": "CRyptonite",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 624,
+          "match_number": 7,
+          "qual_number": 7,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 624,
+          "match_number": 13,
+          "qual_number": 13,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 624,
+          "match_number": 19,
+          "qual_number": 19,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Katy",
+        "country": "USA",
+        "key": "frc624",
+        "name": "BP/Oceaneering/Transocean/Bechtel/Shell/Apache/IMC/Gene Haas Foundation/Baker Hughes/Phillips 66/HESS Petroleum/Long Wave/Texas Workforce Commission/Fastenal/Technip Energy/Synsus/Chevron/SolidWorks/Autodesk&Cinco Ranch High School",
+        "nickname": "CRyptonite",
+        "state_prov": "Texas",
+        "team_number": 624
+      },
+      "statbotics_info": {
+        "team_number": 624,
+        "team_name": "CRyptonite",
+        "epa_total": 67.21,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          0
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 39,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0.0,
+          0.0,
+          124.0,
+          27.0,
+          6.0,
+          0.0
+        ],
+        "team_key": "frc624"
+      }
+    },
+    "6357": {
+      "team_number": 6357,
+      "nickname": "The Spring Konstant",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 6357,
+          "match_number": 5,
+          "qual_number": 5,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 6357,
+          "match_number": 13,
+          "qual_number": 13,
+          "auto": 1.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 6357,
+          "match_number": 21,
+          "qual_number": 21,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Dripping Springs",
+        "country": "USA",
+        "key": "frc6357",
+        "name": "DSISD/ARM Automation/Texas Workforce Commission/Gene Haas Foundation/Qualcomm&Dripping Springs High School",
+        "nickname": "The Spring Konstant",
+        "state_prov": "Texas",
+        "team_number": 6357
+      },
+      "statbotics_info": {
+        "team_number": 6357,
+        "team_name": "The Spring Konstant",
+        "epa_total": 62.03,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 10,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          5.0,
+          0.0,
+          142.0,
+          33.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc6357"
+      }
+    },
+    "6377": {
+      "team_number": 6377,
+      "nickname": "Howdy Bots",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 6377,
+          "match_number": 1,
+          "qual_number": 1,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 6377,
+          "match_number": 9,
+          "qual_number": 9,
+          "auto": 0,
+          "strategy": 1,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 6377,
+          "match_number": 15,
+          "qual_number": 15,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 6377,
+          "match_number": 23,
+          "qual_number": 23,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Austin",
+        "country": "USA",
+        "key": "frc6377",
+        "name": "Integrated Metal Products/Microsoft/Firefly Aerospace/NI/Emerson/ATX Robotics&Family/Community",
+        "nickname": "Howdy Bots",
+        "state_prov": "Texas",
+        "team_number": 6377
+      },
+      "statbotics_info": {
+        "team_number": 6377,
+        "team_name": "Howdy Bots",
+        "epa_total": 40.75,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          1
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 37,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          0.5,
+          0.0,
+          73.5,
+          10.0,
+          4.0,
+          0.0
+        ],
+        "team_key": "frc6377"
+      }
+    },
+    "6800": {
+      "team_number": 6800,
+      "nickname": "Valor",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 6800,
+          "match_number": 6,
+          "qual_number": 6,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 6800,
+          "match_number": 11,
+          "qual_number": 11,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 6800,
+          "match_number": 16,
+          "qual_number": 16,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Austin",
+        "country": "USA",
+        "key": "frc6800",
+        "name": "West Coast Products/Choudhary Family/ThriftyBot/Alam Family/Sagi Family/BAE Systems/Gene Haas Foundation/Broadcom/Kakati Family/Mulanax Family/Schnee Family/Texas Workforce Commission/HACKERS, Inc./Four Points Automotive/Avand Garde College Prep Services/Fabworks/Gaunt Family/Huang Family/Cloran Family/Austin Dental Co/Leander ISD/ViperBots Friends & Family&Vandegrift High School",
+        "nickname": "Valor",
+        "state_prov": "Texas",
+        "team_number": 6800
+      },
+      "statbotics_info": {
+        "team_number": 6800,
+        "team_name": "Valor",
+        "epa_total": 83.35,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 7,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          145.0,
+          30.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc6800"
+      }
+    },
+    "7492": {
+      "team_number": 7492,
+      "nickname": "CavBots",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 7492,
+          "match_number": 1,
+          "qual_number": 1,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 7492,
+          "match_number": 10,
+          "qual_number": 10,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 7492,
+          "match_number": 18,
+          "qual_number": 18,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 7492,
+          "match_number": 24,
+          "qual_number": 24,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "The Woodlands",
+        "country": "USA",
+        "key": "frc7492",
+        "name": "Texas Workforce Commission/Gene Haas Foundation/i.e. Smart System/Americas ER/TCO Products Inc./Puris/Costco/Lowes/Taktikal Directional/Conroe ISD&The Woodlands-College Park HS&Academy of Science and Technology at College Park HS",
+        "nickname": "CavBots",
+        "state_prov": "Texas",
+        "team_number": 7492
+      },
+      "statbotics_info": {
+        "team_number": 7492,
+        "team_name": "CavBots",
+        "epa_total": 50.76,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          4
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 25,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          2.0,
+          0.0,
+          92.0,
+          13.0,
+          4.0,
+          0.0
+        ],
+        "team_key": "frc7492"
+      }
+    },
+    "7691": {
+      "team_number": 7691,
+      "nickname": "TSA All Stars",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 7691,
+          "match_number": 3,
+          "qual_number": 3,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 7691,
+          "match_number": 9,
+          "qual_number": 9,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 7691,
+          "match_number": 18,
+          "qual_number": 18,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Tomball",
+        "country": "USA",
+        "key": "frc7691",
+        "name": "Chuck Lorre Foundation/Dow/The Simon Family/Coach Stephanie and Coach Brian/Gene Haas Foundation/Reliance Steel/The Stand/Texas Workforce Commission/America's First ER/MIT Club of South Texas&Tomball star academy",
+        "nickname": "TSA All Stars",
+        "state_prov": "Texas",
+        "team_number": 7691
+      },
+      "statbotics_info": {
+        "team_number": 7691,
+        "team_name": "TSA All Stars",
+        "epa_total": 22.78,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          2
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 35,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          1.0,
+          0.0,
+          59.5,
+          14.5,
+          5.0,
+          0.0
+        ],
+        "team_key": "frc7691"
+      }
+    },
+    "8044": {
+      "team_number": 8044,
+      "nickname": "Denham Venom",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 8044,
+          "match_number": 2,
+          "qual_number": 2,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 8044,
+          "match_number": 9,
+          "qual_number": 9,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Golf Tees",
+          "team_number": 8044,
+          "match_number": 17,
+          "qual_number": 17,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 8044,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 2.5,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Denham Springs",
+        "country": "USA",
+        "key": "frc8044",
+        "name": "NASA/DoD STEM/The Haas Foundation/Weyerhauser/The Dow Chemical Company/Chevron&Denham Springs High School&Denham Springs High School STEM and Robotics Center",
+        "nickname": "Denham Venom",
+        "state_prov": "Louisiana",
+        "team_number": 8044
+      },
+      "statbotics_info": {
+        "team_number": 8044,
+        "team_name": "Denham Venom",
+        "epa_total": 77.01,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          12
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 3,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          160.0,
+          37.0,
+          24.0,
+          0.0
+        ],
+        "team_key": "frc8044"
+      }
+    },
+    "8370": {
+      "team_number": 8370,
+      "nickname": "Glow With The Flow",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 8370,
+          "match_number": 7,
+          "qual_number": 7,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 8370,
+          "match_number": 13,
+          "qual_number": 13,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 8370,
+          "match_number": 18,
+          "qual_number": 18,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 8370,
+          "match_number": 23,
+          "qual_number": 23,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Katy",
+        "country": "USA",
+        "key": "frc8370",
+        "name": "Katy ISD/Stanley Consultants/Gene Hass Foundation/HEB Tournament of Champions/Rimkus Consultants/Texas Workforce Commission/Argosy Foundation&Patricia Paetow High School",
+        "nickname": "Glow With The Flow",
+        "state_prov": "Texas",
+        "team_number": 8370
+      },
+      "statbotics_info": {
+        "team_number": 8370,
+        "team_name": "Glow With The Flow",
+        "epa_total": 28.4,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 13,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          5.0,
+          0.0,
+          109.0,
+          12.0,
+          26.0,
+          0.0
+        ],
+        "team_key": "frc8370"
+      }
+    },
+    "8515": {
+      "team_number": 8515,
+      "nickname": "Photon",
+      "scouting_data": [
+        {
+          "other": "Center",
+          "team_number": 8515,
+          "match_number": 6,
+          "qual_number": 6,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 8515,
+          "match_number": 11,
+          "qual_number": 11,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 8515,
+          "match_number": 17,
+          "qual_number": 17,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Houston",
+        "country": "USA",
+        "key": "frc8515",
+        "name": "Dow/Apple/The Boeing Company/Analog Devices/REV Robotics/Gene Haas Foundation/TE Connectivity/QADWorks/Solarcraft Inc./Texas Workforce Commission/NI/Emerson/Fabworks/SendCutSend&St Agnes Academy&Strake Jesuit College Prep Sch",
+        "nickname": "Photon",
+        "state_prov": "Texas",
+        "team_number": 8515
+      },
+      "statbotics_info": {
+        "team_number": 8515,
+        "team_name": "Photon",
+        "epa_total": 17.04,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          2
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 28,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          2.0,
+          0.0,
+          84.0,
+          19.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc8515"
+      }
+    },
+    "9140": {
+      "team_number": 9140,
+      "nickname": "The Robobots",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 9140,
+          "match_number": 1,
+          "qual_number": 1,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 9140,
+          "match_number": 8,
+          "qual_number": 8,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 9140,
+          "match_number": 15,
+          "qual_number": 15,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 9140,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Austin",
+        "country": "USA",
+        "key": "frc9140",
+        "name": "Ken James/Round Rock ISD/Gene Haas Foundation/Texas Workforce Commission&Mcneil High School",
+        "nickname": "The Robobots",
+        "state_prov": "Texas",
+        "team_number": 9140
+      },
+      "statbotics_info": {
+        "team_number": 9140,
+        "team_name": "The Robobots",
+        "epa_total": 64.16,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 22,
+        "record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          3.0,
+          0.0,
+          136.0,
+          30.5,
+          9.0,
+          0.0
+        ],
+        "team_key": "frc9140"
+      }
+    },
+    "9418": {
+      "team_number": 9418,
+      "nickname": "Pastabots",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 9418,
+          "match_number": 6,
+          "qual_number": 6,
+          "auto": 2,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 9418,
+          "match_number": 12,
+          "qual_number": 12,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 9418,
+          "match_number": 18,
+          "qual_number": 18,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 9418,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Spring",
+        "country": "USA",
+        "key": "frc9418",
+        "name": "Conroe ISD/The Woodlands High School/Gene Haas Foundation/The Hamel Family/Marine Technology Society&The Woodlands High School",
+        "nickname": "Pastabots",
+        "state_prov": "Texas",
+        "team_number": 9418
+      },
+      "statbotics_info": {
+        "team_number": 9418,
+        "team_name": "Pastabots",
+        "epa_total": 39.17,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          6
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 6,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          6.0,
+          0.0,
+          145.0,
+          30.0,
+          14.0,
+          0.0
+        ],
+        "team_key": "frc9418"
+      }
+    },
+    "9986": {
+      "team_number": 9986,
+      "nickname": "Off-Season Demo Team 9986",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 9986,
+          "match_number": 1,
+          "qual_number": 1,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 9986,
+          "match_number": 14,
+          "qual_number": 14,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Left",
+          "team_number": 9986,
+          "match_number": 20,
+          "qual_number": 20,
+          "auto": 3,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Manchester",
+        "country": "USA",
+        "key": "frc9986",
+        "name": "FIRST Off-Season Demo Team",
+        "nickname": "Off-Season Demo Team 9986",
+        "state_prov": "NH",
+        "team_number": 9986
+      },
+      "statbotics_info": {
+        "team_number": 9986,
+        "team_name": "Team 9986",
+        "epa_total": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          5
+        ],
+        "matches_played": 1,
+        "qual_average": "",
+        "rank": 11,
+        "record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 1
+        },
+        "sort_orders": [
+          5.0,
+          0.0,
+          116.0,
+          16.0,
+          26.0,
+          0.0
+        ],
+        "team_key": "frc9986"
+      }
+    },
+    "9991": {
+      "team_number": 9991,
+      "nickname": "Off-Season Demo Team 9991",
+      "scouting_data": [
+        {
+          "other": "Left",
+          "team_number": 9991,
+          "match_number": 5,
+          "qual_number": 5,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 9991,
+          "match_number": 10,
+          "qual_number": 10,
+          "auto": 1.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Center",
+          "team_number": 9991,
+          "match_number": 16,
+          "qual_number": 16,
+          "auto": 0.5,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 9991,
+          "match_number": 22,
+          "qual_number": 22,
+          "auto": 1,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Manchester",
+        "country": "USA",
+        "key": "frc9991",
+        "name": "FIRST Off-Season Demo Team",
+        "nickname": "Off-Season Demo Team 9991",
+        "state_prov": "NH",
+        "team_number": 9991
+      },
+      "statbotics_info": {
+        "team_number": 9991,
+        "team_name": "Off-Season Demo Team 9991",
+        "epa_total": 17.97,
+        "epa_auto": "",
+        "epa_teleop": "",
+        "epa_endgame": "",
+        "auto_epa": "",
+        "teleop_epa": "",
+        "endgame_epa": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          3
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 32,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          1.5,
+          0.0,
+          81.5,
+          15.5,
+          10.0,
+          0.0
+        ],
+        "team_key": "frc9991"
+      }
+    },
+    "9994": {
+      "team_number": 9994,
+      "nickname": "Off-Season Demo Team 9994",
+      "scouting_data": [
+        {
+          "other": "Right",
+          "team_number": 9994,
+          "match_number": 2,
+          "qual_number": 2,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 9994,
+          "match_number": 8,
+          "qual_number": 8,
+          "auto": 0,
+          "strategy": 0,
+          "teleop": 0
+        },
+        {
+          "other": "Right",
+          "team_number": 9994,
+          "match_number": 16,
+          "qual_number": 16,
+          "auto": 1.5,
+          "strategy": 0,
+          "teleop": 0
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {
+        "city": "Manchester",
+        "country": "USA",
+        "key": "frc9994",
+        "name": "FIRST Off-Season Demo Team",
+        "nickname": "Off-Season Demo Team 9994",
+        "state_prov": "NH",
+        "team_number": 9994
+      },
+      "statbotics_info": {
+        "team_number": 9994,
+        "team_name": "Team 9994",
+        "epa_total": ""
+      },
+      "ranking_info": {
+        "dq": 0,
+        "extra_stats": [
+          3
+        ],
+        "matches_played": 2,
+        "qual_average": "",
+        "rank": 31,
+        "record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "sort_orders": [
+          1.5,
+          0.0,
+          85.0,
+          16.0,
+          10.0,
+          0.0
+        ],
+        "team_key": "frc9994"
+      }
+    }
+  },
+  "metadata": {
+    "scouting_headers": [
+      "",
+      "Robot #",
+      "Match #",
+      "Auto",
+      "AutoPieces",
+      "Branch",
+      "Trough",
+      "Algae",
+      "Notes",
+      "Abilities",
+      "",
+      "",
+      "Robot #",
+      "Match #",
+      "Zone",
+      "Auto piece count (Trough/L2 half value) [x1]",
+      "# of pieces scored on branches (L2-L4) [1x]",
+      "# of pieces scored on branches (L2-L4) [10x]",
+      "# of pieces scored in trough (L1) [1x]",
+      "# of pieces scored in trough (L1) [10x]",
+      "# of algae scored (Net & Processor) [1x]",
+      "# of algae scored (Net & Processor) [10x]",
+      "Did the robot do any of the following during this match?",
+      "Notes"
+    ],
+    "superscouting_headers": [],
+    "created_timestamp": "2025-06-27T21:27:52.699098"
+  },
+  "matches": [
+    {
+      "match_number": 6,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 11,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 16,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 22,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 7,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 12,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 20,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 4,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 13,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 21,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 3,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 8,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 15,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 24,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 2,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 1,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 10,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 23,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 5,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 9,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 17,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 14,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 19,
+      "comp_level": "qm"
+    },
+    {
+      "match_number": 18,
+      "comp_level": "qm"
+    }
+  ],
+  "scouting": [
+    {
+      "other": "Left",
+      "team_number": 10014,
+      "match_number": 6,
+      "qual_number": 6,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 10014,
+      "match_number": 11,
+      "qual_number": 11,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 10014,
+      "match_number": 16,
+      "qual_number": 16,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 10014,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 10118,
+      "match_number": 7,
+      "qual_number": 7,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 10118,
+      "match_number": 12,
+      "qual_number": 12,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 10118,
+      "match_number": 20,
+      "qual_number": 20,
+      "auto": 1.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 10385,
+      "match_number": 4,
+      "qual_number": 4,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 10385,
+      "match_number": 13,
+      "qual_number": 13,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 10385,
+      "match_number": 21,
+      "qual_number": 21,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 118,
+      "match_number": 3,
+      "qual_number": 3,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 118,
+      "match_number": 8,
+      "qual_number": 8,
+      "auto": 4,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 118,
+      "match_number": 15,
+      "qual_number": 15,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 118,
+      "match_number": 24,
+      "qual_number": 24,
+      "auto": 4,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 1477,
+      "match_number": 2,
+      "qual_number": 2,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 1477,
+      "match_number": 13,
+      "qual_number": 13,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 1477,
+      "match_number": 20,
+      "qual_number": 20,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2582,
+      "match_number": 1,
+      "qual_number": 1,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2582,
+      "match_number": 8,
+      "qual_number": 8,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2582,
+      "match_number": 21,
+      "qual_number": 21,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 2587,
+      "match_number": 2,
+      "qual_number": 2,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 2587,
+      "match_number": 10,
+      "qual_number": 10,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 2587,
+      "match_number": 23,
+      "qual_number": 23,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2718,
+      "match_number": 5,
+      "qual_number": 5,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2718,
+      "match_number": 10,
+      "qual_number": 10,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 2718,
+      "match_number": 15,
+      "qual_number": 15,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2848,
+      "match_number": 4,
+      "qual_number": 4,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2848,
+      "match_number": 9,
+      "qual_number": 9,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2848,
+      "match_number": 16,
+      "qual_number": 16,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2881,
+      "match_number": 2,
+      "qual_number": 2,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 2881,
+      "match_number": 9,
+      "qual_number": 9,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 2881,
+      "match_number": 17,
+      "qual_number": 17,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 2882,
+      "match_number": 5,
+      "qual_number": 5,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 2882,
+      "match_number": 14,
+      "qual_number": 14,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 3005,
+      "match_number": 1,
+      "qual_number": 1,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 3005,
+      "match_number": 8,
+      "qual_number": 8,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 3005,
+      "match_number": 19,
+      "qual_number": 19,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 323,
+      "match_number": 3,
+      "qual_number": 3,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 323,
+      "match_number": 12,
+      "qual_number": 12,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 323,
+      "match_number": 21,
+      "qual_number": 21,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 324,
+      "match_number": 7,
+      "qual_number": 7,
+      "auto": 1.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 324,
+      "match_number": 12,
+      "qual_number": 12,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 324,
+      "match_number": 17,
+      "qual_number": 17,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 324,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 3847,
+      "match_number": 4,
+      "qual_number": 4,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 3847,
+      "match_number": 12,
+      "qual_number": 12,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 3847,
+      "match_number": 17,
+      "qual_number": 17,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 3847,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 418,
+      "match_number": 5,
+      "qual_number": 5,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 418,
+      "match_number": 14,
+      "qual_number": 14,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 418,
+      "match_number": 19,
+      "qual_number": 19,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 4192,
+      "match_number": 7,
+      "qual_number": 7,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 4192,
+      "match_number": 14,
+      "qual_number": 14,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 4192,
+      "match_number": 21,
+      "qual_number": 21,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 4336,
+      "match_number": 6,
+      "qual_number": 6,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 4336,
+      "match_number": 13,
+      "qual_number": 13,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 4336,
+      "match_number": 20,
+      "qual_number": 20,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 4587,
+      "match_number": 2,
+      "qual_number": 2,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 4587,
+      "match_number": 11,
+      "qual_number": 11,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 4587,
+      "match_number": 18,
+      "qual_number": 18,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 4639,
+      "match_number": 4,
+      "qual_number": 4,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 4639,
+      "match_number": 10,
+      "qual_number": 10,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 4639,
+      "match_number": 19,
+      "qual_number": 19,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5070,
+      "match_number": 6,
+      "qual_number": 6,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5070,
+      "match_number": 14,
+      "qual_number": 14,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5070,
+      "match_number": 21,
+      "qual_number": 21,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5414,
+      "match_number": 4,
+      "qual_number": 4,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5414,
+      "match_number": 10,
+      "qual_number": 10,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5414,
+      "match_number": 15,
+      "qual_number": 15,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5427,
+      "match_number": 5,
+      "qual_number": 5,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 5427,
+      "match_number": 11,
+      "qual_number": 11,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5427,
+      "match_number": 18,
+      "qual_number": 18,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5427,
+      "match_number": 23,
+      "qual_number": 23,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5431,
+      "match_number": 3,
+      "qual_number": 3,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5431,
+      "match_number": 9,
+      "qual_number": 9,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5431,
+      "match_number": 15,
+      "qual_number": 15,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5503,
+      "match_number": 4,
+      "qual_number": 4,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5503,
+      "match_number": 12,
+      "qual_number": 12,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5503,
+      "match_number": 20,
+      "qual_number": 20,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5829,
+      "match_number": 7,
+      "qual_number": 7,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5829,
+      "match_number": 14,
+      "qual_number": 14,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5829,
+      "match_number": 19,
+      "qual_number": 19,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5829,
+      "match_number": 24,
+      "qual_number": 24,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 5892,
+      "match_number": 3,
+      "qual_number": 3,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 5892,
+      "match_number": 8,
+      "qual_number": 8,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5892,
+      "match_number": 17,
+      "qual_number": 17,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 5892,
+      "match_number": 23,
+      "qual_number": 23,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5908,
+      "match_number": 3,
+      "qual_number": 3,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 5908,
+      "match_number": 11,
+      "qual_number": 11,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 5908,
+      "match_number": 19,
+      "qual_number": 19,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 624,
+      "match_number": 7,
+      "qual_number": 7,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 624,
+      "match_number": 13,
+      "qual_number": 13,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 624,
+      "match_number": 19,
+      "qual_number": 19,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 6357,
+      "match_number": 5,
+      "qual_number": 5,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 6357,
+      "match_number": 13,
+      "qual_number": 13,
+      "auto": 1.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 6357,
+      "match_number": 21,
+      "qual_number": 21,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 6377,
+      "match_number": 1,
+      "qual_number": 1,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 6377,
+      "match_number": 9,
+      "qual_number": 9,
+      "auto": 0,
+      "strategy": 1,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 6377,
+      "match_number": 15,
+      "qual_number": 15,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 6377,
+      "match_number": 23,
+      "qual_number": 23,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 6800,
+      "match_number": 6,
+      "qual_number": 6,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 6800,
+      "match_number": 11,
+      "qual_number": 11,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 6800,
+      "match_number": 16,
+      "qual_number": 16,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 7492,
+      "match_number": 1,
+      "qual_number": 1,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 7492,
+      "match_number": 10,
+      "qual_number": 10,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 7492,
+      "match_number": 18,
+      "qual_number": 18,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 7492,
+      "match_number": 24,
+      "qual_number": 24,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 7691,
+      "match_number": 3,
+      "qual_number": 3,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 7691,
+      "match_number": 9,
+      "qual_number": 9,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 7691,
+      "match_number": 18,
+      "qual_number": 18,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 8044,
+      "match_number": 2,
+      "qual_number": 2,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 8044,
+      "match_number": 9,
+      "qual_number": 9,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Golf Tees",
+      "team_number": 8044,
+      "match_number": 17,
+      "qual_number": 17,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 8044,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 2.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 8370,
+      "match_number": 7,
+      "qual_number": 7,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 8370,
+      "match_number": 13,
+      "qual_number": 13,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 8370,
+      "match_number": 18,
+      "qual_number": 18,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 8370,
+      "match_number": 23,
+      "qual_number": 23,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 8515,
+      "match_number": 6,
+      "qual_number": 6,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 8515,
+      "match_number": 11,
+      "qual_number": 11,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 8515,
+      "match_number": 17,
+      "qual_number": 17,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9140,
+      "match_number": 1,
+      "qual_number": 1,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 9140,
+      "match_number": 8,
+      "qual_number": 8,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 9140,
+      "match_number": 15,
+      "qual_number": 15,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9140,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9418,
+      "match_number": 6,
+      "qual_number": 6,
+      "auto": 2,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9418,
+      "match_number": 12,
+      "qual_number": 12,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9418,
+      "match_number": 18,
+      "qual_number": 18,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9418,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9986,
+      "match_number": 1,
+      "qual_number": 1,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9986,
+      "match_number": 14,
+      "qual_number": 14,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9986,
+      "match_number": 20,
+      "qual_number": 20,
+      "auto": 3,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Left",
+      "team_number": 9991,
+      "match_number": 5,
+      "qual_number": 5,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9991,
+      "match_number": 10,
+      "qual_number": 10,
+      "auto": 1.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Center",
+      "team_number": 9991,
+      "match_number": 16,
+      "qual_number": 16,
+      "auto": 0.5,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9991,
+      "match_number": 22,
+      "qual_number": 22,
+      "auto": 1,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9994,
+      "match_number": 2,
+      "qual_number": 2,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9994,
+      "match_number": 8,
+      "qual_number": 8,
+      "auto": 0,
+      "strategy": 0,
+      "teleop": 0
+    },
+    {
+      "other": "Right",
+      "team_number": 9994,
+      "match_number": 16,
+      "qual_number": 16,
+      "auto": 1.5,
+      "strategy": 0,
+      "teleop": 0
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import EventArchiveManager from "../components/EventArchiveManager";
 import SheetConfigManager from "../components/SheetConfigManager";
+import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 interface Event {
   key: string;
@@ -90,6 +91,16 @@ function Setup() {
   const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [selectedEventName, setSelectedEventName] = useState<string>("");
   
+  // Manual event input states
+  const [isManualEventMode, setIsManualEventMode] = useState<boolean>(false);
+  const [manualEventKey, setManualEventKey] = useState<string>("");
+  const [isValidatingManualEvent, setIsValidatingManualEvent] = useState<boolean>(false);
+  const [manualEventValidation, setManualEventValidation] = useState<{
+    isValid: boolean;
+    eventData?: Event;
+    error?: string;
+  } | null>(null);
+  
   // Current event state
   const [currentEvent, setCurrentEvent] = useState<EventInfo>({});
   const [isLoadingCurrentEvent, setIsLoadingCurrentEvent] = useState<boolean>(true);
@@ -114,7 +125,7 @@ function Setup() {
     // Fetch current event info
     const fetchCurrentEvent = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/setup/info");
+        const response = await fetchWithNgrokHeaders(apiUrl("/api/setup/info"));
         const data = await response.json();
         
         if (data.status === "success" && data.event_key) {
@@ -152,7 +163,7 @@ function Setup() {
     setIsLoadingManagedManuals(true);
     setManagedManualsError(null);
     try {
-      const response = await fetch("http://localhost:8000/api/manuals");
+      const response = await fetchWithNgrokHeaders(apiUrl("/api/manuals"));
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || "Failed to fetch manuals");
@@ -172,7 +183,7 @@ function Setup() {
     setEventsError(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/setup/events?year=${yearToFetch}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/setup/events?year=${yearToFetch}`));
 
       if (!response.ok) {
         throw new Error("Failed to fetch events");
@@ -246,7 +257,7 @@ function Setup() {
       formData.append("year", year.toString());
       formData.append("manual_file", selectedManualFile);
       
-      const response = await fetch("http://localhost:8000/api/setup/start", {
+      const response = await fetchWithNgrokHeaders(apiUrl("/api/setup/start"), {
         method: "POST",
         body: formData, 
       });
@@ -288,7 +299,7 @@ function Setup() {
     setIsLoadingSelectedManualId(manual.id);
     setSelectedManualError(null);
     try {
-      const response = await fetch(`http://localhost:8000/api/manuals/${manual.id}`);
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/manuals/${manual.id}`));
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Failed to fetch details for manual ${manual.id}`);
@@ -338,7 +349,7 @@ function Setup() {
     setActiveDeletingManualId(manualId);
     setDeleteManualError(null);
     try {
-      const response = await fetch(`http://localhost:8000/api/manuals/${manualId}`, { method: 'DELETE' });
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/manuals/${manualId}`), { method: 'DELETE' });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Failed to delete manual ${manualId}`);
@@ -505,7 +516,7 @@ function Setup() {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/manuals/process-sections", {
+      const response = await fetchWithNgrokHeaders(apiUrl("/api/manuals/process-sections"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -588,7 +599,7 @@ function Setup() {
       formData.append("year", yearToUse.toString());
       formData.append("event_key", eventToUse);
 
-      const response = await fetch("http://localhost:8000/api/setup/start", {
+      const response = await fetchWithNgrokHeaders(apiUrl("/api/setup/start"), {
         method: "POST",
         body: formData, 
       });
@@ -618,6 +629,96 @@ function Setup() {
       setIsSettingUpEvent(false);
     }
   };
+
+  // Manual event validation function
+  const validateManualEvent = async (eventKey: string) => {
+    if (!eventKey.trim()) {
+      setManualEventValidation(null);
+      return;
+    }
+
+    setIsValidatingManualEvent(true);
+    setManualEventValidation(null);
+
+    try {
+      // Try to fetch event data from TBA API via backend
+      const response = await fetchWithNgrokHeaders(apiUrl(`/api/setup/event/${eventKey}`));
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.event) {
+          const eventData = data.event;
+          setManualEventValidation({
+            isValid: true,
+            eventData: {
+              key: eventData.key,
+              name: eventData.name,
+              code: eventData.event_code,
+              location: eventData.location_name || 
+                       `${eventData.city || ''}${eventData.city && eventData.state_prov ? ', ' : ''}${eventData.state_prov || ''}${(eventData.city || eventData.state_prov) && eventData.country ? ', ' : ''}${eventData.country || ''}`.trim(),
+              dates: eventData.start_date && eventData.end_date 
+                ? `${eventData.start_date} to ${eventData.end_date}`
+                : 'Dates TBD',
+              type: eventData.event_type_string || 'Unknown',
+              week: eventData.week || 0
+            }
+          });
+          setSelectedEvent(eventKey);
+          setSelectedEventName(eventData.name);
+        } else {
+          // Backend returned success but no event data
+          setManualEventValidation({
+            isValid: false,
+            error: `Event "${eventKey}" not found in The Blue Alliance database. You can still proceed with this event code.`
+          });
+          setSelectedEvent(eventKey);
+          setSelectedEventName(eventKey);
+        }
+      } else {
+        // Event not found in TBA, but allow manual entry anyway
+        setManualEventValidation({
+          isValid: false,
+          error: `Event "${eventKey}" not found in The Blue Alliance database. You can still proceed with this event code.`
+        });
+        setSelectedEvent(eventKey);
+        setSelectedEventName(eventKey);
+      }
+    } catch (err) {
+      console.error("Error validating manual event:", err);
+      setManualEventValidation({
+        isValid: false,
+        error: "Unable to validate event. You can still proceed with this event code."
+      });
+      setSelectedEvent(eventKey);
+      setSelectedEventName(eventKey);
+    } finally {
+      setIsValidatingManualEvent(false);
+    }
+  };
+
+  // Handle manual event key input
+  const handleManualEventKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setManualEventKey(value);
+    
+    if (value.length < 3) {
+      setManualEventValidation(null);
+      setSelectedEvent("");
+      setSelectedEventName("");
+    }
+  };
+
+  // Debounced validation effect
+  useEffect(() => {
+    if (manualEventKey.length >= 3) {
+      const timeoutId = setTimeout(() => {
+        validateManualEvent(manualEventKey);
+      }, 500);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [manualEventKey]);
 
   const handleContinue = () => {
     navigate("/field-selection");
@@ -983,50 +1084,143 @@ function Setup() {
           </div>
 
           <div>
-            <label className="block mb-2 font-semibold">Select Event</label>
-            {loadingEvents ? (
-              <div className="p-2 text-blue-600">Loading events...</div>
-            ) : eventsError ? (
-              <div className="p-2 text-red-600">{eventsError}</div>
-            ) : (
-              <div className="space-y-2">
-                <select
-                  value={selectedEvent}
-                  onChange={handleEventChange}
-                  className="w-full p-2 border rounded"
+            <div className="flex items-center justify-between mb-3">
+              <label className="block font-semibold">Select Event</label>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Manual Input</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsManualEventMode(!isManualEventMode);
+                    setSelectedEvent("");
+                    setSelectedEventName("");
+                    setManualEventKey("");
+                    setManualEventValidation(null);
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isManualEventMode ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
                 >
-                  <option value="">-- Select an event --</option>
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isManualEventMode ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
 
-                  {/* Display events grouped by type */}
-                  {Object.entries(groupedEvents).map(([type, eventsList]) => (
-                    <optgroup key={type} label={type}>
-                      {eventsList.map(event => (
-                        <option key={event.key} value={event.key}>
-                          {event.name} - {event.location}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+            {isManualEventMode ? (
+              <div className="space-y-3">
+                <div>
+                  <input
+                    type="text"
+                    value={manualEventKey}
+                    onChange={handleManualEventKeyChange}
+                    placeholder="Enter event code (e.g., 2025txhou, 2025casd, 2025nyny)"
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {isValidatingManualEvent && (
+                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        <span className="text-blue-600 text-sm">Validating event...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                {selectedEvent && (
-                  <div className="p-2 bg-blue-50 border border-blue-200 rounded">
-                    <p className="font-semibold">{selectedEventName}</p>
-                    <p className="text-sm mt-1">
-                      Event Code: {selectedEvent}
-                      {events.find(e => e.key === selectedEvent)?.dates && (
-                        <span className="ml-2">
-                          ({events.find(e => e.key === selectedEvent)?.dates})
-                        </span>
-                      )}
-                    </p>
+                {manualEventValidation && (
+                  <div className={`p-3 rounded border ${
+                    manualEventValidation.isValid 
+                      ? 'bg-green-50 border-green-200' 
+                      : 'bg-yellow-50 border-yellow-200'
+                  }`}>
+                    {manualEventValidation.isValid && manualEventValidation.eventData ? (
+                      <div>
+                        <div className="flex items-center mb-2">
+                          <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          </svg>
+                          <span className="font-semibold text-green-800">Event Found!</span>
+                        </div>
+                        <p className="font-semibold">{manualEventValidation.eventData.name}</p>
+                        <p className="text-sm mt-1">
+                          Event Code: {manualEventValidation.eventData.key}
+                          <span className="ml-2">({manualEventValidation.eventData.dates})</span>
+                        </p>
+                        <p className="text-sm">
+                          Location: {manualEventValidation.eventData.location}
+                        </p>
+                        <p className="text-sm">
+                          Type: {manualEventValidation.eventData.type}
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-center mb-2">
+                          <svg className="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                          </svg>
+                          <span className="font-semibold text-yellow-800">Note</span>
+                        </div>
+                        <p className="text-sm text-yellow-800">{manualEventValidation.error}</p>
+                      </div>
+                    )}
                   </div>
                 )}
 
                 <p className="text-sm text-gray-500">
-                  Select the event you're scouting for. This will be used to pre-populate team lists and event data.
+                  Enter the event code manually. The system will try to validate it against The Blue Alliance database and pull event details automatically.
                 </p>
               </div>
+            ) : (
+              <>
+                {loadingEvents ? (
+                  <div className="p-2 text-blue-600">Loading events...</div>
+                ) : eventsError ? (
+                  <div className="p-2 text-red-600">{eventsError}</div>
+                ) : (
+                  <div className="space-y-2">
+                    <select
+                      value={selectedEvent}
+                      onChange={handleEventChange}
+                      className="w-full p-2 border rounded"
+                    >
+                      <option value="">-- Select an event --</option>
+
+                      {/* Display events grouped by type */}
+                      {Object.entries(groupedEvents).map(([type, eventsList]) => (
+                        <optgroup key={type} label={type}>
+                          {eventsList.map(event => (
+                            <option key={event.key} value={event.key}>
+                              {event.name} - {event.location}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+
+                    {selectedEvent && (
+                      <div className="p-2 bg-blue-50 border border-blue-200 rounded">
+                        <p className="font-semibold">{selectedEventName}</p>
+                        <p className="text-sm mt-1">
+                          Event Code: {selectedEvent}
+                          {events.find(e => e.key === selectedEvent)?.dates && (
+                            <span className="ml-2">
+                              ({events.find(e => e.key === selectedEvent)?.dates})
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+
+                    <p className="text-sm text-gray-500">
+                      Select the event you're scouting for from the official TBA event list. This will be used to pre-populate team lists and event data.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
