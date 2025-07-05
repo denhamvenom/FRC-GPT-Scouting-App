@@ -45,6 +45,7 @@ from app.api import archive  # Import event archiving API
 from app.api import sheet_config  # Import sheet configuration API
 from app.api import manuals as manuals_router  # Import the new manuals router
 from app.api import team_comparison  # New team comparison API
+from app.api.v1.endpoints import game_labels  # Import game labels API
 
 app = FastAPI(title="FRC Scouting Assistant", version="0.1.0")
 
@@ -112,6 +113,7 @@ app.include_router(alliance_selection.router)  # Add the alliance selection API
 app.include_router(archive.router)  # Add the event archiving API
 app.include_router(sheet_config.router)  # Sheet configuration API already has prefix
 app.include_router(manuals_router.router)  # Add the manuals router
+app.include_router(game_labels.router, prefix="/api/v1")  # Add the game labels API
 
 
 @app.get("/")

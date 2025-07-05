@@ -13,6 +13,7 @@ import datetime
 
 from app.services.manual_parser_service import extract_text_from_selected_sections
 from app.services.data_aggregation_service import DataAggregationService
+from app.services.game_label_extractor_service import GameLabelExtractorService
 from app.database.db import get_db_session
 from app.database.models import GameManual
 
@@ -104,6 +105,76 @@ async def trigger_context_extraction(year: int, manual_text_filepath: str) -> Di
             print(f"✅ ⏱️  Processing Time: {processing_time:.1f} seconds")
             print(f"✅ 🎯 Status: Ready for efficient picklist generation!")
             print("✅" + "="*60)
+            
+            # 🚀 NEW: Attempt game label extraction (optional)
+            print("🏷️" + "="*60)
+            print("🏷️ STARTING GAME LABEL EXTRACTION")
+            print("🏷️" + "="*60)
+            
+            try:
+                label_extractor = GameLabelExtractorService()
+                label_extraction_start = datetime.datetime.now()
+                
+                # Load manual data for label extraction
+                with open(manual_text_filepath, 'r') as f:
+                    manual_data_for_labels = json.load(f)
+                
+                label_result = await label_extractor.extract_game_labels(
+                    manual_data=manual_data_for_labels,
+                    year=year,
+                    force_refresh=False
+                )
+                
+                label_extraction_end = datetime.datetime.now()
+                label_processing_time = (label_extraction_end - label_extraction_start).total_seconds()
+                
+                if label_result.success:
+                    print("✅" + "="*60)
+                    print("✅ LABEL EXTRACTION COMPLETED SUCCESSFULLY!")
+                    print("✅" + "="*60)
+                    print(f"✅ 🏷️  Labels Extracted: {label_result.labels_count}")
+                    print(f"✅ ⏱️  Processing Time: {label_processing_time:.1f} seconds")
+                    print(f"✅ 📂 Saved to: game_labels_{year}.json")
+                    print("✅" + "="*60)
+                    
+                    # Add label extraction info to result
+                    result["label_extraction"] = {
+                        "success": True,
+                        "labels_count": label_result.labels_count,
+                        "processing_time": label_processing_time,
+                        "message": f"Extracted {label_result.labels_count} game labels"
+                    }
+                else:
+                    print("⚠️" + "="*60)
+                    print("⚠️ LABEL EXTRACTION FAILED - CONTINUING WITHOUT LABELS")
+                    print("⚠️" + "="*60)
+                    print(f"⚠️ ❌ Error: {label_result.error}")
+                    print(f"⚠️ 📋 Impact: Field categorization will use basic patterns")
+                    print(f"⚠️ 🔄 Retry: Can attempt extraction later via game labels API")
+                    print("⚠️" + "="*60)
+                    
+                    result["label_extraction"] = {
+                        "success": False,
+                        "error": label_result.error,
+                        "processing_time": label_processing_time,
+                        "message": "Label extraction failed, using basic categorization"
+                    }
+                    
+            except Exception as e:
+                print("⚠️" + "="*60)
+                print("⚠️ LABEL EXTRACTION ERROR - CONTINUING WITHOUT LABELS")
+                print("⚠️" + "="*60)
+                print(f"⚠️ 🐛 Exception: {str(e)}")
+                print(f"⚠️ 📋 Impact: System fully functional, basic categorization only")
+                print(f"⚠️ 🔄 Recovery: Can attempt extraction later")
+                print("⚠️" + "="*60)
+                
+                result["label_extraction"] = {
+                    "success": False,
+                    "error": str(e),
+                    "processing_time": 0.0,
+                    "message": "Label extraction service error"
+                }
             
             return {
                 "status": "optimized",
