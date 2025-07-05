@@ -29,13 +29,17 @@ export function useGameLabels() {
     setError(null);
     
     try {
+      console.log(`Loading labels from: /api/v1/game-labels/${currentYear}`);
       const response = await fetchWithNgrokHeaders(
         apiUrl(`/api/v1/game-labels/${currentYear}`)
       );
       
+      console.log(`Labels response status: ${response.status}`);
+      
       if (!response.ok) {
         // If no labels found (404), that's OK - just start with empty array
         if (response.status === 404) {
+          console.log('No labels found (404), using empty array');
           setLabels([]);
           return;
         }
@@ -43,8 +47,10 @@ export function useGameLabels() {
       }
       
       const data: GameLabelResponse = await response.json();
+      console.log('Labels response data:', data);
       
       if (data.success) {
+        console.log(`Loaded ${data.labels?.length || 0} labels`);
         setLabels(data.labels || []);
       } else {
         setError(data.message || 'Failed to load labels');

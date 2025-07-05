@@ -425,3 +425,62 @@ Return the structured JSON as specified in the system prompt."""
         except Exception as e:
             logger.error(f"Failed to get service info: {str(e)}")
             return {'error': str(e)}
+
+    async def call_gpt_for_description(self, prompt: str) -> Dict[str, Any]:
+        """
+        Call GPT to generate description for a custom label.
+        
+        Args:
+            prompt: The prompt to send to GPT
+            
+        Returns:
+            Dictionary with generation results
+        """
+        try:
+            if not self.client:
+                return {'success': False, 'error': 'OpenAI client not initialized'}
+            
+            logger.info("Calling GPT for label description generation")
+            
+            response = await self.client.chat.completions.create(
+                model=GPT_MODEL,
+                messages=[{
+                    'role': 'user',
+                    'content': prompt
+                }],
+                temperature=0.3,
+                max_tokens=800
+            )
+            
+            content = response.choices[0].message.content.strip()
+            logger.info(f"GPT response received: {len(content)} characters")
+            
+            # Try to parse as JSON (handle markdown code blocks)
+            try:
+                # Remove markdown code blocks if present
+                json_content = content
+                if content.strip().startswith('```json'):
+                    json_content = content.split('```json')[1].split('```')[0].strip()
+                elif content.strip().startswith('```'):
+                    json_content = content.split('```')[1].split('```')[0].strip()
+                
+                result = json.loads(json_content)
+                result['success'] = True
+                return result
+            except (json.JSONDecodeError, IndexError) as e:
+                # If not JSON, try to extract key information
+                logger.warning(f"GPT response was not valid JSON, attempting to parse: {e}")
+                return {
+                    'success': True,
+                    'description': content,
+                    'typical_range': 'varies',
+                    'usage_context': 'custom tracking',
+                    'suggested_label': None
+                }
+                
+        except Exception as e:
+            logger.error(f"GPT description generation failed: {str(e)}")
+            return {
+                'success': False,
+                'error': f"GPT description generation failed: {str(e)}"
+            }

@@ -21,6 +21,7 @@ class FieldSelections(BaseModel):
     year: int
     critical_mappings: Optional[CriticalMappings] = None
     robot_groups: Optional[Dict[str, List[str]]] = None
+    label_mappings: Optional[Dict[str, Any]] = None
 
 
 @router.post("/save-selections")
@@ -82,6 +83,10 @@ async def save_field_selections(selections: FieldSelections):
 
                 # Store both category and source
                 category_mapping[header] = {"category": category, "source": source}
+
+                # Add label mapping if available
+                if selections.label_mappings and header in selections.label_mappings:
+                    category_mapping[header]["label_mapping"] = selections.label_mappings[header]
 
                 # Add robot group mapping for superscout fields
                 if source == "super" and selections.robot_groups:

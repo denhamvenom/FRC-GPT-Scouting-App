@@ -88,7 +88,29 @@ def parse_scouting_row(row: List[str], headers: List[str]) -> Dict[str, Any]:
                     # Keep as string if conversion fails
                     pass
 
-            scouting_data[mapped_field] = value
+            # Check if there's a label mapping for enhanced field names
+            enhanced_field_name = mapped_field
+            try:
+                # Load field metadata to get label mappings
+                data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
+                metadata_path = os.path.join(data_dir, "field_metadata_2025.json")
+                if os.path.exists(metadata_path):
+                    with open(metadata_path, "r", encoding="utf-8") as f:
+                        field_metadata = json.load(f)
+                    
+                    if header in field_metadata and "label_mapping" in field_metadata[header]:
+                        label_mapping = field_metadata[header]["label_mapping"]
+                        if "label" in label_mapping:
+                            enhanced_field_name = label_mapping["label"]
+            except Exception as e:
+                # If we can't load metadata, use the original field name
+                pass
+
+            scouting_data[enhanced_field_name] = value
+            
+            # Also store with original mapped field name for backwards compatibility
+            if enhanced_field_name != mapped_field:
+                scouting_data[mapped_field] = value
 
             # Special case for "qual_number" -> also store as "match_number" for compatibility
             if mapped_field == "qual_number" and "match_number" not in scouting_data:

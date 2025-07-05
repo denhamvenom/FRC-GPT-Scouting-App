@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CategoryTabs, { Category } from '../components/CategoryTabs';
 import { apiUrl, fetchWithNgrokHeaders } from '../config';
+import { useGameLabels, GameLabel } from '../hooks/useGameLabels';
+import { AddLabelModal } from '../components/AddLabelModal';
 
 interface FieldCategory {
   key: string;
@@ -50,57 +52,169 @@ const DATA_CATEGORIES: Category[] = [
   { id: 'critical', label: 'Critical Fields', description: 'Required fields for proper data validation', icon: '⚠️' },
 ];
 
-// Enhanced utility function to auto-categorize fields based on patterns
-const autoCategorizeField = (header: string): string => {
+// Fuzzy matching algorithm to find best matching label
+const calculateStringSimilarity = (str1: string, str2: string): number => {
+  // Convert to lowercase for case-insensitive comparison
+  const s1 = str1.toLowerCase();
+  const s2 = str2.toLowerCase();
+  
+  // Exact match
+  if (s1 === s2) return 1.0;
+  
+  // Calculate Levenshtein distance
+  const matrix = [];
+  for (let i = 0; i <= s2.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= s1.length; j++) {
+    matrix[0][j] = j;
+  }
+  
+  for (let i = 1; i <= s2.length; i++) {
+    for (let j = 1; j <= s1.length; j++) {
+      if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  
+  const distance = matrix[s2.length][s1.length];
+  const maxLength = Math.max(s1.length, s2.length);
+  return (maxLength - distance) / maxLength;
+};
+
+// Find best matching label for a field header
+const findBestLabelMatch = (header: string, labels: GameLabel[]): { label: GameLabel; score: number } | null => {
+  if (!labels || labels.length === 0) return null;
+  
+  let bestMatch: { label: GameLabel; score: number } | null = null;
+  const headerLower = header.toLowerCase();
+  
+  for (const label of labels) {
+    // Extract key parts from label name (remove common prefixes/suffixes)
+    const labelName = label.label.toLowerCase();
+    const labelWords = labelName.split('_');
+    
+    // Check for exact substring matches first
+    if (headerLower.includes(labelName) || labelName.includes(headerLower)) {
+      const score = 0.9;
+      if (!bestMatch || score > bestMatch.score) {
+        bestMatch = { label, score };
+      }
+      continue;
+    }
+    
+    // Check for word matches
+    const headerWords = headerLower.split(/[\s_\-]+/);
+    let wordMatches = 0;
+    let totalWords = Math.max(labelWords.length, headerWords.length);
+    
+    for (const labelWord of labelWords) {
+      if (headerWords.some(hw => hw.includes(labelWord) || labelWord.includes(hw))) {
+        wordMatches++;
+      }
+    }
+    
+    if (wordMatches > 0) {
+      const score = wordMatches / totalWords;
+      if (!bestMatch || score > bestMatch.score) {
+        bestMatch = { label, score };
+      }
+    }
+    
+    // Fallback to string similarity
+    const similarity = calculateStringSimilarity(header, labelName);
+    if (similarity > 0.3) {
+      const score = similarity * 0.7; // Lower weight for pure similarity
+      if (!bestMatch || score > bestMatch.score) {
+        bestMatch = { label, score };
+      }
+    }
+  }
+  
+  // Only return matches with reasonable confidence
+  return bestMatch && bestMatch.score > 0.3 ? bestMatch : null;
+};
+
+// Enhanced utility function to auto-categorize fields based on patterns and label matching
+const autoCategorizeField = (header: string, labels: GameLabel[] = []): { category: string; matchedLabel?: GameLabel; confidence?: number } => {
   // Convert to lowercase for case-insensitive matching
   const headerLower = header.toLowerCase();
   
   // Special handling for robot team numbers in SuperScouting
   if (/robot\s*\d+\s*number/i.test(header)) {
-    return 'team_number'; // Identify "Robot X Number" as team number fields
+    return { category: 'team_number' };
   }
   
   // Check for team number or match number patterns (general)
   if ((/team|^t\d+$|^frc\d+$/i.test(headerLower)) && /number/i.test(headerLower)) {
-    return 'team_number';
+    return { category: 'team_number' };
   }
   
   // Handle match/qual number fields
   if (/qual\s*number/i.test(headerLower)) {
-    return 'match_number';
+    return { category: 'match_number' };
   }
   
   if (/match|qualification|^q\d+$/i.test(headerLower)) {
-    return 'match_number';
+    return { category: 'match_number' };
   }
   
+  // Try to find a matching label first
+  const labelMatch = findBestLabelMatch(header, labels);
+  if (labelMatch && labelMatch.score > 0.5) {
+    // Map label categories to field categories
+    const categoryMap: { [key: string]: string } = {
+      'autonomous': 'auto',
+      'teleop': 'teleop',
+      'endgame': 'endgame',
+      'defense': 'strategy',
+      'reliability': 'strategy',
+      'strategic': 'strategy'
+    };
+    
+    const mappedCategory = categoryMap[labelMatch.label.category] || 'other';
+    return { 
+      category: mappedCategory, 
+      matchedLabel: labelMatch.label, 
+      confidence: labelMatch.score 
+    };
+  }
+  
+  // Fallback to pattern matching
   // Check for autonomous/auto patterns
   if (/auto|autonomous|^a_|^a\.|auton/i.test(headerLower)) {
-    return 'auto';
+    return { category: 'auto' };
   }
   
   // Check for teleop patterns
   if (/tele|teleop|teleoperated|driver|^t_|^t\./i.test(headerLower)) {
-    return 'teleop';
+    return { category: 'teleop' };
   }
   
   // Check for endgame patterns
   if (/end|endgame|final|climb|parking|docking|hanging/i.test(headerLower)) {
-    return 'endgame';
+    return { category: 'endgame' };
   }
   
   // Check for strategy/subjective patterns
   if (/strat|comment|note|subjective|rating|skill|defense|speed|observ/i.test(headerLower)) {
-    return 'strategy';
+    return { category: 'strategy' };
   }
   
   // Check for team info patterns
   if (/alliance|color|station|position|start/i.test(headerLower)) {
-    return 'team_info';
+    return { category: 'team_info' };
   }
   
   // Default to 'other' if no patterns match
-  return 'other';
+  return { category: 'other' };
 };
 
 
@@ -111,6 +225,8 @@ interface FieldSelectionProps {
 
 function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = {}) {
   const navigate = useNavigate();
+  const { labels, loadLabels, isLoading: labelsLoading } = useGameLabels();
+  
   // Headers from different scouting spreadsheets
   const [scoutingHeaders, setScoutingHeaders] = useState<string[]>([]);
   const [superscoutingHeaders, setSuperscoutingHeaders] = useState<string[]>([]);
@@ -118,6 +234,9 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
 
   // Field categorization
   const [selectedFields, setSelectedFields] = useState<{ [key: string]: string }>({});
+  
+  // Label mappings for enhanced field names
+  const [labelMappings, setLabelMappings] = useState<{ [fieldHeader: string]: GameLabel }>({});
 
   // UI Category tabs state
   const [activeCategory, setActiveCategory] = useState<string>('match');
@@ -138,6 +257,57 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2025);
+  
+  // Add Label Modal state
+  const [isAddLabelModalOpen, setIsAddLabelModalOpen] = useState(false);
+  const [currentFieldForLabel, setCurrentFieldForLabel] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState<GameLabel | null>(null);
+
+  useEffect(() => {
+    // Load game labels on component mount
+    console.log('Loading game labels...');
+    loadLabels();
+  }, [loadLabels]);
+
+  // Re-run auto-categorization when labels are loaded
+  useEffect(() => {
+    if (labels.length > 0 && (scoutingHeaders.length > 0 || superscoutingHeaders.length > 0 || pitScoutingHeaders.length > 0)) {
+      console.log(`Re-running auto-categorization with ${labels.length} labels loaded`);
+      
+      // Re-categorize all headers with labels
+      const updatedFields: { [key: string]: string } = {};
+      const updatedLabelMappings: { [fieldHeader: string]: GameLabel } = {};
+      
+      [
+        ...scoutingHeaders,
+        ...superscoutingHeaders,
+        ...pitScoutingHeaders
+      ].forEach(header => {
+        const categorization = autoCategorizeField(header, labels);
+        updatedFields[header] = categorization.category;
+        
+        // Store label mapping if one was found
+        if (categorization.matchedLabel) {
+          updatedLabelMappings[header] = categorization.matchedLabel;
+        }
+      });
+      
+      setSelectedFields(updatedFields);
+      setLabelMappings(updatedLabelMappings);
+      
+      console.log(`Updated label mappings for ${Object.keys(updatedLabelMappings).length} fields`);
+      
+      // Update success message with new label match count
+      const autoMappedCount = Object.values(updatedFields).filter(v => v !== 'ignore' && v !== 'other').length;
+      const labelMatchCount = Object.keys(updatedLabelMappings).length;
+      
+      if (labelMatchCount > 0) {
+        setSuccessMessage(`✅ Enhanced categorization with ${labelMatchCount} label matches! Auto-categorized ${autoMappedCount} total fields. Please review and adjust as needed.`);
+      } else {
+        setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on patterns. ${labels.length} labels available for manual selection.`);
+      }
+    }
+  }, [labels, scoutingHeaders, superscoutingHeaders, pitScoutingHeaders]);
 
   useEffect(() => {
     // Fetch headers from Google Sheets
@@ -441,18 +611,27 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
           setError(null);
         }
 
-        // Initialize all headers with auto-categorization
+        // Initialize all headers with enhanced auto-categorization using labels
         const initialFields: { [key: string]: string } = {};
+        const initialLabelMappings: { [fieldHeader: string]: GameLabel } = {};
+        
         [
           ...(scoutData.headers || []),
           ...(superData.headers || []),
           ...(pitData.headers || [])
         ].forEach(header => {
-          initialFields[header] = autoCategorizeField(header);
+          const categorization = autoCategorizeField(header, labels);
+          initialFields[header] = categorization.category;
+          
+          // Store label mapping if one was found
+          if (categorization.matchedLabel) {
+            initialLabelMappings[header] = categorization.matchedLabel;
+          }
         });
 
         // Set selected fields with auto-categorization
         setSelectedFields(initialFields);
+        setLabelMappings(initialLabelMappings);
 
         // Update critical field mappings
         const newCriticalMappings = {
@@ -469,10 +648,14 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
         });
         setCriticalFieldMappings(newCriticalMappings);
 
-        // Add feedback about automated categorization
+        // Add feedback about automated categorization and label matching
         const autoMappedCount = Object.values(initialFields).filter(v => v !== 'ignore' && v !== 'other').length;
-        if (autoMappedCount > 0) {
-          setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on naming patterns. Please review and adjust as needed.`);
+        const labelMatchCount = Object.keys(initialLabelMappings).length;
+        
+        if (labelMatchCount > 0) {
+          setSuccessMessage(`Auto-categorized ${autoMappedCount} fields (${labelMatchCount} matched with scouting labels). Labels loaded: ${labels.length}. Please review and adjust as needed.`);
+        } else if (autoMappedCount > 0) {
+          setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on naming patterns. Labels available: ${labels.length}. Please review and adjust as needed.`);
         }
       } catch (err) {
         console.error('Error fetching headers:', err);
@@ -601,11 +784,12 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
     try {
       setIsLoading(true);
       
-      // Save the schema
+      // Save the schema including label mappings
       const schema = {
         field_selections: selectedFields,
         year: year,
-        critical_mappings: criticalFieldMappings
+        critical_mappings: criticalFieldMappings,
+        label_mappings: labelMappings
       };
       
       const response = await fetchWithNgrokHeaders(apiUrl('/api/schema/save-selections'), {
@@ -739,16 +923,109 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
     return null;
   };
 
-  if (isLoading) {
+  // Handler for when a new label is successfully added
+  const handleLabelAdded = (newLabel: GameLabel) => {
+    // Reload labels to get the updated list
+    loadLabels();
+    
+    // If we were adding a label for a specific field, apply it automatically
+    if (currentFieldForLabel) {
+      setLabelMappings(prev => ({
+        ...prev,
+        [currentFieldForLabel]: newLabel
+      }));
+    }
+    
+    setSuccessMessage(`✅ Added new label "${newLabel.label}" successfully!`);
+    setCurrentFieldForLabel(null);
+  };
+
+  // Handler for when a label is successfully updated
+  const handleLabelUpdated = (updatedLabel: GameLabel) => {
+    // Reload labels to get the updated list
+    loadLabels();
+    
+    // Update any field mappings that were using the old label
+    setLabelMappings(prev => {
+      const newMappings = { ...prev };
+      Object.entries(newMappings).forEach(([fieldName, label]) => {
+        if (editingLabel && label.label === editingLabel.label) {
+          newMappings[fieldName] = updatedLabel;
+        }
+      });
+      return newMappings;
+    });
+    
+    setSuccessMessage(`✅ Updated label "${updatedLabel.label}" successfully!`);
+    setEditingLabel(null);
+  };
+
+  // Handler to start editing a label
+  const handleEditLabel = (label: GameLabel) => {
+    setEditingLabel(label);
+    setCurrentFieldForLabel(null);
+    setIsAddLabelModalOpen(true);
+  };
+
+  if (isLoading || labelsLoading) {
     return <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <span className="ml-3">Loading field data and scouting labels...</span>
     </div>;
   }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Field Selection</h1>
-      
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Field Selection</h1>
+        
+        <div className="flex items-center space-x-4">
+          {labelsLoading && (
+            <div className="flex items-center text-blue-600">
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500 mr-2"></div>
+              Loading labels...
+            </div>
+          )}
+          
+          {labels.length > 0 && (
+            <div className="text-green-600 text-sm">
+              ✅ {labels.length} scouting labels loaded
+            </div>
+          )}
+          
+          <button
+            onClick={() => {
+              console.log('Triggering manual re-categorization');
+              // Re-run auto-categorization manually
+              const updatedFields: { [key: string]: string } = {};
+              const updatedLabelMappings: { [fieldHeader: string]: GameLabel } = {};
+              
+              [
+                ...scoutingHeaders,
+                ...superscoutingHeaders,
+                ...pitScoutingHeaders
+              ].forEach(header => {
+                const categorization = autoCategorizeField(header, labels);
+                updatedFields[header] = categorization.category;
+                
+                if (categorization.matchedLabel) {
+                  updatedLabelMappings[header] = categorization.matchedLabel;
+                }
+              });
+              
+              setSelectedFields(updatedFields);
+              setLabelMappings(updatedLabelMappings);
+              
+              const labelMatchCount = Object.keys(updatedLabelMappings).length;
+              setSuccessMessage(`🔄 Re-ran categorization: ${labelMatchCount} label matches found with ${labels.length} available labels.`);
+            }}
+            className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200"
+            disabled={labelsLoading}
+          >
+            🔄 Re-match Labels
+          </button>
+        </div>
+      </div>
       
       {error && (
         <div className="p-3 mb-4 bg-red-100 text-red-700 rounded">
@@ -906,12 +1183,14 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border px-4 py-2 text-left">Header</th>
+                  <th className="border px-4 py-2 text-left">Label Match</th>
                   <th className="border px-4 py-2 text-left">Category</th>
                 </tr>
               </thead>
               <tbody>
                 {scoutingHeaders.map((header, index) => {
                   const criticalType = getCriticalFieldType(header);
+                  const matchedLabel = labelMappings[header];
 
                   return (
                     <tr
@@ -925,6 +1204,68 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                           </span>
                         )}
                         {header}
+                      </td>
+                      <td className="border px-4 py-2">
+                        <div className="space-y-2">
+                          <select
+                            value={matchedLabel ? matchedLabel.label : ''}
+                            onChange={(e) => {
+                              const selectedLabelName = e.target.value;
+                              if (selectedLabelName === '___ADD_NEW___') {
+                                setCurrentFieldForLabel(header);
+                                setIsAddLabelModalOpen(true);
+                              } else if (selectedLabelName) {
+                                const selectedLabel = labels.find(l => l.label === selectedLabelName);
+                                if (selectedLabel) {
+                                  setLabelMappings(prev => ({
+                                    ...prev,
+                                    [header]: selectedLabel
+                                  }));
+                                }
+                              } else {
+                                setLabelMappings(prev => {
+                                  const newMappings = { ...prev };
+                                  delete newMappings[header];
+                                  return newMappings;
+                                });
+                              }
+                            }}
+                            className="w-full p-1 border rounded text-xs"
+                          >
+                            <option value="">No label selected</option>
+                            {labels.map(label => (
+                              <option key={label.label} value={label.label}>
+                                {label.label} ({label.category})
+                              </option>
+                            ))}
+                            <option value="___ADD_NEW___" className="text-blue-600 font-medium">
+                              ➕ Add New Label for "{header}"
+                            </option>
+                          </select>
+                          
+                          {matchedLabel && (
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-2">
+                                  ✓ Selected
+                                </span>
+                                <button
+                                  onClick={() => handleEditLabel(matchedLabel)}
+                                  className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                  title="Edit this label"
+                                >
+                                  ✏️ Edit
+                                </button>
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {matchedLabel.description}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                Type: {matchedLabel.data_type} | Range: {matchedLabel.typical_range}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="border px-4 py-2">
                         <select
@@ -968,12 +1309,14 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="border px-4 py-2 text-left">Header</th>
+                      <th className="border px-4 py-2 text-left">Label Match</th>
                       <th className="border px-4 py-2 text-left">Category</th>
                     </tr>
                   </thead>
                   <tbody>
                     {pitScoutingHeaders.map((header, index) => {
                       const criticalType = getCriticalFieldType(header);
+                      const matchedLabel = labelMappings[header];
 
                       return (
                         <tr
@@ -987,6 +1330,68 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                               </span>
                             )}
                             {header}
+                          </td>
+                          <td className="border px-4 py-2">
+                            <div className="space-y-2">
+                              <select
+                                value={matchedLabel ? matchedLabel.label : ''}
+                                onChange={(e) => {
+                                  const selectedLabelName = e.target.value;
+                                  if (selectedLabelName === '___ADD_NEW___') {
+                                    setCurrentFieldForLabel(header);
+                                    setIsAddLabelModalOpen(true);
+                                  } else if (selectedLabelName) {
+                                    const selectedLabel = labels.find(l => l.label === selectedLabelName);
+                                    if (selectedLabel) {
+                                      setLabelMappings(prev => ({
+                                        ...prev,
+                                        [header]: selectedLabel
+                                      }));
+                                    }
+                                  } else {
+                                    setLabelMappings(prev => {
+                                      const newMappings = { ...prev };
+                                      delete newMappings[header];
+                                      return newMappings;
+                                    });
+                                  }
+                                }}
+                                className="w-full p-1 border rounded text-xs"
+                              >
+                                <option value="">No label selected</option>
+                                {labels.map(label => (
+                                  <option key={label.label} value={label.label}>
+                                    {label.label} ({label.category})
+                                  </option>
+                                ))}
+                                <option value="___ADD_NEW___" className="text-blue-600 font-medium">
+                                  ➕ Add New Label for "{header}"
+                                </option>
+                              </select>
+                              
+                              {matchedLabel && (
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-2">
+                                      ✓ Selected
+                                    </span>
+                                    <button
+                                      onClick={() => handleEditLabel(matchedLabel)}
+                                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                      title="Edit this label"
+                                    >
+                                      ✏️ Edit
+                                    </button>
+                                  </div>
+                                  <div className="text-xs text-gray-600">
+                                    {matchedLabel.description}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    Type: {matchedLabel.data_type} | Range: {matchedLabel.typical_range}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="border px-4 py-2">
                             <select
@@ -1051,12 +1456,14 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="border px-4 py-2 text-left">Header</th>
+                      <th className="border px-4 py-2 text-left">Label Match</th>
                       <th className="border px-4 py-2 text-left">Category</th>
                     </tr>
                   </thead>
                   <tbody>
                     {superscoutingHeaders.map((header, index) => {
                       const criticalType = getCriticalFieldType(header);
+                      const matchedLabel = labelMappings[header];
 
                       return (
                         <tr
@@ -1070,6 +1477,68 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                               </span>
                             )}
                             {header}
+                          </td>
+                          <td className="border px-4 py-2">
+                            <div className="space-y-2">
+                              <select
+                                value={matchedLabel ? matchedLabel.label : ''}
+                                onChange={(e) => {
+                                  const selectedLabelName = e.target.value;
+                                  if (selectedLabelName === '___ADD_NEW___') {
+                                    setCurrentFieldForLabel(header);
+                                    setIsAddLabelModalOpen(true);
+                                  } else if (selectedLabelName) {
+                                    const selectedLabel = labels.find(l => l.label === selectedLabelName);
+                                    if (selectedLabel) {
+                                      setLabelMappings(prev => ({
+                                        ...prev,
+                                        [header]: selectedLabel
+                                      }));
+                                    }
+                                  } else {
+                                    setLabelMappings(prev => {
+                                      const newMappings = { ...prev };
+                                      delete newMappings[header];
+                                      return newMappings;
+                                    });
+                                  }
+                                }}
+                                className="w-full p-1 border rounded text-xs"
+                              >
+                                <option value="">No label selected</option>
+                                {labels.map(label => (
+                                  <option key={label.label} value={label.label}>
+                                    {label.label} ({label.category})
+                                  </option>
+                                ))}
+                                <option value="___ADD_NEW___" className="text-blue-600 font-medium">
+                                  ➕ Add New Label for "{header}"
+                                </option>
+                              </select>
+                              
+                              {matchedLabel && (
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full mr-2">
+                                      ✓ Selected
+                                    </span>
+                                    <button
+                                      onClick={() => handleEditLabel(matchedLabel)}
+                                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                      title="Edit this label"
+                                    >
+                                      ✏️ Edit
+                                    </button>
+                                  </div>
+                                  <div className="text-xs text-gray-600">
+                                    {matchedLabel.description}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    Type: {matchedLabel.data_type} | Range: {matchedLabel.typical_range}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="border px-4 py-2">
                             <select
@@ -1122,6 +1591,20 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
           Save Field Selections
         </button>
       </div>
+      
+      {/* Add/Edit Label Modal */}
+      <AddLabelModal
+        isOpen={isAddLabelModalOpen}
+        onClose={() => {
+          setIsAddLabelModalOpen(false);
+          setCurrentFieldForLabel(null);
+          setEditingLabel(null);
+        }}
+        onLabelAdded={handleLabelAdded}
+        onLabelUpdated={handleLabelUpdated}
+        fieldHeader={currentFieldForLabel || undefined}
+        editingLabel={editingLabel || undefined}
+      />
     </div>
   );
 }

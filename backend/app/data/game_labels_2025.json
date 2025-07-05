@@ -1,8 +1,8 @@
 {
   "extraction_version": "1.0",
-  "extraction_date": "2025-07-05T11:04:09.337744",
+  "extraction_date": "2025-07-05T17:48:16.409143",
   "game_year": 2025,
-  "labels_count": 34,
+  "labels_count": 35,
   "labels": [
     {
       "label": "auto_leave_successful",
@@ -377,6 +377,18 @@
       "extraction_version": "1.0",
       "extraction_date": "2025-07-05T11:04:09.336212",
       "game_year": 2025
+    },
+    {
+      "label": "auto_net_score",
+      "category": "autonomous",
+      "description": "The total number of game pieces scored by a robot into the 'Net' scoring area during the autonomous period of a match. This metric reflects the robot's autonomous scoring effectiveness specifically for the Net target.",
+      "data_type": "count",
+      "typical_range": "0-5 (may vary depending on game rules and scoring opportunities)",
+      "usage_context": "Track this metric during the autonomous period by counting each game piece successfully scored by the robot into the Net. Record immediately after autonomous ends, based on observed scoring or official field data.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-05T17:48:16.409121",
+      "game_year": 2025,
+      "custom_added": true
     }
   ]
 }

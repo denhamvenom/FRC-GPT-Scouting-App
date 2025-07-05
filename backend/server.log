@@ -1,0 +1,17 @@
+INFO:     Will watch for changes in these directories: ['/mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     Started reloader process [5879] using WatchFiles
+2025-07-05 12:41:21,851 - root - INFO - === Logging initialized, writing to /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/logs/archive_service_20250705_124121.log ===
+2025-07-05 12:41:23,227 - game_label_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-05 12:41:23,230 - game_label_extractor - INFO - Initialized GameLabelExtractorService with data dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/data
+INFO:     Started server process [5897]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Loaded superscouting schema with 0 mappings
+Loaded robot groups from robot_groups_2025.json with 0 total fields
+INFO:     127.0.0.1:46064 - "GET /api/v1/game-labels/2025 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [5897]
+INFO:     Stopping reloader process [5879]
