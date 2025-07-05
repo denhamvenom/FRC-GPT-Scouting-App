@@ -104,7 +104,12 @@ const autoCategorizeField = (header: string): string => {
 };
 
 
-function FieldSelection() {
+interface FieldSelectionProps {
+  embedded?: boolean;
+  onComplete?: () => void;
+}
+
+function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = {}) {
   const navigate = useNavigate();
   // Headers from different scouting spreadsheets
   const [scoutingHeaders, setScoutingHeaders] = useState<string[]>([]);
@@ -660,11 +665,32 @@ function FieldSelection() {
           });
 
           if (buildResponse.ok) {
-            setSuccessMessage('Dataset built successfully! Proceeding to validation...');
-            // Navigate to validation page after dataset is built
-            setTimeout(() => {
-              navigate('/validation');
-            }, 1500);
+            setSuccessMessage('Dataset built successfully!');
+            if (embedded && onComplete) {
+              onComplete();
+            } else {
+              setSuccessMessage('Dataset built successfully! Proceeding to validation...');
+              setTimeout(() => {
+                navigate('/validation');
+              }, 1500);
+            }
+          } else {
+            if (embedded && onComplete) {
+              setSuccessMessage('Field selections saved, but dataset build had issues.');
+              onComplete();
+            } else {
+              // Still go to validation even if build fails - they can build from there
+              setSuccessMessage('Field selections saved, but dataset build had issues. Proceeding to validation...');
+              setTimeout(() => {
+                navigate('/validation');
+              }, 2000);
+            }
+          }
+        } catch (buildErr) {
+          console.error('Error building dataset:', buildErr);
+          if (embedded && onComplete) {
+            setSuccessMessage('Field selections saved, but dataset build had issues.');
+            onComplete();
           } else {
             // Still go to validation even if build fails - they can build from there
             setSuccessMessage('Field selections saved, but dataset build had issues. Proceeding to validation...');
@@ -672,22 +698,20 @@ function FieldSelection() {
               navigate('/validation');
             }, 2000);
           }
-        } catch (buildErr) {
-          console.error('Error building dataset:', buildErr);
-          // Still go to validation even if build fails - they can build from there
-          setSuccessMessage('Field selections saved, but dataset build had issues. Proceeding to validation...');
-          setTimeout(() => {
-            navigate('/validation');
-          }, 2000);
         }
       } catch (schemaErr) {
         console.error('Error learning schema mappings:', schemaErr);
-        // Still continue to workflow even if schema learning fails
-        // The user can manually trigger schema learning later
-        setSuccessMessage('Field selections saved, but schema learning had issues. Continuing to workflow.');
-        setTimeout(() => {
-          navigate('/workflow');
-        }, 2000);
+        if (embedded && onComplete) {
+          setSuccessMessage('Field selections saved, but schema learning had issues.');
+          onComplete();
+        } else {
+          // Still continue to workflow even if schema learning fails
+          // The user can manually trigger schema learning later
+          setSuccessMessage('Field selections saved, but schema learning had issues. Continuing to workflow.');
+          setTimeout(() => {
+            navigate('/workflow');
+          }, 2000);
+        }
       }
     } catch (err) {
       console.error('Error saving schema:', err);

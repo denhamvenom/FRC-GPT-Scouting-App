@@ -1,151 +1,3 @@
---- Section: 5.1 FIELD (Page 19) ---
- 
-Section 5 ARENA 
-V4 
-19 of 164 
-5 ARENA  
-The ARENA includes all elements of the game infrastructure that are required to play REEFSCAPESM presented 
-by Haas: the FIELD, SCORING ELEMENTS, queue area, team media area, designated TECHNICIAN area, and all 
-equipment needed for FIELD control, ROBOT control, and scorekeeping. 
-Figure 5-1 REEFSCAPE ARENA (queue area, TECHNICIAN area, and media area not pictured) 
- 
-The ARENA is modular and assembled, used, disassembled, and shipped many times during the competition 
-season. It undergoes wear and tear. The ARENA is designed to withstand rigorous play and frequent shipping. 
-Every effort is made to ensure that ARENAS are consistent from event to event. However, ARENAS are 
-assembled in different venues by different event staff and some small variations occur. For details regarding 
-assembly tolerances, please refer to the 2025 ARENA Layout and Marking Diagram. Successful teams will 
-design ROBOTS that are insensitive to these variations. 
-Illustrations included in this section are for a general visual understanding of the REEFSCAPE ARENA, and 
-dimensions included in the manual are nominal. Please refer to the official drawings for exact dimensions, 
-tolerances, and construction details. The official drawings, CAD models, and drawings for low-cost versions of 
-important elements of the REEFSCAPE FIELD are posted on the REEFSCAPE Playing FIELD web page on the 
-FIRST website. 
-5.1 FIELD 
-Each FIELD for REEFSCAPE is an approximately 26 ft. 5 in. (~805 cm) by 57 ft. 6⅞ in. (~1 755 cm) carpeted 
-area bounded by inward facing surfaces of the ALLIANCE WALLS, CORAL STATIONS, PROCESSORS and 
-PROCESSOR openings, and guardrails. 
-
- 
-Section 5 ARENA 
-V4 
-20 of 164 
-Figure 5-2 FIELD boundary in pink 
- 
-The FIELD is populated with and surrounded by the following elements:  
-− 
-1 REEF per ALLIANCE,  
-− 
-1 PROCESSOR per ALLIANCE,  
-− 
-2 CORAL STATIONS per ALLIANCE, and  
-− 
-1 BARGE which consists of 3 CAGES and 1 NET for each ALLIANCE. 
-The surface of the FIELD is low pile carpet, Shaw Floors, Philadelphia Commercial, Neyland II 20, “66561 
-Medallion.” Neyland II carpet is not available for purchase, and the closest equivalent is Shaw, Philadelphia 
-Brand, Profusion 20, Style 54933; see results from FIRST’s evaluation in this blog post.  
-Carpet edges and seams are secured with 3MTM Premium Matte Cloth (Gaffers) Tape GT2, GT3 or comparable 
-Gaffer’s Tape. Tears, rips, and damage to the carpet may be repaired with the same styles of tape and ROBOTS 
-must be prepared to operate on surfaces made of carpet, tape, or combinations of both materials as repairs 
-are made through the course of competition. 
-Guardrails form the long edges of the FIELD. Guardrails are a 1 ft. 8 in. (~51 cm) tall system of transparent 
-polycarbonate supported on the top and bottom by aluminum extrusion. There are 4 gates in the guardrail that 
-allow access to the FIELD for placement and removal of ROBOTS. The gate passthrough, when open, is 3 ft. 2 
-in. (~97 cm) wide. Gates are closed and shielded during the MATCH.  
-
-
-
---- Section: 5.2 Areas, Zones, & Markings (Page 21) ---
- 
-Section 5 ARENA 
-V4 
-21 of 164 
-Figure 5-3 Gate locations 
- 
-There are 2 versions of guardrails and DRIVER STATIONS used for competitions. 1 design is reflected in the 
-2025 Official FIRST FIELD Drawings & Models. The other is designed and sold by AndyMark. While the designs 
-are slightly different, the critical dimensions, performance, and expected user experience between them are the 
-same unless otherwise noted. Detailed drawings for the AndyMark design are posted on the AndyMark 
-website. All illustrations in this manual show the traditional FIELD design. 
-5.2 Areas, Zones, & Markings  
-FIELD areas, zones, and markings of consequence are described below. Unless otherwise specified, the tape 
-used to mark lines and zones throughout the FIELD is 2 in. (~51 mm) 3M™ Premium Matte Cloth (Gaffers) 
-Tape (GT2), ProGaff® Premium Professional Grade Gaffer Tape, or comparable gaffers tape. 
-
- 
-Section 5 ARENA 
-V4 
-22 of 164 
-Figure 5-4 Areas, markings, and zones 
- 
-− 
-ALLIANCE AREA: a 30 ft. wide by 13 ft. 8⅜ in. deep (~914 cm by 423 cm) infinitely tall volume formed 
-by, and including the ALLIANCE WALL, CORAL STATION AREAs, the edge of the carpet, and white 
-colored tape perpendicular to the DRIVER STATIONS. 
-− 
-BARGE ZONE: a 3 ft. 10 in. deep by 12 ft. 2½ in. long (~117 cm by 372 cm)., infinitely tall, 4-sided 
-volume surrounding the ALLIANCE’S half of the BARGE. It is bounded by and includes the ALLIANCE-
-colored tape.  
-− 
-CORAL MARK: 1 of 6 4 in. by 4 in. (~102 mm by 102 mm) “+” marks used to identify placement of 
-CORAL before the MATCH. Marks are made with black tape. 
-− 
-CORAL STATION AREA: a 5 ft. 10⅞ in. wide by 13 ft. 8⅜ in. ft deep (~180 cm by 423 cm) infinitely tall 
-volume bounded by the CORAL STATION, edge of carpet, and ALLIANCE and white colored tape.  
-− 
-HUMAN STARTING LINE: a white line spanning the ALLIANCE AREA between the CORAL STATION 
-AREAs that is parallel to and located 2 ft. (~61 cm) from the bottom square tube of the ALLIANCE 
-WALL to the near edge of the tape. 
-− 
-PROCESSOR AREA: a 3 ft. 7⅜ in. wide by 7 ft. 6 in. deep (~110 cm by 229 cm) infinitely tall volume 
-formed by, and including, the ALLIANCE colored tape, guardrail, and the PROCESSOR wall. 
-− 
-REEF ZONE: an infinitely tall 6-sided, 7 ft. 9½ in. wide (face to face) (~237 cm), volume surrounding the 
-ALLIANCE’S REEF. It is bounded by and includes the ALLIANCE-colored tape. 
-− 
-ROBOT STARTING LINE: a black line that spans the width of the FIELD between each REEF and the 
-BARGE. It is positioned such that it is 7 ft. 4 in. (~224 cm) from the REEF.   
-
-
-
---- Section: 5.3 REEF (Page 23) ---
- 
-Section 5 ARENA 
-V4 
-23 of 164 
-5.3 REEF 
-Figure 5-5 REEF 
- 
-A REEF is 1 of 2 5 ft. 5 ½ in. (~166 cm) hexagonal structures with BRANCHES that extend from each side 
-where CORAL are scored. Each ALLIANCE has a dedicated REEF centered between each guardrail and located 
-12 ft. away from the ALLIANCE WALL. Each REEF has 4 levels to score on: Level 1 (L1), Level 2 (L2), Level 3 
-(L3), and Level 4 (L4). 
-Figure 5-6: Scoring Level Locations (L1-L4) 
- 
-The base of each REEF has a trough (L1) into which ROBOTS can score CORAL. The trough includes the 
-angled and vertical surfaces, as well as the top of the front edge as shown in Figure 5-7. The front edge of the 
-trough is 1 ft. 6 in. (~46 cm) off the carpet. 
-
- 
-Section 5 ARENA 
-V4 
-24 of 164 
-Figure 5-7: Trough Surfaces 
- 
-Vertical pipes extend up from the base, and pipes on the same face are 1 ft. 1 in. (~33 cm) apart (center to 
-center). The pipes are made out of 1-¼ in. Schedule 40 Steel. Each pipe has 3 BRANCHES which are angled or 
-compound extensions from the REEF vertical pipes. 
-L2 is the 12 lowest level BRANCHES and are angled up at 35°. The highest point of the L2 BRANCH is 2 ft. 7⅞ 
-in. (~81 cm) from the carpet and is inset 1⅝ in. (~41 mm) from the REEF base. 
-L3 is the 12 mid-level BRANCHES and are angled up at 35°. The highest point of the L3 BRANCH is 3 ft. 11⅝ in. 
-(~121 cm) from the carpet and is inset 1⅝ in. (~41 mm) from the REEF base. 
-L4 is the 12 highest-level BRANCHES and they are vertical. The highest point of the L4 BRANCH is 6 ft. (~183 
-cm) from the carpet and is inset 1⅛ in. (~29 mm) from the REEF base.   
-For scoring purposes, the BRANCHES of the REEF are tracked in FMS as follows: 
-Figure 5-8: Reef Scoring Location Tracking 
- 
-
-
-
 --- Section: 5.4 BARGE (Page 25) ---
  
 Section 5 ARENA 
@@ -250,6 +102,45 @@ A NET is a goal in which an ALLIANCE scores ALGAE. The NET is ¼ in. (~6 mm) kni
 (~122 cm) wide by 12 ft. (~366 cm) long with a sewn cord border. It is available for purchase from AndyMark, 
 am-5522. It is suspended from the top of the BARGE such that its lowest point hangs 6 ft. 4 in. (~193 cm) 
 above the FIELD carpet. There is a NET for the Blue ALLIANCE and for the Red ALLIANCE.  
+
+
+
+--- Section: 5.3 REEF (Page 23) ---
+ 
+Section 5 ARENA 
+V4 
+23 of 164 
+5.3 REEF 
+Figure 5-5 REEF 
+ 
+A REEF is 1 of 2 5 ft. 5 ½ in. (~166 cm) hexagonal structures with BRANCHES that extend from each side 
+where CORAL are scored. Each ALLIANCE has a dedicated REEF centered between each guardrail and located 
+12 ft. away from the ALLIANCE WALL. Each REEF has 4 levels to score on: Level 1 (L1), Level 2 (L2), Level 3 
+(L3), and Level 4 (L4). 
+Figure 5-6: Scoring Level Locations (L1-L4) 
+ 
+The base of each REEF has a trough (L1) into which ROBOTS can score CORAL. The trough includes the 
+angled and vertical surfaces, as well as the top of the front edge as shown in Figure 5-7. The front edge of the 
+trough is 1 ft. 6 in. (~46 cm) off the carpet. 
+
+ 
+Section 5 ARENA 
+V4 
+24 of 164 
+Figure 5-7: Trough Surfaces 
+ 
+Vertical pipes extend up from the base, and pipes on the same face are 1 ft. 1 in. (~33 cm) apart (center to 
+center). The pipes are made out of 1-¼ in. Schedule 40 Steel. Each pipe has 3 BRANCHES which are angled or 
+compound extensions from the REEF vertical pipes. 
+L2 is the 12 lowest level BRANCHES and are angled up at 35°. The highest point of the L2 BRANCH is 2 ft. 7⅞ 
+in. (~81 cm) from the carpet and is inset 1⅝ in. (~41 mm) from the REEF base. 
+L3 is the 12 mid-level BRANCHES and are angled up at 35°. The highest point of the L3 BRANCH is 3 ft. 11⅝ in. 
+(~121 cm) from the carpet and is inset 1⅝ in. (~41 mm) from the REEF base. 
+L4 is the 12 highest-level BRANCHES and they are vertical. The highest point of the L4 BRANCH is 6 ft. (~183 
+cm) from the carpet and is inset 1⅛ in. (~29 mm) from the REEF base.   
+For scoring purposes, the BRANCHES of the REEF are tracked in FMS as follows: 
+Figure 5-8: Reef Scoring Location Tracking 
+ 
 
 
 
@@ -394,156 +285,6 @@ which is 16.25 in. (~413 mm) diameter.
 The tolerances to which ALGAE are manufactured allow for variances in 
 diameter, wall thickness, weight distribution and overall weight. They may not 
 always be uniformly spherical, roll straight, or bounce as expected. 
-
-
-
---- Section: 6.1 MATCH Overview (Page 41) ---
- 
-Section 6 Game Details 
-V13 
-41 of 164 
-6 Game Details 
-Figure 6-1 REEFSCAPE 
- 
-In REEFSCAPE, 2 ALLIANCES (an ALLIANCE is a cooperative of up to 4 FIRST Robotics Competition teams) 
-play MATCHES, set up and implemented per the details described below.  
-6.1 MATCH Overview 
-MATCHES run on 7–10-minute cycles, which consist of pre-MATCH setup, the 2-minute and 30-second 
-MATCH, and the post-MATCH reset. 
-During the MATCH, ROBOTS collect CORAL and score on their REEF. ROBOTS also collect ALGAE and score in 
-their PROCESSOR or NET. HUMAN PLAYERS can score ALGAE in their NET once it has been passed to them 
-via their opponent’s PROCESSOR.  
-ROBOTS conclude the MATCH PARKING in their BARGE ZONE or suspending from a CAGE. 
-6.2 DRIVE TEAM 
-A DRIVE TEAM is a set of up to 5 people from the same FIRST Robotics Competition team responsible for 
-team performance for a specific MATCH. There are 4 specific roles on a DRIVE TEAM which ALLIANCES can 
-use to assist ROBOTS with REEFSCAPE, and no more than 1 member of the DRIVE TEAM may be a non-
-STUDENT.  
-The intent of the definition of DRIVE TEAM and DRIVE TEAM related rules is that, 
-barring extenuating circumstances, the DRIVE TEAM consists of people who 
-arrived at the event affiliated with that team and are responsible for their team’s 
-and ROBOT’S performance at the event (this means a person may be affiliated 
-
-
-
---- Section: 6.3.4 SCORING ELEMENTS (Page 45) ---
- 
-Section 6 Game Details 
-V13 
-45 of 164 
-6.3.4 SCORING ELEMENTS 
-Before each MATCH begins, FIELD STAFF stage SCORING ELEMENTS.  
-Figure 6-2 CORAL MARK locations and SCORING ELEMENT staging positions 
- 
-6.3.4.1 CORAL 
-126 CORAL are staged for each MATCH as follows (reference Figure 6-2):  
-A. 1 CORAL is staged on each CORAL MARK (6 total, CORAL are staged such that each CORAL covers the 
-opposite ends of each CORAL MARK), 
-B. 1 CORAL may be preloaded in each ROBOT by the ROBOT’S DRIVE TEAM, such that the CORAL is fully 
-supported by the ROBOT (up to 6 total, a CORAL not pre-loaded in a ROBOT is staged with CORAL in the 
-corresponding ALLIANCE AREA), and  
-C. remaining CORAL are split evenly behind each CORAL STATION (57 to 60 per ALLIANCE, depending on 
-how many are preloaded in ROBOTS).  
-6.3.4.2 ALGAE 
-18 ALGAE are staged for each MATCH as follows (reference Figure 6-2):  
-A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) such that they are 
-placed lightly onto the REEF, and 
-B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
-Staged ALGAE will not contact CORAL placed on L4. 
-
-
-
---- Section: 6.3.4.1 CORAL (Page 45) ---
- 
-Section 6 Game Details 
-V13 
-45 of 164 
-6.3.4 SCORING ELEMENTS 
-Before each MATCH begins, FIELD STAFF stage SCORING ELEMENTS.  
-Figure 6-2 CORAL MARK locations and SCORING ELEMENT staging positions 
- 
-6.3.4.1 CORAL 
-126 CORAL are staged for each MATCH as follows (reference Figure 6-2):  
-A. 1 CORAL is staged on each CORAL MARK (6 total, CORAL are staged such that each CORAL covers the 
-opposite ends of each CORAL MARK), 
-B. 1 CORAL may be preloaded in each ROBOT by the ROBOT’S DRIVE TEAM, such that the CORAL is fully 
-supported by the ROBOT (up to 6 total, a CORAL not pre-loaded in a ROBOT is staged with CORAL in the 
-corresponding ALLIANCE AREA), and  
-C. remaining CORAL are split evenly behind each CORAL STATION (57 to 60 per ALLIANCE, depending on 
-how many are preloaded in ROBOTS).  
-6.3.4.2 ALGAE 
-18 ALGAE are staged for each MATCH as follows (reference Figure 6-2):  
-A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) such that they are 
-placed lightly onto the REEF, and 
-B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
-Staged ALGAE will not contact CORAL placed on L4. 
-
-
-
---- Section: 6.3.4.2 ALGAE (Page 45) ---
- 
-Section 6 Game Details 
-V13 
-45 of 164 
-6.3.4 SCORING ELEMENTS 
-Before each MATCH begins, FIELD STAFF stage SCORING ELEMENTS.  
-Figure 6-2 CORAL MARK locations and SCORING ELEMENT staging positions 
- 
-6.3.4.1 CORAL 
-126 CORAL are staged for each MATCH as follows (reference Figure 6-2):  
-A. 1 CORAL is staged on each CORAL MARK (6 total, CORAL are staged such that each CORAL covers the 
-opposite ends of each CORAL MARK), 
-B. 1 CORAL may be preloaded in each ROBOT by the ROBOT’S DRIVE TEAM, such that the CORAL is fully 
-supported by the ROBOT (up to 6 total, a CORAL not pre-loaded in a ROBOT is staged with CORAL in the 
-corresponding ALLIANCE AREA), and  
-C. remaining CORAL are split evenly behind each CORAL STATION (57 to 60 per ALLIANCE, depending on 
-how many are preloaded in ROBOTS).  
-6.3.4.2 ALGAE 
-18 ALGAE are staged for each MATCH as follows (reference Figure 6-2):  
-A. 6 ALGAE are staged on pairs of BRANCHES as shown in Figure 6-3 (12 total) such that they are 
-placed lightly onto the REEF, and 
-B. 1 ALGAE is placed on top of each CORAL staged on a CORAL MARK (6 total).  
-Staged ALGAE will not contact CORAL placed on L4. 
-
-
-
---- Section: 6.3.5 CAGES (Page 46) ---
- 
-Section 6 Game Details 
-V13 
-46 of 164 
-Figure 6-3 Staging positions for ALGAE on a REEF 
- 
-6.3.5 CAGES 
-Each team can choose the height of the CAGE closest to their driver station. By default, all CAGES are left in 
-the state from the last match. At the start of each day, all CAGES are set as deep CAGES. If a team would like 
-to alter the CAGE height they must alert the FIELD STAFF during reset. Each team informs FIELD STAFF of their 
-preference for their corresponding CAGE height.  
-Figure 6-4 CAGE positions corresponding to DRIVER STATIONS 
- 
-6.4 MATCH Phases 
-The first phase of each MATCH is 15 seconds long and called the Autonomous Period (AUTO). During AUTO, 
-ROBOTS operate without any DRIVE TEAM control or input. ROBOTS attempt to leave their ROBOT STARTING 
-
-
-
---- Section: 6.4 MATCH Phases (Page 46) ---
- 
-Section 6 Game Details 
-V13 
-46 of 164 
-Figure 6-3 Staging positions for ALGAE on a REEF 
- 
-6.3.5 CAGES 
-Each team can choose the height of the CAGE closest to their driver station. By default, all CAGES are left in 
-the state from the last match. At the start of each day, all CAGES are set as deep CAGES. If a team would like 
-to alter the CAGE height they must alert the FIELD STAFF during reset. Each team informs FIELD STAFF of their 
-preference for their corresponding CAGE height.  
-Figure 6-4 CAGE positions corresponding to DRIVER STATIONS 
- 
-6.4 MATCH Phases 
-The first phase of each MATCH is 15 seconds long and called the Autonomous Period (AUTO). During AUTO, 
-ROBOTS operate without any DRIVE TEAM control or input. ROBOTS attempt to leave their ROBOT STARTING 
 
 
 
@@ -1445,188 +1186,372 @@ Violation: MAJOR FOUL. Additional MAJOR FOUL for each opponent ALGAE de-scored.
 
 
 
---- Section: 7.4.4 Opponent Interaction (Page 70) ---
+--- Section: 10.5.3 Qualification Ranking (Page 122) ---
  
-Section 7 Game Rules (G) 
-V11 
-70 of 164 
-G421 1 defender at a time. No more than 1 ROBOT may be on the opponent’s side of the FIELD (i.e. 
-containing the opponent REEF) with its BUMPERS fully outside and beyond the BARGE ZONES. 
-Violation: MINOR FOUL, and for every 3 seconds in which the situation is not corrected, a MAJOR FOUL is 
-assessed. 
-7.4.4 Opponent Interaction 
-Note, G422, G423, G424 are mutually exclusive. A single ROBOT to ROBOT interaction which violates more 
-than 1 of these rules results in the most punitive penalty, and only the most punitive penalty, being assessed. 
-G422 *Stay out of other ROBOTS. A ROBOT may not use a COMPONENT outside its ROBOT PERIMETER 
-(except its BUMPERS) to initiate contact with an opponent ROBOT inside the vertical projection of the 
-opponent’s ROBOT PERIMETER.  
-Violation: MINOR FOUL. 
-For the purposes of this rule, “initiate contact” requires movement towards an 
-opponent ROBOT.  
-In a collision, it’s possible for both ROBOTS to initiate contact. 
-G423 *This isn’t combat robotics. A ROBOT may not damage or functionally impair an opponent ROBOT in 
-either of the following ways: 
-A. deliberately. 
-B. regardless of intent, by initiating contact, either directly or transitively via a SCORING ELEMENT 
-CONTROLLED by the ROBOT, inside the vertical projection of an opponent’s ROBOT 
-PERIMETER.  
-Damage or functional impairment because of contact with a tipped-over opponent ROBOT, which is not 
-perceived by a REFEREE to be deliberate, is not a violation of this rule. 
-Violation: MAJOR FOUL and YELLOW CARD, or if opponent ROBOT is unable to drive, then MAJOR FOUL 
-and RED CARD. 
-FIRST Robotics Competition can be a full-contact competition and may include 
-rigorous game play. While this rule aims to limit severe damage to ROBOTS, 
-teams should design their ROBOTS to be robust. 
-Examples of violations of this rule include, but are not limited to: 
-A. A ROBOT leaves an arm extended, spins around to change course, and 
-unintentionally hits and damages a COMPONENT inside the ROBOT 
-PERIMETER of a nearby opponent ROBOT. 
-B. A ROBOT, in the process of trying to quickly reverse direction, tips up on a 
-single pair of wheels, lands atop an opponent ROBOT, and damages a 
-COMPONENT inside that opponent’s ROBOT PERIMETER. 
-C. A ROBOT high-speed rams and/or REPEATEDLY smashes an opponent 
-ROBOT and causes damage. The REFEREE infers that the ROBOT was 
-deliberately trying to damage the opponent’s ROBOT. 
-Examples of functionally impairing another ROBOT include, but are not limited to: 
-D. opening an opponent’s relief valve such that the opponent’s air pressure 
-drops and 
-E. powering off an opponent’s ROBOT (this example also clearly results in a RED 
-CARD because the ROBOT is no longer able to drive). 
+Section 10 Tournaments (T) 
+V6 
+122 of 164 
+3. minimize the number of times a team plays opposite any team 
+4. minimize the use of SURROGATES (teams randomly assigned by the FMS to play an extra Qualification 
+MATCH) 
+5. provide even distribution of MATCHES played on blue and red ALLIANCE 
+6. provide even distribution of MATCHES played in each DRIVER STATION number 
+For more information about the MATCH scheduling algorithm, please see Idle 
+Loop software’s website. 
+At events with fewer than 24 participating teams, the criteria are similar, however criterion 5 is changed to 
+minimize the number of times a team swaps between the blue and red ALLIANCE rather than an even 
+distribution. 
+All teams are assigned the same number of Qualification MATCHES, equal to the number of rounds, unless the 
+number of teams multiplied by number of MATCHES is not divisible by 6. In this case, the FMS randomly 
+selects some teams to play an extra MATCH. For the purpose of seeding calculations, those teams are 
+designated as SURROGATES for the extra MATCH. If a team plays a MATCH as a SURROGATE, it is indicated 
+on the MATCH schedule, it is always their third Qualification MATCH, and the outcome of the MATCH has no 
+effect on the team’s ranking. YELLOW and RED CARDS assigned to SURROGATES, however, do carry forward 
+to subsequent MATCHES. 
+10.5.3 Qualification Ranking 
+Ranking Points are units credited to a team based on their ALLIANCE’S performance in Qualification 
+MATCHES. Ranking Points are awarded to each eligible team at the completion of each Qualification MATCH 
+per Table 6-2. 
+Exceptions to Ranking Point assignment are as follows: 
+A. A SURROGATE receives 0 Ranking Points. 
+B. A DISQUALIFIED team, as determined by the Head REFEREE, receives 0 Ranking Points.  
+C. A “no-show” team is either DISQUALIFIED from or issued a RED CARD for that MATCH (see G208). 
+A team is declared a no-show if no member of the DRIVE TEAM is in the ALLIANCE AREA at the 
+start of the MATCH. 
+The total number of Ranking Points earned by a team throughout their Qualification MATCHES divided by the 
+number of MATCHES they’ve been scheduled to play (minus any SURROGATE MATCH), then rounded to 2 
+decimal places, is their Ranking Score (RS). 
+All teams participating in Qualification MATCHES are ranked by Ranking Score. If the number of teams in 
+attendance is ‘n’, they are ranked ‘1’ through ‘n’, with ‘1’ being the team with the highest Ranking Score and ‘n’ 
+being the team with the lowest Ranking Score. 
+Teams are ranked in order, using the sorting criteria defined in Table 10-1. 
+Table 10-1 Qualification MATCH ranking criteria 
+Order Sort Criteria 
+1st 
+Ranking Score 
+2nd 
+Average Coopertition Bonus points 
+3rd 
+Average ALLIANCE MATCH points, not including MINOR FOULS and MAJOR FOULS 
 
+
+
+--- Section: 15 Glossary (Page 159) ---
  
-Section 7 Game Rules (G) 
-V11 
-71 of 164 
-At the conclusion of the MATCH, the Head REFEREE may elect to visually inspect 
-a ROBOT to confirm violations of this rule made during a MATCH and remove the 
-violation if the damage cannot be verified. 
-For the purposes of this rule, “initiating contact” requires movement towards an 
-opponent ROBOT.  
-In a collision, it’s possible for both ROBOTS to initiate contact. 
-"Unable to drive" means that because of the incident, the DRIVER can no longer 
-drive to a desired location in a reasonable time (generally). For example, if a 
-ROBOT can only move in circles, or can only move extremely slowly, the ROBOT 
-is considered unable to drive. 
-G424 *Don’t tip or entangle. A ROBOT may not deliberately, attach to, tip, or entangle with an opponent 
-ROBOT.  
-Violation: MAJOR FOUL and YELLOW CARD, or if CONTINUOUS or opponent ROBOT is unable to drive, 
-then MAJOR FOUL and RED CARD.  
-Examples of violations of this rule include, but are not limited to: 
-A. using a wedge-like MECHANISM to tip over opponent ROBOTS, 
-B. making BUMPER-to-BUMPER contact with an opponent ROBOT that is 
-attempting to right itself after previously falling over and causing them to fall 
-over again, and  
-C. causing an opponent ROBOT to tip over by contacting the ROBOT after it 
-starts to tip if, in the judgement of the REFEREE, that contact could have been 
-avoided. 
-Tipping as an unintended consequence of normal ROBOT to ROBOT interaction, 
-including single BUMPER to BUMPER hits that result in a ROBOT tipping, is not a 
-violation of this rule. 
-"Unable to drive" means that because of the incident, the DRIVER can no longer 
-drive to a desired location in a reasonable time (generally). For example, if a 
-ROBOT can only move in circles, or can only move extremely slowly, the ROBOT 
-is considered unable to drive. 
-G425 *There’s a 3-count on PINS. A ROBOT may not PIN an opponent’s ROBOT for more than 3 seconds. A 
-ROBOT is PINNING if it is preventing the movement of an opponent ROBOT by contact, either direct or 
-transitive (such as against a FIELD element). A PIN count ends once any of the following criteria below 
-are met:  
-A. the ROBOTS have separated by at least 6 ft. (~183 cm) from each other for more than 3 
-seconds, 
-B. either ROBOT has moved 6 ft. from where the PIN initiated for more than 3 seconds, or 
-C. the PINNING ROBOT gets PINNED.  
-For criteria A, the PIN count pauses once ROBOTS are separated by 6 ft. until either the PIN ends or the 
-PINNING ROBOT moves back within 6 ft., at which point the PIN count is resumed.  
-For criteria B, the PIN count pauses once either ROBOT has moved 6ft from where the PIN initiated until 
-the PIN ends or until both ROBOTS move back within 6ft., at which point the PIN count is resumed. 
-Violation: MINOR FOUL, and for every 3 seconds in which the situation is not corrected, a MAJOR FOUL is 
-assessed. 
-
-
-
---- Section: 7.4.5 Human (Page 72) ---
+Section 15 Glossary 
+V2 
+159 of 164 
+15 Glossary 
+Term 
+Definition 
+ACTIVE DEVICE 
+any device capable of dynamically controlling and/or converting a 
+source of electrical energy by the application of external electrical 
+stimulus  
+ALGAE 
+a 16.25 in. (~413 mm) ± ¼ in. (~6 mm) diameter rubber playground 
+ball. 
+ALLIANCE 
+a cooperative of up to 4 FIRST Robotics Competition teams 
+ALLIANCE AREA 
+a 30 ft. wide by 13 ft. 8⅜ in. deep (~914 cm by 423 cm) infinitely tall 
+volume formed by, and including the ALLIANCE WALL, CORAL 
+STATION AREAs, the edge of the carpet, and white colored tape  
+ALLIANCE CAPTAIN 
+The designated STUDENT representative from each ALLIANCE Lead 
+ALLIANCE WALL 
+separates ROBOTS from DRIVE TEAM members in the ALLIANCE 
+AREA 
+ANCHOR 
+a collection of surfaces at the top of the CAGE and chain assembly 
+ARENA 
+includes all elements of the game infrastructure that are required to 
+play REEFSCAPESM presented by Haas: the FIELD, SCORING 
+ELEMENTS, queue area, team media area, designated TECHNICIAN 
+area, and all equipment needed for FIELD control, ROBOT control, and 
+scorekeeping 
+ARENA FAULT 
+an error in ARENA operation 
+AUTO 
+the first 15 seconds of the MATCH, and the FMS blocks any DRIVER 
+control, so ROBOTS operate with only their pre-programmed 
+instructions 
+BACKUP POOL 
+the group of teams willing and able to join an ALLIANCE during the 
+Playoff MATCHES, if needed 
+BACKUP TEAM 
+The team whose ROBOT and DRIVE TEAM replaces another ROBOT 
+and DRIVE TEAM on an ALLIANCE during the Playoff MATCHES 
+BARGE 
+a 29 ft. 2 in. (889 cm) wide, 3 ft. 8 in. (~112 cm) deep, and 8 ft. 5 in. 
+(~257 cm) tall structure that spans the center of the FIELD 
+BARGE ZONE 
+a 3 ft. 10 in. deep by 12 ft. 2½ in. long (~117 cm by 372 cm)., infinitely 
+tall, 4-sided volume surrounding the ALLIANCE’S half of the BARGE. It 
+is bounded by and includes the ALLIANCE-colored tape.  
+BRANCH 
+angled or compound extensions from the REEF vertical pipes. 
  
-Section 7 Game Rules (G) 
-V11 
-72 of 164 
-A team’s desired direction of travel is not a consideration when determining if a 
-ROBOT is PINNED. 
-G426 *Don’t collude with your partners to shut down major parts of game play. 2 or more ROBOTS that 
-appear to a REFEREE to be working together may not isolate or close off any major element of MATCH 
-play.  
-Violation: MAJOR FOUL, and for every 3 seconds in which the situation is not corrected, a MAJOR FOUL is 
-assessed. 
-Examples of violations of this rule include, but are not limited to:  
-A. shutting down access to all SCORING ELEMENTS,   
-B. quarantining all opponents to a small area of the FIELD,  
-C. blocking all access to the opponent’s PROCESSOR, and  
-D. blocking all access to the opponent’s CAGES. 
-A single ROBOT blocking access to a particular area of the FIELD is not a 
-violation of this rule. 
-2 ROBOTS independently playing defense on 2 opponent ROBOTS is not a 
-violation of this rule.  
-G427 ZONE protection. A ROBOT may not contact, directly or transitively through a SCORING ELEMENT, an 
-opponent ROBOT partially or fully inside the opponent’s BARGE ZONE or REEF ZONE regardless of who 
-initiates contact.  
-Violation: MAJOR FOUL. 
-ROBOTS that contact each other while in their respective BARGE ZONES may 
-result in a violation for both ALLIANCES 
-G428 CAGE protection. A ROBOT may not contact, directly or transitively through a SCORING ELEMENT, an 
-opponent ROBOT in contact with an opponent CAGE during the last 20 seconds regardless of who 
-initiates contact.  
-Violation: MAJOR FOUL and the opponent ALLIANCE is awarded the BARGE RP 
-7.4.5 Human 
-G429 *No wandering. A DRIVE TEAM member must remain in their designated area as follows:  
-A. DRIVERS and COACHES may not contact anything outside their ALLIANCE AREA, 
-B. a DRIVER must use the OPERATOR CONSOLE in the DRIVER STATION to which they are 
-assigned, as indicated on the team sign,  
-C. a HUMAN PLAYER may not contact anything outside their ALLIANCE AREA or their PROCESSOR 
-AREA, and  
-D. a TECHNICIAN may not contact anything outside their designated area.  
-Exceptions are granted as follows:  
-E. for a HUMAN PLAYER partially outside the ALLIANCE or PROCESSOR AREA,  
-F. in cases concerning safety, and  
-G. for actions that are inadvertent, MOMENTARY, and inconsequential. 
-Violation: MINOR FOUL 
 
  
-Section 7 Game Rules (G) 
-V11 
-73 of 164 
-An intent of item B is to prevent unsafe situations where long tethers to 
-OPERATOR CONSOLE devices increase tripping hazards as the operator moves 
-about the ALLIANCE AREA. In the interest of avoiding nuisance penalties 
-associated with a DRIVE TEAM member stepping outside of a prescribed area, 
-we prefer to offer a general guideline as to what it means to use the OPERATOR 
-CONSOLE in the ALLIANCE AREA. Provided the DRIVE TEAM member is within 
-close proximity of their DRIVER STATION, there will be no repercussions. 
-However, a DRIVE TEAM member located more than approximately half a 
-DRIVER STATION width away from their own DRIVER STATION while using their 
-OPERATOR CONSOLE is likely violating this rule. 
-G430 *COACHES and other teams: hands off the controls. A ROBOT shall be operated only by the DRIVERS 
-and/or HUMAN PLAYERS of that team. A COACH activating their E-Stop or A-Stop is the exception to 
-this rule. 
-Violation: MAJOR FOUL. RED CARD if greater-than-MOMENTARY. 
-Exceptions may be made before a MATCH for major conflicts, e.g. religious 
-holidays, major testing, transportations issues, etc. 
-G431 *DRIVE TEAMS, watch your reach. A DRIVE TEAM member may not extend into the CHUTE.   
-Violation: MINOR FOUL.  
-G432 *Humans: use SCORING ELEMENTS as directed. A DRIVE TEAM member may not deliberately use a 
-SCORING ELEMENT in an attempt to ease or amplify a challenge associated with a FIELD element.   
-Violation: MAJOR FOUL.  
-Examples include, but are not limited to: 
-A. a HUMAN PLAYER uses an ALGAE to disrupt an opponent ROBOT 
-G433 *SCORING ELEMENT delivery. SCORING ELEMENTS may only be entered onto the FIELD as follows:  
-A. CORAL may only be introduced to the FIELD by a HUMAN PLAYER or DRIVER through the CORAL 
-STATION and 
-B. ALGAE may only be entered onto the FIELD by a HUMAN PLAYER in their PROCESSOR AREA. 
-Violation: MAJOR FOUL.  
-G434 *COACHES, SCORING ELEMENTS are off limits. COACHES may not touch SCORING ELEMENTS, unless 
-for safety purposes. 
-Violation: MINOR FOUL. 
-G435 The PROCESSOR AREA has a storage limit. HUMAN PLAYERS may not store more than 4 ALGAE in the 
-PROCESSOR AREA. ALGAE can only be stored in the following locations: 
-A. 3 in the holders on top of the PROCESSOR, and  
-B. 1 at the end of the PROCESSOR exit ramp  
-HUMAN PLAYERS making a good-faith effort to immediately move or enter additional ALGAE is an 
-exception to this rule.  
-Violation: MAJOR FOUL per additional ALGAE.
+Section 15 Glossary 
+V2 
+160 of 164 
+Term 
+Definition 
+BUMPER 
+a required assembly which attaches to the ROBOT frame. BUMPERS 
+protect ROBOTS from damaging/being damaged by other ROBOTS 
+and FIELD elements. 
+BUMPER ZONE 
+a space between 2 ½ in. (~63 mm) and 5 ¾ in. (~146 mm) from the 
+floor. 
+BYPASSED 
+a state applied to any ROBOT which is unable or ineligible to 
+participate in that MATCH, as determined by the FTA, LRI, or Head 
+REFEREE 
+CAGE 
+2 ft. tall and 7⅜ in. wide (outside dimension) (~61 cm tall and ~19 cm 
+wide) rectangular structures suspended from the truss structure in 
+specific locations 
+CHUTE 
+55° sloped tunnel that leads to the opening in the CORAL STATION 
+COACH 
+a guide or advisor  
+COMPONENT 
+any part in its most basic configuration, which cannot be 
+disassembled without damaging or destroying the part or altering its 
+fundamental function 
+CONTINUOUS 
+describes durations that are more than approximately 10 seconds 
+CONTROL 
+an action by a ROBOT in which a the SCORING ELEMENT is fully 
+supported by or stuck in, on, or under the ROBOT or intentionally 
+pushes a SCORING ELEMENT to a desired location or in a preferred 
+direction (i.e. herding). 
+CORAL 
+a 11 ⅞ in. long (~30 cm) piece of 4 in. diameter Schedule 40 Cellular 
+(Foam) Core PVC pipe. CORAL has a 4-in. (~102 mm) inside diameter 
+and a 4½-in. (~11 cm) outside diameter. 
+CORAL STATION 
+assembly through which HUMAN PLAYERS feed CORAL into the 
+FIELD 
+CORAL STATION AREA 
+a 5 ft. 10⅞ in. wide by 13 ft. 8⅜ in. ft deep (~180 cm by 423 cm) 
+infinitely tall volume bounded by the CORAL STATION, edge of carpet, 
+and ALLIANCE and white colored tape 
+CORAL MARK 
+1 of 6 4 in. by 4 in. (~102 mm by 102 mm) “+” marks used to identify 
+placement of CORAL before the MATCH. Marks are made with black 
+tape. 
+COTS 
+a standard (i.e. not custom order) part commonly available from a 
+VENDOR for all teams for purchase 
+CUSTOM CIRCUIT 
+Any active electrical item that is not an actuator (specified in R501) or 
+core control system item (specified in R710)  
+
+ 
+Section 15 Glossary 
+V2 
+161 of 164 
+Term 
+Definition 
+DISABLED 
+the state in which a ROBOT is commanded to deactivate all outputs, 
+rendering the ROBOT inoperable for the remainder of the MATCH 
+DISQUALIFIED 
+the state of a team in which they receive 0 MATCH points and 0 
+Ranking Points in a Qualification MATCH or causes their ALLIANCE to 
+receive 0 MATCH points in a Playoff MATCH 
+DRIVE TEAM 
+a set of up to 5 people from the same FIRST Robotics Competition 
+team responsible for team performance for a specific MATCH 
+DRIVER 
+an operator and controller of the ROBOT 
+DRIVER STATION 
+1 of 3 assemblies within an ALLIANCE WALL behind which a DRIVE 
+TEAM operates their ROBOT 
+FABRICATED ITEM 
+any COMPONENT or MECHANISM that has been altered, built, cast, 
+constructed, concocted, created, cut, heat treated, machined, 
+manufactured, modified, painted, produced, surface coated, or 
+conjured partially or completely into the final form in which it will be 
+used on the ROBOT 
+FIELD 
+an approximately 26 ft. 5 in. (~805 cm) by 57 ft. 6⅞ in. (~1 755 cm) 
+carpeted area bounded by inward facing surfaces of the ALLIANCE 
+WALLS, CORAL STATIONS, PROCESSORS and PROCESSOR openings, 
+and guardrails 
+FIELD STAFF 
+the collective group of people working on or near the FIELD 
+responsible for making sure the MATCHES are cycled through 
+efficiently, fairly, safely, and with a spirit of cooperation, Gracious 
+Professionalism, and generosity of spirit 
+FMS 
+the FIELD Management System 
+FTA 
+FIRST Technical Advisor  
+HUMAN PLAYER 
+a SCORING ELEMENT manager 
+HUMAN STARTING LINE 
+a white line spanning the ALLIANCE AREA between the CORAL 
+STATION AREAs that is parallel to and located 2 ft. (~61 cm) from the 
+bottom square tube of the ALLIANCE WALL to the near edge of the 
+tape. 
+INSPECTOR 
+a person determined by FIRST to accurately and efficiently assess the 
+legality of a given part of a ROBOT 
+KOP 
+the Kit of Parts (KOP) 
+LINEUP 
+the 3 teams participating in the MATCH and their selected DRIVER 
+STATIONS 
+
+ 
+Section 15 Glossary 
+V2 
+162 of 164 
+Term 
+Definition 
+LEAVE 
+a scoring accomplishment in which a ROBOT must move such that its 
+BUMPERS no longer overlap its ROBOT STARTING LINE at the end of 
+AUTO.  
+LRI 
+the Lead ROBOT INSPECTOR  
+MAJOR FOUL 
+a credit of 6 points towards the opponent’s MATCH point total 
+MAJOR MECHANISM 
+a group of COMPONENTS and/or MECHANISMS assembled together 
+to address at least 1 game challenge: ROBOT movement, SCORING 
+ELEMENT manipulation, FIELD element manipulation, or performance 
+of a scorable task without the assistance of another ROBOT. 
+MATCH 
+the 2-minute and 30-second in which a ROBOT is enabled to play 
+REEFSCAPE 
+MECHANISM 
+an assembly of COMPONENTS that provide specific functionality on 
+the ROBOT. A MECHANISM can be disassembled (and then 
+reassembled) into individual COMPONENTS without damage to the 
+parts. 
+MINOR FOUL 
+a credit of 2 points towards the opponent’s MATCH point total 
+MOMENTARY 
+describes durations that are fewer than approximately 3 seconds 
+MXP 
+myRIO Expansion port, the expansion port on the roboRIO 
+NET 
+a goal in which an ALLIANCE scores ALGAE 
+OPERATOR CONSOLE 
+the set of COMPONENTS and MECHANISMS used by the DRIVERS 
+and/or HUMAN PLAYERS to relay commands to the ROBOT 
+PARK 
+a state in which a ROBOT’S BUMPERS must be partially or completely 
+contained in their BARGE ZONE at the end of the MATCH  
+PASSIVE CONDUCTOR 
+any device or circuit whose capability is limited to the conduction 
+and/or static regulation of the electrical energy applied to it (e.g. wire, 
+splices, connectors, printed wiring board, etc.) 
+PROCESSOR 
+A goal with a rectangular opening through which ROBOTS score 
+ALGAE which is 2 ft. 4 in. wide (~71 cm), 1 ft. 8 in. tall (~51 cm), and 
+7 in. (~18 cm) from the carpet  
+PROCESSOR AREA 
+a 3 ft. 7⅜ in. wide by 7 ft. 6 in. deep (~110 cm by 229 cm) infinitely 
+tall volume formed by, and including, the ALLIANCE colored tape, 
+guardrail, and the PROCESSOR wall. 
+PCM 
+Pneumatics Control Module 
+PDH 
+Power Distribution Hub 
+PDP 
+Power Distribution Panel 
+
+ 
+Section 15 Glossary 
+V2 
+163 of 164 
+Term 
+Definition 
+PH 
+Pneumatic Hub 
+PIN 
+an action by a ROBOT that is preventing the movement of an 
+opponent ROBOT by contact, either direct or transitive (such as 
+against a FIELD element) 
+RED CARD 
+issued by the Head REFEREE for egregious ROBOT or team member 
+behavior or rule violations which results in a team being 
+DISQUALIFIED for the MATCH. 
+REEF 
+1 of 2 5 ft. 5 ½ in. (~166 cm) hexagonal structures with BRANCHES 
+that extend from each side where CORAL are scored 
+REEF ZONE 
+an infinitely tall 6-sided, 7 ft. 9½ in. wide (face to face) (~237 cm), 
+volume surrounding the ALLIANCE’S REEF. It is bounded by and 
+includes the ALLIANCE-colored tape. 
+REFEREE 
+an official who is certified by FIRST to enforce the rules of 
+REEFSCAPE 
+REPEATED 
+describes actions that happen more than once within a MATCH 
+ROBOT 
+an electromechanical assembly built by the FIRST Robotics 
+Competition team to play the current season’s game and includes all 
+the basic systems required to be an active participant in the game –
+power, communications, control, BUMPERS, and movement about the 
+FIELD 
+ROBOT PERIMETER 
+the part of a ROBOT contained within the BUMPER ZONE and 
+established while in the ROBOT’S STARTING CONFIGURATION, that is 
+comprised of fixed, non-articulated structural elements of the ROBOT 
+ROBOT STARTING LINE 
+a black line that spans the width of the FIELD between each REEF and 
+the BARGE. It is positioned such that it is 7 ft. 4 in. (~224 cm) from 
+the REEF.   
+RP 
+Ranking Points 
+RPM 
+Radio Power Module 
+RS 
+Ranking Score  
+RSL 
+ROBOT Signal Light 
+SCORING ELEMENT 
+a CORAL or an ALGAE 
+SIGNAL LEVEL 
+a term used to characterize circuits which draw ≤1A continuous and 
+have a source incapable of delivering >1A, including but not limited to 
+roboRIO non-PWM outputs, CAN signals, PCM/PH Solenoid outputs, 
+VRM 500mA outputs, RPM outputs, and Arduino outputs 
+
+ 
+Section 15 Glossary 
+V2 
+164 of 164 
+Term 
+Definition 
+STARTING CONFIGURATION 
+the physical configuration in which a ROBOT starts a MATCH 
+STUDENT 
+a person who has not completed high-school, secondary school, or 
+the comparable level as of September 1 prior to Kickoff 
+SURROGATE 
+a team randomly assigned by the FMS to play an extra Qualification 
+MATCH 
+TECHNICIAN 
+a resource for ROBOT troubleshooting, setup, and removal from the 
+FIELD 
+TELEOP 
+the Teleoperated Period 
+VENDOR 
+a legitimate business source for COTS items that satisfies criteria 
+defined in Section 8 ROBOT Construction Rules 
+VERBAL WARNING 
+a warning issued by event staff or the Head REFEREE. 
+VRM 
+Voltage Regulator Module 
+YELLOW CARD 
+issued by the Head REFEREE for egregious ROBOT or team member 
+behavior or rule violations

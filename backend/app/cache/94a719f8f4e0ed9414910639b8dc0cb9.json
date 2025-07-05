@@ -1,5 +1,5 @@
 {
-  "timestamp": 1750807081.0906394,
+  "timestamp": 1751733066.172562,
   "data": [
     {
       "city": "\u0130stanbul",
@@ -3617,19 +3617,6 @@
       "year": 2025
     },
     {
-      "city": "Cranberry Township",
-      "country": "USA",
-      "district": null,
-      "end_date": "2025-06-21",
-      "event_code": "ncrc",
-      "event_type": 99,
-      "key": "2025ncrc",
-      "name": "NC/RC 2025",
-      "start_date": "2025-06-20",
-      "state_prov": "PA",
-      "year": 2025
-    },
-    {
       "city": "Rockford",
       "country": "USA",
       "district": null,
@@ -3640,6 +3627,32 @@
       "name": "That ONE Off-Season",
       "start_date": "2025-06-20",
       "state_prov": "MI",
+      "year": 2025
+    },
+    {
+      "city": "Cranberry Township",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-06-21",
+      "event_code": "ncrc",
+      "event_type": 99,
+      "key": "2025ncrc",
+      "name": "North Catholic Robotics Competition",
+      "start_date": "2025-06-21",
+      "state_prov": "PA",
+      "year": 2025
+    },
+    {
+      "city": "Houston",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-06-28",
+      "event_code": "txhou1",
+      "event_type": 99,
+      "key": "2025txhou1",
+      "name": "Texas Robotics Invitational",
+      "start_date": "2025-06-26",
+      "state_prov": "TX",
       "year": 2025
     },
     {
@@ -3669,6 +3682,19 @@
       "year": 2025
     },
     {
+      "city": "Macquarie Park",
+      "country": "Australia",
+      "district": null,
+      "end_date": "2025-06-29",
+      "event_code": "audd",
+      "event_type": 99,
+      "key": "2025audd",
+      "name": "Duel Down Under",
+      "start_date": "2025-06-28",
+      "state_prov": "NSW",
+      "year": 2025
+    },
+    {
       "city": "Manitowoc",
       "country": "USA",
       "district": null,
@@ -3689,7 +3715,7 @@
       "event_code": "iri",
       "event_type": 99,
       "key": "2025iri",
-      "name": "Indiana Robotics Invitational",
+      "name": "Indiana Robotics Invitational ",
       "start_date": "2025-07-10",
       "state_prov": "IN",
       "year": 2025
@@ -3734,6 +3760,32 @@
       "year": 2025
     },
     {
+      "city": "Mandeville",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-07-19",
+      "event_code": "laman",
+      "event_type": 99,
+      "key": "2025laman",
+      "name": "Northshore Knockout",
+      "start_date": "2025-07-18",
+      "state_prov": "LA",
+      "year": 2025
+    },
+    {
+      "city": "Louisville",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-07-19",
+      "event_code": "kylou",
+      "event_type": 99,
+      "key": "2025kylou",
+      "name": "RiverBOaT Rumble",
+      "start_date": "2025-07-18",
+      "state_prov": "KY",
+      "year": 2025
+    },
+    {
       "city": "Mason",
       "country": "USA",
       "district": null,
@@ -3744,6 +3796,19 @@
       "name": "Rainbow Rumble",
       "start_date": "2025-07-25",
       "state_prov": "MI",
+      "year": 2025
+    },
+    {
+      "city": "Rockford",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-07-26",
+      "event_code": "ilrr",
+      "event_type": 99,
+      "key": "2025ilrr",
+      "name": "Rock River Off-Season Competition",
+      "start_date": "2025-07-25",
+      "state_prov": "IL",
       "year": 2025
     },
     {
@@ -3783,6 +3848,32 @@
       "name": "Wolverine Robotics Competition",
       "start_date": "2025-08-01",
       "state_prov": "MI",
+      "year": 2025
+    },
+    {
+      "city": "Flint",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-08-09",
+      "event_code": "mifli",
+      "event_type": 99,
+      "key": "2025mifli",
+      "name": "Kettering All-Star Alliance Invitational",
+      "start_date": "2025-08-07",
+      "state_prov": "MI",
+      "year": 2025
+    },
+    {
+      "city": "Dripping Springs",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-08-10",
+      "event_code": "txdri",
+      "event_type": 99,
+      "key": "2025txdri",
+      "name": "Dripping Springs Robotics Invitational Palooza",
+      "start_date": "2025-08-09",
+      "state_prov": "TX",
       "year": 2025
     },
     {
@@ -3851,6 +3942,32 @@
       "year": 2025
     },
     {
+      "city": "Flint",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-09-19",
+      "event_code": "mifli1",
+      "event_type": 99,
+      "key": "2025mifli1",
+      "name": "Kettering Kickoff (Day 1)",
+      "start_date": "2025-09-19",
+      "state_prov": "MI",
+      "year": 2025
+    },
+    {
+      "city": "Flint",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-09-20",
+      "event_code": "mifli2",
+      "event_type": 99,
+      "key": "2025mifli2",
+      "name": "Kettering Kickoff (Day 2)",
+      "start_date": "2025-09-20",
+      "state_prov": "MI",
+      "year": 2025
+    },
+    {
       "city": "Toronto",
       "country": "Canada",
       "district": null,
@@ -3861,6 +3978,19 @@
       "name": "Robots@Mary Ward Day 1",
       "start_date": "2025-09-20",
       "state_prov": "ON",
+      "year": 2025
+    },
+    {
+      "city": "Flint",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-09-21",
+      "event_code": "mifli3",
+      "event_type": 99,
+      "key": "2025mifli3",
+      "name": "Kettering Kickoff (Day 3)",
+      "start_date": "2025-09-21",
+      "state_prov": "MI",
       "year": 2025
     },
     {
@@ -4020,6 +4150,19 @@
       "year": 2025
     },
     {
+      "city": "Elk Grove",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-26",
+      "event_code": "cacc",
+      "event_type": 99,
+      "key": "2025cacc",
+      "name": "Capital City Classic",
+      "start_date": "2025-10-24",
+      "state_prov": "CA",
+      "year": 2025
+    },
+    {
       "city": "Brainerd",
       "country": "USA",
       "district": null,
@@ -4095,6 +4238,19 @@
       "name": "THOR East",
       "start_date": "2025-11-01",
       "state_prov": "NC",
+      "year": 2025
+    },
+    {
+      "city": "Savage",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-11-22",
+      "event_code": "mmr",
+      "event_type": 99,
+      "key": "2025mmr",
+      "name": "Minne Mini Regional",
+      "start_date": "2025-11-22",
+      "state_prov": "MN",
       "year": 2025
     }
   ]

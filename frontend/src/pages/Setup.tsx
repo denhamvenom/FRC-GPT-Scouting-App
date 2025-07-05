@@ -1,9 +1,10 @@
 // frontend/src/pages/Setup.tsx
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import EventArchiveManager from "../components/EventArchiveManager";
 import SheetConfigManager from "../components/SheetConfigManager";
+import FieldSelection from "./FieldSelection";
 import { apiUrl, fetchWithNgrokHeaders } from "../config";
 
 interface Event {
@@ -58,6 +59,7 @@ interface GameManualDetailResponse extends GameManualResponse {
 
 function Setup() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   // Step management
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -119,6 +121,17 @@ function Setup() {
   // Setup result state (for backward compatibility during transition)
   const [setupResult, setSetupResult] = useState<any>(null);
   const [isSettingUpEvent, setIsSettingUpEvent] = useState<boolean>(false);
+
+  // Handle URL step parameter
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam, 10);
+      if (stepNumber >= 1 && stepNumber <= 6) {
+        setCurrentStep(stepNumber);
+      }
+    }
+  }, [searchParams]);
 
   // Load current event info and events when the component mounts
   useEffect(() => {
@@ -215,9 +228,15 @@ function Setup() {
         // Can proceed from event selection if event is selected
         return selectedEvent || currentEvent.event_key;
       case 3:
-        // Can proceed from sheet config if it's completed
-        return completedSteps.has(3);
+        // Can proceed from label creation (always allowed, it's optional)
+        return true;
       case 4:
+        // Can proceed from connect spreadsheet if it's completed
+        return completedSteps.has(4);
+      case 5:
+        // Can proceed from field selection if it's completed
+        return completedSteps.has(5);
+      case 6:
         // Can't proceed from summary - it's the last step
         return false;
       default:
@@ -729,8 +748,10 @@ function Setup() {
     const steps = [
       { number: 1, title: "Manual Training", description: "Upload game manual" },
       { number: 2, title: "Event Selection", description: "Choose competition" },
-      { number: 3, title: "Database Alignment", description: "Configure sheets" },
-      { number: 4, title: "Setup Complete", description: "Review & finish" }
+      { number: 3, title: "Label Creation", description: "Review scouting metrics" },
+      { number: 4, title: "Connect Spreadsheet", description: "Configure sheets" },
+      { number: 5, title: "Field Selection", description: "Choose data columns" },
+      { number: 6, title: "Setup Complete", description: "Review & finish" }
     ];
 
     return (
@@ -777,8 +798,12 @@ function Setup() {
       case 2:
         return renderEventSelectionStep();
       case 3:
-        return renderDatabaseAlignmentStep();
+        return renderLabelCreationStep();
       case 4:
+        return renderConnectSpreadsheetStep();
+      case 5:
+        return renderFieldSelectionStep();
+      case 6:
         return renderSetupCompleteStep();
       default:
         return null;
@@ -968,6 +993,20 @@ function Setup() {
               <p className="text-sm">Saved to: {processedSectionsResult.saved_text_path}</p>
               <p className="text-sm">Extracted Length: {processedSectionsResult.extracted_text_length} chars</p>
               <p className="text-xs mt-1">Sample: <pre className="whitespace-pre-wrap bg-gray-100 p-1 rounded text-xs">{processedSectionsResult.sample_text}</pre></p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => navigate('/setup/labels')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                  Review Game Labels
+                </button>
+                <button
+                  onClick={() => setCurrentStep(3)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
+                >
+                  Continue to Label Creation
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -1318,8 +1357,50 @@ function Setup() {
     </div>
   );
 
-  // Step 3: Database Alignment
-  const renderDatabaseAlignmentStep = () => (
+  // Step 3: Label Creation
+  const renderLabelCreationStep = () => (
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-xl font-bold mb-4">Review Scouting Labels</h2>
+        <div className="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-blue-400">
+          <h3 className="text-lg font-semibold text-blue-800 mb-2">What Are Scouting Labels?</h3>
+          <p className="text-blue-700 mb-2">
+            Scouting labels are specific metrics that teams track about robot performance during matches.
+            These help categorize your scouting data fields for better analysis.
+          </p>
+          <p className="text-blue-600 text-sm">
+            <strong>Examples:</strong> auto_coral_L1_scored, teleop_defense_rating, endgame_climb_successful
+          </p>
+        </div>
+        
+        <div className="text-center py-8">
+          <p className="text-gray-600 mb-4">
+            Game labels have been extracted from your manual and are ready for review.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => navigate('/setup/labels')}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+            >
+              Review & Edit Labels
+            </button>
+            <button
+              onClick={() => {
+                setCompletedSteps(prev => new Set([...prev, 3]));
+                setCurrentStep(4);
+              }}
+              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold"
+            >
+              Skip Label Review
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Step 4: Connect Spreadsheet
+  const renderConnectSpreadsheetStep = () => (
     <div className="space-y-6">
       {/* Sheet Configuration Manager */}
       <div className="bg-white p-6 rounded-lg shadow">
@@ -1329,12 +1410,12 @@ function Setup() {
           onConfigurationChange={() => {
             console.log("Configuration changed");
             // Mark step as completed when configuration is saved
-            setCompletedSteps(prev => new Set([...prev, 3]));
+            setCompletedSteps(prev => new Set([...prev, 4]));
           }}
           onConfigurationConfirmed={() => {
             console.log("Configuration confirmed for use");
             // Mark step as completed when user confirms to use active configuration
-            setCompletedSteps(prev => new Set([...prev, 3]));
+            setCompletedSteps(prev => new Set([...prev, 4]));
           }}
         />
       </div>
@@ -1342,7 +1423,29 @@ function Setup() {
     </div>
   );
 
-  // Step 4: Setup Complete Summary
+  // Step 5: Field Selection
+  const renderFieldSelectionStep = () => (
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-xl font-bold mb-4">Field Selection</h2>
+        <p className="text-gray-600 mb-6">
+          Now that your spreadsheet is connected, choose which fields to include in your analysis and categorize them properly.
+        </p>
+        
+        {/* Embedded Field Selection Component */}
+        <div className="border rounded-lg p-4">
+          <FieldSelection 
+            embedded={true}
+            onComplete={() => {
+              setCompletedSteps(prev => new Set([...prev, 5]));
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  // Step 6: Setup Complete Summary
   const renderSetupCompleteStep = () => (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow">
@@ -1480,13 +1583,13 @@ function Setup() {
           Previous
         </button>
         
-        {currentStep < 4 && (
+        {currentStep < 6 && (
           <button
             onClick={handleNextStep}
             disabled={!canProceedToNextStep()}
             className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
           >
-            {currentStep === 3 ? "Review Setup" : "Next"}
+            {currentStep === 5 ? "Review Setup" : "Next"}
           </button>
         )}
       </div>

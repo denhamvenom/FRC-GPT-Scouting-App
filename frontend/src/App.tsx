@@ -13,6 +13,7 @@ import UnifiedDatasetBuilder from "./pages/UnifiedDatasetBuilder";
 import DebugLogs from "./pages/DebugLogs";
 import AllianceSelection from "./pages/AllianceSelection";
 import Navbar from "./components/Navbar";
+import GameLabelManager from "./components/GameLabelManager";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/setup" element={<Setup />} />
+            <Route path="/setup/labels" element={<GameLabelManager />} />
             <Route path="/field-selection" element={<FieldSelection />} />
             <Route path="/validation" element={<Validation />} />
             <Route path="/picklist" element={<PicklistNew />} />

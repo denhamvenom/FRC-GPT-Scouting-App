@@ -124,64 +124,80 @@ CRITICAL: UI should be optional - users can skip if they want. Test with the 34 
 ```
 
 ### Deliverables:
-- [ ] `frontend/src/components/GameLabelManager.tsx`
-- [ ] `frontend/src/hooks/useGameLabels.ts` (API integration)
-- [ ] Add routing for /setup/labels path
-- [ ] Add "Review Game Labels" button to Setup.tsx success message
-- [ ] Test with labels from Sprint 1
+- [x] `frontend/src/components/GameLabelManager.tsx`
+- [x] `frontend/src/hooks/useGameLabels.ts` (API integration)
+- [x] Add routing for /setup/labels path
+- [x] Add "Review Game Labels" button to Setup.tsx success message
+- [x] Test with labels from Sprint 1
+
+### **BONUS: Setup Flow Reorganization Completed**
+- [x] Reorganized Setup into 6 logical steps: Manual Training → Event Selection → Label Creation → Connect Spreadsheet → Field Selection → Setup Complete
+- [x] Integrated Field Selection directly into Setup flow as Step 5
+- [x] Renamed "Database Alignment" to "Connect Spreadsheet" for clarity
+- [x] Removed Field Selection from main navigation
+- [x] Enhanced FieldSelection component with embedded mode support
+- [x] Fixed all navigation flows to follow new 6-step structure
 
 ---
 
-## Sprint 3: Field Selection Integration
+## Sprint 3: Label-Aware Field Selection Enhancement
 **Duration**: 1 Claude-Code session  
-**Goal**: Enhance Field Selection with label awareness
+**Goal**: Enhance Field Selection with intelligent label matching for better auto-categorization
 
 ### User Prompt:
 ```
 First, please read these files for context:
 1. GAME_LABEL_EXTRACTION_SPRINT_PLAN.md - for the overall feature plan
-2. frontend/src/pages/FieldSelection.tsx - the file we'll be modifying
+2. frontend/src/pages/FieldSelection.tsx - Field Selection component (now integrated into Setup Step 5)
 3. frontend/src/hooks/useGameLabels.ts - API hook from Sprint 2
-4. backend/app/data/schema_2025.json - to understand schema structure
-5. frontend/src/components/GameLabelManager.tsx - to see the label structure from Sprint 2
+4. backend/app/data/game_labels_2025.json - 34 extracted scouting metrics from Sprint 1
+5. backend/app/data/schema_2025.json - to understand current schema structure
 6. backend/app/services/scouting_parser.py - to see how schema is used in parsing
 7. backend/app/services/schema_loader.py - to understand schema loading
 
-I need to implement Sprint 3 - integrating scouting labels into Field Selection. Please:
-1. Modify FieldSelection.tsx to load scouting labels for the current year
-2. Enhance autoCategorizeField() to check against scouting labels first (e.g., match "Auto_Coral_L1" column to "auto_coral_L1_scored" label)
-3. Show matched label info when a field matches a scouting label (display label description, data type, expected range)
-4. Update the field mapping to include label references in schema files
-5. Ensure the visual layout remains the same, just add label context
-6. Store label-field mappings in the schema files for use by data parsers
-7. CRITICAL: Schema files must include label mappings so scouting_parser.py can use enhanced field names like "auto_coral_L1_scored" instead of generic "auto_points"
+I need to implement Sprint 3 - enhancing Field Selection with label-aware auto-categorization. Please:
 
-This should dramatically improve auto-categorization accuracy by matching spreadsheet columns to specific scouting metrics.
+**UPDATED SCOPE** (Field Selection now integrated into Setup):
+1. Enhance FieldSelection.tsx (now embedded in Setup Step 5) to load scouting labels
+2. Improve autoCategorizeField() to match spreadsheet columns against the 34 scouting metrics:
+   - Match "Auto_Coral_L1" → "auto_coral_L1_scored" 
+   - Match "Defense_Rating" → "defense_effectiveness_rating"
+   - Match column patterns to specific label names using fuzzy matching
+3. Show label match indicators in the field selection table:
+   - Display matched label name, description, and expected range
+   - Visual badge/indicator when a field matches a scouting label
+4. Store label-field mappings in schema files for data processing
+5. Update backend parsers to use enhanced field names from label mappings
+6. CRITICAL: This should dramatically improve auto-categorization accuracy
+
+**Note**: Field Selection is now Step 5 of Setup flow, so modifications should work within the embedded context.
 ```
 
 ### Deliverables:
-- [ ] Enhanced `frontend/src/pages/FieldSelection.tsx`
-- [ ] Updated auto-categorization logic with label awareness
+- [ ] Enhanced `frontend/src/pages/FieldSelection.tsx` with label-aware auto-categorization
+- [ ] Fuzzy matching algorithm for column names to scouting labels
+- [ ] Visual indicators for successful label matches
 - [ ] Label-field mapping storage in schema files
-- [ ] Visual indicator for label matches
-- [ ] Schema files include label mappings for data processing
+- [ ] Backend parser integration with enhanced field names
+- [ ] Improved auto-categorization accuracy test
 
 ---
 
-## Sprint 4: GPT Context Enhancement & Testing
+## Sprint 4: GPT Context Enhancement & End-to-End Testing
 **Duration**: 1 Claude-Code session  
-**Goal**: Include labels in GPT prompts and test full workflow
+**Goal**: Include labels in GPT prompts and validate complete workflow
 
 ### User Prompt:
 ```
 First, please read these files for context:
-1. GAME_LABEL_EXTRACTION_SPRINT_PLAN.md - for the overall feature plan
+1. GAME_LABEL_EXTRACTION_SPRINT_PLAN.md - for the overall feature plan and Sprint 2 completion
 2. backend/app/services/picklist_gpt_service.py - to modify GPT prompts
 3. backend/app/services/data_aggregation_service.py - to add label loading
-4. backend/app/data/game_labels_2025.json - to see the label format (from Sprint 1)
-5. backend/app/data/schema_2025.json - to see label-field mappings (from Sprint 3)
+4. backend/app/data/game_labels_2025.json - 34 extracted scouting metrics from Sprint 1
+5. backend/app/data/schema_2025.json - label-field mappings from Sprint 3
 6. backend/app/services/scouting_parser.py - to verify schema integration
-7. CLAUDE.md - for testing standards
+7. frontend/src/pages/Setup.tsx - to see the new 6-step setup flow
+8. CLAUDE.md - for testing standards
 
 I need to implement Sprint 4 - the final integration. Please:
 1. Update picklist_gpt_service.py to include scouting labels in prompts (e.g., "auto_coral_L1_scored: 2.3 avg" instead of "auto_points: 8.5")
@@ -319,10 +335,29 @@ If you need to check work from a previous sprint, the key files created will be:
 - **Validation**: GPT comparison test only
 
 ## Success Criteria
-- [ ] Labels can be extracted from game manual
-- [ ] Users can review and edit labels
+- [x] Labels can be extracted from game manual
+- [x] Users can review and edit labels
+- [x] **BONUS**: Complete Setup flow reorganization with integrated Field Selection
 - [ ] Field Selection uses labels for better categorization
 - [ ] GPT receives label context for improved analysis
-- [ ] No visual breaking changes
-- [ ] Works with ngrok deployment
-- [ ] Maintains existing error handling patterns
+- [x] No visual breaking changes (improved with better flow)
+- [x] Works with ngrok deployment
+- [x] Maintains existing error handling patterns
+
+## Sprint 2 Completion Summary ✅
+
+**Completed Features:**
+- ✅ Full GameLabelManager component with 34 scouting metrics
+- ✅ Complete API integration with useGameLabels hook
+- ✅ Setup flow integration with optional label review
+- ✅ **MAJOR BONUS**: Complete Setup reorganization into logical 6-step flow
+- ✅ Field Selection integration as Setup Step 5
+- ✅ Enhanced navigation and user experience
+
+**Key Achievements Beyond Original Scope:**
+- 🚀 **6-Step Setup Flow**: Manual Training → Event Selection → Label Creation → Connect Spreadsheet → Field Selection → Setup Complete
+- 🚀 **Integrated Field Selection**: No longer separate page, now part of cohesive setup experience  
+- 🚀 **Enhanced Navigation**: Cleaner flow with proper step progression
+- 🚀 **Better UX**: Labels → Connect Data → Select Fields follows logical order
+
+**Ready for Sprint 3**: Label-aware field selection enhancement with intelligent matching

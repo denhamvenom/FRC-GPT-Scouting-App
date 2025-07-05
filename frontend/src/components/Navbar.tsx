@@ -137,17 +137,6 @@ function Navbar() {
               </Link>
               
               <Link
-                to="/field-selection"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                 isActive("/field-selection") 
-                ? "bg-blue-900 text-white" 
-                : "text-gray-200 hover:bg-blue-700"
-              }`}
-              >
-                Field Selection
-              </Link>
-              
-              <Link
                 to="/validation"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
                   isActive("/validation") 
