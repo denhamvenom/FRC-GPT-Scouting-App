@@ -228,15 +228,39 @@
     },
     "Driver Skill": {
       "category": "ignore",
-      "source": "unknown"
+      "source": "unknown",
+      "label_mapping": {
+        "label": "driver_skill_rating",
+        "category": "strategic",
+        "description": "Number of observed driver errors or notable driving maneuvers during the match.",
+        "data_type": "count",
+        "typical_range": "0-5",
+        "usage_context": "Scouted live during each match by counting visible driver mistakes or impressive actions, such as quick recoveries, precise alignment, or evasive maneuvers."
+      }
     },
     "Strategies": {
       "category": "ignore",
-      "source": "unknown"
+      "source": "unknown",
+      "label_mapping": {
+        "label": "strategy_field",
+        "category": "strategic",
+        "description": "Briefly describes the primary strategies a team employed on the field during the match.",
+        "data_type": "text",
+        "typical_range": "Short text phrases (e.g., 'defense', 'cycle focus', 'coopertition', 'endgame rush')",
+        "usage_context": "Scouted live during matches to capture notable strategic approaches or shifts observed for each team."
+      }
     },
     "Comments": {
       "category": "ignore",
-      "source": "unknown"
+      "source": "unknown",
+      "label_mapping": {
+        "label": "scout_comments",
+        "category": "strategic",
+        "description": "Free-form notes for recording observations or strategic insights about a team's performance during a match.",
+        "data_type": "text",
+        "typical_range": "Short to medium-length text (1\u20133 sentences)",
+        "usage_context": "Entered by scouts during or immediately after a match to capture details not covered by other metrics, such as unique strategies, robot issues, or alliance interactions."
+      }
     },
     "Was your robot disabled? If so, how? ": {
       "category": "ignore",

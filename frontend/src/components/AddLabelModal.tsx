@@ -65,7 +65,8 @@ export function AddLabelModal({ isOpen, onClose, onLabelAdded, onLabelUpdated, f
     'count',
     'rating',
     'boolean',
-    'time'
+    'time',
+    'text'
   ];
 
   const handleGenerateDescription = async () => {
@@ -350,7 +351,7 @@ export function AddLabelModal({ isOpen, onClose, onLabelAdded, onLabelUpdated, f
               type="text"
               value={formData.typical_range}
               onChange={(e) => setFormData(prev => ({ ...prev, typical_range: e.target.value }))}
-              placeholder="e.g., 0-10, 1-5, true/false"
+              placeholder="e.g., 0-10, 1-5, true/false, text"
               className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
             />
           </div>

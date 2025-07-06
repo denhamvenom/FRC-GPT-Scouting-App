@@ -173,6 +173,37 @@ const buildPatternsFromLabels = (labels: GameLabel[]): Map<string, RegExp> => {
   return patterns;
 };
 
+// Helper function to get available labels for a field (excluding already assigned labels)
+const getAvailableLabelsForField = (
+  allLabels: GameLabel[], 
+  labelMappings: { [fieldHeader: string]: GameLabel },
+  currentFieldHeader: string
+): GameLabel[] => {
+  // Get set of already assigned label names, excluding the current field
+  const assignedLabelNames = new Set(
+    Object.entries(labelMappings)
+      .filter(([fieldHeader, _]) => fieldHeader !== currentFieldHeader)
+      .map(([_, label]) => label.label)
+  );
+  
+  // Return labels that are not already assigned
+  return allLabels.filter(label => !assignedLabelNames.has(label.label));
+};
+
+// Helper function to check if a label is assigned to another field
+const isLabelAssignedElsewhere = (
+  label: GameLabel,
+  labelMappings: { [fieldHeader: string]: GameLabel },
+  currentFieldHeader: string
+): string | null => {
+  for (const [fieldHeader, assignedLabel] of Object.entries(labelMappings)) {
+    if (fieldHeader !== currentFieldHeader && assignedLabel.label === label.label) {
+      return fieldHeader;
+    }
+  }
+  return null;
+};
+
 // Cache for label patterns to avoid rebuilding on every call
 let labelPatternsCache: Map<string, RegExp> | null = null;
 let labelsCacheKey: string | null = null;
@@ -1018,7 +1049,7 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                       } else {
                         setBuildProgress('Dataset built successfully! Setup complete!');
                         setTimeout(() => {
-                          navigate('/setup-complete');
+                          navigate('/setup?step=6');
                         }, 1500);
                       }
                     } else if (progressData.status === 'failed') {
@@ -1051,7 +1082,7 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                 if (embedded && onComplete) {
                   onComplete();
                 } else {
-                  navigate('/setup-complete');
+                  navigate('/setup?step=6');
                 }
               }, 2000);
             }
@@ -1235,7 +1266,9 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                 ...superscoutingHeaders,
                 ...pitScoutingHeaders
               ].forEach(header => {
-                const categorization = autoCategorizeField(header, labels);
+                // Only consider labels that haven't been assigned yet
+                const availableLabels = getAvailableLabelsForField(labels, updatedLabelMappings, header);
+                const categorization = autoCategorizeField(header, availableLabels);
                 updatedFields[header] = categorization.category;
                 
                 if (categorization.matchedLabel) {
@@ -1247,7 +1280,8 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
               setLabelMappings(updatedLabelMappings);
               
               const labelMatchCount = Object.keys(updatedLabelMappings).length;
-              setSuccessMessage(`✨ Auto-matched ${labelMatchCount} labels with field headers from ${labels.length} available labels.`);
+              const duplicatePrevention = labelMatchCount < labels.length ? " (duplicate prevention applied)" : "";
+              setSuccessMessage(`✨ Auto-matched ${labelMatchCount} labels with field headers from ${labels.length} available labels${duplicatePrevention}.`);
             }}
             className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200"
             disabled={labelsLoading}
@@ -1463,11 +1497,17 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                             className="w-full p-1 border rounded text-xs"
                           >
                             <option value="">No label selected</option>
-                            {labels.map(label => (
+                            {getAvailableLabelsForField(labels, labelMappings, header).map(label => (
                               <option key={label.label} value={label.label}>
                                 {label.label} ({label.category})
                               </option>
                             ))}
+                            {/* Show currently assigned label even if it would normally be filtered out */}
+                            {matchedLabel && !getAvailableLabelsForField(labels, labelMappings, header).find(l => l.label === matchedLabel.label) && (
+                              <option key={matchedLabel.label} value={matchedLabel.label}>
+                                {matchedLabel.label} ({matchedLabel.category}) - Currently assigned
+                              </option>
+                            )}
                             <option value="___ADD_NEW___" className="text-blue-600 font-medium">
                               ➕ Add New Label for "{header}"
                             </option>
@@ -1589,11 +1629,17 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                                 className="w-full p-1 border rounded text-xs"
                               >
                                 <option value="">No label selected</option>
-                                {labels.map(label => (
+                                {getAvailableLabelsForField(labels, labelMappings, header).map(label => (
                                   <option key={label.label} value={label.label}>
                                     {label.label} ({label.category})
                                   </option>
                                 ))}
+                                {/* Show currently assigned label even if it would normally be filtered out */}
+                                {matchedLabel && !getAvailableLabelsForField(labels, labelMappings, header).find(l => l.label === matchedLabel.label) && (
+                                  <option key={matchedLabel.label} value={matchedLabel.label}>
+                                    {matchedLabel.label} ({matchedLabel.category}) - Currently assigned
+                                  </option>
+                                )}
                                 <option value="___ADD_NEW___" className="text-blue-600 font-medium">
                                   ➕ Add New Label for "{header}"
                                 </option>
@@ -1736,11 +1782,17 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
                                 className="w-full p-1 border rounded text-xs"
                               >
                                 <option value="">No label selected</option>
-                                {labels.map(label => (
+                                {getAvailableLabelsForField(labels, labelMappings, header).map(label => (
                                   <option key={label.label} value={label.label}>
                                     {label.label} ({label.category})
                                   </option>
                                 ))}
+                                {/* Show currently assigned label even if it would normally be filtered out */}
+                                {matchedLabel && !getAvailableLabelsForField(labels, labelMappings, header).find(l => l.label === matchedLabel.label) && (
+                                  <option key={matchedLabel.label} value={matchedLabel.label}>
+                                    {matchedLabel.label} ({matchedLabel.category}) - Currently assigned
+                                  </option>
+                                )}
                                 <option value="___ADD_NEW___" className="text-blue-600 font-medium">
                                   ➕ Add New Label for "{header}"
                                 </option>

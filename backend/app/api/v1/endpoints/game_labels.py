@@ -26,7 +26,7 @@ class GameLabel(BaseModel):
     label: str = Field(..., description="Scouting field name (e.g., auto_coral_L1_scored, teleop_defense_rating)")
     category: str = Field(..., description="Category: autonomous|teleop|endgame|defense|reliability|strategic")
     description: str = Field(..., description="What this metric measures about robot performance")
-    data_type: str = Field(..., description="Data type: count|rating|boolean|time")
+    data_type: str = Field(..., description="Data type: count|rating|boolean|time|text")
     typical_range: str = Field(..., description="Expected range like 0-10, 1-5, true/false")
     usage_context: str = Field(..., description="When this would be tracked during a match")
 

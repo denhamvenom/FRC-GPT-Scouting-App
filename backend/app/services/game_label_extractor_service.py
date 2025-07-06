@@ -163,15 +163,15 @@ Focus on extracting potential scouting data fields in these categories:
 5. **Reliability Metrics**: Robot performance and consistency measures
    - Example: "mechanical_failures", "brownouts_occurred", "overall_reliability_rating"
 
-6. **Strategic Metrics**: Game-specific strategic elements
-   - Example: "cooperation_with_alliance", "field_positioning_effectiveness"
+6. **Strategic Metrics**: Game-specific strategic elements and text observations
+   - Example: "cooperation_with_alliance", "field_positioning_effectiveness", "strategy_notes", "performance_comments"
 
 CRITICAL REQUIREMENTS:
 - Extract SCOUTING METRICS that teams would actually track, not just game elements
 - Use descriptive field names that indicate what is being measured
 - Include metrics for autonomous, teleop, endgame, defense, and reliability
 - Focus on quantifiable or rateable performance indicators
-- Consider both counting metrics (how many X) and rating metrics (effectiveness 1-5)
+- Consider counting metrics (how many X), rating metrics (effectiveness 1-5), and text observations (strategy notes, comments)
 
 OUTPUT FORMAT:
 Return a structured JSON object with this exact schema:
@@ -186,8 +186,8 @@ Return a structured JSON object with this exact schema:
       "label": "<scouting field name like auto_coral_L1_scored>",
       "category": "<autonomous|teleop|endgame|defense|reliability|strategic>",
       "description": "<what this metric measures about robot performance>",
-      "data_type": "<count|rating|boolean|time>",
-      "typical_range": "<expected range like 0-10, 1-5, true/false>",
+      "data_type": "<count|rating|boolean|time|text>",
+      "typical_range": "<expected range like 0-10, 1-5, true/false, or 'text' for text fields>",
       "usage_context": "<when this would be tracked during a match>"
     }
   ]
@@ -206,6 +206,7 @@ Please analyze this manual and extract specific SCOUTING METRICS that teams woul
 2. **Performance ratings**: Effectiveness measures for defense, reliability, cooperation, etc.
 3. **Success/failure tracking**: Whether specific actions were attempted and completed
 4. **Time-based metrics**: How long robots spend on certain activities
+5. **Text observations**: Strategic notes, comments, or descriptive observations about robot performance
 
 Think from a scouting perspective: if you were watching a robot during a match, what specific performance metrics would you want to record to help with alliance selection?
 

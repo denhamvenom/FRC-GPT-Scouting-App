@@ -64,6 +64,7 @@ function Setup() {
   // Step management
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [hasInitializedState, setHasInitializedState] = useState<boolean>(false);
   
   // Step 1: Manual Training states
   const [selectedManualFile, setSelectedManualFile] = useState<File | null>(null);
@@ -129,9 +130,83 @@ function Setup() {
       const stepNumber = parseInt(stepParam, 10);
       if (stepNumber >= 1 && stepNumber <= 6) {
         setCurrentStep(stepNumber);
+        
+        // If navigating to step 6 (Setup Complete), mark step 5 as completed
+        // This handles the case where FieldSelection redirects to Setup Complete
+        if (stepNumber === 6) {
+          setCompletedSteps(prev => new Set([...prev, 5]));
+        }
       }
     }
   }, [searchParams]);
+
+  // Function to check if a step has been completed based on backend data
+  const checkIfStepCompleted = async (step: number): Promise<boolean> => {
+    try {
+      switch (step) {
+        case 1: // Manual Training
+          // Step 1 is completed if we have a current manual or any managed manuals for the year
+          return currentManualInfo !== null || managedManuals.some(m => m.year === year);
+          
+        case 2: // Event Selection
+          // Step 2 is completed if we have a current event configured
+          return !!currentEvent.event_key;
+          
+        case 3: // Label Creation
+          // Step 3 can always be skipped, so consider it completed
+          return true;
+          
+        case 4: // Connect Spreadsheet
+          // Step 4 is completed if we have an active sheet configuration
+          try {
+            const response = await fetchWithNgrokHeaders(apiUrl("/api/sheet-config/active"));
+            const data = await response.json();
+            return data.status === "success" && data.configuration;
+          } catch {
+            return false;
+          }
+          
+        case 5: // Field Selection
+          // Step 5 is completed if we have field selections saved for the current year/event
+          try {
+            const storageKey = currentEvent.event_key || year.toString();
+            const response = await fetchWithNgrokHeaders(apiUrl(`/api/schema/load-selections/${storageKey}`));
+            const data = await response.json();
+            return data.status === "success" && Object.keys(data.field_selections || {}).length > 0;
+          } catch {
+            return false;
+          }
+          
+        default:
+          return false;
+      }
+    } catch (error) {
+      console.error(`Error checking completion for step ${step}:`, error);
+      return false;
+    }
+  };
+
+  // Function to initialize setup state based on existing backend data
+  const initializeSetupState = async () => {
+    try {
+      console.log('Checking setup completion status...');
+      const completedStepNumbers: number[] = [];
+      
+      // Check each step's completion status
+      for (let step = 1; step <= 5; step++) {
+        const isCompleted = await checkIfStepCompleted(step);
+        if (isCompleted) {
+          completedStepNumbers.push(step);
+          console.log(`Step ${step} is completed`);
+        }
+      }
+      
+      setCompletedSteps(new Set(completedStepNumbers));
+      console.log('✅ Initialized setup state. Completed steps:', completedStepNumbers);
+    } catch (error) {
+      console.error('Error initializing setup state:', error);
+    }
+  };
 
   // Load current event info and events when the component mounts
   useEffect(() => {
@@ -171,6 +246,14 @@ function Setup() {
       fetchEvents(currentEvent.year);
     }
   }, [currentEvent, isLoadingCurrentEvent]);
+
+  // Initialize setup state after key data is loaded
+  useEffect(() => {
+    // Wait for initial data loading to complete before checking setup state
+    if (!isLoadingCurrentEvent && !isLoadingManagedManuals) {
+      initializeSetupState();
+    }
+  }, [isLoadingCurrentEvent, isLoadingManagedManuals, currentEvent, managedManuals, year]);
 
   const fetchManagedManuals = async () => {
     setIsLoadingManagedManuals(true);
@@ -1518,7 +1601,7 @@ function Setup() {
           </div>
 
           {/* Sheets Configuration */}
-          <div className="bg-gray-50 p-4 rounded-lg md:col-span-2">
+          <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-semibold text-lg mb-3 flex items-center">
               <svg className="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clipRule="evenodd"/>
@@ -1532,6 +1615,33 @@ function Setup() {
             ) : (
               <p className="text-sm text-yellow-700">
                 Configuration in progress - please complete the sheets setup above.
+              </p>
+            )}
+          </div>
+
+          {/* Field Selection Configuration */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="font-semibold text-lg mb-3 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3 2h6a1 1 0 110 2H7a1 1 0 110-2zm0 4h6a1 1 0 110 2H7a1 1 0 110-2zm0 4h6a1 1 0 110 2H7a1 1 0 110-2z" clipRule="evenodd"/>
+              </svg>
+              Field Selection & Dataset
+            </h3>
+            {completedSteps.has(5) ? (
+              <div className="space-y-1">
+                <p className="text-sm text-green-700">
+                  ✓ Field selections have been configured and saved successfully.
+                </p>
+                <p className="text-sm text-green-700">
+                  ✓ Unified dataset has been built and is ready for analysis.
+                </p>
+                <p className="text-sm text-gray-600">
+                  Your scouting data structure is complete and analysis tools are ready to use.
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-yellow-700">
+                Field selection in progress - please complete the field mapping above.
               </p>
             )}
           </div>
