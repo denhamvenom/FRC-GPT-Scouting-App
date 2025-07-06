@@ -31,6 +31,7 @@ class DataAggregationService:
         self.year = self.dataset.get("year", 2025)
         self.event_key = self.dataset.get("event_key", f"{self.year}arc")
         self.use_extracted_context = use_extracted_context
+        self.label_mappings = self._load_label_mappings()  # Load field-to-label mappings
         
         # Initialize extraction service if using extracted context
         if self.use_extracted_context:
@@ -48,6 +49,53 @@ class DataAggregationService:
                 self.extractor_service = None
         else:
             self.extractor_service = None
+
+    def _load_label_mappings(self) -> Dict[str, str]:
+        """
+        Load field-to-label mappings from schema and metadata files.
+        
+        Returns:
+            Dictionary mapping original field names to enhanced label names
+        """
+        try:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(base_dir, "data")
+            
+            # Try to load field metadata first (from Sprint 3)
+            metadata_path = os.path.join(data_dir, f"field_metadata_{self.year}.json")
+            label_mappings = {}
+            
+            if os.path.exists(metadata_path):
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    field_metadata = json.load(f)
+                
+                # Extract label mappings from field metadata
+                for field_name, field_info in field_metadata.items():
+                    if isinstance(field_info, dict) and "label_mapping" in field_info:
+                        label_mapping = field_info["label_mapping"]
+                        if "label" in label_mapping:
+                            label_mappings[field_name] = label_mapping["label"]
+                
+                logger.info(f"Loaded {len(label_mappings)} field-to-label mappings from metadata")
+            
+            # Also try to load from schema files as fallback
+            schema_path = os.path.join(data_dir, f"schema_{self.year}.json")
+            if os.path.exists(schema_path):
+                with open(schema_path, "r", encoding="utf-8") as f:
+                    schema_data = json.load(f)
+                
+                # Look for label mappings in schema
+                if "label_mappings" in schema_data:
+                    additional_mappings = schema_data["label_mappings"]
+                    label_mappings.update(additional_mappings)
+                    logger.info(f"Added {len(additional_mappings)} label mappings from schema")
+            
+            logger.info(f"Total label mappings loaded: {len(label_mappings)}")
+            return label_mappings
+            
+        except Exception as e:
+            logger.error(f"Error loading label mappings: {e}")
+            return {}
 
     def _load_dataset(self) -> Dict[str, Any]:
         """
@@ -645,10 +693,13 @@ class DataAggregationService:
             "data_sources": []
         }
 
-        # Aggregate scouting data
+        # Aggregate scouting data with label enhancement
         if "scouting_data" in team_data and isinstance(team_data["scouting_data"], list):
             scouting_metrics = self._aggregate_scouting_metrics(team_data["scouting_data"])
-            aggregated["metrics"].update(scouting_metrics)
+            
+            # Apply label mappings to enhance field names
+            enhanced_scouting_metrics = self._apply_label_mappings(scouting_metrics)
+            aggregated["metrics"].update(enhanced_scouting_metrics)
             aggregated["data_sources"].append("scouting")
             aggregated["match_count"] = len(team_data["scouting_data"])
 
@@ -722,6 +773,57 @@ class DataAggregationService:
                 averaged_metrics[metric] = round(metrics_sum[metric] / metrics_count[metric], 2)
 
         return averaged_metrics
+
+    def _apply_label_mappings(self, metrics: Dict[str, float]) -> Dict[str, float]:
+        """
+        Apply label mappings to enhance field names with scouting labels.
+        
+        Args:
+            metrics: Original metrics with generic field names
+            
+        Returns:
+            Enhanced metrics with both original and label-enhanced field names
+        """
+        if not isinstance(metrics, dict):
+            logger.warning(f"Expected dict for metrics, got {type(metrics)}")
+            return {}
+            
+        enhanced_metrics = {}
+        
+        try:
+            # Keep all original metrics for compatibility
+            enhanced_metrics.update(metrics)
+            
+            # Add enhanced metrics using label mappings
+            if self.label_mappings:
+                enhanced_count = 0
+                for original_field, value in metrics.items():
+                    if not isinstance(original_field, str):
+                        continue
+                        
+                    if original_field in self.label_mappings:
+                        try:
+                            enhanced_field = self.label_mappings[original_field]
+                            
+                            # Validate enhanced field name
+                            if isinstance(enhanced_field, str) and enhanced_field.strip():
+                                enhanced_metrics[enhanced_field] = value
+                                enhanced_count += 1
+                                logger.debug(f"Enhanced field: {original_field} -> {enhanced_field}")
+                        except Exception as e:
+                            logger.warning(f"Error applying label mapping for {original_field}: {e}")
+                
+                if enhanced_count > 0:
+                    logger.info(f"Enhanced {enhanced_count} field names with scouting labels")
+            else:
+                logger.debug("No label mappings available")
+        
+        except Exception as e:
+            logger.error(f"Error applying label mappings: {e}")
+            # Return original metrics if enhancement fails
+            return metrics
+        
+        return enhanced_metrics
 
     def get_teams_for_analysis(
         self,

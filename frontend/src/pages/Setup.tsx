@@ -740,7 +740,7 @@ function Setup() {
   }, [manualEventKey]);
 
   const handleContinue = () => {
-    navigate("/field-selection");
+    navigate("/validation");
   };
 
   // Render step indicator
@@ -1525,7 +1525,7 @@ function Setup() {
               </svg>
               Google Sheets Configuration
             </h3>
-            {completedSteps.has(3) ? (
+            {completedSteps.has(4) ? (
               <p className="text-sm text-green-700">
                 ✓ Google Sheets configuration has been completed. Sheet mappings are ready for field selection.
               </p>
@@ -1544,7 +1544,7 @@ function Setup() {
               onClick={handleContinue}
               className="flex-1 py-3 px-6 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
             >
-              Continue to Field Selection →
+              Continue to Validation →
             </button>
             
             <button

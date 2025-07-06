@@ -87,6 +87,9 @@ async def save_field_selections(selections: FieldSelections):
                 # Add label mapping if available
                 if selections.label_mappings and header in selections.label_mappings:
                     category_mapping[header]["label_mapping"] = selections.label_mappings[header]
+                    print(f"✅ Added label mapping for header: '{header}' -> {selections.label_mappings[header]}")
+                elif selections.label_mappings:
+                    print(f"❌ No label mapping found for header: '{header}'")
 
                 # Add robot group mapping for superscout fields
                 if source == "super" and selections.robot_groups:
@@ -111,6 +114,51 @@ async def save_field_selections(selections: FieldSelections):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/load-selections/{year}")
+async def load_field_selections(year: int = 2025):
+    """
+    Load field selections including label mappings for a given year.
+    """
+    try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(base_dir, "data")
+        
+        # Load the main field selections
+        selections_path = os.path.join(data_dir, f"field_selections_{year}.json")
+        if not os.path.exists(selections_path):
+            return {
+                "status": "not_found",
+                "message": f"No field selections found for year {year}"
+            }
+            
+        with open(selections_path, "r", encoding="utf-8") as f:
+            selections_data = json.load(f)
+        
+        # Load field metadata (which includes label mappings)
+        metadata_path = os.path.join(data_dir, f"field_metadata_{year}.json")
+        label_mappings = {}
+        if os.path.exists(metadata_path):
+            with open(metadata_path, "r", encoding="utf-8") as f:
+                metadata = json.load(f)
+            
+            # Extract label mappings from metadata
+            for header, field_info in metadata.items():
+                if isinstance(field_info, dict) and "label_mapping" in field_info:
+                    label_mappings[header] = field_info["label_mapping"]
+        
+        return {
+            "status": "success",
+            "year": year,
+            "field_selections": selections_data.get("field_selections", {}),
+            "critical_mappings": selections_data.get("critical_mappings", {}),
+            "robot_groups": selections_data.get("robot_groups", {}),
+            "label_mappings": label_mappings
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading field selections: {str(e)}")
 
 
 def generate_auto_robot_groups_for_save(field_selections: Dict[str, str]) -> Dict[str, List[str]]:

@@ -40,7 +40,7 @@ const FIELD_CATEGORIES: FieldCategory[] = [
   { key: 'auto', label: 'Autonomous', description: 'Robot actions during the autonomous period' },
   { key: 'teleop', label: 'Teleop', description: 'Robot actions during the teleop period' },
   { key: 'endgame', label: 'Endgame', description: 'Robot actions during the endgame period' },
-  { key: 'strategy', label: 'Strategy', description: 'Strategic assessment and qualitative observations' },
+  { key: 'strategy', label: 'Strategy/Notes', description: 'Strategic assessment, text notes, and qualitative observations' },
   { key: 'other', label: 'Other', description: 'Any additional fields that don\'t fit above categories' },
 ];
 
@@ -142,10 +142,52 @@ const findBestLabelMatch = (header: string, labels: GameLabel[]): { label: GameL
   return bestMatch && bestMatch.score > 0.3 ? bestMatch : null;
 };
 
+// Build dynamic patterns from loaded labels (memoized for performance)
+const buildPatternsFromLabels = (labels: GameLabel[]): Map<string, RegExp> => {
+  const patterns = new Map<string, RegExp>();
+  
+  const categories = ['autonomous', 'teleop', 'endgame', 'defense', 'reliability', 'strategic', 'qualitative', 'subjective', 'notes'];
+  
+  categories.forEach(category => {
+    const categoryLabels = labels.filter(l => l.category === category);
+    if (categoryLabels.length === 0) return;
+    
+    // Extract unique keywords from label names
+    const keywords = new Set<string>();
+    categoryLabels.forEach(label => {
+      // Split by underscore and extract meaningful parts
+      const parts = label.label.toLowerCase().split('_');
+      parts.forEach(part => {
+        if (part.length > 2 && !['the', 'and', 'or', 'in', 'on', 'at', 'to', 'for'].includes(part)) {
+          keywords.add(part);
+        }
+      });
+    });
+    
+    if (keywords.size > 0) {
+      const pattern = Array.from(keywords).join('|');
+      patterns.set(category, new RegExp(pattern, 'i'));
+    }
+  });
+  
+  return patterns;
+};
+
+// Cache for label patterns to avoid rebuilding on every call
+let labelPatternsCache: Map<string, RegExp> | null = null;
+let labelsCacheKey: string | null = null;
+
 // Enhanced utility function to auto-categorize fields based on patterns and label matching
 const autoCategorizeField = (header: string, labels: GameLabel[] = []): { category: string; matchedLabel?: GameLabel; confidence?: number } => {
   // Convert to lowercase for case-insensitive matching
   const headerLower = header.toLowerCase();
+  
+  // Build patterns cache if needed
+  const labelsKey = labels.map(l => l.label).join(',');
+  if (labels.length > 0 && (labelPatternsCache === null || labelsCacheKey !== labelsKey)) {
+    labelPatternsCache = buildPatternsFromLabels(labels);
+    labelsCacheKey = labelsKey;
+  }
   
   // Special handling for robot team numbers in SuperScouting
   if (/robot\s*\d+\s*number/i.test(header)) {
@@ -166,9 +208,9 @@ const autoCategorizeField = (header: string, labels: GameLabel[] = []): { catego
     return { category: 'match_number' };
   }
   
-  // Try to find a matching label first
+  // Try to find a matching label first, but only for very high confidence matches
   const labelMatch = findBestLabelMatch(header, labels);
-  if (labelMatch && labelMatch.score > 0.5) {
+  if (labelMatch && labelMatch.score > 0.85) {  // Only use label matching for very high confidence
     // Map label categories to field categories
     const categoryMap: { [key: string]: string } = {
       'autonomous': 'auto',
@@ -176,7 +218,12 @@ const autoCategorizeField = (header: string, labels: GameLabel[] = []): { catego
       'endgame': 'endgame',
       'defense': 'strategy',
       'reliability': 'strategy',
-      'strategic': 'strategy'
+      'strategic': 'strategy',
+      'qualitative': 'strategy',
+      'subjective': 'strategy',
+      'notes': 'strategy',
+      'team_info': 'team_info',
+      'match_info': 'team_info'
     };
     
     const mappedCategory = categoryMap[labelMatch.label.category] || 'other';
@@ -187,30 +234,73 @@ const autoCategorizeField = (header: string, labels: GameLabel[] = []): { catego
     };
   }
   
-  // Fallback to pattern matching
+  // Fallback to pattern matching - use dynamic patterns from labels if available
+  if (labelPatternsCache && labelPatternsCache.size > 0) {
+    // Try dynamic patterns based on loaded labels
+    const autoPattern = labelPatternsCache.get('autonomous');
+    if (autoPattern && autoPattern.test(headerLower)) {
+      return { category: 'auto' };
+    }
+    
+    const teleopPattern = labelPatternsCache.get('teleop');
+    if (teleopPattern && teleopPattern.test(headerLower)) {
+      return { category: 'teleop' };
+    }
+    
+    const endgamePattern = labelPatternsCache.get('endgame');
+    if (endgamePattern && endgamePattern.test(headerLower)) {
+      return { category: 'endgame' };
+    }
+    
+    // For strategy, check multiple related categories
+    const strategyCategories = ['defense', 'reliability', 'strategic', 'qualitative', 'subjective', 'notes'];
+    for (const cat of strategyCategories) {
+      const pattern = labelPatternsCache.get(cat);
+      if (pattern && pattern.test(headerLower)) {
+        return { category: 'strategy' };
+      }
+    }
+  }
+  
+  // Generic fallback patterns if no labels are loaded or no dynamic patterns matched
   // Check for autonomous/auto patterns
-  if (/auto|autonomous|^a_|^a\.|auton/i.test(headerLower)) {
+  if (/auto|autonomous|^a_|^a\.|auton|initial|opening|^pre_/i.test(headerLower)) {
     return { category: 'auto' };
   }
   
   // Check for teleop patterns
-  if (/tele|teleop|teleoperated|driver|^t_|^t\./i.test(headerLower)) {
+  if (/tele|teleop|teleoperated|driver|^t_|^t\.|manual|operated/i.test(headerLower)) {
     return { category: 'teleop' };
   }
   
   // Check for endgame patterns
-  if (/end|endgame|final|climb|parking|docking|hanging/i.test(headerLower)) {
+  if (/end|endgame|final|climb|hanging|finish|last|conclude/i.test(headerLower)) {
     return { category: 'endgame' };
   }
   
   // Check for strategy/subjective patterns
-  if (/strat|comment|note|subjective|rating|skill|defense|speed|observ/i.test(headerLower)) {
+  if (/strat|comment|note|subjective|rating|skill|defense|speed|observ|text|description|details|remarks|feedback|evaluation|qualitative|narrative|analysis|summary|report|scout|assess|judge|opinion|review/i.test(headerLower)) {
     return { category: 'strategy' };
   }
   
   // Check for team info patterns
-  if (/alliance|color|station|position|start/i.test(headerLower)) {
+  if (/alliance|color|station|position|start|timestamp|time|date|match|team|robot|event/i.test(headerLower)) {
     return { category: 'team_info' };
+  }
+  
+  // Check for scoring/game piece patterns (generic)
+  if (/score|point|goal|piece/i.test(headerLower)) {
+    return { category: 'teleop' }; // Default scoring to teleop
+  }
+  
+  // Check for movement/mobility patterns
+  if (/move|mobility|drive|cross|leave|exit|path|route/i.test(headerLower)) {
+    return { category: 'auto' }; // Movement often relates to auto
+  }
+  
+  // Check for reliability/performance patterns
+  if (/broke|fail|dead|disable|penalty|foul|technical|malfunction|issue|problem|reliable/i.test(headerLower)) {
+    return { category: 'strategy' };
   }
   
   // Default to 'other' if no patterns match
@@ -253,6 +343,8 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
 
   // UI state
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isBuildingDataset, setIsBuildingDataset] = useState<boolean>(false);
+  const [buildProgress, setBuildProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
@@ -269,26 +361,98 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
     loadLabels();
   }, [loadLabels]);
 
-  // Re-run auto-categorization when labels are loaded
+  // Load saved field selections when headers are available
   useEffect(() => {
-    if (labels.length > 0 && (scoutingHeaders.length > 0 || superscoutingHeaders.length > 0 || pitScoutingHeaders.length > 0)) {
+    // Only load saved selections after headers are loaded
+    if (scoutingHeaders.length === 0 && superscoutingHeaders.length === 0 && pitScoutingHeaders.length === 0) {
+      return;
+    }
+
+    const loadSavedSelections = async () => {
+      try {
+        console.log('Attempting to load saved field selections...');
+        const response = await fetchWithNgrokHeaders(apiUrl(`/api/schema/load-selections/${year}`));
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success') {
+            console.log('Loading saved field selections:', data);
+            
+            // Load field selections, but only for headers that exist
+            if (data.field_selections) {
+              const validSelections: { [key: string]: string } = {};
+              const allHeaders = [...scoutingHeaders, ...superscoutingHeaders, ...pitScoutingHeaders];
+              
+              Object.entries(data.field_selections).forEach(([header, category]) => {
+                if (allHeaders.includes(header)) {
+                  validSelections[header] = category as string;
+                }
+              });
+              
+              if (Object.keys(validSelections).length > 0) {
+                setSelectedFields(validSelections);
+                console.log(`✅ Restored ${Object.keys(validSelections).length} field selections`);
+              }
+            }
+            
+            // Load critical mappings
+            if (data.critical_mappings) {
+              setCriticalFieldMappings(data.critical_mappings);
+              console.log('✅ Restored critical field mappings');
+            }
+            
+            // Load robot groups (for superscout fields)
+            if (data.robot_groups) {
+              console.log('Robot groups loaded:', data.robot_groups);
+            }
+            
+            // Load label mappings
+            if (data.label_mappings) {
+              setLabelMappings(data.label_mappings);
+              console.log(`✅ Restored ${Object.keys(data.label_mappings).length} label mappings`);
+            }
+          }
+        } else {
+          // No saved selections found, which is normal for first-time setup
+          console.log('No saved field selections found, starting fresh');
+        }
+      } catch (error) {
+        console.error('Error loading saved field selections:', error);
+        // Don't show error to user, as this is optional functionality
+      }
+    };
+
+    loadSavedSelections();
+  }, [year, scoutingHeaders, superscoutingHeaders, pitScoutingHeaders]);
+
+  // Re-run auto-categorization when labels are loaded (but after saved selections are loaded)
+  useEffect(() => {
+    // Add a small delay to ensure saved selections are loaded first
+    const timer = setTimeout(() => {
+      if (labels.length > 0 && (scoutingHeaders.length > 0 || superscoutingHeaders.length > 0 || pitScoutingHeaders.length > 0)) {
       console.log(`Re-running auto-categorization with ${labels.length} labels loaded`);
       
-      // Re-categorize all headers with labels
-      const updatedFields: { [key: string]: string } = {};
-      const updatedLabelMappings: { [fieldHeader: string]: GameLabel } = {};
+      // Re-categorize all headers with labels, but preserve user's manual selections
+      const updatedFields: { [key: string]: string } = { ...selectedFields };
+      const updatedLabelMappings: { [fieldHeader: string]: GameLabel } = { ...labelMappings };
       
       [
         ...scoutingHeaders,
         ...superscoutingHeaders,
         ...pitScoutingHeaders
       ].forEach(header => {
-        const categorization = autoCategorizeField(header, labels);
-        updatedFields[header] = categorization.category;
+        // Only auto-categorize if the user hasn't manually set this field
+        // or if it's currently set to 'ignore' or 'other' (default values)
+        const currentValue = updatedFields[header];
+        const shouldAutoCategorize = !currentValue || currentValue === 'ignore' || currentValue === 'other';
         
-        // Store label mapping if one was found
-        if (categorization.matchedLabel) {
-          updatedLabelMappings[header] = categorization.matchedLabel;
+        if (shouldAutoCategorize) {
+          const categorization = autoCategorizeField(header, labels);
+          updatedFields[header] = categorization.category;
+          
+          // Store label mapping if one was found
+          if (categorization.matchedLabel) {
+            updatedLabelMappings[header] = categorization.matchedLabel;
+          }
         }
       });
       
@@ -306,7 +470,10 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
       } else {
         setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on patterns. ${labels.length} labels available for manual selection.`);
       }
-    }
+      }
+    }, 100); // Small delay to let saved selections load first
+    
+    return () => clearTimeout(timer);
   }, [labels, scoutingHeaders, superscoutingHeaders, pitScoutingHeaders]);
 
   useEffect(() => {
@@ -781,8 +948,17 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
       }
     }
     
+    // Set states before the async operation
+    console.log('handleSaveSchema called - setting states...');
+    setIsBuildingDataset(true);
+    setBuildProgress('Saving field selections...');
+    // Don't set isLoading here as it conflicts with overlay display
+    
+    // Force a re-render to ensure overlay appears
+    await new Promise(resolve => setTimeout(resolve, 100));
+    console.log('States should now be updated, isBuildingDataset:', true);
+    
     try {
-      setIsLoading(true);
       
       // Save the schema including label mappings
       const schema = {
@@ -803,15 +979,15 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
       }
       
       // Show initial success message
-      setSuccessMessage('Field selections saved successfully! Now learning schema mappings...');
+      setBuildProgress('Field selections saved! Learning schema mappings...');
       
       // Trigger schema mapping for regular scouting
       try {
         // Learn regular scouting schema
         await fetchWithNgrokHeaders(apiUrl('/api/schema/learn'));
         
-        // Show building dataset message
-        setSuccessMessage('Field selections and schema mappings saved successfully! Building dataset...');
+        // Show building dataset message with more detail
+        setBuildProgress('Schema mappings learned! Starting dataset build...');
 
         // Trigger dataset build
         try {
@@ -834,11 +1010,19 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
           // Check if we have a valid event key
           if (!eventKey) {
             setError('No event selected. Please go to Setup page and select an event first.');
+            setIsBuildingDataset(false);
+            setIsLoading(false);
             return;
           }
 
-          // Build the dataset
-          const buildResponse = await fetchWithNgrokHeaders(apiUrl("/api/unified/build"), {
+          console.log('Building dataset for event:', eventKey, 'year:', yearValue);
+          setBuildProgress('Sending dataset build request...');
+
+          // Build the dataset with progress tracking
+          const buildUrl = apiUrl("/api/unified/build");
+          console.log('API URL:', buildUrl);
+          
+          const buildResponse = await fetchWithNgrokHeaders(buildUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -848,52 +1032,125 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
             })
           });
 
+          console.log('Build response status:', buildResponse.status);
+
           if (buildResponse.ok) {
-            setSuccessMessage('Dataset built successfully!');
-            if (embedded && onComplete) {
-              onComplete();
+            const buildData = await buildResponse.json();
+            console.log('Build response data:', buildData);
+            
+            if (buildData.operation_id) {
+              // Track progress
+              setBuildProgress('Building unified dataset... This may take a moment.');
+              
+              // Poll for progress
+              const checkProgress = async () => {
+                try {
+                  const progressResponse = await fetchWithNgrokHeaders(
+                    apiUrl(`/api/progress/${buildData.operation_id}`)
+                  );
+                  
+                  if (progressResponse.ok) {
+                    const progressData = await progressResponse.json();
+                    
+                    if (progressData.status === 'completed') {
+                      setBuildProgress('Dataset built successfully!');
+                      setSuccessMessage('Dataset built successfully!');
+                      setIsBuildingDataset(false);
+                      setIsLoading(false);
+                      
+                      if (embedded && onComplete) {
+                        // In embedded mode, wait a bit to show success before completing
+                        setTimeout(() => {
+                          onComplete();
+                        }, 1500);
+                      } else {
+                        setBuildProgress('Dataset built successfully! Setup complete!');
+                        setTimeout(() => {
+                          navigate('/setup-complete');
+                        }, 1500);
+                      }
+                    } else if (progressData.status === 'failed') {
+                      throw new Error(progressData.message || 'Dataset build failed');
+                    } else {
+                      // Still in progress, update message and check again
+                      setBuildProgress(`Building dataset... ${progressData.progress}% - ${progressData.message || 'Processing'}`);
+                      setTimeout(checkProgress, 1000);
+                    }
+                  } else {
+                    // If progress check fails, wait and continue
+                    setTimeout(checkProgress, 1000);
+                  }
+                } catch (err) {
+                  console.error('Error checking progress:', err);
+                  setError('Error tracking dataset build progress');
+                  setIsLoading(false);
+                  setIsBuildingDataset(false);
+                }
+              };
+              
+              // Start checking progress after a short delay
+              setTimeout(checkProgress, 500);
             } else {
-              setSuccessMessage('Dataset built successfully! Proceeding to validation...');
+              // Fallback if no operation ID (shouldn't happen)
+              setBuildProgress('Dataset build started...');
               setTimeout(() => {
-                navigate('/validation');
-              }, 1500);
+                setIsBuildingDataset(false);
+                setIsLoading(false);
+                if (embedded && onComplete) {
+                  onComplete();
+                } else {
+                  navigate('/setup-complete');
+                }
+              }, 2000);
             }
           } else {
+            const errorData = await buildResponse.json().catch(() => ({ error: 'Unknown error' }));
+            console.error('Dataset build failed:', errorData);
+            
+            setIsBuildingDataset(false);
+            setIsLoading(false);
+            
             if (embedded && onComplete) {
-              setSuccessMessage('Field selections saved, but dataset build had issues.');
-              onComplete();
+              setError(`Dataset build failed: ${errorData.error || 'Unknown error'}. Please try again.`);
+              // Don't complete if build failed
+              return;
             } else {
-              // Still go to validation even if build fails - they can build from there
-              setSuccessMessage('Field selections saved, but dataset build had issues. Proceeding to validation...');
+              // Go to setup complete even if build fails
+              setSuccessMessage('Field selections saved, but dataset build had issues. Setup marked as complete.');
               setTimeout(() => {
-                navigate('/validation');
+                navigate('/setup-complete');
               }, 2000);
             }
           }
         } catch (buildErr) {
           console.error('Error building dataset:', buildErr);
+          setIsBuildingDataset(false);
+          setIsLoading(false);
+          
           if (embedded && onComplete) {
             setSuccessMessage('Field selections saved, but dataset build had issues.');
             onComplete();
           } else {
-            // Still go to validation even if build fails - they can build from there
-            setSuccessMessage('Field selections saved, but dataset build had issues. Proceeding to validation...');
+            // Go to setup complete even if build fails
+            setSuccessMessage('Field selections saved, but dataset build had issues. Setup marked as complete.');
             setTimeout(() => {
-              navigate('/validation');
+              navigate('/setup-complete');
             }, 2000);
           }
         }
       } catch (schemaErr) {
         console.error('Error learning schema mappings:', schemaErr);
+        setIsBuildingDataset(false);
+        setIsLoading(false);
+        
         if (embedded && onComplete) {
           setSuccessMessage('Field selections saved, but schema learning had issues.');
           onComplete();
         } else {
-          // Still continue to workflow even if schema learning fails
-          // The user can manually trigger schema learning later
-          setSuccessMessage('Field selections saved, but schema learning had issues. Continuing to workflow.');
+          // Still continue to setup complete even if schema learning fails
+          setSuccessMessage('Field selections saved, but schema learning had issues. Setup marked as complete.');
           setTimeout(() => {
-            navigate('/workflow');
+            navigate('/setup-complete');
           }, 2000);
         }
       }
@@ -901,6 +1158,7 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
       console.error('Error saving schema:', err);
       setError('Error saving field selections');
       setIsLoading(false);
+      setIsBuildingDataset(false);
     }
   };
 
@@ -967,7 +1225,8 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
     setIsAddLabelModalOpen(true);
   };
 
-  if (isLoading || labelsLoading) {
+  // Only show generic loading if we're not building dataset (which has its own overlay)
+  if ((isLoading || labelsLoading) && !isBuildingDataset) {
     return <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       <span className="ml-3">Loading field data and scouting labels...</span>
@@ -975,7 +1234,26 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6 relative">
+      {/* Loading overlay */}
+      {isBuildingDataset && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+             style={{display: 'flex'}}  /* Force display */>
+          <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+              <h3 className="text-lg font-semibold mb-2">Building Dataset</h3>
+              <p className="text-gray-600 text-center">
+                {buildProgress || 'Processing field selections and building unified dataset...'}
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Please wait while we process your field selections...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Field Selection</h1>
         
@@ -1586,9 +1864,14 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
       <div className="flex justify-end">
         <button
           onClick={handleSaveSchema}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          disabled={isBuildingDataset}
+          className={`px-4 py-2 rounded ${
+            isBuildingDataset 
+              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          }`}
         >
-          Save Field Selections
+          {isBuildingDataset ? 'Processing...' : 'Save Field Selections'}
         </button>
       </div>
       

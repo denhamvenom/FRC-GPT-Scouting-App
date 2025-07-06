@@ -1,0 +1,48 @@
+{
+  "event_key": "2025test",
+  "year": 2025,
+  "teams": {
+    "1234": {
+      "team_number": 1234,
+      "nickname": "Test Team",
+      "scouting_data": [
+        {
+          "team_number": 1234,
+          "match_number": 1,
+          "auto": 3,
+          "teleop": 5,
+          "endgame": 2,
+          "auto_coral_L1_scored": 3,
+          "teleop_coral_L2_scored": 2,
+          "teleop_algae_net_scored": 1,
+          "teleop_coral_L1_scored": 3
+        },
+        {
+          "team_number": 1234,
+          "match_number": 2,
+          "auto": 4,
+          "teleop": 6,
+          "endgame": 3,
+          "auto_coral_L1_scored": 4,
+          "teleop_coral_L2_scored": 3,
+          "teleop_algae_net_scored": 2,
+          "teleop_coral_L1_scored": 1
+        }
+      ],
+      "superscouting_data": [],
+      "tba_info": {},
+      "statbotics_info": {},
+      "ranking_info": {}
+    }
+  },
+  "metadata": {
+    "scouting_headers": [
+      "Team Number",
+      "Match Number", 
+      "Auto piece count (Trough/L2 half value) [x1]",
+      "# of pieces scored on branches (L2-L4) [1x]",
+      "# of algae scored (Net & Processor) [1x]"
+    ],
+    "created_timestamp": "2025-01-06T12:00:00"
+  }
+}

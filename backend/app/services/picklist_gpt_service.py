@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import os
 import re
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -37,6 +38,41 @@ class PicklistGPTService:
         
         self.max_tokens_limit = 100000
         self.game_context = None  # Can be set by external services
+        self.scouting_labels = self._load_scouting_labels()  # Load scouting labels for context
+
+    def _load_scouting_labels(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Load scouting labels from the game labels file.
+        
+        Returns:
+            Dictionary mapping label names to their metadata
+        """
+        try:
+            # Get the data directory path
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(base_dir, "data")
+            labels_path = os.path.join(data_dir, "game_labels_2025.json")
+            
+            if os.path.exists(labels_path):
+                with open(labels_path, "r", encoding="utf-8") as f:
+                    labels_data = json.load(f)
+                
+                # Convert to dictionary keyed by label name for easy lookup
+                labels_dict = {}
+                for label in labels_data.get("labels", []):
+                    label_name = label.get("label", "")
+                    if label_name:
+                        labels_dict[label_name] = label
+                        
+                logger.info(f"Loaded {len(labels_dict)} scouting labels for GPT context")
+                return labels_dict
+            else:
+                logger.warning(f"Scouting labels file not found: {labels_path}")
+                return {}
+                
+        except Exception as e:
+            logger.error(f"Error loading scouting labels: {e}")
+            return {}
 
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
@@ -121,22 +157,66 @@ CRITICAL RULES
 • Rank all {team_count} indices, each exactly once.  
 • Use indices 1-{team_count} from TEAM_INDEX_MAP exactly once.
 • Sort by weighted performance, then synergy with Team {{your_team_number}} for {pick_position} pick.  
-• Each reason must be ≤10 words, NO REPETITION, cite 1 metric (e.g. "Strong auto: 3.2 avg").
+• Each reason must be ≤10 words, NO REPETITION, cite 1 metric (e.g. "Strong auto_coral_L4_scored: 2.3 avg").
 • NO repetitive words or phrases. Be concise and specific.
 • If you cannot complete all teams due to length limits, respond only {{"s":"overflow"}}.
 
 {context_note}"""
 
+            # Add scouting labels context if available
+            if self.scouting_labels:
+                labels_context = self._create_labels_context()
+                if labels_context:
+                    prompt += f"\n\nSCOUTING METRICS GUIDE:\n{labels_context}"
+
             if game_context:
                 prompt += f"\n\nGame Context:\n{game_context}\n"
 
             prompt += f"""
-EXAMPLE: {{"p":[[1,8.5,"Strong auto: 2.8 avg"],[2,7.9,"Consistent defense"],[3,6.2,"Reliable endgame"]],"s":"ok"}}"""
+EXAMPLE: {{"p":[[1,8.5,"Strong auto_coral_L4_scored: 2.3"],[2,7.9,"High defense_effectiveness_rating"],[3,6.2,"Reliable endgame_climb_successful"]],"s":"ok"}}"""
 
             return prompt
         else:
             # Fallback to standard format for smaller requests
             return self._create_standard_format_prompt(pick_position, team_count, game_context)
+
+    def _create_standard_format_prompt(self, pick_position: str, team_count: int, game_context: Optional[str] = None) -> str:
+        """Create standard format system prompt for smaller requests."""
+        position_context = {
+            "first": "First pick teams should be overall powerhouse teams that excel in multiple areas.",
+            "second": "Second pick teams should complement the first pick and address specific needs.",
+            "third": "Third pick teams are more specialized, often focusing on a single critical function.",
+        }
+
+        context_note = position_context.get(pick_position, "")
+
+        prompt = f"""You are an expert FRC alliance strategist analyzing teams for {pick_position} pick position.
+
+Task: Rank all {team_count} teams based on their performance data and alliance potential.
+
+{context_note}
+
+Focus on:
+1. Overall performance metrics
+2. Consistency and reliability
+3. Strategic value for alliance composition
+4. Specific strengths that complement alliance needs
+
+Response format (JSON only):
+{{"teams": [{{"team_number": int, "score": float, "reasoning": "brief explanation"}}, ...], "status": "ok"}}
+
+CRITICAL: Return only valid JSON. Provide specific reasoning citing actual metrics."""
+
+        # Add scouting labels context if available
+        if self.scouting_labels:
+            labels_context = self._create_labels_context()
+            if labels_context:
+                prompt += f"\n\nSCOUTING METRICS GUIDE:\n{labels_context}"
+
+        if game_context:
+            prompt += f"\n\nGame Context:\n{game_context}"
+
+        return prompt
 
     def create_user_prompt(
         self,
@@ -190,7 +270,7 @@ Please produce output following RULES.
         priorities: List[Dict[str, Any]],
         team_index_map: Optional[Dict[int, int]] = None,
     ) -> List[Dict[str, Any]]:
-        """ORIGINAL TEAM PREPARATION WITH WEIGHTED SCORES"""
+        """ORIGINAL TEAM PREPARATION WITH WEIGHTED SCORES + SCOUTING LABEL CONTEXT"""
 
         teams_with_scores = []
 
@@ -207,9 +287,9 @@ Please produce output following RULES.
                     "weighted_score": weighted_score,
                 }
 
-                # Add condensed metrics
+                # Add metrics with scouting label context
                 if "metrics" in team and isinstance(team["metrics"], dict):
-                    team_with_score["metrics"] = team["metrics"]
+                    team_with_score["metrics"] = self._enhance_metrics_with_labels(team["metrics"])
 
                 teams_with_scores.append(team_with_score)
         else:
@@ -223,11 +303,125 @@ Please produce output following RULES.
                 }
 
                 if "metrics" in team and isinstance(team["metrics"], dict):
-                    team_with_score["metrics"] = team["metrics"]
+                    team_with_score["metrics"] = self._enhance_metrics_with_labels(team["metrics"])
 
                 teams_with_scores.append(team_with_score)
 
         return teams_with_scores
+
+    def _enhance_metrics_with_labels(self, metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Enhance metrics with scouting label context for better GPT understanding.
+        
+        Args:
+            metrics: Original team metrics
+            
+        Returns:
+            Enhanced metrics with label context and descriptions
+        """
+        if not isinstance(metrics, dict):
+            logger.warning(f"Expected dict for metrics, got {type(metrics)}")
+            return {}
+            
+        enhanced_metrics = {}
+        
+        try:
+            for field_name, value in metrics.items():
+                if not isinstance(field_name, str):
+                    logger.warning(f"Skipping non-string field name: {field_name}")
+                    continue
+                    
+                # Check if this field name matches a scouting label
+                if field_name in self.scouting_labels:
+                    try:
+                        label_info = self.scouting_labels[field_name]
+                        
+                        # Validate label_info structure
+                        if not isinstance(label_info, dict):
+                            logger.warning(f"Invalid label info for {field_name}: {type(label_info)}")
+                            enhanced_metrics[field_name] = value
+                            continue
+                        
+                        # Create enhanced field name with context
+                        description = label_info.get("description", "")
+                        category = label_info.get("category", "unknown")
+                        data_type = label_info.get("data_type", "unknown")
+                        typical_range = label_info.get("typical_range", "")
+                        
+                        # Sanitize values to prevent extremely long context
+                        if len(description) > 100:
+                            description = description[:97] + "..."
+                        
+                        # Add the enhanced field with context (only if value is numeric)
+                        if isinstance(value, (int, float)):
+                            enhanced_field_key = f"{field_name}_[{category}_{data_type}]"
+                            enhanced_metrics[enhanced_field_key] = {
+                                "value": value,
+                                "description": description,
+                                "range": typical_range
+                            }
+                        
+                        # Also keep original field name for compatibility
+                        enhanced_metrics[field_name] = value
+                        
+                    except Exception as e:
+                        logger.warning(f"Error enhancing metric {field_name}: {e}")
+                        enhanced_metrics[field_name] = value
+                else:
+                    # Keep original field as-is if no label match found
+                    enhanced_metrics[field_name] = value
+                    
+        except Exception as e:
+            logger.error(f"Error in metric enhancement: {e}")
+            # Fallback to original metrics
+            return metrics
+                
+        return enhanced_metrics
+
+    def _create_labels_context(self) -> str:
+        """
+        Create a compact context string explaining scouting metrics for GPT.
+        
+        Returns:
+            Formatted string explaining key scouting metrics
+        """
+        if not self.scouting_labels:
+            return ""
+            
+        # Group labels by category for better organization
+        categories = {}
+        for label_name, label_info in self.scouting_labels.items():
+            category = label_info.get("category", "other")
+            if category not in categories:
+                categories[category] = []
+            categories[category].append((label_name, label_info))
+        
+        context_parts = []
+        
+        # Create compact descriptions for key categories
+        for category, labels in categories.items():
+            if category in ["autonomous", "teleop", "endgame", "defense"]:
+                category_labels = []
+                for label_name, label_info in labels[:3]:  # Limit to top 3 per category
+                    description = label_info.get("description", "")
+                    # Create very compact description
+                    if "coral" in label_name.lower() and "scored" in label_name.lower():
+                        category_labels.append(f"{label_name}: CORAL scoring performance")
+                    elif "climb" in label_name.lower():
+                        category_labels.append(f"{label_name}: Climbing ability")
+                    elif "defense" in label_name.lower():
+                        category_labels.append(f"{label_name}: Defense capability")
+                    elif "algae" in label_name.lower():
+                        category_labels.append(f"{label_name}: ALGAE scoring")
+                    else:
+                        # Truncate long descriptions
+                        short_desc = description[:40] + "..." if len(description) > 40 else description
+                        category_labels.append(f"{label_name}: {short_desc}")
+                
+                if category_labels:
+                    context_parts.append(f"{category.upper()}: {'; '.join(category_labels)}")
+        
+        return "\n".join(context_parts)
 
     def _calculate_weighted_score(
         self, team_data: Dict[str, Any], priorities: List[Dict[str, Any]]

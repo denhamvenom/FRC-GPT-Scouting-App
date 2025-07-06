@@ -18,7 +18,16 @@ def parse_scouting_row(row: List[str], headers: List[str]) -> Dict[str, Any]:
         Dict[str, Any]: Structured scouting dictionary
     """
 
-    # Get schema mapping
+    # Get schema mapping - ensure schemas are loaded first
+    from app.services.schema_loader import load_schemas
+    
+    # Load schemas if not already loaded
+    if not get_match_mapping():
+        try:
+            load_schemas(2025)  # Default to 2025, should be configurable
+        except Exception as e:
+            print(f"Warning: Could not load schemas: {e}")
+    
     schema_data = get_match_mapping()
     scouting_data = {}
 

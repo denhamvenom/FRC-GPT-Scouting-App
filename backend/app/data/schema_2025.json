@@ -1,20 +1,3 @@
 {
-  "Robot #": "team_number",
-  "Match #": "match_number",
-  "Auto": "auto",
-  "AutoPieces": "auto",
-  "Branch": "auto",
-  "Trough": "auto",
-  "Algae": "auto",
-  "Notes": "strategy",
-  "Abilities": "strategy",
-  "Zone": "other",
-  "Auto piece count (Trough/L2 half value) [x1]": "auto",
-  "# of pieces scored on branches (L2-L4) [1x]": "teleop",
-  "# of pieces scored on branches (L2-L4) [10x]": "teleop",
-  "# of pieces scored in trough (L1) [1x]": "teleop",
-  "# of pieces scored in trough (L1) [10x]": "teleop",
-  "# of algae scored (Net & Processor) [1x]": "teleop",
-  "# of algae scored (Net & Processor) [10x]": "teleop",
-  "Did the robot do any of the following during this match?": "strategy"
+  "test": "auto"
 }

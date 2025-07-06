@@ -17,6 +17,130 @@ from app.services.statbotics_client import get_team_epa
 from app.services.sheets_service import get_sheet_values
 
 
+def load_field_metadata(year: int) -> Dict[str, Any]:
+    """
+    Load field metadata with label mappings from the saved field selections.
+    
+    Args:
+        year: The year to load metadata for
+        
+    Returns:
+        Dictionary mapping field headers to their metadata including labels
+    """
+    try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(base_dir, "data")
+        metadata_path = os.path.join(data_dir, f"field_metadata_{year}.json")
+        
+        if os.path.exists(metadata_path):
+            with open(metadata_path, "r", encoding="utf-8") as f:
+                metadata = json.load(f)
+                print(f"🔵 Loaded field metadata with {len(metadata)} entries for {year}")
+                return metadata
+        else:
+            print(f"⚠️ No field metadata found for {year} at {metadata_path}")
+            return {}
+    except Exception as e:
+        print(f"❌ Error loading field metadata: {e}")
+        return {}
+
+
+def apply_label_mappings_to_raw_data(row: List[str], headers: List[str], field_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Apply label mappings to raw row data using original headers.
+    This creates additional fields with enhanced scouting label names.
+    
+    Args:
+        row: Raw row data from Google Sheets
+        headers: Original headers from Google Sheets
+        field_metadata: Field metadata containing label mappings
+        
+    Returns:
+        Dictionary with enhanced field names based on scouting labels
+    """
+    enhanced_data = {}
+    
+    if not field_metadata:
+        return enhanced_data
+        
+    try:
+        enhanced_count = 0
+        for i, header in enumerate(headers):
+            if i < len(row) and header in field_metadata:
+                field_info = field_metadata[header]
+                # Found matching metadata
+                if isinstance(field_info, dict) and "label_mapping" in field_info:
+                    label_mapping = field_info["label_mapping"]
+                    if isinstance(label_mapping, dict) and "label" in label_mapping:
+                        enhanced_field = label_mapping["label"]
+                        value = row[i]
+                        
+                        # Try to convert numeric values
+                        if value is not None and isinstance(value, str):
+                            value = value.strip()
+                            try:
+                                if value.isdigit():
+                                    value = int(value)
+                                elif value.replace(".", "", 1).isdigit() and value.count(".") < 2:
+                                    value = float(value)
+                            except (ValueError, TypeError):
+                                pass
+                        
+                        enhanced_data[enhanced_field] = value
+                        enhanced_count += 1
+        
+        if enhanced_count > 0:
+            print(f"🔵 Enhanced {enhanced_count} fields with label mappings")
+        else:
+            print(f"⚠️ No fields enhanced - checked {len(headers)} headers against {len(field_metadata)} metadata entries")
+            print(f"🔍 Sample headers: {headers[:5]}")
+            print(f"🔍 Sample metadata keys: {list(field_metadata.keys())[:5]}")
+        
+        return enhanced_data
+    except Exception as e:
+        print(f"❌ Error applying label mappings: {e}")
+        return enhanced_data
+
+
+def apply_label_mappings(parsed_data: Dict[str, Any], field_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Apply label mappings to enhance field names in parsed data.
+    
+    Args:
+        parsed_data: Original parsed data with generic field names
+        field_metadata: Field metadata containing label mappings
+        
+    Returns:
+        Enhanced parsed data with both original and label-enhanced field names
+    """
+    if not field_metadata:
+        return parsed_data
+        
+    enhanced_data = dict(parsed_data)  # Keep all original data
+    
+    try:
+        enhanced_count = 0
+        for original_field, value in parsed_data.items():
+            if original_field in field_metadata:
+                field_info = field_metadata[original_field]
+                if isinstance(field_info, dict) and "label_mapping" in field_info:
+                    label_mapping = field_info["label_mapping"]
+                    if isinstance(label_mapping, dict) and "label" in label_mapping:
+                        enhanced_field = label_mapping["label"]
+                        enhanced_data[enhanced_field] = value
+                        enhanced_count += 1
+        
+        if enhanced_count > 0:
+            print(f"🔵 Enhanced {enhanced_count} fields with label mappings")
+        else:
+            print(f"⚠️ No fields enhanced - checked {len(headers)} headers against {len(field_metadata)} metadata entries")
+        
+        return enhanced_data
+    except Exception as e:
+        print(f"❌ Error applying label mappings: {e}")
+        return parsed_data
+
+
 def get_unified_dataset_path(event_key: str) -> str:
     """
     Get the path for a unified dataset based on the event key.
@@ -113,6 +237,12 @@ async def build_unified_dataset(
     load_schemas(year)
     if tracker:
         tracker.update(5, "Loaded schemas", "Load schemas")
+    
+    # Load field metadata with label mappings
+    print(f"\U0001f535 Loading field metadata for {year}")
+    field_metadata = load_field_metadata(year)
+    if tracker:
+        tracker.update(7, "Loaded field metadata with label mappings", "Load field metadata")
 
     # Check if dataset already exists and if we should rebuild
     output_path = get_unified_dataset_path(event_key)
@@ -181,6 +311,12 @@ async def build_unified_dataset(
             )
 
         parsed = parse_scouting_row(row, headers)
+        
+        # Apply label mappings to enhance field names using original headers (Sprint 4 enhancement)
+        if field_metadata:
+            enhanced_fields = apply_label_mappings_to_raw_data(row, headers, field_metadata)
+            if parsed and enhanced_fields:
+                parsed.update(enhanced_fields)  # Add enhanced fields to parsed data
 
         # Debug logging for scouting parser
         if i == 0:  # Log the first row parsing for debugging
@@ -294,8 +430,17 @@ async def build_unified_dataset(
 
         parsed_robots = parse_superscout_row(row, superscouting_headers)
 
+        # Apply label mappings to enhance superscouting field names using original headers (Sprint 4 enhancement)
+        enhanced_superscout_fields = {}
+        if field_metadata:
+            enhanced_superscout_fields = apply_label_mappings_to_raw_data(row, superscouting_headers, field_metadata)
+
         # Each row can generate multiple robot entries due to robot grouping
         for robot_data in parsed_robots:
+            # Add enhanced fields to robot data
+            if robot_data and enhanced_superscout_fields:
+                robot_data.update(enhanced_superscout_fields)
+                
             # Only include entries with valid team numbers
             if "team_number" in robot_data and robot_data["team_number"]:
                 # Ensure match_number is present if available

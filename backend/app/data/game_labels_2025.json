@@ -1,19 +1,22 @@
 {
   "extraction_version": "1.0",
-  "extraction_date": "2025-07-05T17:48:16.409143",
+  "extraction_date": "2025-07-06T02:02:58.655723",
   "game_year": 2025,
-  "labels_count": 35,
+  "labels_count": 41,
   "labels": [
     {
       "label": "auto_leave_successful",
       "category": "autonomous",
       "description": "Whether the robot fully crossed the ROBOT STARTING LINE during autonomous period",
-      "data_type": "boolean",
+      "data_type": "count",
       "typical_range": "true/false",
       "usage_context": "Tracked at the end of autonomous period",
       "extraction_version": "1.0",
       "extraction_date": "2025-07-05T11:04:09.336191",
-      "game_year": 2025
+      "game_year": 2025,
+      "custom_added": false,
+      "last_modified": "2025-07-05T21:22:56.253889",
+      "modified_by_user": true
     },
     {
       "label": "auto_coral_L1_scored",
@@ -387,6 +390,78 @@
       "usage_context": "Track this metric during the autonomous period by counting each game piece successfully scored by the robot into the Net. Record immediately after autonomous ends, based on observed scoring or official field data.",
       "extraction_version": "1.0",
       "extraction_date": "2025-07-05T17:48:16.409121",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "Teleop Game Piece Score",
+      "category": "teleop",
+      "description": "Total number of game pieces scored by the team during the teleoperated period.",
+      "data_type": "count",
+      "typical_range": "0-20",
+      "usage_context": "Tracked live during the match by counting each game piece scored in teleop, recorded after the teleop period ends.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-05T21:24:22.249772",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "strategy_observed",
+      "category": "strategic",
+      "description": "Indicates whether a notable team strategy or unique play was observed during the match.",
+      "data_type": "boolean",
+      "typical_range": "true/false",
+      "usage_context": "Checked if scouts observe a significant strategic action or deviation from standard play during the match.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-05T21:26:08.233948",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "auto_mobility_score",
+      "category": "autonomous",
+      "description": "Number of times the robot successfully crosses the mobility line during autonomous.",
+      "data_type": "count",
+      "typical_range": "0-1",
+      "usage_context": "Tracked during the autonomous period by observing if the robot fully exits its starting zone for mobility points.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-06T02:00:16.295465",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "Auto Total Points",
+      "category": "autonomous",
+      "description": "Total number of points scored by the robot during the autonomous period.",
+      "data_type": "count",
+      "typical_range": "0–40",
+      "usage_context": "Recorded after the autonomous period ends, based on the robot's scoring actions as shown on the field display or by manual tally.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-06T02:01:04.637178",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "teleop_total_points",
+      "category": "autonomous",
+      "description": "Total points scored by the team during the teleoperated period.",
+      "data_type": "count",
+      "typical_range": "0-100",
+      "usage_context": "Tracked live during the teleop phase by summing all point-scoring actions performed by the team.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-06T02:02:05.485413",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "endgame_total_points",
+      "category": "autonomous",
+      "description": "Total points earned by the team during the endgame period of the match.",
+      "data_type": "count",
+      "typical_range": "0-30",
+      "usage_context": "Recorded at the end of the match by summing all points scored by the team during the endgame phase.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-06T02:02:58.655709",
       "game_year": 2025,
       "custom_added": true
     }
