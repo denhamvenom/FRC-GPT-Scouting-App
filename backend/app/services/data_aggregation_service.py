@@ -819,7 +819,7 @@ class DataAggregationService:
 
             for key, value in match_data.items():
                 # Skip standard non-metric fields
-                if key in ["team_number", "match_number", "alliance_color", "notes", "timestamp"]:
+                if key in ["team_number", "match_number", "qual_number", "alliance_color", "notes", "timestamp"]:
                     continue
 
                 if isinstance(value, (int, float)):

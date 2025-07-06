@@ -125,6 +125,7 @@ class PicklistGPTService:
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Prepare team data in a format optimized for GPT analysis with enhanced label support.
+        Uses enhanced label names instead of raw field names for better GPT understanding.
 
         Args:
             teams_data: Dictionary of team data from the unified dataset
@@ -142,8 +143,13 @@ class PicklistGPTService:
                     "nickname": team_data.get("nickname", f"Team {team_data['team_number']}"),
                 }
 
-                # Add enhanced performance metrics if available
-                if "metrics" in team_data and isinstance(team_data["metrics"], dict):
+                # Process raw scouting data to create enhanced metrics if metrics not available
+                if "metrics" not in team_data and "scouting_data" in team_data:
+                    # Aggregate scouting data and apply enhanced labels
+                    raw_metrics = self._aggregate_raw_scouting_data(team_data["scouting_data"])
+                    enhanced_metrics = self._apply_enhanced_label_mappings(raw_metrics)
+                    formatted_team["metrics"] = enhanced_metrics
+                elif "metrics" in team_data and isinstance(team_data["metrics"], dict):
                     metrics = team_data["metrics"]
                     
                     # Separate text fields from numeric metrics
@@ -160,9 +166,11 @@ class PicklistGPTService:
                                 else:
                                     formatted_team["text_data"][field_name] = field_info
                         
-                        formatted_team["metrics"] = numeric_metrics
+                        # Ensure numeric metrics use enhanced label names
+                        formatted_team["metrics"] = self._ensure_enhanced_metric_names(numeric_metrics)
                     else:
-                        formatted_team["metrics"] = metrics
+                        # Apply enhanced labeling to existing metrics
+                        formatted_team["metrics"] = self._ensure_enhanced_metric_names(metrics)
 
                 # Add any additional relevant data
                 for key in ["autonomous", "teleop", "endgame", "defense", "reliability"]:
@@ -180,6 +188,144 @@ class PicklistGPTService:
                 formatted_teams.append(formatted_team)
 
         return formatted_teams
+
+    def _aggregate_raw_scouting_data(self, scouting_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Aggregate raw scouting data from individual matches.
+        
+        Args:
+            scouting_data: List of match scouting data
+            
+        Returns:
+            Dictionary of aggregated metrics with text field support
+        """
+        metrics_sum = {}
+        metrics_count = {}
+        text_data = {}
+
+        # Accumulate metrics from all matches
+        for match_data in scouting_data:
+            if not isinstance(match_data, dict):
+                continue
+
+            for key, value in match_data.items():
+                # Skip standard non-metric fields
+                if key in ["team_number", "match_number", "qual_number", "alliance_color", "notes", "timestamp"]:
+                    continue
+
+                if isinstance(value, (int, float)):
+                    # Handle numeric fields
+                    if key not in metrics_sum:
+                        metrics_sum[key] = 0
+                        metrics_count[key] = 0
+                    metrics_sum[key] += value
+                    metrics_count[key] += 1
+                elif isinstance(value, str) and value.strip():
+                    # Handle text fields - collect all non-empty values
+                    if key not in text_data:
+                        text_data[key] = []
+                    text_data[key].append(value.strip())
+
+        # Calculate averages for numeric fields
+        aggregated_metrics = {}
+        for metric in metrics_sum:
+            if metrics_count[metric] > 0:
+                aggregated_metrics[metric] = round(metrics_sum[metric] / metrics_count[metric], 2)
+
+        # Add text data with consolidation
+        for field, values in text_data.items():
+            # Remove duplicates while preserving order
+            unique_values = []
+            seen = set()
+            for value in values:
+                if value not in seen:
+                    unique_values.append(value)
+                    seen.add(value)
+            
+            # Store as concatenated string if multiple unique values
+            if len(unique_values) == 1:
+                aggregated_metrics[field] = unique_values[0]
+            elif len(unique_values) > 1:
+                aggregated_metrics[field] = " | ".join(unique_values)
+
+        return aggregated_metrics
+
+    def _apply_enhanced_label_mappings(self, raw_metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Apply enhanced label mappings to convert field names to enhanced labels.
+        
+        Args:
+            raw_metrics: Raw metrics with original field names
+            
+        Returns:
+            Enhanced metrics with label names and separated text fields
+        """
+        enhanced_metrics = {}
+        text_fields = {}
+        
+        # Process each metric
+        for field_name, value in raw_metrics.items():
+            # Check if we have an enhanced label for this field
+            label_info = None
+            for label_name, label_data in self.scouting_labels.items():
+                if label_data.get("original_field") == field_name:
+                    label_info = label_data
+                    break
+            
+            if label_info:
+                # Use enhanced label name
+                enhanced_field_name = label_info.get("label", field_name)
+                data_type = label_info.get("data_type", "count")
+                
+                if data_type == "text":
+                    # Store text fields separately
+                    text_fields[enhanced_field_name] = {
+                        "value": value,
+                        "description": label_info.get("description", ""),
+                        "category": label_info.get("category", "unknown"),
+                        "usage_context": label_info.get("usage_context", "")
+                    }
+                else:
+                    # Store numeric metrics with enhanced name
+                    enhanced_metrics[enhanced_field_name] = value
+            else:
+                # Keep original field name if no mapping found
+                enhanced_metrics[field_name] = value
+        
+        # Add text fields if any were found
+        if text_fields:
+            enhanced_metrics["text_fields"] = text_fields
+        
+        return enhanced_metrics
+
+    def _ensure_enhanced_metric_names(self, metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Ensure metrics use enhanced label names instead of raw field names.
+        
+        Args:
+            metrics: Original metrics dictionary
+            
+        Returns:
+            Metrics with enhanced label names where available
+        """
+        enhanced_metrics = {}
+        
+        for field_name, value in metrics.items():
+            # Look for enhanced label mapping
+            if field_name in self.scouting_labels:
+                # Field name is already an enhanced label, keep as-is
+                enhanced_metrics[field_name] = value
+            else:
+                # Look for this field as an original_field in scouting labels
+                enhanced_name = field_name  # Default to original
+                for label_name, label_info in self.scouting_labels.items():
+                    if label_info.get("original_field") == field_name:
+                        enhanced_name = label_name
+                        break
+                
+                enhanced_metrics[enhanced_name] = value
+        
+        return enhanced_metrics
 
     def check_token_count(
         self, system_prompt: str, user_prompt: str, max_tokens: int = None
@@ -361,9 +507,16 @@ Please produce output following RULES.
                     "weighted_score": weighted_score,
                 }
 
-                # Add metrics with scouting label context
+                # Add metrics with enhanced labels and scouting label context
                 if "metrics" in team and isinstance(team["metrics"], dict):
-                    team_with_score["metrics"] = self._enhance_metrics_with_labels(team["metrics"])
+                    # First ensure enhanced label names are used
+                    enhanced_metrics = self._ensure_enhanced_metric_names(team["metrics"])
+                    # Then add additional context for GPT
+                    team_with_score["metrics"] = self._enhance_metrics_with_labels(enhanced_metrics)
+                
+                # Include text data if available
+                if "text_data" in team and isinstance(team["text_data"], dict):
+                    team_with_score["text_data"] = team["text_data"]
 
                 teams_with_scores.append(team_with_score)
         else:
@@ -376,8 +529,16 @@ Please produce output following RULES.
                     "weighted_score": weighted_score,
                 }
 
+                # Add metrics with enhanced labels and scouting label context
                 if "metrics" in team and isinstance(team["metrics"], dict):
-                    team_with_score["metrics"] = self._enhance_metrics_with_labels(team["metrics"])
+                    # First ensure enhanced label names are used
+                    enhanced_metrics = self._ensure_enhanced_metric_names(team["metrics"])
+                    # Then add additional context for GPT
+                    team_with_score["metrics"] = self._enhance_metrics_with_labels(enhanced_metrics)
+                
+                # Include text data if available
+                if "text_data" in team and isinstance(team["text_data"], dict):
+                    team_with_score["text_data"] = team["text_data"]
 
                 teams_with_scores.append(team_with_score)
 
@@ -789,6 +950,17 @@ CRITICAL: Return only valid JSON."""
         Returns:
             Analysis results with picklist and metadata
         """
+        # Log the prompts being sent to GPT for debugging
+        logger.info("=" * 80)
+        logger.info("GPT ANALYSIS REQUEST")
+        logger.info("=" * 80)
+        logger.info("SYSTEM PROMPT:")
+        logger.info(system_prompt)
+        logger.info("-" * 40)
+        logger.info("USER PROMPT:")
+        logger.info(user_prompt)
+        logger.info("=" * 80)
+
         # Check token count
         try:
             self.check_token_count(system_prompt, user_prompt)
@@ -799,6 +971,14 @@ CRITICAL: Return only valid JSON."""
         result = await self._execute_api_call_with_retry(system_prompt, user_prompt, max_retries)
 
         if result["status"] == "success":
+            # Log the GPT response for debugging
+            logger.info("=" * 80)
+            logger.info("GPT ANALYSIS RESPONSE")
+            logger.info("=" * 80)
+            logger.info("RAW RESPONSE:")
+            logger.info(result["response_data"])
+            logger.info("=" * 80)
+            
             # Parse response
             picklist = self.parse_response_with_index_mapping(
                 result["response_data"], teams_data, team_index_map

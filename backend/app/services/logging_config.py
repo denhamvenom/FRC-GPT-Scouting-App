@@ -17,7 +17,7 @@ def setup_logging():
 
     # Create a timestamped log file
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = os.path.join(logs_dir, f"archive_service_{timestamp}.log")
+    log_file = os.path.join(logs_dir, f"scouting_app_{timestamp}.log")
 
     # Configure the root logger
     logging.basicConfig(
@@ -28,6 +28,8 @@ def setup_logging():
 
     # Configure specific loggers
     logging.getLogger("archive_service").setLevel(logging.DEBUG)
+    logging.getLogger("picklist_gpt_service").setLevel(logging.INFO)  # GPT interactions
+    logging.getLogger("gpt_analysis_service").setLevel(logging.INFO)  # Strategy analysis
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)  # Reduce SQL logging
 
     # Log the start of the application

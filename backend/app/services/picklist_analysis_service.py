@@ -75,27 +75,122 @@ class PicklistAnalysisService:
             print(f"Error loading unified dataset: {e}")
             return {}
 
-    def _load_field_selections(self) -> Dict[str, str]:
-        """Load the field selection mappings from config file."""
+    def _load_field_selections(self) -> Dict[str, Any]:
+        """
+        Load enhanced field selections using unified structure.
+        Priority: field_selections.label_mapping → game_labels → fallback
+        
+        Returns:
+            Dictionary mapping field names to enhanced label data and metadata
+        """
         try:
-            # Try to load field selections based on year
-            field_selections_path = os.path.join(DATA_DIR, f"field_selections_{self.year}.json")
-
+            enhanced_selections = {}
+            
+            # PRIORITY 1: Load from unified field_selections with enhanced label_mapping
+            field_selections_path = os.path.join(DATA_DIR, f"field_selections_{self.year}{self.event_key.replace(str(self.year), '')}.json")
+            
             if os.path.exists(field_selections_path):
                 with open(field_selections_path, "r", encoding="utf-8") as f:
-                    selections_data = json.load(f)
-                    return selections_data.get("field_selections", {})
-
-            # Fallback to legacy schema files
-            schema_path = os.path.join(DATA_DIR, f"schema_{self.year}.json")
-            if os.path.exists(schema_path):
-                with open(schema_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
-
-            # Still no selections found, use empty dict
-            return {}
+                    field_selections_data = json.load(f)
+                
+                # Extract enhanced field selections
+                field_selections = field_selections_data.get("field_selections", {})
+                for field_name, field_info in field_selections.items():
+                    if isinstance(field_info, dict):
+                        # Store enhanced field information
+                        enhanced_info = {
+                            "category": field_info.get("category", "unknown"),
+                            "source": field_info.get("source", "unknown")
+                        }
+                        
+                        # Add label mapping if available
+                        if "label_mapping" in field_info:
+                            label_mapping = field_info["label_mapping"]
+                            enhanced_info.update({
+                                "label": label_mapping.get("label", field_name),
+                                "description": label_mapping.get("description", ""),
+                                "data_type": label_mapping.get("data_type", "count"),
+                                "typical_range": label_mapping.get("typical_range", ""),
+                                "usage_context": label_mapping.get("usage_context", ""),
+                                "has_enhanced_mapping": True
+                            })
+                        else:
+                            enhanced_info.update({
+                                "label": field_name,
+                                "description": "",
+                                "data_type": "count",
+                                "typical_range": "",
+                                "usage_context": "",
+                                "has_enhanced_mapping": False
+                            })
+                        
+                        enhanced_selections[field_name] = enhanced_info
+                
+                print(f"Loaded {len(enhanced_selections)} enhanced field selections from unified structure")
+            
+            # PRIORITY 2: Fallback to game_labels for additional metrics
+            game_labels_path = os.path.join(DATA_DIR, f"game_labels_{self.year}.json")
+            
+            if os.path.exists(game_labels_path):
+                with open(game_labels_path, "r", encoding="utf-8") as f:
+                    game_labels_data = json.load(f)
+                
+                # Add game labels not already present from field_selections
+                game_labels_added = 0
+                for label_info in game_labels_data.get("labels", []):
+                    label_name = label_info.get("label", "")
+                    
+                    # Check if this label isn't already mapped from field_selections
+                    found_in_field_selections = any(
+                        field_data.get("label") == label_name 
+                        for field_data in enhanced_selections.values()
+                    )
+                    
+                    if label_name and not found_in_field_selections:
+                        # Add as direct mapping (label name = field name)
+                        enhanced_selections[label_name] = {
+                            "category": label_info.get("category", "unknown"),
+                            "source": "game_labels",
+                            "label": label_name,
+                            "description": label_info.get("description", ""),
+                            "data_type": label_info.get("data_type", "count"),
+                            "typical_range": label_info.get("typical_range", ""),
+                            "usage_context": label_info.get("usage_context", ""),
+                            "has_enhanced_mapping": True
+                        }
+                        game_labels_added += 1
+                
+                if game_labels_added > 0:
+                    print(f"Added {game_labels_added} fallback metrics from game_labels")
+            
+            # PRIORITY 3: Legacy support for schema files
+            if not enhanced_selections:
+                schema_path = os.path.join(DATA_DIR, f"schema_{self.year}.json")
+                if os.path.exists(schema_path):
+                    with open(schema_path, "r", encoding="utf-8") as f:
+                        legacy_data = json.load(f)
+                    
+                    # Convert legacy format to enhanced format
+                    for field_name, category in legacy_data.items():
+                        if isinstance(category, str):
+                            enhanced_selections[field_name] = {
+                                "category": category,
+                                "source": "legacy_schema",
+                                "label": field_name,
+                                "description": "",
+                                "data_type": "count",
+                                "typical_range": "",
+                                "usage_context": "",
+                                "has_enhanced_mapping": False
+                            }
+                    
+                    print(f"Loaded {len(enhanced_selections)} legacy field selections")
+            
+            print(f"Total enhanced field selections loaded: {len(enhanced_selections)}")
+            return enhanced_selections
+            
         except Exception as e:
-            print(f"Error loading field selections: {e}")
+            print(f"Error loading enhanced field selections: {e}")
             return {}
 
     def _load_manual_info(self) -> Dict[str, Any]:
@@ -193,55 +288,91 @@ class PicklistAnalysisService:
 
         return superscout_metrics
 
-    def identify_game_specific_metrics(self) -> List[Dict[str, str]]:
+    def identify_game_specific_metrics(self) -> List[Dict[str, Any]]:
         """
-        Identify game-specific metrics based on the field selections and scouting data.
-        Returns list of metric objects with id, label, and category.
+        Identify game-specific metrics using enhanced field selections with metadata.
+        Returns list of metric objects with id, label, category, and enhanced metadata.
         """
-        # Start with metrics from field selections if available
+        # Start with metrics from enhanced field selections if available
         if self.field_selections:
             # Group fields by category
             auto_metrics = []
             teleop_metrics = []
             endgame_metrics = []
             strategy_metrics = []
+            autonomous_metrics = []  # For "autonomous" category
+            strategic_metrics = []   # For "strategic" category
             other_metrics = []
 
-            for field, category in self.field_selections.items():
-                # Skip ignored fields
-                if category == "ignore":
-                    continue
+            for field_name, field_info in self.field_selections.items():
+                if isinstance(field_info, dict):
+                    category = field_info.get("category", "unknown")
+                    
+                    # Skip ignored fields
+                    if category == "ignore":
+                        continue
 
-                # Skip universal fields
-                if category in [
-                    "team_number",
-                    "match_number",
-                    "qual_number",
-                    "alliance_color",
-                ]:
-                    continue
+                    # Skip universal fields
+                    if category in [
+                        "team_number",
+                        "match_number",
+                        "qual_number",
+                        "alliance_color",
+                    ]:
+                        continue
 
-                # Format the label from snake_case to Title Case
-                label = " ".join(w.capitalize() for w in field.split("_"))
+                    # Use enhanced label or fallback to formatted field name
+                    label = field_info.get("label", " ".join(w.capitalize() for w in field_name.split("_")))
 
-                # Create metric object
-                metric = {"id": field, "label": label, "category": category}
+                    # Create enhanced metric object
+                    metric = {
+                        "id": field_name,
+                        "label": label,
+                        "category": category,
+                        "description": field_info.get("description", ""),
+                        "data_type": field_info.get("data_type", "count"),
+                        "typical_range": field_info.get("typical_range", ""),
+                        "usage_context": field_info.get("usage_context", ""),
+                        "source": field_info.get("source", "unknown"),
+                        "has_enhanced_mapping": field_info.get("has_enhanced_mapping", False)
+                    }
 
-                # Add to appropriate category list
-                if category == "auto":
-                    auto_metrics.append(metric)
-                elif category == "teleop":
-                    teleop_metrics.append(metric)
-                elif category == "endgame":
-                    endgame_metrics.append(metric)
-                elif category == "strategy":
-                    strategy_metrics.append(metric)
-                else:
-                    other_metrics.append(metric)
+                    # Add to appropriate category list
+                    if category in ["auto", "autonomous"]:
+                        if category == "autonomous":
+                            autonomous_metrics.append(metric)
+                        else:
+                            auto_metrics.append(metric)
+                    elif category == "teleop":
+                        teleop_metrics.append(metric)
+                    elif category == "endgame":
+                        endgame_metrics.append(metric)
+                    elif category in ["strategy", "strategic"]:
+                        if category == "strategic":
+                            strategic_metrics.append(metric)
+                        else:
+                            strategy_metrics.append(metric)
+                    else:
+                        other_metrics.append(metric)
 
-            # Combine all metrics in phase order
+            # Combine all metrics in phase order, prioritizing enhanced mappings
+            all_metrics = (
+                autonomous_metrics + auto_metrics + 
+                teleop_metrics + endgame_metrics + 
+                strategic_metrics + strategy_metrics + 
+                other_metrics
+            )
+            
+            # Sort each category by whether it has enhanced mapping (enhanced first)
+            def sort_by_enhancement(metric_list):
+                return sorted(metric_list, key=lambda m: not m.get("has_enhanced_mapping", False))
+            
             return (
-                auto_metrics + teleop_metrics + endgame_metrics + strategy_metrics + other_metrics
+                sort_by_enhancement(autonomous_metrics + auto_metrics) +
+                sort_by_enhancement(teleop_metrics) +
+                sort_by_enhancement(endgame_metrics) +
+                sort_by_enhancement(strategic_metrics + strategy_metrics) +
+                sort_by_enhancement(other_metrics)
             )
         # Fallback to analyzing dataset structure if no field selections found
         if not self.teams_data:
@@ -516,13 +647,13 @@ class PicklistAnalysisService:
         # Get statistics for metrics
         metrics_stats = self.calculate_metrics_statistics()
 
-        # Prepare metric information for GPT
+        # Prepare enhanced metric information for GPT with metadata
         metric_info = []
         for metric in all_metrics:
             metric_id = metric["id"]
             stats = metrics_stats.get(metric_id, {})
 
-            # Create description with stats if available
+            # Create enhanced description with metadata
             description = {
                 "id": metric_id,
                 "name": metric["label"],
@@ -531,7 +662,26 @@ class PicklistAnalysisService:
                 "source": (
                     "superscouting" if metric in superscout_metrics else "regular"
                 ),  # Add source to distinguish
+                "enhanced_metadata": {}
             }
+
+            # Add enhanced metadata if available (from Sprint 1 improvements)
+            if hasattr(metric, 'get') and isinstance(metric, dict):
+                enhanced_metadata = {}
+                
+                if metric.get("description"):
+                    enhanced_metadata["description"] = metric["description"]
+                if metric.get("data_type"):
+                    enhanced_metadata["data_type"] = metric["data_type"]
+                if metric.get("typical_range"):
+                    enhanced_metadata["typical_range"] = metric["typical_range"]
+                if metric.get("usage_context"):
+                    enhanced_metadata["usage_context"] = metric["usage_context"]
+                if metric.get("has_enhanced_mapping"):
+                    enhanced_metadata["has_enhanced_mapping"] = metric["has_enhanced_mapping"]
+                
+                if enhanced_metadata:
+                    description["enhanced_metadata"] = enhanced_metadata
 
             # Add stats if available
             if stats:
@@ -554,25 +704,74 @@ class PicklistAnalysisService:
                 game_context += self.manual_info["relevant_sections"]
         else:
             game_context = f"For the {self.year} FRC season."
-        # Build the GPT prompt
+        # Organize metrics by category for better context
+        metrics_by_category = {}
+        text_field_metrics = []
+        
+        for metric in metric_info:
+            category = metric.get("category", "other")
+            data_type = metric.get("enhanced_metadata", {}).get("data_type", "count")
+            
+            # Separate text fields for special handling
+            if data_type == "text":
+                text_field_metrics.append(metric)
+            else:
+                if category not in metrics_by_category:
+                    metrics_by_category[category] = []
+                metrics_by_category[category].append(metric)
+
+        # Build the enhanced GPT prompt with category groupings
         prompt = f"""
 You are an expert FRC (FIRST Robotics Competition) strategist assistant. 
 Your task is to analyze a team's strategy request and identify the most relevant metrics for their picklist.
 
 {game_context}
 
-Available metrics for this team's scouting data:
-{json.dumps(metric_info, indent=2)}
+ENHANCED METRIC CATEGORIES:
 
-IMPORTANT: Pay special attention to metrics from "source": "superscouting". These are qualitative observations about teams' mechanisms, strategies, and capabilities, and are often more descriptive of robot abilities than quantitative metrics.
+AUTONOMOUS PHASE METRICS:
+{json.dumps(metrics_by_category.get("autonomous", []) + metrics_by_category.get("auto", []), indent=2)}
+
+TELEOP PHASE METRICS:
+{json.dumps(metrics_by_category.get("teleop", []), indent=2)}
+
+ENDGAME PHASE METRICS:
+{json.dumps(metrics_by_category.get("endgame", []), indent=2)}
+
+STRATEGIC & QUALITATIVE METRICS:
+{json.dumps(metrics_by_category.get("strategic", []) + metrics_by_category.get("strategy", []), indent=2)}
+
+TEXT DATA FIELDS (Strategy Notes & Comments):
+{json.dumps(text_field_metrics, indent=2)}
+
+UNIVERSAL METRICS:
+{json.dumps(metrics_by_category.get("universal", []), indent=2)}
+
+SUPERSCOUTING METRICS:
+{json.dumps(metrics_by_category.get("superscout", []), indent=2)}
+
+OTHER METRICS:
+{json.dumps(metrics_by_category.get("other", []) + metrics_by_category.get("unknown", []), indent=2)}
+
+CRITICAL INSTRUCTIONS:
+- Pay special attention to "enhanced_metadata" fields which contain detailed descriptions, usage_context, typical_range, and data_type information
+- TEXT DATA FIELDS contain strategy notes and scout comments - these are especially valuable for understanding team capabilities and strategic approaches
+- Metrics with "has_enhanced_mapping": true have richer, more accurate descriptions
+- When strategy mentions specific capabilities, prioritize metrics with detailed descriptions in enhanced_metadata
+- Consider the "usage_context" field to understand when and how each metric is collected
+- Use "typical_range" to understand what constitutes good vs poor performance
 
 The team is building a picklist and has described their strategy needs as follows:
 "{strategy_prompt}"
 
-Based on this strategy description and the available metrics, identify the most relevant metrics that would
-help the team execute their strategy.
+Based on this strategy description and the categorized metrics above, identify the most relevant metrics that would help the team execute their strategy.
 
-When the strategy mentions specific robot capabilities, mechanisms, or play styles (like "ground intake", "amp scorer", "defense", etc.), PRIORITIZE matching superscouting metrics that directly assess these qualities over generic statistical metrics.
+PRIORITIZATION GUIDELINES:
+1. Enhanced metrics (has_enhanced_mapping: true) over basic metrics
+2. Text fields over numeric when strategy involves qualitative assessment
+3. Superscouting metrics for robot capabilities and mechanisms
+4. Phase-specific metrics that match strategy timing (auto, teleop, endgame)
+5. Metrics with high correlation_with_winning for competitive advantage
 
 Provide your response in the following JSON format:
 {{
@@ -581,15 +780,16 @@ Provide your response in the following JSON format:
     {{
       "id": "metric_id",
       "weight": float_value,
-      "reason": "Brief reason for selecting this metric"
+      "reason": "Brief reason for selecting this metric, citing enhanced_metadata if available"
     }},
     ...
-  ]
+  ],
+  "category_focus": "Primary game phase or strategy type this focuses on"
 }}
 
 The weight should be between 0.5 and 3.0, with higher values for metrics that are more critical to the strategy.
 Limit your response to 3-6 metrics that best match the strategy.
-Only include metrics from the provided list.
+Only include metrics from the provided lists above.
         """
 
         try:
@@ -615,6 +815,10 @@ Only include metrics from the provided list.
                     metric["weight"] = max(0.5, min(3.0, float(metric["weight"])))
                 else:
                     metric["weight"] = 1.0
+
+            # Add category_focus if not present (for backwards compatibility)
+            if "category_focus" not in result:
+                result["category_focus"] = "general"
 
             return result
 
