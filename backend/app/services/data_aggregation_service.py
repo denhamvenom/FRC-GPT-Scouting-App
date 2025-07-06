@@ -50,51 +50,113 @@ class DataAggregationService:
         else:
             self.extractor_service = None
 
-    def _load_label_mappings(self) -> Dict[str, str]:
+    def _load_label_mappings(self) -> Dict[str, Any]:
         """
-        Load field-to-label mappings from schema and metadata files.
+        Load field-to-label mappings using unified field selection structure.
+        Priority: field_selections.label_mapping → game_labels → fallback
         
         Returns:
-            Dictionary mapping original field names to enhanced label names
+            Dictionary mapping original field names to enhanced label data and metadata
         """
         try:
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             data_dir = os.path.join(base_dir, "data")
             
-            # Try to load field metadata first (from Sprint 3)
-            metadata_path = os.path.join(data_dir, f"field_metadata_{self.year}.json")
             label_mappings = {}
             
+            # PRIORITY 1: Load from field_selections with enhanced label_mapping
+            field_selections_path = os.path.join(data_dir, f"field_selections_{self.year}{self.event_key.replace(str(self.year), '')}.json")
+            if os.path.exists(field_selections_path):
+                with open(field_selections_path, "r", encoding="utf-8") as f:
+                    field_selections_data = json.load(f)
+                
+                # Extract enhanced label mappings from field_selections
+                field_selections = field_selections_data.get("field_selections", {})
+                for field_name, field_info in field_selections.items():
+                    if isinstance(field_info, dict) and "label_mapping" in field_info:
+                        label_mapping = field_info["label_mapping"]
+                        if "label" in label_mapping:
+                            # Store full label mapping with metadata
+                            label_mappings[field_name] = {
+                                "label": label_mapping["label"],
+                                "category": label_mapping.get("category", "unknown"),
+                                "description": label_mapping.get("description", ""),
+                                "data_type": label_mapping.get("data_type", "count"),
+                                "typical_range": label_mapping.get("typical_range", ""),
+                                "usage_context": label_mapping.get("usage_context", ""),
+                                "source": "field_selections"
+                            }
+                
+                logger.info(f"Loaded {len(label_mappings)} enhanced field-to-label mappings from field_selections")
+            
+            # PRIORITY 2: Load from game_labels as fallback for unmapped fields
+            game_labels_path = os.path.join(data_dir, f"game_labels_{self.year}.json")
+            if os.path.exists(game_labels_path):
+                with open(game_labels_path, "r", encoding="utf-8") as f:
+                    game_labels_data = json.load(f)
+                
+                # Create a lookup for game labels
+                game_labels_lookup = {}
+                for label_info in game_labels_data.get("labels", []):
+                    label_name = label_info.get("label", "")
+                    if label_name:
+                        game_labels_lookup[label_name] = label_info
+                
+                # Fill in missing mappings from game_labels
+                game_labels_added = 0
+                for label_name, label_info in game_labels_lookup.items():
+                    # Check if this label isn't already mapped from field_selections
+                    found_in_field_selections = any(
+                        mapping.get("label") == label_name 
+                        for mapping in label_mappings.values()
+                    )
+                    
+                    if not found_in_field_selections:
+                        # Add as direct mapping (label name = field name)
+                        label_mappings[label_name] = {
+                            "label": label_name,
+                            "category": label_info.get("category", "unknown"),
+                            "description": label_info.get("description", ""),
+                            "data_type": label_info.get("data_type", "count"),
+                            "typical_range": label_info.get("typical_range", ""),
+                            "usage_context": label_info.get("usage_context", ""),
+                            "source": "game_labels"
+                        }
+                        game_labels_added += 1
+                
+                logger.info(f"Added {game_labels_added} fallback mappings from game_labels")
+            
+            # PRIORITY 3: Legacy support for field_metadata files (Sprint 3 compatibility)
+            metadata_path = os.path.join(data_dir, f"field_metadata_{self.year}.json")
             if os.path.exists(metadata_path):
                 with open(metadata_path, "r", encoding="utf-8") as f:
                     field_metadata = json.load(f)
                 
-                # Extract label mappings from field metadata
+                # Add any mappings not already present
+                legacy_added = 0
                 for field_name, field_info in field_metadata.items():
-                    if isinstance(field_info, dict) and "label_mapping" in field_info:
+                    if field_name not in label_mappings and isinstance(field_info, dict) and "label_mapping" in field_info:
                         label_mapping = field_info["label_mapping"]
                         if "label" in label_mapping:
-                            label_mappings[field_name] = label_mapping["label"]
+                            label_mappings[field_name] = {
+                                "label": label_mapping["label"],
+                                "category": label_mapping.get("category", "unknown"),
+                                "description": label_mapping.get("description", ""),
+                                "data_type": label_mapping.get("data_type", "count"),
+                                "typical_range": label_mapping.get("typical_range", ""),
+                                "usage_context": label_mapping.get("usage_context", ""),
+                                "source": "field_metadata"
+                            }
+                            legacy_added += 1
                 
-                logger.info(f"Loaded {len(label_mappings)} field-to-label mappings from metadata")
+                if legacy_added > 0:
+                    logger.info(f"Added {legacy_added} legacy mappings from field_metadata")
             
-            # Also try to load from schema files as fallback
-            schema_path = os.path.join(data_dir, f"schema_{self.year}.json")
-            if os.path.exists(schema_path):
-                with open(schema_path, "r", encoding="utf-8") as f:
-                    schema_data = json.load(f)
-                
-                # Look for label mappings in schema
-                if "label_mappings" in schema_data:
-                    additional_mappings = schema_data["label_mappings"]
-                    label_mappings.update(additional_mappings)
-                    logger.info(f"Added {len(additional_mappings)} label mappings from schema")
-            
-            logger.info(f"Total label mappings loaded: {len(label_mappings)}")
+            logger.info(f"Total enhanced label mappings loaded: {len(label_mappings)}")
             return label_mappings
             
         except Exception as e:
-            logger.error(f"Error loading label mappings: {e}")
+            logger.error(f"Error loading enhanced label mappings: {e}")
             return {}
 
     def _load_dataset(self) -> Dict[str, Any]:
@@ -736,18 +798,19 @@ class DataAggregationService:
 
         return aggregated
 
-    def _aggregate_scouting_metrics(self, scouting_data: List[Dict[str, Any]]) -> Dict[str, float]:
+    def _aggregate_scouting_metrics(self, scouting_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Calculate average metrics from scouting data.
+        Calculate average metrics from scouting data with text field support.
         
         Args:
             scouting_data: List of match scouting data
             
         Returns:
-            Dictionary of averaged metrics
+            Dictionary of averaged metrics and collected text data
         """
         metrics_sum = {}
         metrics_count = {}
+        text_data = {}
 
         # Accumulate metrics from all matches
         for match_data in scouting_data:
@@ -755,71 +818,114 @@ class DataAggregationService:
                 continue
 
             for key, value in match_data.items():
-                # Skip non-numeric fields
+                # Skip standard non-metric fields
                 if key in ["team_number", "match_number", "alliance_color", "notes", "timestamp"]:
                     continue
 
                 if isinstance(value, (int, float)):
+                    # Handle numeric fields
                     if key not in metrics_sum:
                         metrics_sum[key] = 0
                         metrics_count[key] = 0
                     metrics_sum[key] += value
                     metrics_count[key] += 1
+                elif isinstance(value, str) and value.strip():
+                    # Handle text fields - collect all non-empty values
+                    if key not in text_data:
+                        text_data[key] = []
+                    text_data[key].append(value.strip())
 
-        # Calculate averages
+        # Calculate averages for numeric fields
         averaged_metrics = {}
         for metric in metrics_sum:
             if metrics_count[metric] > 0:
                 averaged_metrics[metric] = round(metrics_sum[metric] / metrics_count[metric], 2)
 
+        # Add text data with consolidation
+        for field, values in text_data.items():
+            # Remove duplicates while preserving order
+            unique_values = []
+            seen = set()
+            for value in values:
+                if value not in seen:
+                    unique_values.append(value)
+                    seen.add(value)
+            
+            # Store as concatenated string if multiple unique values
+            if len(unique_values) == 1:
+                averaged_metrics[field] = unique_values[0]
+            elif len(unique_values) > 1:
+                averaged_metrics[field] = " | ".join(unique_values)
+
         return averaged_metrics
 
-    def _apply_label_mappings(self, metrics: Dict[str, float]) -> Dict[str, float]:
+    def _apply_label_mappings(self, metrics: Dict[str, float]) -> Dict[str, Any]:
         """
-        Apply label mappings to enhance field names with scouting labels.
+        Apply enhanced label mappings to transform field names and add text field support.
         
         Args:
             metrics: Original metrics with generic field names
             
         Returns:
-            Enhanced metrics with both original and label-enhanced field names
+            Enhanced metrics with label-enhanced field names and text data support
         """
         if not isinstance(metrics, dict):
             logger.warning(f"Expected dict for metrics, got {type(metrics)}")
             return {}
             
         enhanced_metrics = {}
+        text_fields = {}
         
         try:
             # Keep all original metrics for compatibility
             enhanced_metrics.update(metrics)
             
-            # Add enhanced metrics using label mappings
+            # Add enhanced metrics using unified label mappings
             if self.label_mappings:
                 enhanced_count = 0
+                text_fields_count = 0
+                
                 for original_field, value in metrics.items():
                     if not isinstance(original_field, str):
                         continue
                         
                     if original_field in self.label_mappings:
                         try:
-                            enhanced_field = self.label_mappings[original_field]
+                            label_info = self.label_mappings[original_field]
+                            enhanced_field = label_info.get("label", "")
+                            data_type = label_info.get("data_type", "count")
                             
                             # Validate enhanced field name
                             if isinstance(enhanced_field, str) and enhanced_field.strip():
-                                enhanced_metrics[enhanced_field] = value
-                                enhanced_count += 1
-                                logger.debug(f"Enhanced field: {original_field} -> {enhanced_field}")
+                                if data_type == "text":
+                                    # Handle text fields separately
+                                    text_fields[enhanced_field] = {
+                                        "value": value,
+                                        "description": label_info.get("description", ""),
+                                        "category": label_info.get("category", "unknown"),
+                                        "usage_context": label_info.get("usage_context", "")
+                                    }
+                                    text_fields_count += 1
+                                else:
+                                    # Handle numeric fields
+                                    enhanced_metrics[enhanced_field] = value
+                                    enhanced_count += 1
+                                
+                                logger.debug(f"Enhanced field: {original_field} -> {enhanced_field} ({data_type})")
                         except Exception as e:
                             logger.warning(f"Error applying label mapping for {original_field}: {e}")
                 
+                # Add text fields to enhanced metrics with special prefix
+                if text_fields:
+                    enhanced_metrics["text_fields"] = text_fields
+                
                 if enhanced_count > 0:
-                    logger.info(f"Enhanced {enhanced_count} field names with scouting labels")
+                    logger.info(f"Enhanced {enhanced_count} numeric and {text_fields_count} text field names with scouting labels")
             else:
                 logger.debug("No label mappings available")
         
         except Exception as e:
-            logger.error(f"Error applying label mappings: {e}")
+            logger.error(f"Error applying enhanced label mappings: {e}")
             # Return original metrics if enhancement fails
             return metrics
         

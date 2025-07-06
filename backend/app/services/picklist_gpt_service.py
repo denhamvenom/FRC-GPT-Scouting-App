@@ -42,47 +42,95 @@ class PicklistGPTService:
 
     def _load_scouting_labels(self) -> Dict[str, Dict[str, Any]]:
         """
-        Load scouting labels from the game labels file.
+        Load enhanced scouting labels merging field_selections and game_labels data.
+        Priority: field_selections.label_mapping → game_labels → fallback
         
         Returns:
-            Dictionary mapping label names to their metadata
+            Dictionary mapping label names to their enhanced metadata
         """
         try:
             # Get the data directory path
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             data_dir = os.path.join(base_dir, "data")
-            labels_path = os.path.join(data_dir, "game_labels_2025.json")
             
-            if os.path.exists(labels_path):
-                with open(labels_path, "r", encoding="utf-8") as f:
-                    labels_data = json.load(f)
+            labels_dict = {}
+            
+            # PRIORITY 1: Load enhanced labels from field_selections
+            year = 2025  # Could be made dynamic if needed
+            field_selections_path = os.path.join(data_dir, f"field_selections_{year}lake.json")
+            
+            if os.path.exists(field_selections_path):
+                with open(field_selections_path, "r", encoding="utf-8") as f:
+                    field_selections_data = json.load(f)
                 
-                # Convert to dictionary keyed by label name for easy lookup
-                labels_dict = {}
-                for label in labels_data.get("labels", []):
-                    label_name = label.get("label", "")
-                    if label_name:
-                        labels_dict[label_name] = label
+                # Extract enhanced label mappings from field_selections
+                field_selections = field_selections_data.get("field_selections", {})
+                for field_name, field_info in field_selections.items():
+                    if isinstance(field_info, dict) and "label_mapping" in field_info:
+                        label_mapping = field_info["label_mapping"]
+                        label_name = label_mapping.get("label", "")
                         
-                logger.info(f"Loaded {len(labels_dict)} scouting labels for GPT context")
-                return labels_dict
-            else:
-                logger.warning(f"Scouting labels file not found: {labels_path}")
-                return {}
+                        if label_name:
+                            # Store enhanced label with field_selections metadata
+                            labels_dict[label_name] = {
+                                "label": label_name,
+                                "category": label_mapping.get("category", "unknown"),
+                                "description": label_mapping.get("description", ""),
+                                "data_type": label_mapping.get("data_type", "count"),
+                                "typical_range": label_mapping.get("typical_range", ""),
+                                "usage_context": label_mapping.get("usage_context", ""),
+                                "source": "field_selections",
+                                "original_field": field_name
+                            }
                 
+                logger.info(f"Loaded {len(labels_dict)} enhanced labels from field_selections")
+            
+            # PRIORITY 2: Fill gaps with game_labels as fallback
+            game_labels_path = os.path.join(data_dir, f"game_labels_{year}.json")
+            
+            if os.path.exists(game_labels_path):
+                with open(game_labels_path, "r", encoding="utf-8") as f:
+                    game_labels_data = json.load(f)
+                
+                game_labels_added = 0
+                for label in game_labels_data.get("labels", []):
+                    label_name = label.get("label", "")
+                    
+                    if label_name and label_name not in labels_dict:
+                        # Add labels not already present from field_selections
+                        labels_dict[label_name] = {
+                            "label": label_name,
+                            "category": label.get("category", "unknown"),
+                            "description": label.get("description", ""),
+                            "data_type": label.get("data_type", "count"),
+                            "typical_range": label.get("typical_range", ""),
+                            "usage_context": label.get("usage_context", ""),
+                            "source": "game_labels",
+                            "extraction_version": label.get("extraction_version", ""),
+                            "extraction_date": label.get("extraction_date", ""),
+                            "game_year": label.get("game_year", year),
+                            "custom_added": label.get("custom_added", False)
+                        }
+                        game_labels_added += 1
+                
+                logger.info(f"Added {game_labels_added} fallback labels from game_labels")
+                
+            logger.info(f"Total enhanced scouting labels loaded: {len(labels_dict)} for GPT context")
+            return labels_dict
+            
         except Exception as e:
-            logger.error(f"Error loading scouting labels: {e}")
+            logger.error(f"Error loading enhanced scouting labels: {e}")
             return {}
 
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
-        Prepare team data in a format optimized for GPT analysis.
+        Prepare team data in a format optimized for GPT analysis with enhanced label support.
 
         Args:
             teams_data: Dictionary of team data from the unified dataset
 
         Returns:
-            List of team data formatted for GPT prompts
+            List of team data formatted for GPT prompts with enhanced labels and text fields
         """
         formatted_teams = []
 
@@ -94,14 +142,40 @@ class PicklistGPTService:
                     "nickname": team_data.get("nickname", f"Team {team_data['team_number']}"),
                 }
 
-                # Add performance metrics if available
+                # Add enhanced performance metrics if available
                 if "metrics" in team_data and isinstance(team_data["metrics"], dict):
-                    formatted_team["metrics"] = team_data["metrics"]
+                    metrics = team_data["metrics"]
+                    
+                    # Separate text fields from numeric metrics
+                    if "text_fields" in metrics:
+                        text_fields = metrics["text_fields"]
+                        numeric_metrics = {k: v for k, v in metrics.items() if k != "text_fields"}
+                        
+                        # Add text fields with proper formatting
+                        if text_fields:
+                            formatted_team["text_data"] = {}
+                            for field_name, field_info in text_fields.items():
+                                if isinstance(field_info, dict) and "value" in field_info:
+                                    formatted_team["text_data"][field_name] = field_info["value"]
+                                else:
+                                    formatted_team["text_data"][field_name] = field_info
+                        
+                        formatted_team["metrics"] = numeric_metrics
+                    else:
+                        formatted_team["metrics"] = metrics
 
                 # Add any additional relevant data
                 for key in ["autonomous", "teleop", "endgame", "defense", "reliability"]:
                     if key in team_data:
                         formatted_team[key] = team_data[key]
+
+                # Add match count if available
+                if "match_count" in team_data:
+                    formatted_team["match_count"] = team_data["match_count"]
+
+                # Add data sources for transparency
+                if "data_sources" in team_data:
+                    formatted_team["data_sources"] = team_data["data_sources"]
 
                 formatted_teams.append(formatted_team)
 
@@ -380,46 +454,83 @@ Please produce output following RULES.
 
     def _create_labels_context(self) -> str:
         """
-        Create a compact context string explaining scouting metrics for GPT.
+        Create enhanced context string with richer metadata for GPT analysis.
+        Includes usage_context, typical_range, and data_type information.
         
         Returns:
-            Formatted string explaining key scouting metrics
+            Formatted string with enhanced scouting metrics metadata
         """
         if not self.scouting_labels:
             return ""
             
         # Group labels by category for better organization
         categories = {}
+        text_fields = []
+        
         for label_name, label_info in self.scouting_labels.items():
             category = label_info.get("category", "other")
-            if category not in categories:
-                categories[category] = []
-            categories[category].append((label_name, label_info))
+            data_type = label_info.get("data_type", "count")
+            
+            # Separate text fields for special handling
+            if data_type == "text":
+                text_fields.append((label_name, label_info))
+            else:
+                if category not in categories:
+                    categories[category] = []
+                categories[category].append((label_name, label_info))
         
         context_parts = []
         
-        # Create compact descriptions for key categories
-        for category, labels in categories.items():
-            if category in ["autonomous", "teleop", "endgame", "defense"]:
+        # Create enhanced descriptions for key categories
+        priority_categories = ["autonomous", "teleop", "endgame", "strategic", "defense", "reliability"]
+        
+        for category in priority_categories:
+            if category in categories:
+                labels = categories[category]
                 category_labels = []
-                for label_name, label_info in labels[:3]:  # Limit to top 3 per category
+                
+                for label_name, label_info in labels[:4]:  # Increased to top 4 per category
                     description = label_info.get("description", "")
-                    # Create very compact description
-                    if "coral" in label_name.lower() and "scored" in label_name.lower():
-                        category_labels.append(f"{label_name}: CORAL scoring performance")
-                    elif "climb" in label_name.lower():
-                        category_labels.append(f"{label_name}: Climbing ability")
-                    elif "defense" in label_name.lower():
-                        category_labels.append(f"{label_name}: Defense capability")
-                    elif "algae" in label_name.lower():
-                        category_labels.append(f"{label_name}: ALGAE scoring")
+                    typical_range = label_info.get("typical_range", "")
+                    usage_context = label_info.get("usage_context", "")
+                    data_type = label_info.get("data_type", "count")
+                    
+                    # Create enhanced description with metadata
+                    label_desc = description[:60] + "..." if len(description) > 60 else description
+                    
+                    # Add range and type information
+                    metadata_parts = []
+                    if typical_range:
+                        metadata_parts.append(f"Range: {typical_range}")
+                    if data_type and data_type != "count":
+                        metadata_parts.append(f"Type: {data_type}")
+                    
+                    # Format with metadata
+                    if metadata_parts:
+                        metadata_str = f" ({', '.join(metadata_parts)})"
+                        category_labels.append(f"{label_name}: {label_desc}{metadata_str}")
                     else:
-                        # Truncate long descriptions
-                        short_desc = description[:40] + "..." if len(description) > 40 else description
-                        category_labels.append(f"{label_name}: {short_desc}")
+                        category_labels.append(f"{label_name}: {label_desc}")
                 
                 if category_labels:
                     context_parts.append(f"{category.upper()}: {'; '.join(category_labels)}")
+        
+        # Add text fields section if present
+        if text_fields:
+            text_labels = []
+            for label_name, label_info in text_fields[:3]:  # Top 3 text fields
+                description = label_info.get("description", "")
+                usage_context = label_info.get("usage_context", "")
+                
+                # Create description with usage context
+                if usage_context:
+                    short_usage = usage_context[:50] + "..." if len(usage_context) > 50 else usage_context
+                    text_labels.append(f"{label_name}: {description} - {short_usage}")
+                else:
+                    text_labels.append(f"{label_name}: {description}")
+            
+            if text_labels:
+                context_parts.append(f"TEXT DATA: {'; '.join(text_labels)}")
         
         return "\n".join(context_parts)
 
