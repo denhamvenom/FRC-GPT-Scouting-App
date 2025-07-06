@@ -17,12 +17,13 @@ from app.services.statbotics_client import get_team_epa
 from app.services.sheets_service import get_sheet_values
 
 
-def load_field_metadata(year: int) -> Dict[str, Any]:
+def load_field_metadata(event_key: str = None, year: int = None) -> Dict[str, Any]:
     """
-    Load field metadata with label mappings from the saved field selections.
+    Load field metadata with label mappings from unified field selections.
     
     Args:
-        year: The year to load metadata for
+        event_key: The event key to load metadata for (preferred)
+        year: Fallback year to load metadata for
         
     Returns:
         Dictionary mapping field headers to their metadata including labels
@@ -30,16 +31,40 @@ def load_field_metadata(year: int) -> Dict[str, Any]:
     try:
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         data_dir = os.path.join(base_dir, "data")
-        metadata_path = os.path.join(data_dir, f"field_metadata_{year}.json")
         
-        if os.path.exists(metadata_path):
-            with open(metadata_path, "r", encoding="utf-8") as f:
-                metadata = json.load(f)
-                print(f"🔵 Loaded field metadata with {len(metadata)} entries for {year}")
-                return metadata
-        else:
-            print(f"⚠️ No field metadata found for {year} at {metadata_path}")
-            return {}
+        storage_key = event_key if event_key else str(year)
+        
+        # Try unified field selections file first
+        selections_path = os.path.join(data_dir, f"field_selections_{storage_key}.json")
+        
+        if os.path.exists(selections_path):
+            with open(selections_path, "r", encoding="utf-8") as f:
+                unified_data = json.load(f)
+            
+            # Extract metadata from unified structure
+            field_metadata = {}
+            field_selections = unified_data.get("field_selections", {})
+            
+            for header, field_info in field_selections.items():
+                if isinstance(field_info, dict):
+                    # New unified format - field_info contains category, source, label_mapping, etc.
+                    field_metadata[header] = field_info
+                else:
+                    # Legacy simple format - just category string
+                    field_metadata[header] = {"category": field_info, "source": "unknown"}
+            
+            print(f"🔵 Loaded unified field metadata with {len(field_metadata)} entries for {storage_key}")
+            enhanced_count = len([f for f in field_metadata.values() if isinstance(f, dict) and 'label_mapping' in f])
+            print(f"🔵 Found {enhanced_count} fields with enhanced label mappings")
+            return field_metadata
+        
+        # Fall back to legacy metadata file for backward compatibility
+        legacy_metadata = load_legacy_field_metadata(event_key, year)
+        if legacy_metadata:
+            return legacy_metadata
+        
+        print(f"⚠️ No field metadata found for event_key={event_key} or year={year}")
+        return {}
     except Exception as e:
         print(f"❌ Error loading field metadata: {e}")
         return {}
@@ -100,6 +125,45 @@ def apply_label_mappings_to_raw_data(row: List[str], headers: List[str], field_m
     except Exception as e:
         print(f"❌ Error applying label mappings: {e}")
         return enhanced_data
+
+
+def load_legacy_field_metadata(event_key: str = None, year: int = None) -> Dict[str, Any]:
+    """
+    Load field metadata from legacy field_metadata_{storage_key}.json files.
+    
+    Args:
+        event_key: The event key to load metadata for
+        year: Fallback year to load metadata for
+        
+    Returns:
+        Dictionary mapping field headers to their metadata including labels
+    """
+    try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(base_dir, "data")
+        
+        # Try event-based metadata first
+        if event_key:
+            metadata_path = os.path.join(data_dir, f"field_metadata_{event_key}.json")
+            if os.path.exists(metadata_path):
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+                    print(f"🔵 Loaded legacy event-based field metadata with {len(metadata)} entries for {event_key}")
+                    return metadata
+        
+        # Fall back to year-based metadata
+        if year:
+            metadata_path = os.path.join(data_dir, f"field_metadata_{year}.json")
+            if os.path.exists(metadata_path):
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+                    print(f"🔵 Loaded legacy year-based field metadata with {len(metadata)} entries for {year}")
+                    return metadata
+        
+        return {}
+    except Exception as e:
+        print(f"❌ Error loading legacy field metadata: {e}")
+        return {}
 
 
 def apply_label_mappings(parsed_data: Dict[str, Any], field_metadata: Dict[str, Any]) -> Dict[str, Any]:
@@ -239,8 +303,8 @@ async def build_unified_dataset(
         tracker.update(5, "Loaded schemas", "Load schemas")
     
     # Load field metadata with label mappings
-    print(f"\U0001f535 Loading field metadata for {year}")
-    field_metadata = load_field_metadata(year)
+    print(f"\U0001f535 Loading field metadata for {event_key} (fallback: {year})")
+    field_metadata = load_field_metadata(event_key=event_key, year=year)
     if tracker:
         tracker.update(7, "Loaded field metadata with label mappings", "Load field metadata")
 

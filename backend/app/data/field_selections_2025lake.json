@@ -1,0 +1,316 @@
+{
+  "year": 2025,
+  "event_key": "2025lake",
+  "field_selections": {
+    "110": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "8808": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Timestamp": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Scout Name": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Qual Number": {
+      "category": "match_number",
+      "source": "unknown"
+    },
+    "Team Number": {
+      "category": "team_number",
+      "source": "unknown"
+    },
+    "Alliance": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Auto Path": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Auto Mobility": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Auto Mobility Score": {
+      "category": "auto",
+      "source": "unknown"
+    },
+    "Where (auto) [Coral L1]": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "auto_coral_L1_scored",
+        "category": "autonomous",
+        "description": "Number of CORAL scored in the REEF trough (L1) during autonomous",
+        "data_type": "count",
+        "typical_range": "0-3",
+        "usage_context": "Counted during autonomous period"
+      }
+    },
+    "Where (auto) [Coral L2]": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "auto_coral_L2_scored",
+        "category": "autonomous",
+        "description": "Number of CORAL scored on REEF L2 BRANCHES during autonomous",
+        "data_type": "count",
+        "typical_range": "0-2",
+        "usage_context": "Counted during autonomous period"
+      }
+    },
+    "Where (auto) [Coral L3]": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "auto_coral_L3_scored",
+        "category": "autonomous",
+        "description": "Number of CORAL scored on REEF L3 BRANCHES during autonomous",
+        "data_type": "count",
+        "typical_range": "0-2",
+        "usage_context": "Counted during autonomous period"
+      }
+    },
+    "Where (auto) [Coral L4]": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "auto_coral_L4_scored",
+        "category": "autonomous",
+        "description": "Number of CORAL scored on REEF L4 BRANCHES during autonomous",
+        "data_type": "count",
+        "typical_range": "0-2",
+        "usage_context": "Counted during autonomous period"
+      }
+    },
+    "Where (auto) [Net]": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "auto_net_score",
+        "category": "autonomous",
+        "description": "The total number of game pieces scored by a robot into the 'Net' scoring area during the autonomous period of a match. This metric reflects the robot's autonomous scoring effectiveness specifically for the Net target.",
+        "data_type": "count",
+        "typical_range": "0-5 (may vary depending on game rules and scoring opportunities)",
+        "usage_context": "Track this metric during the autonomous period by counting each game piece successfully scored by the robot into the Net. Record immediately after autonomous ends, based on observed scoring or official field data."
+      }
+    },
+    "Where (auto) [Processor]": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "auto_algae_processor_scored",
+        "category": "autonomous",
+        "description": "Number of ALGAE scored in the PROCESSOR during autonomous",
+        "data_type": "count",
+        "typical_range": "0-2",
+        "usage_context": "Counted during autonomous period"
+      }
+    },
+    "Auto Score": {
+      "category": "auto",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "Auto Total Points",
+        "category": "autonomous",
+        "description": "Total number of points scored by the robot during the autonomous period.",
+        "data_type": "count",
+        "typical_range": "0\u201340",
+        "usage_context": "Recorded after the autonomous period ends, based on the robot's scoring actions as shown on the field display or by manual tally."
+      }
+    },
+    " Where (teleop) [Coral L1]": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_coral_L1_scored",
+        "category": "teleop",
+        "description": "Number of CORAL scored in the REEF trough (L1) during teleop",
+        "data_type": "count",
+        "typical_range": "0-10",
+        "usage_context": "Counted during teleop period"
+      }
+    },
+    "Where (teleop) [Coral L2]": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_coral_L2_scored",
+        "category": "teleop",
+        "description": "Number of CORAL scored on REEF L2 BRANCHES during teleop",
+        "data_type": "count",
+        "typical_range": "0-6",
+        "usage_context": "Counted during teleop period"
+      }
+    },
+    "Where (teleop) [Coral L3]": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_coral_L3_scored",
+        "category": "teleop",
+        "description": "Number of CORAL scored on REEF L3 BRANCHES during teleop",
+        "data_type": "count",
+        "typical_range": "0-6",
+        "usage_context": "Counted during teleop period"
+      }
+    },
+    "Where (teleop) [Coral L4]": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_coral_L4_scored",
+        "category": "teleop",
+        "description": "Number of CORAL scored on REEF L4 BRANCHES during teleop",
+        "data_type": "count",
+        "typical_range": "0-6",
+        "usage_context": "Counted during teleop period"
+      }
+    },
+    " Where (teleop) [Net]": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_algae_net_scored",
+        "category": "teleop",
+        "description": "Number of ALGAE scored in the NET during teleop",
+        "data_type": "count",
+        "typical_range": "0-6",
+        "usage_context": "Counted during teleop period"
+      }
+    },
+    "Where (teleop) [Processor]": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_algae_processor_scored",
+        "category": "teleop",
+        "description": "Number of ALGAE scored in the PROCESSOR during teleop",
+        "data_type": "count",
+        "typical_range": "0-6",
+        "usage_context": "Counted during teleop period"
+      }
+    },
+    "Tele Score": {
+      "category": "teleop",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "teleop_total_points",
+        "category": "autonomous",
+        "description": "Total points scored by the team during the teleoperated period.",
+        "data_type": "count",
+        "typical_range": "0-100",
+        "usage_context": "Tracked live during the teleop phase by summing all point-scoring actions performed by the team."
+      }
+    },
+    "Endgame (your robot specifically)": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Endgame Score": {
+      "category": "endgame",
+      "source": "unknown",
+      "label_mapping": {
+        "label": "endgame_total_points",
+        "category": "autonomous",
+        "description": "Total points earned by the team during the endgame period of the match.",
+        "data_type": "count",
+        "typical_range": "0-30",
+        "usage_context": "Recorded at the end of the match by summing all points scored by the team during the endgame phase."
+      }
+    },
+    "Driver Skill": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Strategies": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Comments": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Was your robot disabled? If so, how? ": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Was Defended": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Defense Bot": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Team Event Match": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Event Key": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Match Key": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Team": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Stratagies": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Pit Scouting_Images/8808.Robot.135631.jpg": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Mid": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Move Out , Score Coral , Multiple Scores": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Swerve": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "Medium (10-20)": {
+      "category": "ignore",
+      "source": "unknown"
+    },
+    "https://www.appsheet.com/Template/gettablefileurl?appname=Hivemind2024-327566633&tableName=PIT%20SCOUTING_IMAGES&filename=Pit%20Scouting_Images%2F8808.Robot.135631.jpg": {
+      "category": "ignore",
+      "source": "unknown"
+    }
+  },
+  "critical_mappings": {
+    "team_number": [
+      "Team Number"
+    ],
+    "match_number": [
+      "Qual Number"
+    ]
+  },
+  "robot_groups": {
+    "robot_1": [],
+    "robot_2": [],
+    "robot_3": []
+  },
+  "manual_url": null
+}

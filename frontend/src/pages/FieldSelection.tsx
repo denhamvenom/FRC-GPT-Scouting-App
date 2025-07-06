@@ -349,6 +349,7 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2025);
+  const [eventKey, setEventKey] = useState<string | null>(null);
   
   // Add Label Modal state
   const [isAddLabelModalOpen, setIsAddLabelModalOpen] = useState(false);
@@ -371,7 +372,10 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
     const loadSavedSelections = async () => {
       try {
         console.log('Attempting to load saved field selections...');
-        const response = await fetchWithNgrokHeaders(apiUrl(`/api/schema/load-selections/${year}`));
+        // Use event_key if available, otherwise fall back to year
+        const storageKey = eventKey || year.toString();
+        console.log(`Loading field selections with storage key: ${storageKey}`);
+        const response = await fetchWithNgrokHeaders(apiUrl(`/api/schema/load-selections/${storageKey}`));
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success') {
@@ -422,59 +426,10 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
     };
 
     loadSavedSelections();
-  }, [year, scoutingHeaders, superscoutingHeaders, pitScoutingHeaders]);
+  }, [year, eventKey, scoutingHeaders, superscoutingHeaders, pitScoutingHeaders]);
 
-  // Re-run auto-categorization when labels are loaded (but after saved selections are loaded)
-  useEffect(() => {
-    // Add a small delay to ensure saved selections are loaded first
-    const timer = setTimeout(() => {
-      if (labels.length > 0 && (scoutingHeaders.length > 0 || superscoutingHeaders.length > 0 || pitScoutingHeaders.length > 0)) {
-      console.log(`Re-running auto-categorization with ${labels.length} labels loaded`);
-      
-      // Re-categorize all headers with labels, but preserve user's manual selections
-      const updatedFields: { [key: string]: string } = { ...selectedFields };
-      const updatedLabelMappings: { [fieldHeader: string]: GameLabel } = { ...labelMappings };
-      
-      [
-        ...scoutingHeaders,
-        ...superscoutingHeaders,
-        ...pitScoutingHeaders
-      ].forEach(header => {
-        // Only auto-categorize if the user hasn't manually set this field
-        // or if it's currently set to 'ignore' or 'other' (default values)
-        const currentValue = updatedFields[header];
-        const shouldAutoCategorize = !currentValue || currentValue === 'ignore' || currentValue === 'other';
-        
-        if (shouldAutoCategorize) {
-          const categorization = autoCategorizeField(header, labels);
-          updatedFields[header] = categorization.category;
-          
-          // Store label mapping if one was found
-          if (categorization.matchedLabel) {
-            updatedLabelMappings[header] = categorization.matchedLabel;
-          }
-        }
-      });
-      
-      setSelectedFields(updatedFields);
-      setLabelMappings(updatedLabelMappings);
-      
-      console.log(`Updated label mappings for ${Object.keys(updatedLabelMappings).length} fields`);
-      
-      // Update success message with new label match count
-      const autoMappedCount = Object.values(updatedFields).filter(v => v !== 'ignore' && v !== 'other').length;
-      const labelMatchCount = Object.keys(updatedLabelMappings).length;
-      
-      if (labelMatchCount > 0) {
-        setSuccessMessage(`✅ Enhanced categorization with ${labelMatchCount} label matches! Auto-categorized ${autoMappedCount} total fields. Please review and adjust as needed.`);
-      } else {
-        setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on patterns. ${labels.length} labels available for manual selection.`);
-      }
-      }
-    }, 100); // Small delay to let saved selections load first
-    
-    return () => clearTimeout(timer);
-  }, [labels, scoutingHeaders, superscoutingHeaders, pitScoutingHeaders]);
+  // Note: Automatic auto-categorization removed to preserve saved field selections
+  // Auto-categorization now only happens when user clicks "Auto-match Labels" button
 
   useEffect(() => {
     // Fetch headers from Google Sheets
@@ -495,9 +450,13 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
             sheetConfig = setupData.sheet_config;
             console.log("Using sheet configuration from setup:", sheetConfig);
 
-            // Also get year if available
+            // Get year and event_key if available
             if (setupData.year) {
               setYear(setupData.year);
+            }
+            if (setupData.event_key) {
+              setEventKey(setupData.event_key);
+              console.log("Set event key for field selections:", setupData.event_key);
             }
           } else {
             console.warn("No sheet_config found in setup data:", setupData);
@@ -778,27 +737,22 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
           setError(null);
         }
 
-        // Initialize all headers with enhanced auto-categorization using labels
+        // Initialize all headers with default 'ignore' category (auto-categorization removed)
+        // This prevents overriding saved field selections when page loads
         const initialFields: { [key: string]: string } = {};
-        const initialLabelMappings: { [fieldHeader: string]: GameLabel } = {};
         
         [
           ...(scoutData.headers || []),
           ...(superData.headers || []),
           ...(pitData.headers || [])
         ].forEach(header => {
-          const categorization = autoCategorizeField(header, labels);
-          initialFields[header] = categorization.category;
-          
-          // Store label mapping if one was found
-          if (categorization.matchedLabel) {
-            initialLabelMappings[header] = categorization.matchedLabel;
-          }
+          // Set all fields to 'ignore' by default - saved selections will override this
+          initialFields[header] = 'ignore';
         });
 
-        // Set selected fields with auto-categorization
+        // Set selected fields with defaults (saved selections will override these)
         setSelectedFields(initialFields);
-        setLabelMappings(initialLabelMappings);
+        setLabelMappings({});
 
         // Update critical field mappings
         const newCriticalMappings = {
@@ -815,14 +769,11 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
         });
         setCriticalFieldMappings(newCriticalMappings);
 
-        // Add feedback about automated categorization and label matching
-        const autoMappedCount = Object.values(initialFields).filter(v => v !== 'ignore' && v !== 'other').length;
-        const labelMatchCount = Object.keys(initialLabelMappings).length;
-        
-        if (labelMatchCount > 0) {
-          setSuccessMessage(`Auto-categorized ${autoMappedCount} fields (${labelMatchCount} matched with scouting labels). Labels loaded: ${labels.length}. Please review and adjust as needed.`);
-        } else if (autoMappedCount > 0) {
-          setSuccessMessage(`Auto-categorized ${autoMappedCount} fields based on naming patterns. Labels available: ${labels.length}. Please review and adjust as needed.`);
+        // Show information about available labels and instructions
+        if (labels.length > 0) {
+          setSuccessMessage(`Headers loaded successfully! ${labels.length} scouting labels available. Use "Auto-match Labels" button to automatically categorize fields, or set categories manually.`);
+        } else {
+          setSuccessMessage(`Headers loaded successfully! Set field categories manually or use "Auto-match Labels" once labels are loaded.`);
         }
       } catch (err) {
         console.error('Error fetching headers:', err);
@@ -964,6 +915,7 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
       const schema = {
         field_selections: selectedFields,
         year: year,
+        event_key: eventKey,
         critical_mappings: criticalFieldMappings,
         label_mappings: labelMappings
       };
@@ -1295,12 +1247,12 @@ function FieldSelection({ embedded = false, onComplete }: FieldSelectionProps = 
               setLabelMappings(updatedLabelMappings);
               
               const labelMatchCount = Object.keys(updatedLabelMappings).length;
-              setSuccessMessage(`🔄 Re-ran categorization: ${labelMatchCount} label matches found with ${labels.length} available labels.`);
+              setSuccessMessage(`✨ Auto-matched ${labelMatchCount} labels with field headers from ${labels.length} available labels.`);
             }}
             className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200"
             disabled={labelsLoading}
           >
-            🔄 Re-match Labels
+            ✨ Auto-match Labels
           </button>
         </div>
       </div>

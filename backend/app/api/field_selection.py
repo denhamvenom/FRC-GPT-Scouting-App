@@ -11,8 +11,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 
-@router.post("/save-selections")
-async def save_field_selections(request: Request):
+@router.post("/save-selections-legacy")
+async def save_field_selections_legacy(request: Request):
     """
     Save field selection mappings, including critical fields and robot groups.
 
