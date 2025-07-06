@@ -1119,3 +1119,29 @@ CRITICAL: Return only valid JSON."""
                 "error": f"API call failed: {e}",
                 "error_type": "api_error",
             }
+
+    def has_enhanced_labels(self) -> bool:
+        """
+        Check if enhanced labels are available and being used.
+        
+        Returns:
+            True if enhanced labels are loaded and available
+        """
+        return bool(self.scouting_labels and len(self.scouting_labels) > 0)
+
+    def has_text_data(self) -> bool:
+        """
+        Check if text data fields are available in the enhanced structure.
+        
+        Returns:
+            True if text data fields are present in scouting labels
+        """
+        if not self.scouting_labels:
+            return False
+        
+        # Check if any labels have text data type
+        return any(
+            label_info.get("data_type") == "text" 
+            for label_info in self.scouting_labels.values()
+            if isinstance(label_info, dict)
+        )

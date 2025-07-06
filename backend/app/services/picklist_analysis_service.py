@@ -1,10 +1,11 @@
 # backend/app/services/picklist_analysis_service.py
 
 import json
+import logging
 import os
 import re
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
@@ -16,6 +17,9 @@ GPT_MODEL = OPENAI_MODEL
 # Base directory setup for file operations
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
+
+# Initialize logger
+logger = logging.getLogger(__name__)
 
 # Initialize OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -112,7 +116,8 @@ class PicklistAnalysisService:
                                 "data_type": label_mapping.get("data_type", "count"),
                                 "typical_range": label_mapping.get("typical_range", ""),
                                 "usage_context": label_mapping.get("usage_context", ""),
-                                "has_enhanced_mapping": True
+                                "has_enhanced_mapping": True,
+                                "label_mapping": label_mapping  # Preserve original label_mapping structure
                             })
                         else:
                             enhanced_info.update({
@@ -291,8 +296,13 @@ class PicklistAnalysisService:
     def identify_game_specific_metrics(self) -> List[Dict[str, Any]]:
         """
         Identify game-specific metrics using enhanced field selections with metadata.
+        Only returns metrics that actually exist in the unified dataset scouting data.
         Returns list of metric objects with id, label, category, and enhanced metadata.
         """
+        # Get labels that were actually assigned during field selection setup
+        assigned_labels = self.get_assigned_labels_from_field_selections()
+        logger.info(f"Found {len(assigned_labels)} assigned labels from field selections")
+        
         # Start with metrics from enhanced field selections if available
         if self.field_selections:
             # Group fields by category
@@ -306,12 +316,22 @@ class PicklistAnalysisService:
 
             for field_name, field_info in self.field_selections.items():
                 if isinstance(field_info, dict):
+                    # Skip ignored fields first
+                    if field_info.get("category") == "ignore":
+                        continue
+                    
+                    # CRITICAL: Only include metrics that have assigned labels (were connected during setup)
+                    if "label_mapping" not in field_info:
+                        logger.debug(f"Skipping field '{field_name}' - no label mapping (not connected)")
+                        continue
+                    
+                    assigned_label = field_info["label_mapping"].get("label")
+                    if not assigned_label or assigned_label not in assigned_labels:
+                        logger.debug(f"Skipping field '{field_name}' - label '{assigned_label}' not in assigned labels")
+                        continue
+                    
                     category = field_info.get("category", "unknown")
                     
-                    # Skip ignored fields
-                    if category == "ignore":
-                        continue
-
                     # Skip universal fields
                     if category in [
                         "team_number",
@@ -321,20 +341,21 @@ class PicklistAnalysisService:
                     ]:
                         continue
 
-                    # Use enhanced label or fallback to formatted field name
-                    label = field_info.get("label", " ".join(w.capitalize() for w in field_name.split("_")))
-
-                    # Create enhanced metric object
+                    # Get the enhanced label mapping data
+                    label_mapping = field_info["label_mapping"]
+                    
+                    # Create enhanced metric object using the assigned label as ID
                     metric = {
-                        "id": field_name,
-                        "label": label,
-                        "category": category,
-                        "description": field_info.get("description", ""),
-                        "data_type": field_info.get("data_type", "count"),
-                        "typical_range": field_info.get("typical_range", ""),
-                        "usage_context": field_info.get("usage_context", ""),
-                        "source": field_info.get("source", "unknown"),
-                        "has_enhanced_mapping": field_info.get("has_enhanced_mapping", False)
+                        "id": assigned_label,  # Use the assigned label as the metric ID
+                        "label": label_mapping.get("label", assigned_label),
+                        "category": label_mapping.get("category", category),
+                        "description": label_mapping.get("description", ""),
+                        "data_type": label_mapping.get("data_type", "count"),
+                        "typical_range": label_mapping.get("typical_range", ""),
+                        "usage_context": label_mapping.get("usage_context", ""),
+                        "source": field_info.get("source", "field_selections"),
+                        "has_enhanced_mapping": True,  # Always true for assigned labels
+                        "original_header": field_name  # Keep reference to original header
                     }
 
                     # Add to appropriate category list
@@ -1163,3 +1184,152 @@ Only include metrics from the provided lists above.
         team_scores.sort(key=lambda x: x["score"], reverse=True)
 
         return team_scores
+
+    def get_enhanced_field_metadata(self) -> Dict[str, Any]:
+        """
+        Get enhanced field metadata for API exposure.
+        
+        Returns:
+            Dictionary containing enhanced field selection metadata
+        """
+        if not self.field_selections:
+            return {}
+        
+        metadata = {
+            "total_fields": len(self.field_selections),
+            "fields_by_category": {},
+            "fields_by_data_type": {},
+            "enhanced_fields_count": 0,
+            "text_fields_count": 0,
+        }
+        
+        for field_name, field_info in self.field_selections.items():
+            if isinstance(field_info, dict):
+                category = field_info.get("category", "unknown")
+                data_type = field_info.get("data_type", "count")
+                
+                # Count by category
+                if category not in metadata["fields_by_category"]:
+                    metadata["fields_by_category"][category] = 0
+                metadata["fields_by_category"][category] += 1
+                
+                # Count by data type
+                if data_type not in metadata["fields_by_data_type"]:
+                    metadata["fields_by_data_type"][data_type] = 0
+                metadata["fields_by_data_type"][data_type] += 1
+                
+                # Count enhanced fields
+                if field_info.get("has_enhanced_mapping", False):
+                    metadata["enhanced_fields_count"] += 1
+                
+                # Count text fields
+                if data_type == "text":
+                    metadata["text_fields_count"] += 1
+        
+        return metadata
+
+    def get_assigned_labels_from_field_selections(self) -> Set[str]:
+        """
+        Get the set of labels that were actually assigned during field selection setup.
+        These are the labels that have been connected to spreadsheet headers.
+        
+        Returns:
+            Set of label names that are assigned/connected
+        """
+        assigned_labels = set()
+        
+        if not self.field_selections:
+            return assigned_labels
+        
+        # Extract assigned labels from field selections
+        logger.info(f"Checking {len(self.field_selections)} field selections for assigned labels")
+        
+        for field_name, field_info in self.field_selections.items():
+            if isinstance(field_info, dict):
+                # Skip ignored fields
+                if field_info.get("category") == "ignore":
+                    continue
+                
+                # Check if this field has a label mapping (meaning it was connected)
+                if "label_mapping" in field_info:
+                    label_mapping = field_info["label_mapping"]
+                    assigned_label = label_mapping.get("label")
+                    if assigned_label:
+                        assigned_labels.add(assigned_label)
+                        logger.debug(f"Found assigned label: {assigned_label} (from header: {field_name})")
+        
+        logger.info(f"Found {len(assigned_labels)} assigned labels from field selections")
+        return assigned_labels
+
+    def get_actual_scouting_fields(self) -> Set[str]:
+        """
+        Get the set of fields that actually exist in the unified dataset scouting data.
+        
+        Returns:
+            Set of field names that are present in team scouting data
+        """
+        actual_fields = set()
+        
+        if not self.teams_data:
+            return actual_fields
+        
+        # Collect all fields from actual scouting data
+        for team_data in self.teams_data.values():
+            if isinstance(team_data, dict) and "scouting_data" in team_data:
+                scouting_data = team_data["scouting_data"]
+                if isinstance(scouting_data, list):
+                    for match in scouting_data:
+                        if isinstance(match, dict):
+                            for field_name in match.keys():
+                                # Skip metadata fields
+                                if field_name not in ["team_number", "match_number", "qual_number", "alliance_color"]:
+                                    actual_fields.add(field_name)
+        
+        return actual_fields
+
+    def get_field_selections_summary(self) -> Dict[str, Any]:
+        """
+        Get summary information about field selections for API exposure.
+        
+        Returns:
+            Summary of field selections structure and capabilities
+        """
+        if not self.field_selections:
+            return {"available": False, "source": "fallback_to_game_labels"}
+        
+        return {
+            "available": True,
+            "source": "enhanced_field_selections",
+            "categories_available": list(set(
+                field_info.get("category", "unknown")
+                for field_info in self.field_selections.values()
+                if isinstance(field_info, dict)
+            )),
+            "data_types_available": list(set(
+                field_info.get("data_type", "count")
+                for field_info in self.field_selections.values()
+                if isinstance(field_info, dict)
+            )),
+            "enhanced_features": {
+                "descriptions": any(
+                    field_info.get("description") 
+                    for field_info in self.field_selections.values()
+                    if isinstance(field_info, dict)
+                ),
+                "usage_context": any(
+                    field_info.get("usage_context") 
+                    for field_info in self.field_selections.values()
+                    if isinstance(field_info, dict)
+                ),
+                "typical_ranges": any(
+                    field_info.get("typical_range") 
+                    for field_info in self.field_selections.values()
+                    if isinstance(field_info, dict)
+                ),
+                "text_fields": any(
+                    field_info.get("data_type") == "text"
+                    for field_info in self.field_selections.values()
+                    if isinstance(field_info, dict)
+                ),
+            }
+        }

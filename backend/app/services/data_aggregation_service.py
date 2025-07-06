@@ -1051,3 +1051,24 @@ class DataAggregationService:
         except Exception as e:
             logger.error(f"Error refreshing dataset: {e}")
             return False
+
+    def get_label_mapping_source(self) -> str:
+        """
+        Get information about the source of label mappings being used.
+        
+        Returns:
+            String indicating the primary source of label mappings
+        """
+        if hasattr(self, 'field_selections') and self.field_selections:
+            # Check if we have enhanced field selections with label mappings
+            has_label_mappings = any(
+                isinstance(field_info, dict) and field_info.get('label')
+                for field_info in self.field_selections.values()
+            )
+            if has_label_mappings:
+                return "enhanced_field_selections"
+        
+        if hasattr(self, 'label_mappings') and self.label_mappings:
+            return "game_labels_fallback"
+        
+        return "minimal_fallback"

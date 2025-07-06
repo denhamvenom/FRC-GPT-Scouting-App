@@ -264,6 +264,20 @@ async def generate_picklist(request: PicklistRequest):
 
         logger.info(f"Successfully generated picklist for request {request_id}")
 
+        # Add enhanced data structure information to response
+        try:
+            enhanced_info = {
+                "enhanced_labels_used": generator_service.gpt_service.has_enhanced_labels(),
+                "text_fields_processed": generator_service.gpt_service.has_text_data(),
+                "label_mapping_source": generator_service.data_service.get_label_mapping_source(),
+                "field_selections_available": bool(generator_service.data_service.field_selections),
+            }
+            result["enhanced_data_info"] = enhanced_info
+        except Exception as e:
+            logger.warning(f"Could not add enhanced data info: {e}")
+            # Don't fail the entire request if metadata gathering fails
+            pass
+
         # Add the cache key to the response for status polling
         result["cache_key"] = cache_key
         return result
