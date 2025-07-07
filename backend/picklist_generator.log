@@ -16,3 +16,102 @@
 2025-06-25 14:53:46,954 - data_aggregation_service - INFO - Prepared 2 teams for analysis
 2025-06-25 14:53:46,954 - picklist_generator - INFO - Using single processing for 2 teams
 2025-06-25 14:53:50,658 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-06 20:19:32,580 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025txhou1.json
+2025-07-06 20:19:32,585 - data_aggregation_service - INFO - Added 45 fallback mappings from game_labels
+2025-07-06 20:19:32,588 - data_aggregation_service - INFO - Added 16 legacy mappings from field_metadata
+2025-07-06 20:19:32,588 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 61
+2025-07-06 20:19:32,806 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:19:32,810 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:19:32,810 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:19:32,810 - data_aggregation_service - INFO - Filtered teams: 42 -> 42
+2025-07-06 20:19:32,811 - data_aggregation_service - INFO - Prepared 42 teams for analysis
+2025-07-06 20:19:32,815 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025txhou1.json
+2025-07-06 20:19:32,820 - data_aggregation_service - INFO - Added 45 fallback mappings from game_labels
+2025-07-06 20:19:32,823 - data_aggregation_service - INFO - Added 16 legacy mappings from field_metadata
+2025-07-06 20:19:32,823 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 61
+2025-07-06 20:19:32,835 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:19:32,839 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:19:32,839 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:19:32,851 - picklist_gpt_service - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:19:32,855 - picklist_gpt_service - INFO - Loaded 18 enhanced labels from field_selections
+2025-07-06 20:19:32,858 - picklist_gpt_service - INFO - Added 27 fallback labels from game_labels
+2025-07-06 20:19:32,858 - picklist_gpt_service - INFO - Total enhanced scouting labels loaded: 45 for GPT context
+2025-07-06 20:19:32,868 - game_context_extractor - INFO - Returning cached extraction for key: 9749e5b42e97e80e...
+2025-07-06 20:19:32,868 - data_aggregation_service - INFO - Using extracted context for 2025 (Size reduction: 94.4%)
+2025-07-06 20:19:32,868 - data_aggregation_service - INFO - Context size: 74105 -> 4128 characters
+2025-07-06 20:19:32,884 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025txhou1.json
+2025-07-06 20:19:32,889 - data_aggregation_service - INFO - Added 45 fallback mappings from game_labels
+2025-07-06 20:19:32,892 - data_aggregation_service - INFO - Added 16 legacy mappings from field_metadata
+2025-07-06 20:19:32,893 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 61
+2025-07-06 20:19:32,904 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:19:32,908 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:19:32,908 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:19:32,921 - picklist_gpt_service - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:19:32,924 - picklist_gpt_service - INFO - Loaded 18 enhanced labels from field_selections
+2025-07-06 20:19:32,927 - picklist_gpt_service - INFO - Added 27 fallback labels from game_labels
+2025-07-06 20:19:32,927 - picklist_gpt_service - INFO - Total enhanced scouting labels loaded: 45 for GPT context
+2025-07-06 20:19:32,936 - game_context_extractor - INFO - Returning cached extraction for key: 9749e5b42e97e80e...
+2025-07-06 20:19:32,936 - data_aggregation_service - INFO - Using extracted context for 2025 (Size reduction: 94.4%)
+2025-07-06 20:19:32,936 - data_aggregation_service - INFO - Context size: 74105 -> 4128 characters
+2025-07-06 20:19:32,936 - data_aggregation_service - INFO - Filtered teams: 42 -> 42
+2025-07-06 20:19:32,937 - data_aggregation_service - INFO - Prepared 42 teams for analysis
+2025-07-06 20:32:05,197 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025lake.json
+2025-07-06 20:32:05,201 - data_aggregation_service - INFO - Loaded 18 enhanced field-to-label mappings from field_selections
+2025-07-06 20:32:05,205 - data_aggregation_service - INFO - Added 27 fallback mappings from game_labels
+2025-07-06 20:32:05,208 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 45
+2025-07-06 20:32:05,422 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:05,426 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:32:05,426 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:32:05,439 - picklist_gpt_service - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:05,442 - picklist_gpt_service - INFO - Loaded 18 enhanced labels from field_selections
+2025-07-06 20:32:05,446 - picklist_gpt_service - INFO - Added 27 fallback labels from game_labels
+2025-07-06 20:32:05,446 - picklist_gpt_service - INFO - Total enhanced scouting labels loaded: 45 for GPT context
+2025-07-06 20:32:05,454 - game_context_extractor - INFO - Returning cached extraction for key: 9749e5b42e97e80e...
+2025-07-06 20:32:05,455 - data_aggregation_service - INFO - Using extracted context for 2025 (Size reduction: 94.4%)
+2025-07-06 20:32:05,455 - data_aggregation_service - INFO - Context size: 74105 -> 4128 characters
+2025-07-06 20:32:05,476 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025lake.json
+2025-07-06 20:32:05,479 - data_aggregation_service - INFO - Loaded 18 enhanced field-to-label mappings from field_selections
+2025-07-06 20:32:05,483 - data_aggregation_service - INFO - Added 27 fallback mappings from game_labels
+2025-07-06 20:32:05,486 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 45
+2025-07-06 20:32:05,497 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:05,500 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:32:05,501 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:32:05,512 - picklist_gpt_service - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:05,516 - picklist_gpt_service - INFO - Loaded 18 enhanced labels from field_selections
+2025-07-06 20:32:05,520 - picklist_gpt_service - INFO - Added 27 fallback labels from game_labels
+2025-07-06 20:32:05,520 - picklist_gpt_service - INFO - Total enhanced scouting labels loaded: 45 for GPT context
+2025-07-06 20:32:05,527 - game_context_extractor - INFO - Returning cached extraction for key: 9749e5b42e97e80e...
+2025-07-06 20:32:05,528 - data_aggregation_service - INFO - Using extracted context for 2025 (Size reduction: 94.4%)
+2025-07-06 20:32:05,528 - data_aggregation_service - INFO - Context size: 74105 -> 4128 characters
+2025-07-06 20:32:05,528 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-07-06 20:32:05,530 - data_aggregation_service - INFO - Prepared 55 teams for analysis
+2025-07-06 20:32:28,983 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025lake.json
+2025-07-06 20:32:28,988 - data_aggregation_service - INFO - Loaded 18 enhanced field-to-label mappings from field_selections
+2025-07-06 20:32:28,991 - data_aggregation_service - INFO - Added 27 fallback mappings from game_labels
+2025-07-06 20:32:28,995 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 45
+2025-07-06 20:32:29,138 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:29,142 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:32:29,142 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:32:29,155 - picklist_gpt_service - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:29,159 - picklist_gpt_service - INFO - Loaded 18 enhanced labels from field_selections
+2025-07-06 20:32:29,162 - picklist_gpt_service - INFO - Added 27 fallback labels from game_labels
+2025-07-06 20:32:29,162 - picklist_gpt_service - INFO - Total enhanced scouting labels loaded: 45 for GPT context
+2025-07-06 20:32:29,170 - game_context_extractor - INFO - Returning cached extraction for key: 9749e5b42e97e80e...
+2025-07-06 20:32:29,170 - data_aggregation_service - INFO - Using extracted context for 2025 (Size reduction: 94.4%)
+2025-07-06 20:32:29,171 - data_aggregation_service - INFO - Context size: 74105 -> 4128 characters
+2025-07-06 20:32:29,191 - data_aggregation_service - INFO - Loaded dataset from app/data/unified_event_2025lake.json
+2025-07-06 20:32:29,196 - data_aggregation_service - INFO - Loaded 18 enhanced field-to-label mappings from field_selections
+2025-07-06 20:32:29,199 - data_aggregation_service - INFO - Added 27 fallback mappings from game_labels
+2025-07-06 20:32:29,202 - data_aggregation_service - INFO - Total enhanced label mappings loaded: 45
+2025-07-06 20:32:29,214 - game_context_extractor - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:29,217 - game_context_extractor - INFO - Initialized GameContextExtractorService with cache dir: /mnt/c/Users/deila/Documents/FRC-GPT-Scouting-App/FRC-GPT-Scouting-App/backend/app/cache/game_context
+2025-07-06 20:32:29,217 - data_aggregation_service - INFO - Initialized game context extractor service
+2025-07-06 20:32:29,229 - picklist_gpt_service - INFO - Using fallback encoding 'cl100k_base' for model gpt-4.1
+2025-07-06 20:32:29,233 - picklist_gpt_service - INFO - Loaded 18 enhanced labels from field_selections
+2025-07-06 20:32:29,236 - picklist_gpt_service - INFO - Added 27 fallback labels from game_labels
+2025-07-06 20:32:29,236 - picklist_gpt_service - INFO - Total enhanced scouting labels loaded: 45 for GPT context
+2025-07-06 20:32:29,244 - game_context_extractor - INFO - Returning cached extraction for key: 9749e5b42e97e80e...
+2025-07-06 20:32:29,244 - data_aggregation_service - INFO - Using extracted context for 2025 (Size reduction: 94.4%)
+2025-07-06 20:32:29,244 - data_aggregation_service - INFO - Context size: 74105 -> 4128 characters
+2025-07-06 20:32:29,244 - data_aggregation_service - INFO - Filtered teams: 55 -> 55
+2025-07-06 20:32:29,246 - data_aggregation_service - INFO - Prepared 55 teams for analysis

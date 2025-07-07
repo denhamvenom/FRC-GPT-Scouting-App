@@ -19,8 +19,9 @@ class TeamComparisonService:
         self.data_service = TeamDataService(unified_dataset_path)
         self.prompt_service = ComparisonPromptService()
         self.gpt_service = GPTAnalysisService()
-        self.metrics_service = MetricsExtractionService()
         self.generator = PicklistGeneratorService(unified_dataset_path)  # For token checking
+        # Pass the data aggregation service to metrics service for field selections access
+        self.metrics_service = MetricsExtractionService(self.generator.data_service)
 
 
 
