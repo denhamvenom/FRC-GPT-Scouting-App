@@ -169,6 +169,17 @@ function Navbar() {
                 Alliance Selection
               </Link>
               
+              <Link
+                to="/graphical-analysis"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive("/graphical-analysis") 
+                    ? "bg-blue-900 text-white" 
+                    : "text-gray-200 hover:bg-blue-700"
+                }`}
+              >
+                Graphical Analysis
+              </Link>
+              
               {/* Refresh Scouting Data Button */}
               <button
                 onClick={handleRefreshData}

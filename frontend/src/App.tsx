@@ -12,6 +12,7 @@ import PicklistNew from "./pages/PicklistNew";
 import UnifiedDatasetBuilder from "./pages/UnifiedDatasetBuilder";
 import DebugLogs from "./pages/DebugLogs";
 import AllianceSelection from "./pages/AllianceSelection";
+import GraphicalAnalysis from "./pages/GraphicalAnalysis";
 import Navbar from "./components/Navbar";
 import GameLabelManager from "./components/GameLabelManager";
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/build-dataset" element={<UnifiedDatasetBuilder />} />
             <Route path="/alliance-selection" element={<AllianceSelection />} />
             <Route path="/alliance-selection/:selectionId" element={<AllianceSelection />} />
+            <Route path="/graphical-analysis" element={<GraphicalAnalysis />} />
             
             {/* Redirect old Schema route to Field Selection */}
             <Route path="/schema" element={<FieldSelection />} />
