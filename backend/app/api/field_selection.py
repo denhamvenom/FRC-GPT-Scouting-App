@@ -211,3 +211,30 @@ async def get_field_selections(year: int = 2025):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error loading field selections: {str(e)}")
+
+
+@router.get("/field-metadata")
+async def get_field_metadata(event_key: str = "2025lake"):
+    """
+    Get the field metadata configuration for an event.
+    This returns the complete field_selections file with label mappings.
+    """
+    try:
+        # For now, we'll serve the static file based on event key
+        # In the future, this could be dynamic based on event
+        metadata_path = os.path.join(DATA_DIR, f"field_selections_{event_key}.json")
+        
+        # Fallback to default if event-specific file doesn't exist
+        if not os.path.exists(metadata_path):
+            metadata_path = os.path.join(DATA_DIR, "field_selections_2025lake.json")
+            
+        if not os.path.exists(metadata_path):
+            raise HTTPException(status_code=404, detail=f"Field metadata not found for event: {event_key}")
+            
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+            
+        return metadata
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading field metadata: {str(e)}")
