@@ -59,6 +59,7 @@ export function usePicklistGeneration(
     pickPosition,
     priorities,
     excludeTeams = [],
+    strategyInterpretation,
     onPicklistGenerated,
     onPicklistCleared,
   } = props;
@@ -285,6 +286,7 @@ export function usePicklistGeneration(
         pick_position: pickPosition,
         priorities: simplePriorities,
         exclude_teams: teamsToExclude,
+        strategy_interpretation: strategyInterpretation || null,
         use_batching: useBatching,
         batch_size: 60,
         reference_teams_count: 3,

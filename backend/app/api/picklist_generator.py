@@ -21,6 +21,9 @@ class PicklistRequest(BaseModel):
     pick_position: str = Field(..., description="Options: 'first', 'second', or 'third'")
     priorities: List[MetricPriority]
     exclude_teams: Optional[List[int]] = None
+    strategy_interpretation: Optional[str] = Field(
+        None, description="Strategic interpretation from Parse Strategy to guide picklist generation"
+    )
     batch_size: int = Field(
         20, ge=5, le=100, description="Number of teams in each batch (default: 20)"
     )
@@ -249,6 +252,7 @@ async def generate_picklist(request: PicklistRequest):
             pick_position=request.pick_position,
             priorities=priorities,  # Use the plain dict version
             exclude_teams=request.exclude_teams,
+            strategy_interpretation=request.strategy_interpretation,  # Pass strategy interpretation
             request_id=request_id,  # Pass the request ID for logging
             cache_key=cache_key,  # Pass the cache key for deduplication and progress tracking
             batch_size=request.batch_size,

@@ -78,6 +78,7 @@ class PicklistGeneratorService:
         pick_position: str,
         priorities: List[Dict[str, Any]],
         exclude_teams: Optional[List[int]] = None,
+        strategy_interpretation: Optional[str] = None,
         request_id: Optional[int] = None,
         cache_key: Optional[str] = None,
         batch_size: int = 60,
@@ -125,13 +126,13 @@ class PicklistGeneratorService:
                 result = await self._orchestrate_batch_processing(
                     teams_data, your_team_number, pick_position, normalized_priorities,
                     cache_key, optimal_batch_size, reference_teams_count, reference_selection, final_rerank,
-                    progress_tracker
+                    progress_tracker, strategy_interpretation
                 )
             else:
                 logger.info(f"Using single processing for {len(teams_data)} teams")
                 progress_tracker.update(35, f"Starting single processing ({len(teams_data)} teams)...", "single_processing")
                 result = await self._orchestrate_single_processing(
-                    teams_data, your_team_number, pick_position, normalized_priorities, cache_key
+                    teams_data, your_team_number, pick_position, normalized_priorities, cache_key, strategy_interpretation
                 )
                 progress_tracker.update(90, "Finalizing results...", "finalization")
             
@@ -190,7 +191,8 @@ class PicklistGeneratorService:
                     missing_team_numbers, existing_picklist, your_team_number,
                     pick_position, normalized_priorities, all_teams
                 ),
-                teams_data=all_teams
+                teams_data=all_teams,
+                strategy_interpretation=None
             )
             
             if analysis_result.get("status") == "success":
@@ -288,7 +290,7 @@ class PicklistGeneratorService:
     async def _orchestrate_batch_processing(
         self, teams_data, your_team_number, pick_position, normalized_priorities,
         cache_key, batch_size, reference_teams_count, reference_selection, final_rerank,
-        progress_tracker=None
+        progress_tracker=None, strategy_interpretation=None
     ) -> Dict[str, Any]:
         """Coordinate batch processing following baseline logic"""
         # Create simple batches like baseline
@@ -344,7 +346,8 @@ class PicklistGeneratorService:
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 teams_data=batch,
-                team_index_map=team_index_map
+                team_index_map=team_index_map,
+                strategy_interpretation=strategy_interpretation
             )
             
             if batch_result.get("status") == "success":
@@ -400,7 +403,8 @@ class PicklistGeneratorService:
                     ),
                     user_prompt=user_prompt,
                     teams_data=final_teams_data,
-                    team_index_map=team_index_map
+                    team_index_map=team_index_map,
+                    strategy_interpretation=strategy_interpretation
                 )
                 if final_result.get("status") == "success":
                     combined_picklist = final_result["picklist"]
@@ -464,7 +468,7 @@ class PicklistGeneratorService:
         return final_size
 
     async def _orchestrate_single_processing(
-        self, teams_data, your_team_number, pick_position, normalized_priorities, cache_key
+        self, teams_data, your_team_number, pick_position, normalized_priorities, cache_key, strategy_interpretation=None
     ) -> Dict[str, Any]:
         """ORIGINAL SINGLE PROCESSING WITH INDEX MAPPING - EXACT RESTORATION"""
         
@@ -491,7 +495,8 @@ class PicklistGeneratorService:
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             teams_data=teams_data,
-            team_index_map=team_index_map
+            team_index_map=team_index_map,
+            strategy_interpretation=strategy_interpretation
         )
         
         if analysis_result.get("status") == "success":
@@ -549,7 +554,8 @@ class PicklistGeneratorService:
                     list(missing_team_numbers), picklist, your_team_number,
                     pick_position, priorities, missing_teams_data
                 ),
-                teams_data=missing_teams_data
+                teams_data=missing_teams_data,
+                strategy_interpretation=None
             )
             
             if missing_result.get("status") == "success":

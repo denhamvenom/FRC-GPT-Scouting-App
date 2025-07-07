@@ -67,6 +67,7 @@ export interface PicklistGeneratorProps {
     third: MetricPriority[];
   };
   excludeTeams?: number[];
+  strategyInterpretation?: string;
   onPicklistGenerated?: (result: PicklistResult) => void;
   initialPicklist?: Team[];
   onExcludeTeam?: (teamNumber: number) => void;

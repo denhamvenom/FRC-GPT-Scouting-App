@@ -2205,6 +2205,7 @@ const PicklistNew: React.FC = () => {
                     pickPosition={activeTab}
                     priorities={getActivePriorities()}
                     excludeTeams={excludedTeams}
+                    strategyInterpretation={parsedPriorities?.interpretation}
                     onPicklistGenerated={handlePicklistGenerated}
                     onExcludeTeam={handleExcludeTeam}
                     isLocked={hasLockedPicklist}
