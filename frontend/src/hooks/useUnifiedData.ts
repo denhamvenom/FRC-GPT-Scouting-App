@@ -103,13 +103,13 @@ export const useUnifiedData = (eventKey?: string): UseUnifiedDataReturn => {
     setError(null);
 
     try {
-      const baseUrl = getApiBaseUrl();
-      let url = `${baseUrl}/api/unified/dataset`;
-      
-      // Add event_key parameter if provided
-      if (targetEventKey) {
-        url += `?event_key=${encodeURIComponent(targetEventKey)}`;
+      // Validate event key before making the request
+      if (!targetEventKey || targetEventKey.trim() === '') {
+        throw new Error('Event key is required to fetch unified data');
       }
+
+      const baseUrl = getApiBaseUrl();
+      const url = `${baseUrl}/api/unified/dataset?event_key=${encodeURIComponent(targetEventKey)}`;
 
       console.log('Fetching unified data from:', url);
       
@@ -144,12 +144,23 @@ export const useUnifiedData = (eventKey?: string): UseUnifiedDataReturn => {
   };
 
   const refetch = () => {
-    fetchUnifiedData(eventKey);
+    // Only refetch if eventKey is valid
+    if (eventKey && eventKey.trim() !== '') {
+      fetchUnifiedData(eventKey);
+    }
   };
 
   // Fetch data on mount and when eventKey changes
   useEffect(() => {
-    fetchUnifiedData(eventKey);
+    // Only fetch if eventKey is provided and not empty
+    if (eventKey && eventKey.trim() !== '') {
+      fetchUnifiedData(eventKey);
+    } else {
+      // Clear previous data if eventKey is empty
+      setData(null);
+      setError(null);
+      setLoading(false);
+    }
   }, [eventKey]);
 
   return {

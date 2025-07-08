@@ -10,9 +10,12 @@ import {
   GraphicalAnalysisState, 
   MetricsByCategory, 
   METRIC_PRESETS, 
-  DEFAULT_SETTINGS 
+  DEFAULT_SETTINGS,
+  ChartType
 } from '../types/graphicalAnalysis';
 import RadarChartVisualization from '../components/RadarChartVisualization';
+import ConsistencyHeatmap from '../components/ConsistencyHeatmap';
+import { processDataForHeatmap } from '../utils/heatmapDataProcessing';
 import { apiUrl, fetchWithNgrokHeaders } from '../config';
 
 interface GraphicalAnalysisProps {}
@@ -36,8 +39,12 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
       enabled: false,
       excludeLowest: 1,
       excludeHighest: 1
-    }
+    },
+    chartType: 'radar'
   });
+  
+  // State for team search
+  const [teamSearchQuery, setTeamSearchQuery] = useState<string>('');
   
   const { data: unifiedData, loading: dataLoading, error: dataError } = useUnifiedData(eventKey);
   const { 
@@ -99,10 +106,45 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
     }));
   };
 
+  const handleClearMetrics = () => {
+    setState(prev => ({
+      ...prev,
+      selectedMetrics: []
+    }));
+  };
+
+  const handleClearTeams = () => {
+    setState(prev => ({
+      ...prev,
+      selectedTeams: []
+    }));
+  };
+
+  const handleChartTypeChange = (chartType: ChartType) => {
+    setState(prev => ({
+      ...prev,
+      chartType
+    }));
+  };
+
   // Get processed data for display
   const availableTeams = unifiedData ? getAvailableTeams(unifiedData) : [];
   const availableMetrics = unifiedData ? getAvailableMetrics(unifiedData) : [];
   const metricsByCategory = getMetricsByCategory();
+  
+  // Filter teams based on search query
+  const filteredTeams = React.useMemo(() => {
+    if (!teamSearchQuery.trim()) {
+      return availableTeams;
+    }
+    
+    const query = teamSearchQuery.toLowerCase().trim();
+    return availableTeams.filter(team => {
+      const teamNumber = team.team_number.toString();
+      const nickname = team.nickname.toLowerCase();
+      return teamNumber.includes(query) || nickname.includes(query);
+    });
+  }, [availableTeams, teamSearchQuery]);
 
   // Process chart data when selections change
   const chartProcessingResult = React.useMemo(() => {
@@ -152,6 +194,35 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
     });
     return names;
   }, [availableTeams]);
+
+  // Process heatmap data when needed
+  const heatmapData = React.useMemo(() => {
+    if (!unifiedData || state.chartType !== 'heatmap' || state.selectedMetrics.length === 0 || state.selectedTeams.length === 0) {
+      return null;
+    }
+
+    console.log('Processing heatmap data:', {
+      selectedMetrics: state.selectedMetrics,
+      selectedTeams: state.selectedTeams,
+      chartType: state.chartType
+    });
+
+    try {
+      // For heatmap, we use the first selected metric
+      const primaryMetric = state.selectedMetrics[0];
+      
+      return processDataForHeatmap(
+        unifiedData,
+        state.selectedTeams,
+        primaryMetric,
+        'total', // Default to total for now
+        'global'
+      );
+    } catch (error) {
+      console.error('Error processing heatmap data:', error);
+      return null;
+    }
+  }, [unifiedData, state.chartType, state.selectedMetrics, state.selectedTeams]);
 
   // Fetch event key from setup on component mount
   useEffect(() => {
@@ -222,7 +293,7 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Graphical Analysis</h1>
         <p className="text-gray-600">
-          Visualize and compare team performance using Multi-Axis Radar Charts
+          Visualize and compare team performance using multiple chart types
         </p>
       </div>
 
@@ -277,9 +348,19 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
 
             {/* Metric Selection */}
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
-                Metric Selection ({state.selectedMetrics.length} selected)
-              </h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Metric Selection ({state.selectedMetrics.length} selected)
+                </h3>
+                {state.selectedMetrics.length > 0 && (
+                  <button
+                    onClick={handleClearMetrics}
+                    className="text-xs text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
               <div className="max-h-64 overflow-y-auto border rounded p-2">
                 {Object.entries(metricsByCategory).map(([category, metrics]) => (
                   <div key={category} className="mb-2">
@@ -321,11 +402,34 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
 
             {/* Team Selection */}
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
-                Team Selection ({state.selectedTeams.length}/6 selected)
-              </h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Team Selection ({state.selectedTeams.length}/6 selected)
+                </h3>
+                {state.selectedTeams.length > 0 && (
+                  <button
+                    onClick={handleClearTeams}
+                    className="text-xs text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+              
+              {/* Team Search */}
+              <div className="mb-2">
+                <input
+                  type="text"
+                  placeholder="Search teams by number or name..."
+                  value={teamSearchQuery}
+                  onChange={(e) => setTeamSearchQuery(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
               <div className="max-h-48 overflow-y-auto border rounded p-2">
-                {availableTeams.map(team => (
+                {filteredTeams.length > 0 ? (
+                  filteredTeams.map(team => (
                   <label key={team.team_number} className="flex items-center p-2 hover:bg-gray-50 rounded">
                     <input
                       type="checkbox"
@@ -339,7 +443,12 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
                       <div className="text-xs text-gray-500">{team.nickname}</div>
                     </div>
                   </label>
-                ))}
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-sm text-gray-500">
+                    {teamSearchQuery ? 'No teams found matching your search' : 'No teams available'}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -473,20 +582,61 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
         {/* Chart Panel */}
         <div className="lg:col-span-2 order-1 lg:order-2">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Multi-Axis Radar Chart</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">
+                {state.chartType === 'radar' ? 'Multi-Axis Radar Chart' : 
+                 state.chartType === 'heatmap' ? 'Consistency Heatmap' : 
+                 'Scoring Distribution'}
+              </h2>
+              
+              {/* Chart Type Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                {(['radar', 'heatmap', 'distribution'] as ChartType[]).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleChartTypeChange(type)}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      state.chartType === type
+                        ? 'bg-white text-blue-700 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
             
             {/* Current Selections Summary */}
             <div className="mb-6 p-4 bg-blue-50 rounded-lg">
               <h3 className="text-sm font-medium text-blue-800 mb-2">Current Selections</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-blue-600 font-medium mb-1">Selected Metrics ({state.selectedMetrics.length})</p>
+                  <p className="text-xs text-blue-600 font-medium mb-1">
+                    Selected Metrics ({state.selectedMetrics.length})
+                    {state.chartType === 'heatmap' && state.selectedMetrics.length > 1 && (
+                      <span className="text-orange-600 ml-1">(Heatmap uses first metric only)</span>
+                    )}
+                  </p>
                   {state.selectedMetrics.length > 0 ? (
                     <div className="text-xs text-blue-700">
-                      {state.selectedMetrics.slice(0, 3).map(metric => 
-                        metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-                      ).join(', ')}
-                      {state.selectedMetrics.length > 3 && ` and ${state.selectedMetrics.length - 3} more...`}
+                      {state.chartType === 'heatmap' ? (
+                        <span className="font-medium">
+                          {state.selectedMetrics[0].replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {state.selectedMetrics.length > 1 && (
+                            <span className="text-orange-600 ml-1">
+                              (+{state.selectedMetrics.length - 1} others for radar chart)
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <>
+                          {state.selectedMetrics.slice(0, 3).map(metric => 
+                            metric.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                          ).join(', ')}
+                          {state.selectedMetrics.length > 3 && ` and ${state.selectedMetrics.length - 3} more...`}
+                        </>
+                      )}
                     </div>
                   ) : (
                     <div className="text-xs text-blue-500 italic">No metrics selected</div>
@@ -506,19 +656,86 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
               </div>
             </div>
 
-            {/* Radar Chart Visualization */}
+            {/* Chart Visualization */}
             {state.selectedMetrics.length > 0 && state.selectedTeams.length > 0 ? (
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <RadarChartVisualization
-                  chartData={chartProcessingResult?.chartData || []}
-                  selectedTeams={state.selectedTeams}
-                  teamNames={teamNames}
-                  teamMetrics={chartProcessingResult?.teamMetrics || []}
-                  selectedMetrics={state.selectedMetrics}
-                  loading={loading}
-                  error={chartProcessingResult === null ? 'Unable to process chart data' : null}
-                  height={500}
-                />
+                {state.chartType === 'radar' && (
+                  <RadarChartVisualization
+                    chartData={chartProcessingResult?.chartData || []}
+                    selectedTeams={state.selectedTeams}
+                    teamNames={teamNames}
+                    teamMetrics={chartProcessingResult?.teamMetrics || []}
+                    selectedMetrics={state.selectedMetrics}
+                    loading={loading}
+                    error={chartProcessingResult === null ? 'Unable to process chart data' : null}
+                    height={500}
+                  />
+                )}
+                
+                {state.chartType === 'heatmap' && (
+                  heatmapData ? (
+                    <ConsistencyHeatmap
+                      data={heatmapData}
+                      selectedMetric={state.selectedMetrics[0]}
+                      showMode="total"
+                      normalizationMode="global"
+                      height={500}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-64 text-gray-500">
+                      <div className="text-center">
+                        <svg
+                          className="mx-auto h-16 w-16 mb-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <p className="text-lg font-medium mb-2">Unable to Generate Heatmap</p>
+                        <p className="text-sm mb-4">
+                          {state.selectedMetrics.length === 0 
+                            ? 'Please select at least one metric to display the heatmap.'
+                            : state.selectedTeams.length === 0
+                            ? 'Please select at least one team to display the heatmap.'
+                            : 'Unable to process heatmap data. Please check your selections.'}
+                        </p>
+                        <div className="text-xs text-gray-400">
+                          <p>• Select a metric from the left panel</p>
+                          <p>• Choose teams to compare</p>
+                          <p>• Ensure teams have match data available</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )}
+                
+                {state.chartType === 'distribution' && (
+                  <div className="flex items-center justify-center h-64 text-gray-500">
+                    <div className="text-center">
+                      <svg
+                        className="mx-auto h-16 w-16 mb-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                        />
+                      </svg>
+                      <p className="text-lg font-medium mb-2">Distribution Chart</p>
+                      <p className="text-sm">Coming in Sprint 2</p>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
@@ -538,7 +755,11 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-700 mb-2">Multi-Axis Radar Chart</h3>
+                <h3 className="text-lg font-medium text-gray-700 mb-2">
+                  {state.chartType === 'radar' ? 'Multi-Axis Radar Chart' : 
+                   state.chartType === 'heatmap' ? 'Consistency Heatmap' : 
+                   'Scoring Distribution'}
+                </h3>
                 <p className="text-gray-500 mb-4">
                   Select metrics and teams to visualize performance comparisons
                 </p>
@@ -546,7 +767,10 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
                   <p>• Choose metrics from the categories on the left</p>
                   <p>• Select 1-6 teams for comparison</p>
                   <p>• Use presets for quick metric selection</p>
-                  <p>• Interactive tooltips and legend available</p>
+                  <p>• Switch between different chart types using the toggle above</p>
+                  {state.chartType === 'heatmap' && (
+                    <p>• Heatmap shows match-by-match performance consistency</p>
+                  )}
                 </div>
               </div>
             )}

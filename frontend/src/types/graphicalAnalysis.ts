@@ -23,6 +23,9 @@ export type {
   ChartDataProcessingOptions 
 } from '../utils/chartDataProcessing';
 
+// Chart types
+export type ChartType = 'radar' | 'heatmap' | 'distribution';
+
 // Component state interfaces
 export interface GraphicalAnalysisState {
   selectedMetrics: string[];
@@ -36,6 +39,7 @@ export interface GraphicalAnalysisState {
     excludeLowest: number;
     excludeHighest: number;
   };
+  chartType: ChartType;
 }
 
 // UI Component props
@@ -215,6 +219,34 @@ export const METRIC_PRESETS: MetricPreset[] = [
     metrics: ['auto_algae_processor_scored', 'teleop_algae_processor_scored', 'auto_net_score']
   }
 ];
+
+// Heatmap specific types
+export interface HeatmapCell {
+  teamNumber: number;
+  matchNumber: number;
+  value: number;
+  isValid: boolean;
+  matchType?: string;
+  allianceColor?: 'red' | 'blue';
+}
+
+export interface HeatmapData {
+  cells: HeatmapCell[];
+  teams: Array<{ teamNumber: number; nickname: string; avgScore: number }>;
+  matches: Array<{ matchNumber: number; displayName: string }>;
+  valueRange: { min: number; max: number };
+  colorScale: 'greenToRed' | 'blueToRed' | 'sequential';
+}
+
+export interface HeatmapProps {
+  data: HeatmapData;
+  selectedMetric: string;
+  showMode: 'auto' | 'teleop' | 'total';
+  normalizationMode: 'match' | 'global';
+  onCellHover?: (cell: HeatmapCell | null) => void;
+  onCellClick?: (cell: HeatmapCell) => void;
+  height?: number;
+}
 
 // Validation functions
 export const validateMetricSelection = (selectedMetrics: string[], availableMetrics: string[]): GraphicalAnalysisError | null => {
