@@ -1,0 +1,394 @@
+{
+  "event_key": "2025lake",
+  "year": 2025,
+  "total_teams": 55,
+  "avg_matches_per_team": 9.054545454545455,
+  "event_level": "regional",
+  "competitive_context": {
+    "total_teams": 55,
+    "metrics_calculated": 18,
+    "avg_matches_per_team": 9.1,
+    "event_level": "regional",
+    "analysis_timestamp": "2025-07-09T02:27:52.418322"
+  },
+  "baselines": {
+    "auto_coral_L2_scored": {
+      "metric_name": "auto_coral_L2_scored",
+      "statistics": {
+        "mean": 0.048582995951417005,
+        "std": 0.27333864045808937,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 2.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 5.626220349429006
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 0.0
+      },
+      "field_size": 55,
+      "top_performers": 6
+    },
+    "auto_coral_L3_scored": {
+      "metric_name": "auto_coral_L3_scored",
+      "statistics": {
+        "mean": 0.002028397565922921,
+        "std": 0.0450377349111045,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 1.0,
+        "sample_size": 493,
+        "coefficient_of_variation": 22.20360331117452
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 0.0
+      },
+      "field_size": 55,
+      "top_performers": 1
+    },
+    "teleop_total_points": {
+      "metric_name": "teleop_total_points",
+      "statistics": {
+        "mean": 18.68016194331984,
+        "std": 16.81117333377128,
+        "median": 15.0,
+        "min_value": 0.0,
+        "max_value": 74.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 0.8999479439621816
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 4.0,
+        "50th": 15.0,
+        "75th": 30.0,
+        "90th": 43.0
+      },
+      "field_size": 55,
+      "top_performers": 16
+    },
+    "auto_coral_L1_scored": {
+      "metric_name": "auto_coral_L1_scored",
+      "statistics": {
+        "mean": 0.13157894736842105,
+        "std": 0.388598585811413,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 3.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 2.953349252166739
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 1.0
+      },
+      "field_size": 55,
+      "top_performers": 1
+    },
+    "endgame": {
+      "metric_name": "endgame",
+      "statistics": {
+        "mean": 3.376518218623482,
+        "std": 4.222985401645046,
+        "median": 2.0,
+        "min_value": 0.0,
+        "max_value": 12.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 1.2506923191922377
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.5,
+        "50th": 2.0,
+        "75th": 2.0,
+        "90th": 12.0
+      },
+      "field_size": 55,
+      "top_performers": 0
+    },
+    "teleop_algae_net_scored": {
+      "metric_name": "teleop_algae_net_scored",
+      "statistics": {
+        "mean": 0.17611336032388664,
+        "std": 0.6943383583571113,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 7.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 3.942564931361069
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 0.0
+      },
+      "field_size": 55,
+      "top_performers": 11
+    },
+    "teleop_algae_processor_scored": {
+      "metric_name": "teleop_algae_processor_scored",
+      "statistics": {
+        "mean": 0.5263157894736842,
+        "std": 1.1737130060460035,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 9.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 2.2300547114874067
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 2.0
+      },
+      "field_size": 55,
+      "top_performers": 13
+    },
+    "teleop_coral_L3_scored": {
+      "metric_name": "teleop_coral_L3_scored",
+      "statistics": {
+        "mean": 0.9188640973630832,
+        "std": 1.5079427674913657,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 8.0,
+        "sample_size": 493,
+        "coefficient_of_variation": 1.6410944467400514
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 1.0,
+        "90th": 3.0
+      },
+      "field_size": 55,
+      "top_performers": 17
+    },
+    "Auto Total Points": {
+      "metric_name": "Auto Total Points",
+      "statistics": {
+        "mean": 4.676113360323886,
+        "std": 4.242683270523426,
+        "median": 3.0,
+        "min_value": 0.0,
+        "max_value": 24.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 0.9073097556876938
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 3.0,
+        "50th": 3.0,
+        "75th": 6.0,
+        "90th": 10.0
+      },
+      "field_size": 55,
+      "top_performers": 12
+    },
+    "auto_net_score": {
+      "metric_name": "auto_net_score",
+      "statistics": {
+        "mean": 0.0,
+        "std": 0.0,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 0.0,
+        "sample_size": 494,
+        "coefficient_of_variation": Infinity
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 0.0
+      },
+      "field_size": 55,
+      "top_performers": 0
+    },
+    "auto": {
+      "metric_name": "auto",
+      "statistics": {
+        "mean": 4.676113360323886,
+        "std": 4.242683270523426,
+        "median": 3.0,
+        "min_value": 0.0,
+        "max_value": 24.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 0.9073097556876938
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 3.0,
+        "50th": 3.0,
+        "75th": 6.0,
+        "90th": 10.0
+      },
+      "field_size": 55,
+      "top_performers": 12
+    },
+    "teleop_coral_L1_scored": {
+      "metric_name": "teleop_coral_L1_scored",
+      "statistics": {
+        "mean": 0.917004048582996,
+        "std": 2.237245647034825,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 15.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 2.439733663653871
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 1.0,
+        "90th": 3.0
+      },
+      "field_size": 55,
+      "top_performers": 12
+    },
+    "teleop_coral_L2_scored": {
+      "metric_name": "teleop_coral_L2_scored",
+      "statistics": {
+        "mean": 0.6369168356997972,
+        "std": 1.17391024849642,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 6.0,
+        "sample_size": 493,
+        "coefficient_of_variation": 1.8431138614927867
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 1.0,
+        "90th": 2.0
+      },
+      "field_size": 55,
+      "top_performers": 23
+    },
+    "auto_coral_L4_scored": {
+      "metric_name": "auto_coral_L4_scored",
+      "statistics": {
+        "mean": 0.2129817444219067,
+        "std": 0.5346469788023489,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 3.0,
+        "sample_size": 493,
+        "coefficient_of_variation": 2.510294862376743
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 1.0
+      },
+      "field_size": 55,
+      "top_performers": 8
+    },
+    "teleop_coral_L4_scored": {
+      "metric_name": "teleop_coral_L4_scored",
+      "statistics": {
+        "mean": 1.4817813765182186,
+        "std": 2.397317649277807,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 10.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 1.6178619108514163
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 3.0,
+        "90th": 5.0
+      },
+      "field_size": 55,
+      "top_performers": 16
+    },
+    "endgame_total_points": {
+      "metric_name": "endgame_total_points",
+      "statistics": {
+        "mean": 3.376518218623482,
+        "std": 4.222985401645046,
+        "median": 2.0,
+        "min_value": 0.0,
+        "max_value": 12.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 1.2506923191922377
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.5,
+        "50th": 2.0,
+        "75th": 2.0,
+        "90th": 12.0
+      },
+      "field_size": 55,
+      "top_performers": 0
+    },
+    "auto_algae_processor_scored": {
+      "metric_name": "auto_algae_processor_scored",
+      "statistics": {
+        "mean": 0.0,
+        "std": 0.0,
+        "median": 0.0,
+        "min_value": 0.0,
+        "max_value": 0.0,
+        "sample_size": 494,
+        "coefficient_of_variation": Infinity
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 0.0,
+        "50th": 0.0,
+        "75th": 0.0,
+        "90th": 0.0
+      },
+      "field_size": 55,
+      "top_performers": 0
+    },
+    "teleop": {
+      "metric_name": "teleop",
+      "statistics": {
+        "mean": 18.68016194331984,
+        "std": 16.81117333377128,
+        "median": 15.0,
+        "min_value": 0.0,
+        "max_value": 74.0,
+        "sample_size": 494,
+        "coefficient_of_variation": 0.8999479439621816
+      },
+      "percentiles": {
+        "10th": 0.0,
+        "25th": 4.0,
+        "50th": 15.0,
+        "75th": 30.0,
+        "90th": 43.0
+      },
+      "field_size": 55,
+      "top_performers": 16
+    }
+  }
+}

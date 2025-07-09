@@ -77,6 +77,12 @@ function Validation() {
   
   // State for handling missing data resolution
   const [actionMode, setActionMode] = useState<'none' | 'watch-video' | 'virtual-scout' | 'ignore-match'>('none');
+  
+  // State for performance signature generation
+  const [isGeneratingSignatures, setIsGeneratingSignatures] = useState<boolean>(false);
+  const [signatureProgress, setSignatureProgress] = useState<number>(0);
+  const [signatureStatus, setSignatureStatus] = useState<string>('');
+  const [signatureResult, setSignatureResult] = useState<any>(null);
   const [ignoreReason, setIgnoreReason] = useState<'not_operational' | 'not_present' | 'other'>('not_operational');
   const [customReason, setCustomReason] = useState<string>('');
 
@@ -382,6 +388,106 @@ function Validation() {
     }
   };
 
+  // Handle performance signature generation
+  const handleValidationComplete = async () => {
+    if (!datasetPath) {
+      setError('No dataset path available');
+      return;
+    }
+
+    setIsGeneratingSignatures(true);
+    setSignatureProgress(0);
+    setSignatureStatus('Initializing performance signature generation...');
+    setError(null);
+
+    try {
+      // Initial progress updates (fast operations)
+      const initialProgressUpdates = [
+        { progress: 10, status: 'Loading unified dataset...' },
+        { progress: 25, status: 'Auto-detecting metrics from scouting data...' },
+        { progress: 40, status: 'Calculating event-wide statistical baselines...' },
+        { progress: 60, status: 'Generating performance signatures for all teams...' }
+      ];
+
+      // Update initial progress quickly
+      for (const update of initialProgressUpdates) {
+        setSignatureProgress(update.progress);
+        setSignatureStatus(update.status);
+        await new Promise(resolve => setTimeout(resolve, 400)); // Faster for initial steps
+      }
+
+      // Start the API call
+      setSignatureProgress(75);
+      setSignatureStatus('Creating signature files...');
+      
+      // Start the actual API call (this will take time for GPT processing)
+      const apiCallPromise = fetchWithNgrokHeaders(apiUrl('/api/performance-signatures/generate'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          unified_dataset_path: datasetPath
+        })
+      });
+
+      // Continue progress updates during API processing (strategic analysis takes time)
+      const strategicProgressUpdates = [
+        { progress: 85, status: 'Performance signatures complete - starting strategic analysis...', delay: 1000 },
+        { progress: 90, status: 'Generating strategic intelligence for all teams...', delay: 3000 },
+        { progress: 95, status: 'Processing teams in strategic analysis batches...', delay: 5000 },
+        { progress: 98, status: 'Creating strategic intelligence files...', delay: 2000 }
+      ];
+
+      // Run progress updates concurrently with API call
+      const progressPromise = (async () => {
+        for (const update of strategicProgressUpdates) {
+          await new Promise(resolve => setTimeout(resolve, update.delay));
+          setSignatureProgress(update.progress);
+          setSignatureStatus(update.status);
+        }
+      })();
+
+      // Wait for API call to complete
+      const response = await apiCallPromise;
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Ensure progress reaches 100% after API completion
+        setSignatureProgress(100);
+        setSignatureStatus('Strategic analysis complete!');
+        setSignatureResult(result);
+        
+        // Show success message with both performance signatures and strategic intelligence
+        let successMsg = `Performance signatures generated for ${result.teams_analyzed} teams with ${result.metrics_processed} metrics`;
+        if (result.strategic_teams_analyzed) {
+          successMsg += ` + strategic intelligence for ${result.strategic_teams_analyzed} teams`;
+        }
+        setSuccessMessage(successMsg);
+        
+        // Wait a moment to show completion, then proceed to Sprint 4 (enhanced picklist with strategic analysis)
+        setTimeout(() => {
+          setIsGeneratingSignatures(false);
+          // Navigate to picklist - now with strategic intelligence files ready for Sprint 4
+          window.location.href = '/picklist';
+        }, 2000);
+        
+      } else {
+        throw new Error(result.error || 'Performance signature generation failed');
+      }
+
+    } catch (err) {
+      console.error('Error generating performance signatures:', err);
+      setError(`Failed to generate performance signatures: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setIsGeneratingSignatures(false);
+      setSignatureProgress(0);
+      setSignatureStatus('');
+    }
+  };
+
   if (loading && !validationResult) {
     return <div className="flex justify-center items-center h-64">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -427,20 +533,46 @@ function Validation() {
               </div>
             </div>
             
+            {/* Performance Signature Generation Progress */}
+            {isGeneratingSignatures && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold text-blue-800">Generating Performance Signatures</h3>
+                  <span className="text-sm font-medium text-blue-600">{signatureProgress}%</span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-3 mb-2">
+                  <div 
+                    className="bg-blue-600 h-3 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${signatureProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-blue-700">{signatureStatus}</p>
+                <div className="flex items-center mt-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-600 mr-2"></div>
+                  <span className="text-xs text-blue-600">Processing... This may take a few moments</span>
+                </div>
+              </div>
+            )}
+
             <div className="mt-4 flex justify-between items-center">
               <button
-                onClick={() => window.location.href = '/picklist'}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                onClick={handleValidationComplete}
+                disabled={isGeneratingSignatures}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                <span className="mr-2">Validation Complete</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-                </svg>
+                <span className="mr-2">{isGeneratingSignatures ? 'Generating Signatures...' : 'Validation Complete'}</span>
+                {isGeneratingSignatures ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                  </svg>
+                )}
               </button>
 
               <button
                 onClick={() => fetchValidationData(datasetPath)}
-                disabled={loading}
+                disabled={loading || isGeneratingSignatures}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
               >
                 {loading ? 'Refreshing...' : 'Refresh Data'}

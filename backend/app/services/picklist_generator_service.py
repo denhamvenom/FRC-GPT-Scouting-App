@@ -19,6 +19,7 @@ from app.services.priority_calculation_service import PriorityCalculationService
 from app.services.batch_processing_service import BatchProcessingService
 from app.services.performance_optimization_service import PerformanceOptimizationService
 from app.services.picklist_gpt_service import PicklistGPTService
+from app.services.strategic_analysis_service import StrategicAnalysisService
 
 # Configure logging
 logging.basicConfig(
@@ -62,6 +63,7 @@ class PicklistGeneratorService:
         self.performance_service = PerformanceOptimizationService(self._picklist_cache)
         self.batch_service = BatchProcessingService(self._picklist_cache)
         self.gpt_service = PicklistGPTService()
+        self.strategic_service = StrategicAnalysisService()
         
         # Preserve baseline attributes for API compatibility
         self.dataset_path = unified_dataset_path
@@ -581,3 +583,68 @@ class PicklistGeneratorService:
         
         logger.warning("Using original picklist without missing teams")
         return picklist
+
+    async def generate_strategic_intelligence(
+        self, 
+        exclude_teams: Optional[List[int]] = None
+    ) -> Dict[str, Any]:
+        """
+        Generate strategic intelligence for all teams using batched GPT processing.
+        
+        This method provides strategic analysis separate from picklist generation,
+        enabling advanced team profiling and performance signature creation.
+        
+        Args:
+            exclude_teams: Optional list of team numbers to exclude
+            
+        Returns:
+            Strategic intelligence with enhanced team signatures and analysis
+            
+        Raises:
+            ValueError: When insufficient data for strategic analysis
+        """
+        start_time = time.time()
+        logger.info("Starting strategic intelligence generation")
+        
+        try:
+            # Get teams data for analysis
+            teams_data = self.data_service.get_teams_for_analysis(exclude_teams)
+            
+            if len(teams_data) < 5:
+                raise ValueError(f"Insufficient teams for strategic analysis: {len(teams_data)} < 5")
+            
+            # Use strategic service for batched processing
+            intelligence_result = await self.strategic_service.generate_strategic_intelligence(teams_data)
+            
+            if intelligence_result.get("status") == "success":
+                # Enhance with event metadata
+                intelligence_result["event_metadata"] = {
+                    "event_key": self.event_key,
+                    "year": self.year,
+                    "total_teams_available": len(self.teams_data),
+                    "teams_analyzed": len(teams_data),
+                    "excluded_teams": exclude_teams or []
+                }
+                
+                intelligence_result["processing_time"] = time.time() - start_time
+                
+                logger.info(
+                    f"Strategic intelligence completed: {len(intelligence_result.get('strategic_signatures', {}))} "
+                    f"teams analyzed in {intelligence_result['processing_time']:.2f}s"
+                )
+                
+                return intelligence_result
+            else:
+                raise ValueError(f"Strategic analysis failed: {intelligence_result.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"Error generating strategic intelligence: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "processing_time": time.time() - start_time,
+                "event_metadata": {
+                    "event_key": self.event_key,
+                    "year": self.year
+                }
+            }

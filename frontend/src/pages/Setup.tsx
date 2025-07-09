@@ -1075,6 +1075,20 @@ function Setup() {
               <h4 className="font-semibold">Sections Processed Successfully!</h4>
               <p className="text-sm">Saved to: {processedSectionsResult.saved_text_path}</p>
               <p className="text-sm">Extracted Length: {processedSectionsResult.extracted_text_length} chars</p>
+              
+              {/* Context Extraction Status */}
+              {processedSectionsResult.context_extraction_status && (
+                <div className="mt-2 p-2 bg-blue-50 border-l-4 border-blue-400 rounded">
+                  <p className="text-sm font-medium text-blue-800">
+                    📊 Context Extraction: {processedSectionsResult.context_extraction_status === 'optimized' ? '✅ Optimized' : processedSectionsResult.context_extraction_status}
+                  </p>
+                  {processedSectionsResult.token_savings_achieved && (
+                    <p className="text-xs text-blue-700">Token Savings: {processedSectionsResult.token_savings_achieved}</p>
+                  )}
+                </div>
+              )}
+              
+              
               <p className="text-xs mt-1">Sample: <pre className="whitespace-pre-wrap bg-gray-100 p-1 rounded text-xs">{processedSectionsResult.sample_text}</pre></p>
               <div className="mt-3 flex gap-2">
                 <button

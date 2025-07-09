@@ -244,7 +244,7 @@ class ProcessedSectionsResponse(BaseModel):
     manual_text_json_created: bool = False
     manual_text_json_path: Optional[str] = None
     game_name_detected: Optional[str] = None
-    # New extraction fields
+    # Context extraction fields
     context_extraction_status: Optional[str] = None
     context_extraction_message: Optional[str] = None
     token_savings_achieved: Optional[str] = None
@@ -418,14 +418,52 @@ async def process_selected_sections(
                     game_name = "STRONGHOLD 2016"
                     break
 
-        # Create the manual text JSON structure expected by picklist generator
+        # Parse the extracted text into individual sections for better synthesis processing
+        individual_sections = {}
+        current_section = None
+        current_content = []
+        
+        for line in extracted_text.split('\n'):
+            # Check if this line starts a new section
+            if line.startswith('--- Section:') and 'Page' in line:
+                # Save the previous section if it exists
+                if current_section and current_content:
+                    clean_content = '\n'.join(current_content).strip()
+                    if clean_content:  # Only save non-empty sections
+                        individual_sections[current_section] = clean_content
+                
+                # Extract section name from "--- Section: 5.3 REEF (Page 23) ---"
+                try:
+                    section_part = line.split('---')[1].strip()  # "Section: 5.3 REEF (Page 23)"
+                    section_part = section_part.replace('Section:', '').strip()  # "5.3 REEF (Page 23)"
+                    section_name = section_part.split('(Page')[0].strip()  # "5.3 REEF"
+                    current_section = section_name.replace(' ', '_').lower()  # "5.3_reef"
+                    current_content = []
+                except:
+                    current_section = f"section_{len(individual_sections) + 1}"
+                    current_content = []
+            else:
+                # Add content to current section
+                if current_section:
+                    current_content.append(line)
+        
+        # Don't forget the last section
+        if current_section and current_content:
+            clean_content = '\n'.join(current_content).strip()
+            if clean_content:
+                individual_sections[current_section] = clean_content
+        
+        # Create the manual text JSON structure for synthesis
         manual_text_data = {
             "game_name": game_name,
-            "relevant_sections": extracted_text,
+            "relevant_sections": extracted_text,  # Keep for backward compatibility
             "year": year,
             "sections_processed": len(selected_sections_dicts),
             "processing_timestamp": datetime.datetime.now().isoformat(),
             "source_manual": original_manual_filename,
+            # Add individual sections for synthesis
+            "individual_sections": individual_sections,
+            "section_count": len(individual_sections)
         }
 
         with open(manual_text_filepath, "w", encoding="utf-8") as f:

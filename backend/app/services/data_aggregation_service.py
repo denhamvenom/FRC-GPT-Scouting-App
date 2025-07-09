@@ -3,10 +3,28 @@
 import json
 import logging
 import os
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from app.services.game_context_extractor_service import GameContextExtractorService
-from app.config.extraction_config import get_extraction_config
+try:
+    from app.services.game_context_extractor_service import GameContextExtractorService
+    EXTRACTION_AVAILABLE = True
+except ImportError:
+    EXTRACTION_AVAILABLE = False
+    GameContextExtractorService = None
+
+try:
+    from app.services.game_context_synthesis_service import GameContextSynthesisService
+    SYNTHESIS_AVAILABLE = True
+except ImportError:
+    SYNTHESIS_AVAILABLE = False
+    GameContextSynthesisService = None
+
+try:
+    from app.config.extraction_config import get_extraction_config
+except ImportError:
+    def get_extraction_config():
+        return {}
 
 logger = logging.getLogger("data_aggregation_service")
 
@@ -15,26 +33,30 @@ class DataAggregationService:
     """
     Service for collecting, transforming, and validating data from multiple sources.
     Extracted from monolithic PicklistGeneratorService to improve maintainability.
+    
+    Enhanced with GameContextSynthesisService for strategic manual compression.
     """
 
-    def __init__(self, unified_dataset_path: str, use_extracted_context: bool = True):
+    def __init__(self, unified_dataset_path: str, use_extracted_context: bool = True, use_synthesis: bool = True):
         """
         Initialize the data aggregation service.
         
         Args:
             unified_dataset_path: Path to the unified dataset JSON file
             use_extracted_context: Whether to use extracted context (True) or full manual (False)
+            use_synthesis: Whether to use context synthesis (True) for strategic compression
         """
         self.dataset_path = unified_dataset_path
         self.dataset = self._load_dataset()
         self.teams_data = self.dataset.get("teams", {})
-        self.year = self.dataset.get("year", 2025)
+        self.year = self._determine_year()
         self.event_key = self.dataset.get("event_key", f"{self.year}arc")
         self.use_extracted_context = use_extracted_context
+        self.use_synthesis = use_synthesis
         self.label_mappings = self._load_label_mappings()  # Load field-to-label mappings
         
         # Initialize extraction service if using extracted context
-        if self.use_extracted_context:
+        if self.use_extracted_context and EXTRACTION_AVAILABLE:
             try:
                 cache_dir = os.path.join(
                     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -48,7 +70,80 @@ class DataAggregationService:
                 self.use_extracted_context = False
                 self.extractor_service = None
         else:
+            if self.use_extracted_context and not EXTRACTION_AVAILABLE:
+                logger.warning("Extraction service not available, falling back to full manual context")
+                self.use_extracted_context = False
             self.extractor_service = None
+        
+        # Initialize synthesis service if using synthesis
+        if self.use_synthesis and SYNTHESIS_AVAILABLE:
+            try:
+                cache_dir = os.path.join(
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "cache"
+                )
+                self.synthesis_service = GameContextSynthesisService(cache_dir=cache_dir)
+                logger.info("Initialized game context synthesis service")
+            except Exception as e:
+                logger.warning(f"Failed to initialize synthesis service: {e}")
+                logger.warning("Falling back to full manual context")
+                self.use_synthesis = False
+                self.synthesis_service = None
+        else:
+            if self.use_synthesis and not SYNTHESIS_AVAILABLE:
+                logger.warning("Synthesis service not available, falling back to full manual context")
+                self.use_synthesis = False
+            self.synthesis_service = None
+
+    def _get_current_year(self) -> int:
+        """
+        Get current FRC season year as fallback when no year is specified.
+        
+        This should only be used as a last resort fallback when:
+        - No year is provided in the dataset
+        - No year is provided by user input
+        - No year can be determined from other sources
+        
+        FRC seasons run from roughly September to April, so:
+        - September-December: Use current calendar year + 1
+        - January-August: Use current calendar year
+        
+        Returns:
+            Current FRC season year (fallback only)
+        """
+        now = datetime.now()
+        if now.month >= 9:  # September or later
+            return now.year + 1
+        else:  # January through August
+            return now.year
+
+    def _determine_year(self) -> int:
+        """
+        Determine the FRC season year using proper priority order.
+        
+        Priority order:
+        1. Year from dataset (user input via setup process)
+        2. Year from global cache (active user session)
+        3. Dynamic calculation as last resort fallback
+        
+        Returns:
+            FRC season year from the most authoritative source available
+        """
+        # PRIORITY 1: Use year from dataset (comes from user input in setup)
+        if "year" in self.dataset and isinstance(self.dataset["year"], int):
+            return self.dataset["year"]
+        
+        # PRIORITY 2: Try to get year from global cache (active user session)
+        try:
+            from app.services.global_cache import cache
+            if "active_event_year" in cache and isinstance(cache["active_event_year"], int):
+                return cache["active_event_year"]
+        except Exception:
+            # Global cache may not be available in all contexts
+            pass
+        
+        # PRIORITY 3: Fall back to dynamic calculation (last resort)
+        return self._get_current_year()
 
     def _load_label_mappings(self) -> Dict[str, Any]:
         """
@@ -185,8 +280,10 @@ class DataAggregationService:
         """
         Load the game context for picklist generation.
         
-        If extraction is enabled, returns optimized extracted context.
-        Otherwise, returns the full manual text.
+        Priority order:
+        1. Synthesis (compressed strategic context) if enabled
+        2. Extraction (optimized context) if enabled 
+        3. Full manual text (fallback)
         
         Returns:
             Game context text or None if not available
@@ -195,13 +292,21 @@ class DataAggregationService:
             manual_data = self._load_manual_data()
             if not manual_data:
                 return None
-                
-            # Use extracted context if available and enabled
+            
+            # PRIORITY 1: Use synthesis if available and enabled
+            if self.use_synthesis and self.synthesis_service:
+                synthesized_context = self._get_synthesized_context(manual_data)
+                if synthesized_context:
+                    return synthesized_context
+                else:
+                    logger.warning("Synthesis failed, falling back to extraction/full context")
+            
+            # PRIORITY 2: Use extracted context if available and enabled
             if self.use_extracted_context and self.extractor_service:
                 return self._get_extracted_context(manual_data)
-            else:
-                # Fall back to full manual context
-                return self._get_full_manual_context(manual_data)
+            
+            # PRIORITY 3: Fall back to full manual context
+            return self._get_full_manual_context(manual_data)
                 
         except Exception as e:
             logger.error(f"Error loading game context: {e}")
@@ -230,6 +335,118 @@ class DataAggregationService:
         except Exception as e:
             logger.error(f"Error loading manual data: {e}")
             return None
+
+    def _load_field_selections(self) -> Optional[Dict[str, Any]]:
+        """
+        Load field selections metadata for the current year/event.
+        
+        Returns:
+            Field selections dictionary or None if not available
+        """
+        try:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(base_dir, "data")
+            field_selections_path = os.path.join(data_dir, f"field_selections_{self.year}{self.event_key.replace(str(self.year), '')}.json")
+
+            if os.path.exists(field_selections_path):
+                with open(field_selections_path, "r", encoding="utf-8") as f:
+                    field_selections_data = json.load(f)
+                    logger.debug(f"Loaded field selections for {self.year}{self.event_key.replace(str(self.year), '')}")
+                    return field_selections_data.get("field_selections", {})
+            else:
+                logger.warning(f"Field selections not found: {field_selections_path}")
+                return None
+        except Exception as e:
+            logger.error(f"Error loading field selections: {e}")
+            return None
+
+    def _get_synthesized_context(self, manual_data: Dict[str, Any]) -> Optional[str]:
+        """
+        Get synthesized game context using the synthesis service.
+        
+        Args:
+            manual_data: Raw manual data dictionary
+            
+        Returns:
+            Synthesized context string or None if synthesis fails
+        """
+        try:
+            # Load field selections for synthesis
+            field_selections = self._load_field_selections()
+            if not field_selections:
+                logger.warning("No field selections available for synthesis")
+                return None
+            
+            import asyncio
+            
+            # Check if we're already in an event loop
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # We're in an async context, create a new loop in a thread
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        future = executor.submit(self._run_synthesis_sync, manual_data, field_selections)
+                        synthesis_result = future.result()
+                else:
+                    # Safe to run directly
+                    synthesis_result = loop.run_until_complete(
+                        self.synthesis_service.synthesize_game_context(manual_data, field_selections)
+                    )
+            except RuntimeError:
+                # No event loop, create one
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    synthesis_result = loop.run_until_complete(
+                        self.synthesis_service.synthesize_game_context(manual_data, field_selections)
+                    )
+                finally:
+                    loop.close()
+                    asyncio.set_event_loop(None)
+            
+            if synthesis_result.success and synthesis_result.synthesized_context:
+                synthesized_context = synthesis_result.synthesized_context
+                
+                # Log token savings
+                original_size = len(manual_data.get('relevant_sections', ''))
+                synthesized_size = len(synthesized_context)
+                savings = 100 * (1 - synthesized_size / original_size) if original_size > 0 else 0
+                
+                logger.info(f"Using synthesized context for {self.year} (Size reduction: {savings:.1f}%)")
+                logger.info(f"Context size: {original_size} -> {synthesized_size} characters")
+                logger.info(f"Processing time: {synthesis_result.processing_time:.2f}s")
+                
+                return synthesized_context
+            else:
+                logger.warning(f"Synthesis failed: {synthesis_result.error}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error in synthesized context: {e}")
+            return None
+
+    def _run_synthesis_sync(self, manual_data: Dict[str, Any], field_selections: Dict[str, Any]) -> Any:
+        """
+        Helper method to run synthesis in a new event loop.
+        
+        Args:
+            manual_data: Manual data to synthesize from
+            field_selections: Field selections metadata
+            
+        Returns:
+            SynthesisResult from the synthesis process
+        """
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(
+                self.synthesis_service.synthesize_game_context(manual_data, field_selections)
+            )
+        finally:
+            loop.close()
+            asyncio.set_event_loop(None)
 
     def _get_extracted_context(self, manual_data: Dict[str, Any]) -> Optional[str]:
         """
@@ -1041,7 +1258,7 @@ class DataAggregationService:
             if new_dataset:
                 self.dataset = new_dataset
                 self.teams_data = self.dataset.get("teams", {})
-                self.year = self.dataset.get("year", 2025)
+                self.year = self._determine_year()
                 self.event_key = self.dataset.get("event_key", f"{self.year}arc")
                 logger.info("Dataset refreshed successfully")
                 return True
@@ -1072,3 +1289,319 @@ class DataAggregationService:
             return "game_labels_fallback"
         
         return "minimal_fallback"
+    
+    def generate_performance_signatures(self, output_filepath: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Generate performance signatures for all teams in the dataset.
+        
+        This method is triggered after data validation is complete to create
+        strategic intelligence signatures for each team's metrics.
+        
+        Args:
+            output_filepath: Optional path to save performance signatures.
+                           If None, generates filename based on event_key.
+        
+        Returns:
+            Dictionary with signature generation results and metadata
+        """
+        try:
+            from app.services.performance_signature_service import PerformanceSignatureService
+            
+            # Initialize performance signature service
+            signature_service = PerformanceSignatureService(self.dataset_path)
+            
+            logger.info(f"Generating performance signatures for {self.event_key}...")
+            
+            # Generate profiles for all teams
+            team_profiles = signature_service.generate_all_team_profiles()
+            
+            if not team_profiles:
+                return {
+                    "success": False,
+                    "error": "No valid team profiles generated",
+                    "teams_analyzed": 0
+                }
+            
+            # Get metrics summary for reporting
+            metrics_summary = signature_service.get_metric_summary()
+            
+            # Determine output filepath
+            if output_filepath is None:
+                data_dir = os.path.dirname(self.dataset_path)
+                filename = f"performance_signatures_{self.event_key}.json"
+                output_filepath = os.path.join(data_dir, filename)
+            
+            # Export team profiles
+            signature_service.export_team_profiles(team_profiles, output_filepath)
+            
+            # Also export baselines for reference
+            baseline_filepath = output_filepath.replace('.json', '_baselines.json')
+            event_baselines = signature_service.get_event_baselines()
+            signature_service.stats_service.export_baselines(baseline_filepath, event_baselines)
+            
+            logger.info(f"Performance signatures generated successfully:")
+            logger.info(f"  Teams analyzed: {len(team_profiles)}")
+            logger.info(f"  Metrics processed: {metrics_summary['metrics_analyzed']}")
+            logger.info(f"  Signatures saved: {output_filepath}")
+            logger.info(f"  Baselines saved: {baseline_filepath}")
+            
+            return {
+                "success": True,
+                "teams_analyzed": len(team_profiles),
+                "metrics_processed": metrics_summary['metrics_analyzed'],
+                "signatures_filepath": output_filepath,
+                "baselines_filepath": baseline_filepath,
+                "event_info": metrics_summary['event_info'],
+                "processing_summary": {
+                    "total_teams": metrics_summary['event_info']['total_teams'],
+                    "teams_with_signatures": len(team_profiles),
+                    "avg_matches_per_team": metrics_summary['event_info']['avg_matches_per_team'],
+                    "event_level": metrics_summary['event_info']['event_level']
+                },
+                "message": f"Generated performance signatures for {len(team_profiles)} teams with {metrics_summary['metrics_analyzed']} metrics"
+            }
+            
+        except ImportError as e:
+            logger.error(f"Performance signature service not available: {e}")
+            return {
+                "success": False,
+                "error": "Performance signature service not available",
+                "message": "Performance signature generation requires PerformanceSignatureService"
+            }
+        except Exception as e:
+            logger.error(f"Error generating performance signatures: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"Failed to generate performance signatures: {e}"
+            }
+    
+    async def generate_strategic_intelligence_file(self, output_filepath: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Generate strategic intelligence file for all teams using StrategicAnalysisService.
+        
+        This method is called after performance signature generation to create strategic
+        intelligence files ready for Sprint 4 picklist enhancement.
+        
+        Args:
+            output_filepath: Optional path to save strategic intelligence.
+                           If None, generates filename based on event_key.
+        
+        Returns:
+            Dictionary with strategic intelligence generation results and metadata
+        """
+        try:
+            from app.services.strategic_analysis_service import StrategicAnalysisService
+            import json
+            from datetime import datetime
+            
+            # Initialize strategic analysis service
+            strategic_service = StrategicAnalysisService()
+            
+            logger.info(f"Generating strategic intelligence for {self.event_key}...")
+            
+            # Get teams data for analysis (reuse existing method)
+            teams_data = self.get_teams_for_analysis()
+            
+            if len(teams_data) < 5:
+                return {
+                    "success": False,
+                    "error": f"Insufficient teams for strategic analysis: {len(teams_data)} < 5",
+                    "teams_analyzed": len(teams_data)
+                }
+            
+            # Generate strategic intelligence using batched processing
+            intelligence_result = await strategic_service.generate_strategic_intelligence(teams_data)
+            
+            if intelligence_result.get("status") != "success":
+                return {
+                    "success": False,
+                    "error": intelligence_result.get("error", "Strategic analysis failed"),
+                    "teams_analyzed": len(teams_data)
+                }
+            
+            # Determine output filepath
+            if output_filepath is None:
+                data_dir = os.path.dirname(self.dataset_path)
+                filename = f"strategic_intelligence_{self.event_key}.json"
+                output_filepath = os.path.join(data_dir, filename)
+            
+            # Get original teams data for metric averages calculation (before aggregation)
+            original_teams_data = list(self.teams_data.values())
+            
+            # Enhance strategic signatures with metric averages for user priority weighting
+            enhanced_strategic_signatures = self._add_metric_averages_to_signatures(
+                intelligence_result.get("strategic_signatures", {}), 
+                original_teams_data
+            )
+            
+            # Create complete strategic intelligence file
+            strategic_intelligence_file = {
+                "event_key": self.event_key,
+                "analysis_timestamp": datetime.now().isoformat(),
+                "strategic_signatures": enhanced_strategic_signatures,
+                "event_baselines": intelligence_result.get("event_baselines", {}),
+                "processing_summary": {
+                    "total_teams": len(teams_data),
+                    "teams_processed": len(intelligence_result.get("strategic_signatures", {})),
+                    "batches_processed": intelligence_result.get("batches_processed", 0),
+                    "total_processing_time": intelligence_result.get("total_processing_time", 0),
+                    "token_usage": intelligence_result.get("token_usage", {})
+                }
+            }
+            
+            # Export strategic intelligence file
+            with open(output_filepath, 'w') as f:
+                json.dump(strategic_intelligence_file, f, indent=2)
+            
+            logger.info(f"Strategic intelligence generated successfully:")
+            logger.info(f"  Teams analyzed: {len(teams_data)}")
+            logger.info(f"  Teams with signatures: {len(intelligence_result.get('strategic_signatures', {}))}")
+            logger.info(f"  Batches processed: {intelligence_result.get('batches_processed', 0)}")
+            logger.info(f"  File saved: {output_filepath}")
+            
+            return {
+                "success": True,
+                "teams_analyzed": len(teams_data),
+                "teams_with_signatures": len(intelligence_result.get("strategic_signatures", {})),
+                "batches_processed": intelligence_result.get("batches_processed", 0),
+                "filepath": output_filepath,
+                "processing_time": intelligence_result.get("total_processing_time", 0),
+                "message": f"Generated strategic intelligence for {len(intelligence_result.get('strategic_signatures', {}))} teams"
+            }
+            
+        except ImportError as e:
+            logger.error(f"Strategic analysis service not available: {e}")
+            return {
+                "success": False,
+                "error": "Strategic analysis service not available",
+                "message": "Strategic intelligence generation requires StrategicAnalysisService"
+            }
+        except Exception as e:
+            logger.error(f"Error generating strategic intelligence: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"Failed to generate strategic intelligence: {e}"
+            }
+    
+    def _add_metric_averages_to_signatures(
+        self, 
+        strategic_signatures: Dict[str, Any], 
+        teams_data: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """
+        Add metric averages to strategic signatures for user priority weighting support.
+        
+        This method enhances strategic signatures with raw metric averages that can be
+        used for user-defined priority weighting in picklist generation while maintaining
+        the strategic intelligence benefits.
+        
+        Args:
+            strategic_signatures: Strategic signatures from StrategicAnalysisService
+            teams_data: Original teams data for metric calculation
+            
+        Returns:
+            Enhanced strategic signatures with metric_averages added
+        """
+        try:
+            # Create lookup map for teams data by team number
+            teams_lookup = {team.get("team_number", 0): team for team in teams_data}
+            
+            # Enhance each strategic signature with metric averages
+            enhanced_signatures = {}
+            for team_key, signature in strategic_signatures.items():
+                team_number = signature.get("team_number", 0)
+                
+                # Find corresponding team data
+                team_data = teams_lookup.get(team_number)
+                if not team_data:
+                    logger.warning(f"No team data found for team {team_number} in strategic signatures")
+                    enhanced_signatures[team_key] = signature
+                    continue
+                
+                # Calculate metric averages for this team
+                metric_averages = self._calculate_team_metric_averages(team_data)
+                
+                # Create enhanced signature with metric averages
+                enhanced_signature = signature.copy()
+                enhanced_signature["metric_averages"] = metric_averages
+                enhanced_signatures[team_key] = enhanced_signature
+                
+            logger.info(f"Enhanced {len(enhanced_signatures)} strategic signatures with metric averages")
+            return enhanced_signatures
+            
+        except Exception as e:
+            logger.error(f"Error adding metric averages to signatures: {e}")
+            return strategic_signatures  # Return original signatures on error
+    
+    def _calculate_team_metric_averages(self, team_data: Dict[str, Any]) -> Dict[str, float]:
+        """
+        Calculate metric averages for a single team.
+        
+        This method extracts all numerical metrics from team data and calculates
+        averages for use in user priority weighting system.
+        
+        Args:
+            team_data: Team data dictionary from unified dataset
+            
+        Returns:
+            Dictionary of metric names to average values
+        """
+        try:
+            metric_averages = {}
+            
+            # Get aggregated metrics if available (these are already averages)
+            aggregated_metrics = team_data.get("aggregated_metrics", {})
+            for metric_name, metric_value in aggregated_metrics.items():
+                if isinstance(metric_value, (int, float)) and metric_value is not None:
+                    metric_averages[metric_name] = round(float(metric_value), 2)
+            
+            # Calculate averages from scouting_data (match-by-match data)
+            scouting_data = team_data.get("scouting_data", [])
+            if scouting_data:
+                match_metrics = {}
+                
+                # Collect all metric values across matches
+                for match_data in scouting_data:
+                    for metric_name, metric_value in match_data.items():
+                        # Skip non-numeric fields like match_number, team_number, strategy_field
+                        if (isinstance(metric_value, (int, float)) and 
+                            metric_value is not None and 
+                            metric_name not in ['match_number', 'qual_number', 'team_number']):
+                            
+                            if metric_name not in match_metrics:
+                                match_metrics[metric_name] = []
+                            match_metrics[metric_name].append(float(metric_value))
+                
+                # Calculate averages for match-level metrics
+                for metric_name, values in match_metrics.items():
+                    if values and metric_name not in metric_averages:  # Don't override aggregated metrics
+                        average_value = sum(values) / len(values)
+                        metric_averages[metric_name] = round(average_value, 2)
+            
+            # Also check for 'matches' structure (alternative data format)
+            matches = team_data.get("matches", [])
+            if matches and not scouting_data:  # Only if scouting_data not available
+                match_metrics = {}
+                
+                for match in matches:
+                    match_data = match.get("data", {})
+                    for metric_name, metric_value in match_data.items():
+                        if isinstance(metric_value, (int, float)) and metric_value is not None:
+                            if metric_name not in match_metrics:
+                                match_metrics[metric_name] = []
+                            match_metrics[metric_name].append(float(metric_value))
+                
+                # Calculate averages for match-level metrics
+                for metric_name, values in match_metrics.items():
+                    if values and metric_name not in metric_averages:
+                        average_value = sum(values) / len(values)
+                        metric_averages[metric_name] = round(average_value, 2)
+            
+            logger.debug(f"Calculated {len(metric_averages)} metric averages for team {team_data.get('team_number', 'unknown')}")
+            return metric_averages
+            
+        except Exception as e:
+            logger.error(f"Error calculating metric averages for team {team_data.get('team_number', 'unknown')}: {e}")
+            return {}
