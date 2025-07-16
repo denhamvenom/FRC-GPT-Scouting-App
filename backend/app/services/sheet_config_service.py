@@ -313,19 +313,20 @@ async def set_active_configuration(
 
 async def deactivate_other_configurations(db: Session, event_key: str, year: int) -> None:
     """
-    Deactivate all configurations for an event except the specified one.
-
+    Deactivate ALL configurations since only one can be active at a time.
+    
     Args:
         db: Database session
-        event_key: TBA event key
-        year: Event year
+        event_key: TBA event key (kept for compatibility)
+        year: Event year (kept for compatibility)
     """
     try:
-        db.query(SheetConfiguration).filter(
-            and_(SheetConfiguration.event_key == event_key, SheetConfiguration.year == year)
-        ).update({"is_active": False})
+        # PERSISTENCE FIX: Deactivate ALL configurations, not just ones for the same event
+        # Since only one configuration can be active at a time across all events
+        db.query(SheetConfiguration).update({"is_active": False})
 
         db.commit()
+        logger.info(f"Deactivated all configurations before setting new active config for {event_key}")
     except Exception as e:
         db.rollback()
         logger.exception(f"Error deactivating configurations: {str(e)}")

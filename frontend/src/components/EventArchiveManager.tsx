@@ -31,6 +31,13 @@ interface ArchivedEvent {
     archived_at: string;
     is_empty?: boolean;
     files?: string[];
+    data_types?: {
+      event_specific: number;
+      manual_data: number;
+      cache_files: number;
+      config_files: number;
+      manual_processing: number;
+    };
   };
 }
 
@@ -413,6 +420,14 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
               <div><strong>Loading:</strong> {loading ? "true" : "false"}</div>
               <div><strong>Form Visible:</strong> {showArchiveForm ? "true" : "false"}</div>
               <div><strong>Local Time:</strong> {new Date().toLocaleString()}</div>
+              {archives.length > 0 && (
+                <div className="mt-2">
+                  <strong>Sample Archive Data:</strong>
+                  <pre className="text-xs text-gray-600 mt-1">
+                    {JSON.stringify(archives[0]?.metadata, null, 2)}
+                  </pre>
+                </div>
+              )}
             </div>
           </details>
         </div>
@@ -568,13 +583,52 @@ const EventArchiveManager: React.FC<ArchiveManagerProps> = ({
                         )}
                       </td>
                       <td className="px-3 py-4 text-sm">
+                        {/* Display traditional table data */}
                         {archive.metadata?.tables && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 mb-2">
                             {Object.entries(archive.metadata.tables).map(([table, count]) => (
                               <div key={table} className={table === 'unified_dataset' ? 'font-bold text-blue-600' : ''}>
                                 {table === 'unified_dataset' ? '📊 Unified Dataset' : table}: {count}
                               </div>
                             ))}
+                          </div>
+                        )}
+
+                        {/* Display enhanced data types */}
+                        {archive.metadata?.data_types && (
+                          <div className="text-xs text-gray-600 mb-2">
+                            <div className="font-semibold text-gray-700 mb-1">Data Types:</div>
+                            {archive.metadata.data_types.event_specific > 0 && (
+                              <div className="text-blue-600">
+                                🎯 Event-specific: {archive.metadata.data_types.event_specific}
+                              </div>
+                            )}
+                            {archive.metadata.data_types.manual_data > 0 && (
+                              <div className="text-green-600">
+                                📝 Manual data: {archive.metadata.data_types.manual_data}
+                              </div>
+                            )}
+                            {archive.metadata.data_types.cache_files > 0 && (
+                              <div className="text-orange-600">
+                                🗂️ Cache files: {archive.metadata.data_types.cache_files}
+                              </div>
+                            )}
+                            {archive.metadata.data_types.config_files > 0 && (
+                              <div className="text-purple-600">
+                                ⚙️ Config files: {archive.metadata.data_types.config_files}
+                              </div>
+                            )}
+                            {archive.metadata.data_types.manual_processing > 0 && (
+                              <div className="text-indigo-600">
+                                🔄 Manual processing: {archive.metadata.data_types.manual_processing}
+                              </div>
+                            )}
+                            {/* Show message if no enhanced data types are present */}
+                            {Object.values(archive.metadata.data_types).every(count => count === 0) && (
+                              <div className="text-gray-400 italic">
+                                No enhanced data types available
+                              </div>
+                            )}
                           </div>
                         )}
 

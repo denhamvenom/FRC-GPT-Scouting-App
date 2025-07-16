@@ -8,7 +8,7 @@ import asyncio
 from app.services.progress_tracker import ProgressTracker
 
 from app.services.schema_loader import load_schemas
-from app.services.scouting_parser import parse_scouting_row
+from app.services.scouting_parser import parse_scouting_row, parse_scouting_row_with_field_selections
 
 # Use the enhanced parser that preserves field categories
 from app.services.superscout_parser_enhanced import parse_superscout_row
@@ -41,22 +41,18 @@ def load_field_metadata(event_key: str = None, year: int = None) -> Dict[str, An
             with open(selections_path, "r", encoding="utf-8") as f:
                 unified_data = json.load(f)
             
-            # Extract metadata from unified structure
-            field_metadata = {}
+            # CRITICAL FIX: Return the full unified_data structure, not just field_selections
+            # The parser expects the full structure with field_selections AND critical_mappings
             field_selections = unified_data.get("field_selections", {})
+            critical_mappings = unified_data.get("critical_mappings", {})
             
-            for header, field_info in field_selections.items():
-                if isinstance(field_info, dict):
-                    # New unified format - field_info contains category, source, label_mapping, etc.
-                    field_metadata[header] = field_info
-                else:
-                    # Legacy simple format - just category string
-                    field_metadata[header] = {"category": field_info, "source": "unknown"}
-            
-            print(f"🔵 Loaded unified field metadata with {len(field_metadata)} entries for {storage_key}")
-            enhanced_count = len([f for f in field_metadata.values() if isinstance(f, dict) and 'label_mapping' in f])
+            print(f"🔵 Loaded unified field metadata with {len(field_selections)} field selections for {storage_key}")
+            print(f"🔵 Found {len(critical_mappings)} critical mappings")
+            enhanced_count = len([f for f in field_selections.values() if isinstance(f, dict) and 'label_mapping' in f])
             print(f"🔵 Found {enhanced_count} fields with enhanced label mappings")
-            return field_metadata
+            
+            # Return the full unified_data structure that includes both field_selections and critical_mappings
+            return unified_data
         
         # Fall back to legacy metadata file for backward compatibility
         legacy_metadata = load_legacy_field_metadata(event_key, year)
@@ -90,9 +86,12 @@ def apply_label_mappings_to_raw_data(row: List[str], headers: List[str], field_m
         
     try:
         enhanced_count = 0
+        # Extract field_selections from full structure
+        field_selections = field_metadata.get("field_selections", {})
+        
         for i, header in enumerate(headers):
-            if i < len(row) and header in field_metadata:
-                field_info = field_metadata[header]
+            if i < len(row) and header in field_selections:
+                field_info = field_selections[header]
                 # Found matching metadata
                 if isinstance(field_info, dict) and "label_mapping" in field_info:
                     label_mapping = field_info["label_mapping"]
@@ -117,9 +116,9 @@ def apply_label_mappings_to_raw_data(row: List[str], headers: List[str], field_m
         if enhanced_count > 0:
             print(f"🔵 Enhanced {enhanced_count} fields with label mappings")
         else:
-            print(f"⚠️ No fields enhanced - checked {len(headers)} headers against {len(field_metadata)} metadata entries")
+            print(f"⚠️ No fields enhanced - checked {len(headers)} headers against {len(field_selections)} field selections")
             print(f"🔍 Sample headers: {headers[:5]}")
-            print(f"🔍 Sample metadata keys: {list(field_metadata.keys())[:5]}")
+            print(f"🔍 Sample field selection keys: {list(field_selections.keys())[:5]}")
         
         return enhanced_data
     except Exception as e:
@@ -184,9 +183,12 @@ def apply_label_mappings(parsed_data: Dict[str, Any], field_metadata: Dict[str, 
     
     try:
         enhanced_count = 0
+        # Extract field_selections from full structure  
+        field_selections = field_metadata.get("field_selections", {})
+        
         for original_field, value in parsed_data.items():
-            if original_field in field_metadata:
-                field_info = field_metadata[original_field]
+            if original_field in field_selections:
+                field_info = field_selections[original_field]
                 if isinstance(field_info, dict) and "label_mapping" in field_info:
                     label_mapping = field_info["label_mapping"]
                     if isinstance(label_mapping, dict) and "label" in label_mapping:
@@ -197,7 +199,7 @@ def apply_label_mappings(parsed_data: Dict[str, Any], field_metadata: Dict[str, 
         if enhanced_count > 0:
             print(f"🔵 Enhanced {enhanced_count} fields with label mappings")
         else:
-            print(f"⚠️ No fields enhanced - checked {len(headers)} headers against {len(field_metadata)} metadata entries")
+            print(f"⚠️ No fields enhanced - checked {len(parsed_data)} parsed fields against {len(field_selections)} field selections")
         
         return enhanced_data
     except Exception as e:
@@ -314,19 +316,28 @@ async def build_unified_dataset(
         print(f"\u2705 Using existing unified dataset: {output_path}")
         if tracker:
             tracker.complete(f"Using existing unified dataset: {output_path}")
+        # Clean up database connection before returning
+        if db:
+            db.close()
         return output_path
 
     # 1. Parse Match Scouting Data
     print("\U0001f535 Fetching Match Scouting data...")
+    print(f"\U0001f535 Debug: spreadsheet_id={spreadsheet_id}, scouting_tab={scouting_tab}, db={db}")
     if tracker:
         tracker.update(10, "Fetching match scouting data", "Fetch scouting data")
 
+    # Initialize scouting_raw to None to track if it gets set
+    scouting_raw = None
+    
     # First check if the tab exists
     try:
+        print(f"\U0001f535 About to check available tabs...")
         # Check available tabs - make sure to pass the spreadsheet_id
         from app.services.sheets_service import get_all_sheet_names
 
         tabs_result = await get_all_sheet_names(spreadsheet_id, db)
+        print(f"\U0001f535 get_all_sheet_names returned: {tabs_result}")
         available_tabs = (
             tabs_result.get("sheet_names", []) if tabs_result.get("status") == "success" else []
         )
@@ -339,13 +350,28 @@ async def build_unified_dataset(
         else:
             # Use a more specific range to avoid potential API issues
             # Make sure to pass the spreadsheet_id
+            print(f"\U0001f535 Attempting to fetch data from tab '{scouting_tab}' with spreadsheet_id '{spreadsheet_id}'")
             scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ1000", spreadsheet_id, db)
+            print(f"\U0001f535 get_sheet_values returned: {type(scouting_raw)}, length: {len(scouting_raw) if scouting_raw else 'None'}")
     except Exception as e:
         print(f"\U0001f534 ERROR checking available tabs: {str(e)}")
+        import traceback
+        traceback.print_exc()
         # Try to fetch the data anyway - with spreadsheet_id
-        scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ1000", spreadsheet_id, db)
+        print(f"\U0001f535 Attempting fallback fetch from tab '{scouting_tab}'")
+        try:
+            scouting_raw = await get_sheet_values(f"{scouting_tab}!A1:ZZ1000", spreadsheet_id, db)
+            print(f"\U0001f535 Fallback get_sheet_values returned: {type(scouting_raw)}, length: {len(scouting_raw) if scouting_raw else 'None'}")
+        except Exception as fallback_error:
+            print(f"\U0001f534 ERROR in fallback fetch: {str(fallback_error)}")
+            traceback.print_exc()
+            scouting_raw = []
 
     # Enhanced logging to debug scouting data issues
+    if scouting_raw is None:
+        print(f"\U0001f534 CRITICAL: scouting_raw is None - setting to empty list")
+        scouting_raw = []
+    
     print(f"\U0001f535 Scouting raw data received: {len(scouting_raw) if scouting_raw else 0} rows")
 
     # Check for empty data
@@ -374,13 +400,9 @@ async def build_unified_dataset(
                 "Process scouting data",
             )
 
-        parsed = parse_scouting_row(row, headers)
-        
-        # Apply label mappings to enhance field names using original headers (Sprint 4 enhancement)
-        if field_metadata:
-            enhanced_fields = apply_label_mappings_to_raw_data(row, headers, field_metadata)
-            if parsed and enhanced_fields:
-                parsed.update(enhanced_fields)  # Add enhanced fields to parsed data
+        # Use the new field-selections-based parser instead of the legacy schema parser
+        # This parser already handles label mappings and field selections
+        parsed = parse_scouting_row_with_field_selections(row, headers, field_metadata)
 
         # Debug logging for scouting parser
         if i == 0:  # Log the first row parsing for debugging
@@ -734,5 +756,9 @@ async def build_unified_dataset(
         tracker.complete(
             f"Unified dataset created with {len(unified_data)} teams and {len(expected_matches)} match-team combinations"
         )
+
+    # Clean up database connection
+    if db:
+        db.close()
 
     return output_path

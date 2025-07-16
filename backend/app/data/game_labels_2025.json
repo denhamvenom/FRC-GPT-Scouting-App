@@ -1,8 +1,8 @@
 {
   "extraction_version": "1.0",
-  "extraction_date": "2025-07-06T21:28:05.558208",
+  "extraction_date": "2025-07-15T17:28:52.249677",
   "game_year": 2025,
-  "labels_count": 45,
+  "labels_count": 48,
   "labels": [
     {
       "label": "auto_leave_successful",
@@ -197,13 +197,16 @@
     {
       "label": "endgame_climb_attempted",
       "category": "endgame",
-      "description": "Whether the robot attempted to climb onto a CAGE at the end of the match",
+      "description": "Where Robot Ended at Endgame",
       "data_type": "boolean",
       "typical_range": "true/false",
       "usage_context": "Tracked at match end",
       "extraction_version": "1.0",
       "extraction_date": "2025-07-05T11:04:09.336205",
-      "game_year": 2025
+      "game_year": 2025,
+      "custom_added": false,
+      "last_modified": "2025-07-15T17:28:52.249657",
+      "modified_by_user": true
     },
     {
       "label": "endgame_climb_successful_shallow",
@@ -510,6 +513,42 @@
       "usage_context": "Entered by scouts during or immediately after a match to capture details not covered by other metrics, such as unique strategies, robot issues, or alliance interactions.",
       "extraction_version": "1.0",
       "extraction_date": "2025-07-06T21:28:05.558193",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "Teleop CORAL Scored in Branch (L2-L4)",
+      "category": "teleop",
+      "description": "Number of CORAL scored in the Branch (levels 2-4) during the teleoperated period.",
+      "data_type": "count",
+      "typical_range": "0-25",
+      "usage_context": "Tracked live during the teleop period as robots score CORAL in Branch goals at levels 2 through 4.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-15T17:26:09.743013",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "teleop_algae_scored_barge_processor",
+      "category": "teleop",
+      "description": "Number of ALGAE scored in the Barge and Processor goals during teleoperated period.",
+      "data_type": "count",
+      "typical_range": "0-25",
+      "usage_context": "Tracked live during the teleop phase as each ALGAE piece is scored in either the Barge or Processor goals.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-15T17:27:04.499785",
+      "game_year": 2025,
+      "custom_added": true
+    },
+    {
+      "label": "tele_algae_bleed",
+      "category": "teleop",
+      "description": "Number of ALGAE game pieces unintentionally sent to the opposing side during teleop.",
+      "data_type": "count",
+      "typical_range": "0-10",
+      "usage_context": "Track each time a team accidentally causes an ALGAE piece to cross into the opposing field during the teleoperated period.",
+      "extraction_version": "1.0",
+      "extraction_date": "2025-07-15T17:28:00.161252",
       "game_year": 2025,
       "custom_added": true
     }

@@ -1,5 +1,5 @@
 {
-  "timestamp": 1751733066.172562,
+  "timestamp": 1752599794.952884,
   "data": [
     {
       "city": "\u0130stanbul",
@@ -3786,6 +3786,19 @@
       "year": 2025
     },
     {
+      "city": "San Ya Shi",
+      "country": "China",
+      "district": null,
+      "end_date": "2025-07-22",
+      "event_code": "xxsan",
+      "event_type": 99,
+      "key": "2025xxsan",
+      "name": "World Robot Contest Championships - Sanya",
+      "start_date": "2025-07-19",
+      "state_prov": "Hai Nan Sheng",
+      "year": 2025
+    },
+    {
       "city": "Mason",
       "country": "USA",
       "district": null,
@@ -4072,6 +4085,32 @@
       "year": 2025
     },
     {
+      "city": "St. Louis",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-11",
+      "event_code": "mogw",
+      "event_type": 99,
+      "key": "2025mogw",
+      "name": "Gateway Robotics Challenge (GRC) ",
+      "start_date": "2025-10-10",
+      "state_prov": "MO",
+      "year": 2025
+    },
+    {
+      "city": "Denver",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-12",
+      "event_code": "cokc",
+      "event_type": 99,
+      "key": "2025cokc",
+      "name": "Kendrick Castillo Memorial Tournament (KCMT)",
+      "start_date": "2025-10-10",
+      "state_prov": "CO",
+      "year": 2025
+    },
+    {
       "city": "El Segundo",
       "country": "USA",
       "district": null,
@@ -4199,6 +4238,19 @@
       "name": "NMRC Open",
       "start_date": "2025-10-25",
       "state_prov": "MN",
+      "year": 2025
+    },
+    {
+      "city": "Homestead",
+      "country": "USA",
+      "district": null,
+      "end_date": "2025-10-25",
+      "event_code": "flhom",
+      "event_type": 99,
+      "key": "2025flhom",
+      "name": "Pirate's Pillage",
+      "start_date": "2025-10-25",
+      "state_prov": "FL",
       "year": 2025
     },
     {

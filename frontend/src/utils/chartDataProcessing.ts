@@ -50,6 +50,9 @@ export const extractTeamMetrics = (
       const value = matchData[metric];
       if (typeof value === 'number') {
         metrics[metric].push(value);
+      } else if (typeof value === 'string' && !isNaN(Number(value))) {
+        // Handle string numbers (common from CSV imports)
+        metrics[metric].push(Number(value));
       }
     });
   });
@@ -134,20 +137,38 @@ export const extractTeamMetrics = (
 export const getAvailableMetrics = (unifiedData: UnifiedDataResponse): string[] => {
   const allMetrics = new Set<string>();
   
-  // Sample from first team's first match to get available fields
-  const firstTeam = Object.values(unifiedData.teams)[0];
-  if (firstTeam && firstTeam.scouting_data.length > 0) {
-    const sampleMatch = firstTeam.scouting_data[0];
-    
-    Object.entries(sampleMatch).forEach(([key, value]) => {
-      // Include only numeric fields, excluding identifiers
-      if (typeof value === 'number' && 
-          key !== 'match_number' && 
-          key !== 'qual_number' && 
-          key !== 'team_number') {
-        allMetrics.add(key);
+  // First try to get metrics from the metadata scouting headers
+  if (unifiedData && (unifiedData as any).metadata && (unifiedData as any).metadata.scouting_headers) {
+    const scoutingHeaders = (unifiedData as any).metadata.scouting_headers;
+    scoutingHeaders.forEach((header: string) => {
+      // Exclude non-metric headers
+      if (header !== 'Timestamp' && 
+          header !== 'Team' && 
+          header !== 'Match' && 
+          header !== 'Notes' &&
+          !header.toLowerCase().includes('timestamp') &&
+          !header.toLowerCase().includes('notes')) {
+        allMetrics.add(header);
       }
     });
+  }
+  
+  // Fallback: Sample from first team's first match to get available fields
+  if (allMetrics.size === 0) {
+    const firstTeam = Object.values(unifiedData.teams)[0];
+    if (firstTeam && firstTeam.scouting_data.length > 0) {
+      const sampleMatch = firstTeam.scouting_data[0];
+      
+      Object.entries(sampleMatch).forEach(([key, value]) => {
+        // Include only numeric fields, excluding identifiers
+        if (typeof value === 'number' && 
+            key !== 'match_number' && 
+            key !== 'qual_number' && 
+            key !== 'team_number') {
+          allMetrics.add(key);
+        }
+      });
+    }
   }
 
   return Array.from(allMetrics);

@@ -6,6 +6,7 @@ import pickle
 import logging
 import datetime
 import shutil
+import glob
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import inspect, and_, or_
@@ -31,6 +32,273 @@ TABLES_TO_ARCHIVE = [
     "TeamSelectionStatus",
     "SheetConfiguration",  # Added to ensure Google Sheet configurations are archived
 ]
+
+# Data directories and file patterns to include in archives
+DATA_PATHS = {
+    "manual_data": "backend/app/data/",
+    "event_data": "backend/app/data/",
+    "cache_data": "backend/app/cache/",
+    "config_data": "backend/app/config/",
+    "database": "backend/data/",
+    "logs": "backend/logs/",
+    "manual_processing": "backend/data/manual_processing_data_2025/"
+}
+
+# Essential files that should always be included in archives
+ESSENTIAL_FILES = [
+    # Game configuration files
+    "field_metadata_2025.json",
+    "game_labels_2025.json", 
+    "manual_text_2025.json",
+    "critical_mappings_2025.json",
+    "schema_2025.json",
+    "schema_superscout_2025.json",
+    "schema_superscout_insights_2025.json",
+    "schema_superscout_offsets_2025.json",
+    "robot_groups_2025.json",
+    # Config files
+    "extraction_config.py",
+    "openai_config.py",
+    "statbotics_field_map_DEFAULT.json",
+    # Database
+    "scouting_app.db"
+]
+
+
+def _get_file_content_safe(file_path: str, file_type: str = "json") -> Optional[Any]:
+    """
+    Safely read file content with error handling.
+    
+    Args:
+        file_path: Path to the file to read
+        file_type: Type of file (json, text, binary)
+        
+    Returns:
+        File content or None if file doesn't exist or can't be read
+    """
+    try:
+        if not os.path.exists(file_path):
+            return None
+            
+        with open(file_path, "r", encoding="utf-8") as f:
+            if file_type == "json":
+                return json.load(f)
+            elif file_type == "text":
+                return f.read()
+            else:  # binary
+                with open(file_path, "rb") as bf:
+                    return bf.read()
+    except Exception as e:
+        logger.warning(f"Could not read file {file_path}: {e}")
+        return None
+
+
+def _collect_event_specific_files(event_key: str, year: int) -> Dict[str, Any]:
+    """
+    Collect all event-specific data files.
+    
+    Args:
+        event_key: TBA event key
+        year: FRC season year
+        
+    Returns:
+        Dictionary of event-specific file contents
+    """
+    files = {}
+    
+    # Get current working directory and construct base path
+    base_path = os.getcwd()
+    
+    # Event-specific files to look for
+    event_patterns = [
+        f"field_selections_{year}{event_key}.json",
+        f"unified_event_{year}{event_key}.json",
+        f"test_enhanced_{year}{event_key}.json",
+        f"enhanced_dataset_{year}{event_key}.json"
+    ]
+    
+    # Determine data directories based on environment
+    if base_path.endswith('/app'):  # Docker environment
+        data_dirs = ["app/data/", "backend/app/data/", "backend/data/"]
+    else:  # Local environment
+        data_dirs = ["backend/app/data/", "backend/data/"]
+    
+    # Search in data directories
+    for pattern in event_patterns:
+        for data_dir in data_dirs:
+            file_path = os.path.join(base_path, data_dir, pattern)
+            content = _get_file_content_safe(file_path, "json")
+            if content is not None:
+                files[pattern] = content
+                logger.info(f"Included event-specific file: {pattern}")
+    
+    return files
+
+
+def _collect_manual_data_files(year: int) -> Dict[str, Any]:
+    """
+    Collect all manual data files (game configuration, schemas, etc.).
+    
+    Args:
+        year: FRC season year
+        
+    Returns:
+        Dictionary of manual data file contents
+    """
+    files = {}
+    base_path = os.getcwd()
+    
+    # Manual data files to collect
+    manual_files = [
+        f"field_metadata_{year}.json",
+        f"field_metadata_{year}_backup.json",
+        f"field_metadata_{year}_corrected.json",
+        f"game_labels_{year}.json",
+        f"manual_text_{year}.json",
+        f"critical_mappings_{year}.json",
+        f"schema_{year}.json",
+        f"schema_superscout_{year}.json",
+        f"schema_superscout_insights_{year}.json",
+        f"schema_superscout_offsets_{year}.json",
+        f"robot_groups_{year}.json",
+        f"unified_dataset_{year}.json"
+    ]
+    
+    # Determine data directories based on environment
+    if base_path.endswith('/app'):  # Docker environment
+        data_dirs = ["app/data/", "backend/app/data/", "backend/data/"]
+    else:  # Local environment
+        data_dirs = ["backend/app/data/", "backend/data/", "backend/backend/app/data/"]
+    
+    # Search in data directories
+    for filename in manual_files:
+        for data_dir in data_dirs:
+            file_path = os.path.join(base_path, data_dir, filename)
+            content = _get_file_content_safe(file_path, "json")
+            if content is not None:
+                files[filename] = content
+                logger.info(f"Included manual data file: {filename}")
+                break  # Only include the first found instance
+    
+    return files
+
+
+def _collect_cache_files(limit: int = 50) -> Dict[str, Any]:
+    """
+    Collect cache files (limited to avoid huge archives).
+    
+    Args:
+        limit: Maximum number of cache files to include
+        
+    Returns:
+        Dictionary of cache file contents
+    """
+    files = {}
+    base_path = os.getcwd()
+    
+    # Determine cache directory based on environment
+    if base_path.endswith('/app'):  # Docker environment
+        cache_dir = os.path.join(base_path, "app/cache/")
+    else:  # Local environment
+        cache_dir = os.path.join(base_path, "backend/app/cache/")
+    
+    if not os.path.exists(cache_dir):
+        return files
+    
+    try:
+        # Get all cache files, sorted by modification time (most recent first)
+        cache_files = glob.glob(os.path.join(cache_dir, "*.json"))
+        cache_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+        
+        # Include up to the limit
+        for i, file_path in enumerate(cache_files[:limit]):
+            if i >= limit:
+                break
+                
+            filename = os.path.basename(file_path)
+            content = _get_file_content_safe(file_path, "json")
+            if content is not None:
+                files[f"cache_{filename}"] = content
+                
+        logger.info(f"Included {len(files)} cache files (limit: {limit})")
+    except Exception as e:
+        logger.warning(f"Error collecting cache files: {e}")
+    
+    return files
+
+
+def _collect_config_files() -> Dict[str, Any]:
+    """
+    Collect configuration files.
+    
+    Returns:
+        Dictionary of configuration file contents
+    """
+    files = {}
+    base_path = os.getcwd()
+    
+    # Determine configuration file paths based on environment
+    if base_path.endswith('/app'):  # Docker environment
+        config_files = [
+            ("app/config/extraction_config.py", "text"),
+            ("app/config/openai_config.py", "text"),
+            ("app/config/statbotics_field_map_DEFAULT.json", "json"),
+            (".env.example", "text")
+        ]
+    else:  # Local environment
+        config_files = [
+            ("backend/app/config/extraction_config.py", "text"),
+            ("backend/app/config/openai_config.py", "text"),
+            ("backend/app/config/statbotics_field_map_DEFAULT.json", "json"),
+            ("backend/.env.example", "text")
+        ]
+    
+    for file_path, file_type in config_files:
+        full_path = os.path.join(base_path, file_path)
+        content = _get_file_content_safe(full_path, file_type)
+        if content is not None:
+            filename = os.path.basename(file_path)
+            files[f"config_{filename}"] = content
+            logger.info(f"Included config file: {filename}")
+    
+    return files
+
+
+def _collect_manual_processing_data(year: int) -> Dict[str, Any]:
+    """
+    Collect manual processing data (parsed game manual sections).
+    
+    Args:
+        year: FRC season year
+        
+    Returns:
+        Dictionary of manual processing data
+    """
+    files = {}
+    base_path = os.getcwd()
+    
+    # Determine manual processing file paths based on environment
+    if base_path.endswith('/app'):  # Docker environment
+        processing_files = [
+            f"data/manual_processing_data_{year}/parsed_sections/{year}GameManual_selected_sections.txt",
+            f"data/manual_processing_data_{year}/toc/{year}GameManual_toc.json"
+        ]
+    else:  # Local environment
+        processing_files = [
+            f"backend/data/manual_processing_data_{year}/parsed_sections/{year}GameManual_selected_sections.txt",
+            f"backend/data/manual_processing_data_{year}/toc/{year}GameManual_toc.json"
+        ]
+    
+    for file_path in processing_files:
+        full_path = os.path.join(base_path, file_path)
+        file_type = "json" if file_path.endswith(".json") else "text"
+        content = _get_file_content_safe(full_path, file_type)
+        if content is not None:
+            filename = os.path.basename(file_path)
+            files[f"manual_processing_{filename}"] = content
+            logger.info(f"Included manual processing file: {filename}")
+    
+    return files
 
 
 async def archive_current_event(
@@ -86,6 +354,13 @@ async def archive_current_event(
             "archived_at": datetime.datetime.now().isoformat(),
             "is_empty": not (picklists or selections),
             "files": [],
+            "data_types": {
+                "event_specific": 0,
+                "manual_data": 0,
+                "cache_files": 0,
+                "config_files": 0,
+                "manual_processing": 0
+            }
         }
 
         # Try to include unified dataset if it exists
@@ -101,6 +376,59 @@ async def archive_current_event(
             except Exception as e:
                 logger.error(f"Error including unified dataset in archive: {e}")
                 # Continue without including unified dataset
+
+        # Collect all additional data types
+        logger.info("Collecting comprehensive data for archive...")
+        
+        # Collect event-specific files
+        event_files = _collect_event_specific_files(event_key, year)
+        if event_files:
+            archive_data["event_specific_files"] = event_files
+            archive_metadata["data_types"]["event_specific"] = len(event_files)
+            logger.info(f"Included {len(event_files)} event-specific files")
+        
+        # Collect manual data files
+        manual_files = _collect_manual_data_files(year)
+        if manual_files:
+            archive_data["manual_data_files"] = manual_files
+            archive_metadata["data_types"]["manual_data"] = len(manual_files)
+            logger.info(f"Included {len(manual_files)} manual data files")
+        
+        # Collect cache files (limited to avoid huge archives)
+        cache_files = _collect_cache_files(limit=50)
+        if cache_files:
+            archive_data["cache_files"] = cache_files
+            archive_metadata["data_types"]["cache_files"] = len(cache_files)
+            logger.info(f"Included {len(cache_files)} cache files")
+        
+        # Collect configuration files
+        config_files = _collect_config_files()
+        if config_files:
+            archive_data["config_files"] = config_files
+            archive_metadata["data_types"]["config_files"] = len(config_files)
+            logger.info(f"Included {len(config_files)} configuration files")
+        
+        # Collect manual processing data
+        processing_files = _collect_manual_processing_data(year)
+        if processing_files:
+            archive_data["manual_processing_files"] = processing_files
+            archive_metadata["data_types"]["manual_processing"] = len(processing_files)
+            logger.info(f"Included {len(processing_files)} manual processing files")
+        
+        # Calculate total data file count
+        total_data_files = sum(archive_metadata["data_types"].values())
+        logger.info(f"Total data files included in archive: {total_data_files}")
+        
+        # Update the emptiness detection to consider all data types
+        has_data = (picklists or selections or 
+                   event_files or manual_files or 
+                   cache_files or config_files or processing_files)
+        archive_metadata["is_empty"] = not has_data
+        
+        if has_data:
+            logger.info(f"Archive contains substantial data: {total_data_files} data files")
+        else:
+            logger.warning(f"Archive appears to be empty or minimal")
 
         if not picklists and not selections:
             logger.warning(f"No data found for event {event_key} ({year}), creating empty archive")
@@ -676,6 +1004,166 @@ async def restore_archived_event(db: Session, archive_id: int) -> Dict[str, Any]
             except Exception as e:
                 logger.error(f"Error restoring unified dataset: {e}")
                 # Continue even if unified dataset restoration fails
+
+        # Restore event-specific files
+        if "event_specific_files" in archive_data:
+            try:
+                event_files = archive_data["event_specific_files"]
+                base_path = os.getcwd()
+                event_file_count = 0
+                
+                for filename, content in event_files.items():
+                    # Determine the appropriate directory
+                    file_path = os.path.join(base_path, "backend/app/data/", filename)
+                    
+                    # Create directory if needed
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    
+                    # Write the file
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        if isinstance(content, dict) or isinstance(content, list):
+                            json.dump(content, f, indent=2)
+                        else:
+                            f.write(str(content))
+                    
+                    event_file_count += 1
+                    logger.info(f"Restored event-specific file: {filename}")
+                
+                restored_counts["event_specific_files"] = event_file_count
+                logger.info(f"Restored {event_file_count} event-specific files")
+            except Exception as e:
+                logger.error(f"Error restoring event-specific files: {e}")
+
+        # Restore manual data files
+        if "manual_data_files" in archive_data:
+            try:
+                manual_files = archive_data["manual_data_files"]
+                base_path = os.getcwd()
+                manual_file_count = 0
+                
+                for filename, content in manual_files.items():
+                    # Determine the appropriate directory
+                    file_path = os.path.join(base_path, "backend/app/data/", filename)
+                    
+                    # Create directory if needed
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    
+                    # Write the file
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        if isinstance(content, dict) or isinstance(content, list):
+                            json.dump(content, f, indent=2)
+                        else:
+                            f.write(str(content))
+                    
+                    manual_file_count += 1
+                    logger.info(f"Restored manual data file: {filename}")
+                
+                restored_counts["manual_data_files"] = manual_file_count
+                logger.info(f"Restored {manual_file_count} manual data files")
+            except Exception as e:
+                logger.error(f"Error restoring manual data files: {e}")
+
+        # Restore cache files
+        if "cache_files" in archive_data:
+            try:
+                cache_files = archive_data["cache_files"]
+                base_path = os.getcwd()
+                cache_dir = os.path.join(base_path, "backend/app/cache/")
+                cache_file_count = 0
+                
+                # Create cache directory if needed
+                os.makedirs(cache_dir, exist_ok=True)
+                
+                for filename, content in cache_files.items():
+                    # Remove the "cache_" prefix
+                    actual_filename = filename.replace("cache_", "")
+                    file_path = os.path.join(cache_dir, actual_filename)
+                    
+                    # Write the file
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        if isinstance(content, dict) or isinstance(content, list):
+                            json.dump(content, f, indent=2)
+                        else:
+                            f.write(str(content))
+                    
+                    cache_file_count += 1
+                    logger.info(f"Restored cache file: {actual_filename}")
+                
+                restored_counts["cache_files"] = cache_file_count
+                logger.info(f"Restored {cache_file_count} cache files")
+            except Exception as e:
+                logger.error(f"Error restoring cache files: {e}")
+
+        # Restore configuration files
+        if "config_files" in archive_data:
+            try:
+                config_files = archive_data["config_files"]
+                base_path = os.getcwd()
+                config_file_count = 0
+                
+                for filename, content in config_files.items():
+                    # Remove the "config_" prefix and determine path
+                    actual_filename = filename.replace("config_", "")
+                    
+                    if actual_filename.endswith('.py'):
+                        file_path = os.path.join(base_path, "backend/app/config/", actual_filename)
+                    elif actual_filename == '.env.example':
+                        file_path = os.path.join(base_path, "backend/", actual_filename)
+                    else:
+                        file_path = os.path.join(base_path, "backend/app/config/", actual_filename)
+                    
+                    # Create directory if needed
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    
+                    # Write the file
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        if isinstance(content, dict) or isinstance(content, list):
+                            json.dump(content, f, indent=2)
+                        else:
+                            f.write(str(content))
+                    
+                    config_file_count += 1
+                    logger.info(f"Restored config file: {actual_filename}")
+                
+                restored_counts["config_files"] = config_file_count
+                logger.info(f"Restored {config_file_count} configuration files")
+            except Exception as e:
+                logger.error(f"Error restoring configuration files: {e}")
+
+        # Restore manual processing files
+        if "manual_processing_files" in archive_data:
+            try:
+                processing_files = archive_data["manual_processing_files"]
+                base_path = os.getcwd()
+                processing_file_count = 0
+                
+                for filename, content in processing_files.items():
+                    # Remove the "manual_processing_" prefix
+                    actual_filename = filename.replace("manual_processing_", "")
+                    
+                    # Determine the appropriate directory structure
+                    if actual_filename.endswith('_toc.json'):
+                        file_path = os.path.join(base_path, f"backend/data/manual_processing_data_{archive.year}/toc/", actual_filename)
+                    else:
+                        file_path = os.path.join(base_path, f"backend/data/manual_processing_data_{archive.year}/parsed_sections/", actual_filename)
+                    
+                    # Create directory if needed
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    
+                    # Write the file
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        if isinstance(content, dict) or isinstance(content, list):
+                            json.dump(content, f, indent=2)
+                        else:
+                            f.write(str(content))
+                    
+                    processing_file_count += 1
+                    logger.info(f"Restored manual processing file: {actual_filename}")
+                
+                restored_counts["manual_processing_files"] = processing_file_count
+                logger.info(f"Restored {processing_file_count} manual processing files")
+            except Exception as e:
+                logger.error(f"Error restoring manual processing files: {e}")
 
         return {
             "status": "success",

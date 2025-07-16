@@ -161,3 +161,133 @@ def parse_scouting_row(row: List[str], headers: List[str]) -> Dict[str, Any]:
         scouting_data["match_number"] = qual_number
 
     return scouting_data
+
+
+def parse_scouting_row_with_field_selections(row: List[str], headers: List[str], field_metadata: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Parses a single row from the Match Scouting sheet using field_selections metadata.
+    
+    Args:
+        row (List[str]): The full list of cell values for the row.
+        headers (List[str]): The full list of headers from the Google Sheet.
+        field_metadata (Dict[str, Any]): Field metadata from field_selections_{event_key}.json
+        
+    Returns:
+        Dict[str, Any]: Structured scouting dictionary
+    """
+    scouting_data = {}
+    
+    if not field_metadata:
+        print("🔴 No field metadata provided - cannot parse row")
+        return {}
+    
+    # Extract critical mappings to identify team_number and match_number fields
+    critical_mappings = {}
+    if "critical_mappings" in field_metadata:
+        for critical_field, header_list in field_metadata["critical_mappings"].items():
+            for header_name in header_list:
+                critical_mappings[header_name] = critical_field
+    
+    # Extract field selections for category and label mapping
+    field_selections = field_metadata.get("field_selections", {})
+    
+    print(f"🔵 Processing row with {len(headers)} headers using field_selections")
+    print(f"🔵 Critical mappings found: {critical_mappings}")
+    print(f"🔵 Field selections available: {len(field_selections)}")
+    
+    for header in headers:
+        try:
+            index = headers.index(header)
+            value = row[index] if index < len(row) else None
+            
+            # Skip empty values
+            if value is None or (isinstance(value, str) and value.strip() == ""):
+                continue
+            
+            # Clean up the value
+            if isinstance(value, str):
+                value = value.strip()
+                
+                # Try to convert to appropriate type
+                try:
+                    if value.isdigit():
+                        value = int(value)
+                    elif value.replace(".", "", 1).isdigit() and value.count(".") < 2:
+                        value = float(value)
+                except (ValueError, TypeError):
+                    pass  # Keep as string
+            
+            # Check if this is a critical field (team_number, match_number)
+            if header in critical_mappings:
+                mapped_field = critical_mappings[header]
+                scouting_data[mapped_field] = value
+                print(f"🔵 Mapped critical field: {header} -> {mapped_field} = {value}")
+                continue
+            
+            # Check if this header is in field_selections
+            if header in field_selections:
+                field_info = field_selections[header]
+                
+                # Get the category for basic categorization
+                category = field_info.get("category", "other")
+                
+                # Skip ignored fields
+                if category == "ignore":
+                    continue
+                
+                # Use enhanced label name if available
+                if isinstance(field_info, dict) and "label_mapping" in field_info:
+                    label_mapping = field_info["label_mapping"]
+                    if isinstance(label_mapping, dict) and "label" in label_mapping:
+                        enhanced_field_name = label_mapping["label"]
+                        scouting_data[enhanced_field_name] = value
+                        print(f"🔵 Enhanced field: {header} -> {enhanced_field_name} = {value}")
+                        continue
+                
+                # Fallback to using header name with category prefix
+                if category in ["auto", "teleop", "endgame", "strategy"]:
+                    # Use original header as field name for basic categorization
+                    scouting_data[header] = value
+                    print(f"🔵 Basic field: {header} -> {header} = {value}")
+            else:
+                # Header not in field_selections - check for common patterns
+                header_lower = header.lower()
+                if "team" in header_lower and "number" in header_lower:
+                    scouting_data["team_number"] = value
+                    print(f"🔵 Pattern-matched team field: {header} -> team_number = {value}")
+                elif ("match" in header_lower or "qual" in header_lower) and "number" in header_lower:
+                    scouting_data["match_number"] = value
+                    print(f"🔵 Pattern-matched match field: {header} -> match_number = {value}")
+                else:
+                    print(f"🟡 Unmapped header: {header}")
+                    
+        except (ValueError, IndexError) as e:
+            print(f"🔴 Error processing header {header}: {e}")
+            continue
+    
+    # Validate that we have required fields
+    if "team_number" not in scouting_data:
+        print(f"🔴 CRITICAL: No team_number found in parsed data")
+        print(f"🔴 Available fields: {list(scouting_data.keys())}")
+        return {}
+    
+    # Ensure team_number is an integer
+    try:
+        if isinstance(scouting_data["team_number"], str):
+            # Remove any non-digit characters
+            import re
+            clean_team_number = re.sub(r'[^\d]', '', scouting_data["team_number"])
+            if clean_team_number:
+                scouting_data["team_number"] = int(clean_team_number)
+    except (ValueError, TypeError):
+        print(f"🔴 Could not convert team_number to int: {scouting_data['team_number']}")
+        return {}
+    
+    # Ensure match_number consistency
+    if "match_number" in scouting_data and "qual_number" not in scouting_data:
+        scouting_data["qual_number"] = scouting_data["match_number"]
+    elif "qual_number" in scouting_data and "match_number" not in scouting_data:
+        scouting_data["match_number"] = scouting_data["qual_number"]
+    
+    print(f"🟢 Successfully parsed row: team={scouting_data.get('team_number')}, match={scouting_data.get('match_number')}")
+    return scouting_data

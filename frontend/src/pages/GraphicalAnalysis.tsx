@@ -9,7 +9,6 @@ import {
 import { 
   GraphicalAnalysisState, 
   MetricsByCategory, 
-  METRIC_PRESETS, 
   DEFAULT_SETTINGS,
   ChartType
 } from '../types/graphicalAnalysis';
@@ -54,7 +53,7 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
     error: metadataError, 
     getNumericMetrics, 
     getMetricsByCategory 
-  } = useFieldMetadata();
+  } = useFieldMetadata(eventKey);
 
   // Handler functions for state updates
   const handleMetricToggle = (metric: string) => {
@@ -92,7 +91,7 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
     });
   };
 
-  const handlePresetSelect = (preset: typeof METRIC_PRESETS[0]) => {
+  const handlePresetSelect = (preset: { id: string; name: string; description: string; metrics: string[] }) => {
     setState(prev => ({
       ...prev,
       selectedMetrics: preset.metrics
@@ -132,6 +131,43 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
   const availableTeams = unifiedData ? getAvailableTeams(unifiedData) : [];
   const availableMetrics = unifiedData ? getAvailableMetrics(unifiedData) : [];
   const metricsByCategory = getMetricsByCategory();
+
+  // Generate dynamic presets based on field metadata
+  const dynamicPresets = React.useMemo(() => {
+    if (!fieldMetadata || !fieldMetadata.field_selections) return [];
+    
+    const presets = [];
+    
+    // Get all numeric metrics from field_selections
+    const numericMetrics = getNumericMetrics();
+    
+    // Create presets by category
+    const categorizedMetrics = getMetricsByCategory();
+    
+    // Add category-based presets
+    Object.entries(categorizedMetrics).forEach(([category, metrics]) => {
+      if (metrics.length > 0) {
+        presets.push({
+          id: category,
+          name: category.charAt(0).toUpperCase() + category.slice(1),
+          description: `All ${category} metrics`,
+          metrics: metrics.map(m => m.field_name)
+        });
+      }
+    });
+    
+    // Add an "All Scoring" preset with all numeric metrics
+    if (numericMetrics.length > 0) {
+      presets.unshift({
+        id: 'all-scoring',
+        name: 'All Scoring',
+        description: 'All available scoring metrics',
+        metrics: numericMetrics.map(m => m.field_name)
+      });
+    }
+    
+    return presets;
+  }, [fieldMetadata, getNumericMetrics, getMetricsByCategory]);
   
   // Filter teams based on search query
   const filteredTeams = React.useMemo(() => {
@@ -334,7 +370,7 @@ const GraphicalAnalysis: React.FC<GraphicalAnalysisProps> = () => {
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-700 mb-2">Quick Presets</h3>
               <div className="grid grid-cols-1 gap-2">
-                {METRIC_PRESETS.map(preset => (
+                {dynamicPresets.map(preset => (
                   <button
                     key={preset.id}
                     onClick={() => handlePresetSelect(preset)}

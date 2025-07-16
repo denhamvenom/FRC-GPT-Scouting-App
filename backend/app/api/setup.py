@@ -107,6 +107,30 @@ async def start_setup(
         cache["active_event_year"] = year
 
         print(f"Stored event_key in cache: {event_key}")
+        
+        # PERSISTENCE FIX: Also set the active configuration in the database
+        # This ensures the event selection persists across Docker restarts
+        try:
+            from app.database.db import get_db_session
+            from app.services.sheet_config_service import get_active_configuration, set_active_configuration
+            
+            db = next(get_db_session())
+            
+            # Look for an existing configuration for this event
+            config_result = await get_active_configuration(db, event_key, year)
+            
+            if config_result["status"] == "success":
+                # Configuration exists, make sure it's active
+                config_id = config_result["configuration"]["id"]
+                await set_active_configuration(db, config_id, event_key, year)
+                print(f"✅ Set active configuration in database for event {event_key}")
+            else:
+                print(f"⚠️ No sheet configuration found for event {event_key} - user will need to configure sheets")
+                
+        except Exception as e:
+            print(f"⚠️ Warning: Could not persist active event to database: {e}")
+            # Don't fail the API call if database persistence fails
+            pass
     else:
         print("Warning: No event_key provided, cache not updated")
 
@@ -127,36 +151,32 @@ async def get_setup_info():
     from app.services.global_cache import cache
 
     try:
-        # Attempt to get active event information from cache
-        event_key = cache.get("active_event_key")
-        year = cache.get("active_event_year", 2025)  # Default to 2025 if not set
-
-        print(f"Cache contains: event_key={event_key}, year={year}")
-
-        # Also check if there's an active sheet configuration
+        # PERSISTENCE FIX: Prioritize database over cache for active event
+        # This ensures Docker restarts pick up the correct event
+        event_key = None
+        year = 2025  # Default year
         sheet_config = None
+        
         try:
             from app.database.db import get_db_session
             from app.services.sheet_config_service import get_active_configuration
 
             db = next(get_db_session())
 
-            # Try with event_key from cache, but if none, get any active configuration
-            if event_key:
-                config_result = await get_active_configuration(db, event_key, year)
-            else:
-                # If no event_key in cache, get any active configuration
-                config_result = await get_active_configuration(db)
-
-                # If we find an active configuration, update the cache with its event_key
-                if config_result["status"] == "success":
-                    config_event_key = config_result["configuration"]["event_key"]
-                    if config_event_key:
-                        cache["active_event_key"] = config_event_key
-                        event_key = config_event_key
-                        print(f"Updated cache with event_key from config: {config_event_key}")
-
+            # First, try to get the active configuration from database
+            config_result = await get_active_configuration(db)
+            
             if config_result["status"] == "success":
+                # Get event info from active configuration
+                event_key = config_result["configuration"]["event_key"]
+                year = config_result["configuration"]["year"]
+                
+                # Update cache with database values
+                cache["active_event_key"] = event_key
+                cache["active_event_year"] = year
+                
+                print(f"✅ Retrieved active event from database: {event_key} (year: {year})")
+                
                 sheet_config = {
                     "id": config_result["configuration"]["id"],
                     "name": config_result["configuration"]["name"],
@@ -166,9 +186,19 @@ async def get_setup_info():
                     "super_scouting_sheet": config_result["configuration"]["super_scouting_sheet"],
                     "event_key": config_result["configuration"]["event_key"],
                 }
+            else:
+                # No active configuration in database, fall back to cache
+                print("⚠️ No active configuration in database, checking cache...")
+                event_key = cache.get("active_event_key")
+                year = cache.get("active_event_year", 2025)
+                print(f"Cache contains: event_key={event_key}, year={year}")
+                
         except Exception as e:
-            # Non-critical error, just log it
+            # Non-critical error, fall back to cache
             print(f"Error getting active sheet configuration: {str(e)}")
+            event_key = cache.get("active_event_key")
+            year = cache.get("active_event_year", 2025)
+            print(f"Falling back to cache: event_key={event_key}, year={year}")
 
         # Print detailed debug info
         print(f"Setup Info - Event Key: {event_key}, Year: {year}")
