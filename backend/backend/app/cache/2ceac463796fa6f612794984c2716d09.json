@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600583.2747457,
+  "data": {
+    "team_number": 2481,
+    "team_name": "Roboteers",
+    "epa_total": 99.44,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

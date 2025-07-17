@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600591.6354585,
+  "data": {
+    "team_number": 341,
+    "team_name": "Miss Daisy",
+    "epa_total": 90.62,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

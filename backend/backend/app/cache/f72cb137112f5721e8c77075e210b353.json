@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600620.6277683,
+  "data": {
+    "team_number": 67,
+    "team_name": "The HOT Team",
+    "epa_total": 79.8,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

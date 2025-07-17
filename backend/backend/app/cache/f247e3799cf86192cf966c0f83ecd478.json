@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600612.9664543,
+  "data": {
+    "team_number": 4646,
+    "team_name": "Wildcard Robotics",
+    "epa_total": 67.21,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

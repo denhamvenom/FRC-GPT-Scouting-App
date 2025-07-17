@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600614.3173451,
+  "data": {
+    "team_number": 4655,
+    "team_name": "Stateline Robotics",
+    "epa_total": 78.21,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

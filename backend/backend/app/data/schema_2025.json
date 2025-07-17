@@ -1,0 +1,20 @@
+{
+  "Qual Number": "match_number",
+  "Team Number": "team_number",
+  "Auto Mobility Score": "auto",
+  "Where (auto) [Coral L1]": "auto",
+  "Where (auto) [Coral L2]": "auto",
+  "Where (auto) [Coral L3]": "auto",
+  "Where (auto) [Coral L4]": "auto",
+  "Where (auto) [Net]": "auto",
+  "Where (auto) [Processor]": "auto",
+  "Auto Score": "auto",
+  " Where (teleop) [Coral L1]": "teleop",
+  "Where (teleop) [Coral L2]": "teleop",
+  "Where (teleop) [Coral L3]": "teleop",
+  "Where (teleop) [Coral L4]": "teleop",
+  " Where (teleop) [Net]": "teleop",
+  "Where (teleop) [Processor]": "teleop",
+  "Tele Score": "teleop",
+  "Endgame Score": "endgame"
+}

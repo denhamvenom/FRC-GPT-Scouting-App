@@ -1,0 +1,65 @@
+{
+  "Auto piece count (Trough/L2 half value) [x1]": {
+    "category": "auto",
+    "label_mapping": {
+      "label": "auto_coral_L1_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored in the REEF trough (L1) during autonomous",
+      "matched_by": "fuzzy_match"
+    }
+  },
+  "# of pieces scored on branches (L2-L4) [1x]": {
+    "category": "teleop",
+    "label_mapping": {
+      "label": "teleop_coral_L2_scored",
+      "confidence": "medium",
+      "description": "Number of CORAL scored on REEF L2 BRANCHES during teleop",
+      "matched_by": "fuzzy_match"
+    }
+  },
+  "# of pieces scored on branches (L2-L4) [10x]": {
+    "category": "teleop",
+    "label_mapping": {
+      "label": "teleop_coral_L3_scored",
+      "confidence": "medium",
+      "description": "Number of CORAL scored on REEF L3 BRANCHES during teleop",
+      "matched_by": "fuzzy_match"
+    }
+  },
+  "# of pieces scored in trough (L1) [1x]": {
+    "category": "teleop",
+    "label_mapping": {
+      "label": "teleop_coral_L1_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored in the REEF trough (L1) during teleop",
+      "matched_by": "fuzzy_match"
+    }
+  },
+  "# of pieces scored in trough (L1) [10x]": {
+    "category": "teleop",
+    "label_mapping": {
+      "label": "teleop_coral_L1_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored in the REEF trough (L1) during teleop",
+      "matched_by": "fuzzy_match"
+    }
+  },
+  "# of algae scored (Net & Processor) [1x]": {
+    "category": "teleop",
+    "label_mapping": {
+      "label": "teleop_algae_net_scored",
+      "confidence": "medium",
+      "description": "Number of ALGAE scored in the NET during teleop",
+      "matched_by": "fuzzy_match"
+    }
+  },
+  "# of algae scored (Net & Processor) [10x]": {
+    "category": "teleop",
+    "label_mapping": {
+      "label": "teleop_algae_processor_scored",
+      "confidence": "medium",
+      "description": "Number of ALGAE scored in the PROCESSOR during teleop",
+      "matched_by": "fuzzy_match"
+    }
+  }
+}

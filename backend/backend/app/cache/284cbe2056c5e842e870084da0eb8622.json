@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600602.0553024,
+  "data": {
+    "team_number": 4028,
+    "team_name": "The Beak Squad",
+    "epa_total": 76.28,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

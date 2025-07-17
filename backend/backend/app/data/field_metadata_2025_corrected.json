@@ -1,0 +1,162 @@
+{
+  "Where (auto) [Coral L1]": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_coral_L1_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored in the REEF trough (L1) during autonomous",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (auto) [Coral L2]": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_coral_L2_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored on REEF L2 BRANCHES during autonomous",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (auto) [Coral L3]": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_coral_L3_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored on REEF L3 BRANCHES during autonomous",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (auto) [Coral L4]": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_coral_L4_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored on REEF L4 BRANCHES during autonomous",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (auto) [Net]": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_algae_net_scored",
+      "confidence": "high",
+      "description": "Number of ALGAE scored in NET during autonomous",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (auto) [Processor]": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_algae_processor_scored",
+      "confidence": "high",
+      "description": "Number of ALGAE scored in PROCESSOR during autonomous",
+      "matched_by": "manual_mapping"
+    }
+  },
+  " Where (teleop) [Coral L1]": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_coral_L1_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored in the REEF trough (L1) during teleop",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (teleop) [Coral L2]": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_coral_L2_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored on REEF L2 BRANCHES during teleop",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (teleop) [Coral L3]": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_coral_L3_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored on REEF L3 BRANCHES during teleop",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (teleop) [Coral L4]": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_coral_L4_scored",
+      "confidence": "high",
+      "description": "Number of CORAL scored on REEF L4 BRANCHES during teleop",
+      "matched_by": "manual_mapping"
+    }
+  },
+  " Where (teleop) [Net]": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_algae_net_scored",
+      "confidence": "high",
+      "description": "Number of ALGAE scored in NET during teleop",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Where (teleop) [Processor]": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_algae_processor_scored",
+      "confidence": "high",
+      "description": "Number of ALGAE scored in PROCESSOR during teleop",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Auto Score": {
+    "category": "auto",
+    "source": "match",
+    "label_mapping": {
+      "label": "auto_total_score",
+      "confidence": "high",
+      "description": "Total autonomous score",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Tele Score": {
+    "category": "teleop",
+    "source": "match",
+    "label_mapping": {
+      "label": "teleop_total_score",
+      "confidence": "high",
+      "description": "Total teleop score",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Endgame Score": {
+    "category": "endgame",
+    "source": "match",
+    "label_mapping": {
+      "label": "endgame_total_score",
+      "confidence": "high",
+      "description": "Total endgame score",
+      "matched_by": "manual_mapping"
+    }
+  },
+  "Driver Skill": {
+    "category": "strategy",
+    "source": "match",
+    "label_mapping": {
+      "label": "driver_skill_rating",
+      "confidence": "high",
+      "description": "Driver skill assessment rating",
+      "matched_by": "manual_mapping"
+    }
+  }
+}

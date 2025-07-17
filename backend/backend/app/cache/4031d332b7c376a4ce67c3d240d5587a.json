@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600625.0737736,
+  "data": {
+    "team_number": 868,
+    "team_name": "TechHOUNDS",
+    "epa_total": 82.13,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

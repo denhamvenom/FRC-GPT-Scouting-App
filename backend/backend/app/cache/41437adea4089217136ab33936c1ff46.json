@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600611.6158354,
+  "data": {
+    "team_number": 45,
+    "team_name": "TechnoKats Robotics Team",
+    "epa_total": 56.03,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

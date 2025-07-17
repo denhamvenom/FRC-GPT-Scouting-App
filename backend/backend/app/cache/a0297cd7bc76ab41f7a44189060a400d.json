@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600580.5346746,
+  "data": {
+    "team_number": 1732,
+    "team_name": "Hilltopper Robotics",
+    "epa_total": 82.74,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

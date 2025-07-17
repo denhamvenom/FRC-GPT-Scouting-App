@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600601.3187714,
+  "data": {
+    "team_number": 3940,
+    "team_name": "CyberTooth",
+    "epa_total": 77.87,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

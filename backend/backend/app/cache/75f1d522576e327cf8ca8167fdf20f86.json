@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600622.679541,
+  "data": {
+    "team_number": 7457,
+    "team_name": "suPURDUEper Robotics",
+    "epa_total": 96.41,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

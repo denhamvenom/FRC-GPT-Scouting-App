@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600621.580721,
+  "data": {
+    "team_number": 694,
+    "team_name": "StuyPulse",
+    "epa_total": 97.16,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

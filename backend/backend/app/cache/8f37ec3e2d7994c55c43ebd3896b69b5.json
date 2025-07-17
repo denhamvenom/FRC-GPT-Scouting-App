@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600605.2873578,
+  "data": {
+    "team_number": 422,
+    "team_name": "The Mech Tech Dragons",
+    "epa_total": 95.58,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600593.720517,
+  "data": {
+    "team_number": 3414,
+    "team_name": "Hackbots",
+    "epa_total": 67.62,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

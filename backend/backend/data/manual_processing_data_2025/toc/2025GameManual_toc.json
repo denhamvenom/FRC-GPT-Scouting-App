@@ -1,0 +1,687 @@
+[
+  {
+    "level": 1,
+    "title": "1 Introduction",
+    "page": 5
+  },
+  {
+    "level": 2,
+    "title": "1.1 About FIRST\u00ae",
+    "page": 5
+  },
+  {
+    "level": 2,
+    "title": "1.2 In Memoriam",
+    "page": 5
+  },
+  {
+    "level": 2,
+    "title": "1.3 FIRST\u00ae Robotics Competition",
+    "page": 5
+  },
+  {
+    "level": 2,
+    "title": "1.4 Gracious Professionalism\u00ae, a FIRST Credo",
+    "page": 6
+  },
+  {
+    "level": 2,
+    "title": "1.5 Coopertition\u00ae",
+    "page": 7
+  },
+  {
+    "level": 2,
+    "title": "1.6 Spirit of Volunteering",
+    "page": 8
+  },
+  {
+    "level": 2,
+    "title": "1.7 This Document & Its Conventions",
+    "page": 9
+  },
+  {
+    "level": 2,
+    "title": "1.8 Translations & Other Versions",
+    "page": 11
+  },
+  {
+    "level": 2,
+    "title": "1.9 Team Updates",
+    "page": 11
+  },
+  {
+    "level": 2,
+    "title": "1.10 Question and Answer System",
+    "page": 12
+  },
+  {
+    "level": 1,
+    "title": "2 FIRST Season Overview",
+    "page": 13
+  },
+  {
+    "level": 1,
+    "title": "3 Game Sponsor Recognition",
+    "page": 15
+  },
+  {
+    "level": 1,
+    "title": "4 Game Overview",
+    "page": 17
+  },
+  {
+    "level": 1,
+    "title": "5 ARENA",
+    "page": 19
+  },
+  {
+    "level": 2,
+    "title": "5.1 FIELD",
+    "page": 19
+  },
+  {
+    "level": 2,
+    "title": "5.2 Areas, Zones, & Markings",
+    "page": 21
+  },
+  {
+    "level": 2,
+    "title": "5.3 REEF",
+    "page": 23
+  },
+  {
+    "level": 2,
+    "title": "5.4 BARGE",
+    "page": 25
+  },
+  {
+    "level": 3,
+    "title": "5.4.1 CAGE",
+    "page": 26
+  },
+  {
+    "level": 3,
+    "title": "5.4.2 NET",
+    "page": 27
+  },
+  {
+    "level": 2,
+    "title": "5.5 PROCESSOR",
+    "page": 28
+  },
+  {
+    "level": 2,
+    "title": "5.6 ALLIANCE WALL",
+    "page": 29
+  },
+  {
+    "level": 3,
+    "title": "5.6.1 DRIVER STATIONS",
+    "page": 29
+  },
+  {
+    "level": 3,
+    "title": "5.6.2 CORAL STATION",
+    "page": 32
+  },
+  {
+    "level": 2,
+    "title": "5.7 SCORING ELEMENTS",
+    "page": 32
+  },
+  {
+    "level": 3,
+    "title": "5.7.1 CORAL",
+    "page": 33
+  },
+  {
+    "level": 3,
+    "title": "5.7.2 ALGAE",
+    "page": 34
+  },
+  {
+    "level": 2,
+    "title": "5.8 AprilTags",
+    "page": 35
+  },
+  {
+    "level": 2,
+    "title": "5.9 The FIELD Management System",
+    "page": 39
+  },
+  {
+    "level": 2,
+    "title": "5.10 FIELD STAFF",
+    "page": 40
+  },
+  {
+    "level": 1,
+    "title": "6 Game Details",
+    "page": 41
+  },
+  {
+    "level": 2,
+    "title": "6.1 MATCH Overview",
+    "page": 41
+  },
+  {
+    "level": 2,
+    "title": "6.2 DRIVE TEAM",
+    "page": 41
+  },
+  {
+    "level": 2,
+    "title": "6.3 Setup",
+    "page": 43
+  },
+  {
+    "level": 3,
+    "title": "6.3.1 DRIVE TEAMS",
+    "page": 43
+  },
+  {
+    "level": 3,
+    "title": "6.3.2 OPERATOR CONSOLES",
+    "page": 43
+  },
+  {
+    "level": 3,
+    "title": "6.3.3 ROBOTS",
+    "page": 44
+  },
+  {
+    "level": 3,
+    "title": "6.3.4 SCORING ELEMENTS",
+    "page": 45
+  },
+  {
+    "level": 4,
+    "title": "6.3.4.1 CORAL",
+    "page": 45
+  },
+  {
+    "level": 4,
+    "title": "6.3.4.2 ALGAE",
+    "page": 45
+  },
+  {
+    "level": 3,
+    "title": "6.3.5 CAGES",
+    "page": 46
+  },
+  {
+    "level": 2,
+    "title": "6.4 MATCH Phases",
+    "page": 46
+  },
+  {
+    "level": 2,
+    "title": "6.5 Scoring",
+    "page": 47
+  },
+  {
+    "level": 3,
+    "title": "6.5.1 SCORING ELEMENT Scoring Criteria",
+    "page": 47
+  },
+  {
+    "level": 3,
+    "title": "6.5.2 ROBOT Scoring Criteria",
+    "page": 48
+  },
+  {
+    "level": 3,
+    "title": "6.5.3 Coopertition Bonus",
+    "page": 49
+  },
+  {
+    "level": 3,
+    "title": "6.5.4 Point Values",
+    "page": 50
+  },
+  {
+    "level": 2,
+    "title": "6.6 Violations",
+    "page": 50
+  },
+  {
+    "level": 3,
+    "title": "6.6.1 YELLOW and RED CARDS",
+    "page": 51
+  },
+  {
+    "level": 3,
+    "title": "6.6.2 YELLOW and RED CARD application",
+    "page": 52
+  },
+  {
+    "level": 3,
+    "title": "6.6.3 YELLOW and RED CARDS during Playoff MATCHES",
+    "page": 52
+  },
+  {
+    "level": 3,
+    "title": "6.6.4 Violation Details",
+    "page": 52
+  },
+  {
+    "level": 2,
+    "title": "6.7 Head REFEREE and FTA Interaction",
+    "page": 53
+  },
+  {
+    "level": 3,
+    "title": "6.7.1 Question Box (Q)",
+    "page": 54
+  },
+  {
+    "level": 2,
+    "title": "6.8 Other Logistics",
+    "page": 54
+  },
+  {
+    "level": 1,
+    "title": "7 Game Rules (G)",
+    "page": 57
+  },
+  {
+    "level": 2,
+    "title": "7.1 Personal Safety",
+    "page": 57
+  },
+  {
+    "level": 2,
+    "title": "7.2 Conduct",
+    "page": 58
+  },
+  {
+    "level": 2,
+    "title": "7.3 Pre-MATCH",
+    "page": 62
+  },
+  {
+    "level": 2,
+    "title": "7.4 In-MATCH",
+    "page": 65
+  },
+  {
+    "level": 3,
+    "title": "7.4.1 AUTO",
+    "page": 65
+  },
+  {
+    "level": 3,
+    "title": "7.4.2 SCORING ELEMENTS",
+    "page": 66
+  },
+  {
+    "level": 3,
+    "title": "7.4.3 ROBOT",
+    "page": 67
+  },
+  {
+    "level": 3,
+    "title": "7.4.4 Opponent Interaction",
+    "page": 70
+  },
+  {
+    "level": 3,
+    "title": "7.4.5 Human",
+    "page": 72
+  },
+  {
+    "level": 2,
+    "title": "7.5 Post-MATCH",
+    "page": 74
+  },
+  {
+    "level": 1,
+    "title": "8 ROBOT Construction Rules (R)",
+    "page": 75
+  },
+  {
+    "level": 2,
+    "title": "8.1 General ROBOT Design",
+    "page": 77
+  },
+  {
+    "level": 2,
+    "title": "8.2 ROBOT Safety & Damage Prevention",
+    "page": 79
+  },
+  {
+    "level": 2,
+    "title": "8.3 Budget Constraints & Fabrication Schedule",
+    "page": 80
+  },
+  {
+    "level": 2,
+    "title": "8.4 BUMPER Rules",
+    "page": 84
+  },
+  {
+    "level": 2,
+    "title": "8.5 Motors & Actuators",
+    "page": 89
+  },
+  {
+    "level": 2,
+    "title": "8.6 Power Distribution",
+    "page": 94
+  },
+  {
+    "level": 2,
+    "title": "8.7 Control, Command & Signals System",
+    "page": 103
+  },
+  {
+    "level": 2,
+    "title": "8.8 Pneumatic System",
+    "page": 108
+  },
+  {
+    "level": 2,
+    "title": "8.9 OPERATOR CONSOLE",
+    "page": 112
+  },
+  {
+    "level": 1,
+    "title": "9 Inspection & Eligibility (I)",
+    "page": 115
+  },
+  {
+    "level": 2,
+    "title": "9.1 Rules",
+    "page": 115
+  },
+  {
+    "level": 1,
+    "title": "10 Tournaments (T)",
+    "page": 119
+  },
+  {
+    "level": 2,
+    "title": "10.1 MATCH Schedules",
+    "page": 119
+  },
+  {
+    "level": 2,
+    "title": "10.2 MATCH Replays",
+    "page": 119
+  },
+  {
+    "level": 2,
+    "title": "10.3 Measurement",
+    "page": 120
+  },
+  {
+    "level": 2,
+    "title": "10.4 Practice MATCHES",
+    "page": 121
+  },
+  {
+    "level": 3,
+    "title": "10.4.1 Filler Line",
+    "page": 121
+  },
+  {
+    "level": 2,
+    "title": "10.5 Qualification MATCHES",
+    "page": 121
+  },
+  {
+    "level": 3,
+    "title": "10.5.1 Schedule",
+    "page": 121
+  },
+  {
+    "level": 3,
+    "title": "10.5.2 MATCH Assignment",
+    "page": 121
+  },
+  {
+    "level": 3,
+    "title": "10.5.3 Qualification Ranking",
+    "page": 122
+  },
+  {
+    "level": 2,
+    "title": "10.6 Playoff MATCHES",
+    "page": 123
+  },
+  {
+    "level": 3,
+    "title": "10.6.1 ALLIANCE Selection Process",
+    "page": 123
+  },
+  {
+    "level": 3,
+    "title": "10.6.2 Playoff MATCH Bracket",
+    "page": 125
+  },
+  {
+    "level": 4,
+    "title": "10.6.2.1 Playoff MATCH ties",
+    "page": 127
+  },
+  {
+    "level": 4,
+    "title": "10.6.2.2 Playoff Finals",
+    "page": 128
+  },
+  {
+    "level": 3,
+    "title": "10.6.3 BACKUP TEAMS",
+    "page": 128
+  },
+  {
+    "level": 4,
+    "title": "10.6.3.1 BACKUP TEAM Coupons",
+    "page": 128
+  },
+  {
+    "level": 4,
+    "title": "10.6.3.2 BACKUP POOL",
+    "page": 129
+  },
+  {
+    "level": 3,
+    "title": "10.6.4 LINEUPS",
+    "page": 130
+  },
+  {
+    "level": 4,
+    "title": "10.6.4.1 LINEUPS for 4-team ALLIANCES",
+    "page": 130
+  },
+  {
+    "level": 4,
+    "title": "10.6.4.2 Default LINEUP",
+    "page": 130
+  },
+  {
+    "level": 3,
+    "title": "10.6.5 Pit Crews",
+    "page": 131
+  },
+  {
+    "level": 3,
+    "title": "10.6.6 Small Event Exceptions",
+    "page": 131
+  },
+  {
+    "level": 1,
+    "title": "11 District Tournaments",
+    "page": 133
+  },
+  {
+    "level": 2,
+    "title": "11.1 District Events",
+    "page": 133
+  },
+  {
+    "level": 3,
+    "title": "11.1.1 Qualification Round Performance",
+    "page": 134
+  },
+  {
+    "level": 3,
+    "title": "11.1.2 ALLIANCE Selection Results",
+    "page": 135
+  },
+  {
+    "level": 3,
+    "title": "11.1.3 Playoff Performance",
+    "page": 135
+  },
+  {
+    "level": 3,
+    "title": "11.1.4 Awards",
+    "page": 136
+  },
+  {
+    "level": 3,
+    "title": "11.1.5 Team Age",
+    "page": 136
+  },
+  {
+    "level": 3,
+    "title": "11.1.6 Regional Participation",
+    "page": 136
+  },
+  {
+    "level": 2,
+    "title": "11.2 District Championship Eligibility",
+    "page": 136
+  },
+  {
+    "level": 2,
+    "title": "11.3 District Championships with Multiple Divisions",
+    "page": 137
+  },
+  {
+    "level": 2,
+    "title": "11.4 District Championship Playoffs",
+    "page": 138
+  },
+  {
+    "level": 2,
+    "title": "11.5 FIRST Championship Eligibility",
+    "page": 140
+  },
+  {
+    "level": 1,
+    "title": "12 Regional Tournaments",
+    "page": 143
+  },
+  {
+    "level": 2,
+    "title": "12.1 Regional Events",
+    "page": 143
+  },
+  {
+    "level": 3,
+    "title": "12.1.1 Awards",
+    "page": 144
+  },
+  {
+    "level": 3,
+    "title": "12.1.2 Team Age",
+    "page": 144
+  },
+  {
+    "level": 2,
+    "title": "12.2 FIRST Championship Eligibility",
+    "page": 144
+  },
+  {
+    "level": 2,
+    "title": "12.3 Regional Pool",
+    "page": 145
+  },
+  {
+    "level": 3,
+    "title": "12.3.1 Single-event team points calculation",
+    "page": 145
+  },
+  {
+    "level": 1,
+    "title": "13 FIRST Championship Tournament (C)",
+    "page": 147
+  },
+  {
+    "level": 2,
+    "title": "13.1 Advancement to the FIRST Championship",
+    "page": 147
+  },
+  {
+    "level": 2,
+    "title": "13.2 4-ROBOT ALLIANCES",
+    "page": 147
+  },
+  {
+    "level": 2,
+    "title": "13.3 FIRST Championship Pit Crews",
+    "page": 147
+  },
+  {
+    "level": 2,
+    "title": "13.4 FIRST Championship Playoffs",
+    "page": 148
+  },
+  {
+    "level": 1,
+    "title": "14 Event Rules (E)",
+    "page": 149
+  },
+  {
+    "level": 2,
+    "title": "14.1 General Rules",
+    "page": 149
+  },
+  {
+    "level": 2,
+    "title": "14.2 Machine Shops",
+    "page": 152
+  },
+  {
+    "level": 2,
+    "title": "14.3 Wireless Rules",
+    "page": 152
+  },
+  {
+    "level": 2,
+    "title": "14.4 Load-In",
+    "page": 153
+  },
+  {
+    "level": 2,
+    "title": "14.5 Pits",
+    "page": 154
+  },
+  {
+    "level": 2,
+    "title": "14.6 Practice Areas",
+    "page": 155
+  },
+  {
+    "level": 2,
+    "title": "14.7 ROBOT Carts",
+    "page": 156
+  },
+  {
+    "level": 2,
+    "title": "14.8 Ceremonies",
+    "page": 157
+  },
+  {
+    "level": 2,
+    "title": "14.9 In the Stands",
+    "page": 157
+  },
+  {
+    "level": 1,
+    "title": "15 Glossary",
+    "page": 159
+  }
+]

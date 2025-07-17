@@ -1,0 +1,3478 @@
+{
+  "timestamp": 1752677802.7759697,
+  "data": [
+    {
+      "actual_time": 1752352838,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 263,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 302,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc1690",
+            "frc2056"
+          ]
+        }
+      },
+      "comp_level": "f",
+      "event_key": "2025iri",
+      "key": "2025iri_f1m1",
+      "match_number": 1,
+      "predicted_time": 1752353399,
+      "set_number": 1,
+      "time": 1752351840,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752354340,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 325,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 250,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc1690",
+            "frc2056"
+          ]
+        }
+      },
+      "comp_level": "f",
+      "event_key": "2025iri",
+      "key": "2025iri_f1m2",
+      "match_number": 2,
+      "predicted_time": 1752354128,
+      "set_number": 1,
+      "time": 1752353100,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752355805,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 274,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 321,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc1690",
+            "frc2056"
+          ]
+        }
+      },
+      "comp_level": "f",
+      "event_key": "2025iri",
+      "key": "2025iri_f1m3",
+      "match_number": 3,
+      "predicted_time": 1752355437,
+      "set_number": 1,
+      "time": 1752354360,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752242754,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 181,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc422",
+            "frc4655",
+            "frc3494"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 191,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2826",
+            "frc5712",
+            "frc3414"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm1",
+      "match_number": 1,
+      "predicted_time": 1752242118,
+      "set_number": 1,
+      "time": 1752242400,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752248091,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 246,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1690",
+            "frc180",
+            "frc5907"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 269,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc694",
+            "frc3276",
+            "frc302"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm10",
+      "match_number": 10,
+      "predicted_time": 1752247943,
+      "set_number": 1,
+      "time": 1752246720,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752248650,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 151,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4926",
+            "frc10021",
+            "frc1741"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 255,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1768",
+            "frc2137",
+            "frc3494"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm11",
+      "match_number": 11,
+      "predicted_time": 1752248530,
+      "set_number": 1,
+      "time": 1752247200,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752249159,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 294,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc341",
+            "frc4499",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 236,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc112",
+            "frc3663",
+            "frc5687"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm12",
+      "match_number": 12,
+      "predicted_time": 1752249087,
+      "set_number": 1,
+      "time": 1752247680,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752249676,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 227,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1086",
+            "frc2491",
+            "frc2056"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 217,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc45",
+            "frc4028",
+            "frc4655"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm13",
+      "match_number": 13,
+      "predicted_time": 1752249634,
+      "set_number": 1,
+      "time": 1752248160,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752250183,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 192,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4143",
+            "frc3357",
+            "frc449"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 229,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc469",
+            "frc1024",
+            "frc33"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm14",
+      "match_number": 14,
+      "predicted_time": 1752250113,
+      "set_number": 1,
+      "time": 1752248640,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752251071,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 218,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1833",
+            "frc125",
+            "frc3767"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 208,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9015",
+            "frc3940",
+            "frc111"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm15",
+      "match_number": 15,
+      "predicted_time": 1752250652,
+      "set_number": 1,
+      "time": 1752249120,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752251544,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 228,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5712",
+            "frc2767",
+            "frc9032"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 256,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3276",
+            "frc9245",
+            "frc4145"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm16",
+      "match_number": 16,
+      "predicted_time": 1752251567,
+      "set_number": 1,
+      "time": 1752249600,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752252109,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 279,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1690",
+            "frc67",
+            "frc694"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 173,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2075",
+            "frc4646",
+            "frc868"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm17",
+      "match_number": 17,
+      "predicted_time": 1752251987,
+      "set_number": 1,
+      "time": 1752250080,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752252825,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 207,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5907",
+            "frc1732",
+            "frc1706"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 211,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1987",
+            "frc2826",
+            "frc3538"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm18",
+      "match_number": 18,
+      "predicted_time": 1752252547,
+      "set_number": 1,
+      "time": 1752250560,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752253273,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 265,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2481",
+            "frc118",
+            "frc1023"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 225,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2832",
+            "frc7457",
+            "frc234"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm19",
+      "match_number": 19,
+      "predicted_time": 1752253268,
+      "set_number": 1,
+      "time": 1752251040,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752243415,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 225,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc7457",
+            "frc10021",
+            "frc4028"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 224,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3663",
+            "frc1741",
+            "frc4499"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm2",
+      "match_number": 2,
+      "predicted_time": 1752243180,
+      "set_number": 1,
+      "time": 1752242880,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752253755,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc180",
+            "frc4590",
+            "frc2137"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 210,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3414",
+            "frc8044",
+            "frc422"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm20",
+      "match_number": 20,
+      "predicted_time": 1752254202,
+      "set_number": 1,
+      "time": 1752251520,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752254239,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 218,
+          "surrogate_team_keys": [
+            "frc3940"
+          ],
+          "team_keys": [
+            "frc3940",
+            "frc1768",
+            "frc1086"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 236,
+          "surrogate_team_keys": [
+            "frc111"
+          ],
+          "team_keys": [
+            "frc302",
+            "frc4143",
+            "frc111"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm21",
+      "match_number": 21,
+      "predicted_time": 1752254735,
+      "set_number": 1,
+      "time": 1752252000,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752254816,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 186,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1741",
+            "frc125",
+            "frc45"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 196,
+          "surrogate_team_keys": [
+            "frc5712"
+          ],
+          "team_keys": [
+            "frc1024",
+            "frc5712",
+            "frc4145"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm22",
+      "match_number": 22,
+      "predicted_time": 1752254755,
+      "set_number": 1,
+      "time": 1752252480,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752257683,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 236,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc868",
+            "frc9015",
+            "frc341"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [
+            "frc449"
+          ],
+          "score": 97,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc449",
+            "frc4655",
+            "frc10021"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm23",
+      "match_number": 23,
+      "predicted_time": 1752257208,
+      "set_number": 1,
+      "time": 1752256800,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752258218,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 242,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc2826",
+            "frc4499"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 202,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc67",
+            "frc4926",
+            "frc3357"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm24",
+      "match_number": 24,
+      "predicted_time": 1752258708,
+      "set_number": 1,
+      "time": 1752257220,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752258742,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 262,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc112",
+            "frc1690",
+            "frc3767"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 167,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc234",
+            "frc5907",
+            "frc1023"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm25",
+      "match_number": 25,
+      "predicted_time": 1752258780,
+      "set_number": 1,
+      "time": 1752257640,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752259241,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 221,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3414",
+            "frc4646",
+            "frc2056"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 269,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc118",
+            "frc1732",
+            "frc2767"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm26",
+      "match_number": 26,
+      "predicted_time": 1752259482,
+      "set_number": 1,
+      "time": 1752258060,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752259799,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5687",
+            "frc4590",
+            "frc2491"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 285,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1706",
+            "frc1833",
+            "frc3276"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm27",
+      "match_number": 27,
+      "predicted_time": 1752259696,
+      "set_number": 1,
+      "time": 1752258480,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752260294,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 210,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1987",
+            "frc2832",
+            "frc180"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 241,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3663",
+            "frc3538",
+            "frc9245"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm28",
+      "match_number": 28,
+      "predicted_time": 1752260241,
+      "set_number": 1,
+      "time": 1752258900,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752260786,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 228,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2075",
+            "frc694",
+            "frc469"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 277,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc3494",
+            "frc2481"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm29",
+      "match_number": 29,
+      "predicted_time": 1752260753,
+      "set_number": 1,
+      "time": 1752259320,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752244063,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 210,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1086",
+            "frc33",
+            "frc2481"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 161,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1987",
+            "frc4926",
+            "frc1833"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm3",
+      "match_number": 3,
+      "predicted_time": 1752243851,
+      "set_number": 1,
+      "time": 1752243360,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752261276,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 259,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc7457",
+            "frc3940",
+            "frc2826"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 238,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc868",
+            "frc9032",
+            "frc33"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm30",
+      "match_number": 30,
+      "predicted_time": 1752261323,
+      "set_number": 1,
+      "time": 1752259740,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752261729,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 179,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc10021",
+            "frc67",
+            "frc1024"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 204,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5907",
+            "frc3767",
+            "frc302"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm31",
+      "match_number": 31,
+      "predicted_time": 1752261787,
+      "set_number": 1,
+      "time": 1752260160,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752262174,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 240,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4655",
+            "frc4499",
+            "frc4143"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 190,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc125",
+            "frc234",
+            "frc2137"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm32",
+      "match_number": 32,
+      "predicted_time": 1752262147,
+      "set_number": 1,
+      "time": 1752260580,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752262802,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 151,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc112",
+            "frc118",
+            "frc449"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 271,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3276",
+            "frc111",
+            "frc4028"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm33",
+      "match_number": 33,
+      "predicted_time": 1752262611,
+      "set_number": 1,
+      "time": 1752261000,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752263352,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 217,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3414",
+            "frc2767",
+            "frc3663"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 261,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1833",
+            "frc45",
+            "frc1690"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm34",
+      "match_number": 34,
+      "predicted_time": 1752263244,
+      "set_number": 1,
+      "time": 1752261420,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752263878,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 248,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9015",
+            "frc694",
+            "frc1987"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 183,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1023",
+            "frc4145",
+            "frc469"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm35",
+      "match_number": 35,
+      "predicted_time": 1752263795,
+      "set_number": 1,
+      "time": 1752261840,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752264385,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 241,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4926",
+            "frc7457",
+            "frc3494"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 253,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4590",
+            "frc341",
+            "frc1732"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm36",
+      "match_number": 36,
+      "predicted_time": 1752264326,
+      "set_number": 1,
+      "time": 1752262260,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752264957,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 185,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc33",
+            "frc5712",
+            "frc4646"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 237,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2832",
+            "frc2491",
+            "frc8044"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm37",
+      "match_number": 37,
+      "predicted_time": 1752264845,
+      "set_number": 1,
+      "time": 1752262680,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752265435,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 197,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2075",
+            "frc1741",
+            "frc5687"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 141,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1086",
+            "frc180",
+            "frc3357"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm38",
+      "match_number": 38,
+      "predicted_time": 1752265396,
+      "set_number": 1,
+      "time": 1752263100,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752265919,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 321,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc422",
+            "frc2056",
+            "frc1706"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 242,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9245",
+            "frc2481",
+            "frc1768"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm39",
+      "match_number": 39,
+      "predicted_time": 1752265883,
+      "set_number": 1,
+      "time": 1752263520,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752244657,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 194,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc302",
+            "frc2137",
+            "frc1023"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3357",
+            "frc1732",
+            "frc9245"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm4",
+      "match_number": 4,
+      "predicted_time": 1752244534,
+      "set_number": 1,
+      "time": 1752243840,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752266426,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 233,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2137",
+            "frc9032",
+            "frc1833"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 263,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc67",
+            "frc3538",
+            "frc4028"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm40",
+      "match_number": 40,
+      "predicted_time": 1752266369,
+      "set_number": 1,
+      "time": 1752263940,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752266891,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 217,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3276",
+            "frc234",
+            "frc469"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 197,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc125",
+            "frc3414",
+            "frc10021"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm41",
+      "match_number": 41,
+      "predicted_time": 1752267105,
+      "set_number": 1,
+      "time": 1752264360,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752267334,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 229,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4145",
+            "frc118",
+            "frc5907"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 258,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc302",
+            "frc341",
+            "frc4655"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm42",
+      "match_number": 42,
+      "predicted_time": 1752267356,
+      "set_number": 1,
+      "time": 1752264780,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752267787,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc111",
+            "frc3494",
+            "frc1987"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 269,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4499",
+            "frc1024",
+            "frc1690"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm43",
+      "match_number": 43,
+      "predicted_time": 1752267778,
+      "set_number": 1,
+      "time": 1752265200,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752268298,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 208,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4590",
+            "frc4143",
+            "frc868"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 239,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1023",
+            "frc5687",
+            "frc5712"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm44",
+      "match_number": 44,
+      "predicted_time": 1752268327,
+      "set_number": 1,
+      "time": 1752265620,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752268862,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 261,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2481",
+            "frc45",
+            "frc3940"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 187,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1741",
+            "frc4646",
+            "frc2826"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm45",
+      "match_number": 45,
+      "predicted_time": 1752268762,
+      "set_number": 1,
+      "time": 1752266040,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752269414,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 266,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc694",
+            "frc3663",
+            "frc1768"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 246,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc33",
+            "frc9245",
+            "frc3767"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm46",
+      "match_number": 46,
+      "predicted_time": 1752269315,
+      "set_number": 1,
+      "time": 1752266460,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752270100,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 204,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3538",
+            "frc112",
+            "frc3357"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 291,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2056",
+            "frc8044",
+            "frc7457"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm47",
+      "match_number": 47,
+      "predicted_time": 1752269860,
+      "set_number": 1,
+      "time": 1752266880,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752270681,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 207,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1706",
+            "frc1086",
+            "frc2832"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 217,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc180",
+            "frc449",
+            "frc2767"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm48",
+      "match_number": 48,
+      "predicted_time": 1752270548,
+      "set_number": 1,
+      "time": 1752267300,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752271231,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 203,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9032",
+            "frc2075",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 187,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1732",
+            "frc9015",
+            "frc4926"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm49",
+      "match_number": 49,
+      "predicted_time": 1752271125,
+      "set_number": 1,
+      "time": 1752267720,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752245235,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 195,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5687",
+            "frc469",
+            "frc9015"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 240,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc67",
+            "frc45",
+            "frc1768"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm5",
+      "match_number": 5,
+      "predicted_time": 1752245141,
+      "set_number": 1,
+      "time": 1752244320,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752271666,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 242,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc111",
+            "frc234",
+            "frc3414"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 252,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2491",
+            "frc67",
+            "frc341"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm50",
+      "match_number": 50,
+      "predicted_time": 1752271687,
+      "set_number": 1,
+      "time": 1752268140,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752272172,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 268,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2826",
+            "frc2481",
+            "frc1690"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 142,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4143",
+            "frc4145",
+            "frc10021"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm51",
+      "match_number": 51,
+      "predicted_time": 1752272184,
+      "set_number": 1,
+      "time": 1752268560,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752272647,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 241,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc5907",
+            "frc9245"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 198,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3940",
+            "frc3494",
+            "frc4646"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm52",
+      "match_number": 52,
+      "predicted_time": 1752272638,
+      "set_number": 1,
+      "time": 1752268980,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752273100,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 271,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3538",
+            "frc1023",
+            "frc8044"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 242,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4499",
+            "frc3276",
+            "frc45"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm53",
+      "match_number": 53,
+      "predicted_time": 1752273148,
+      "set_number": 1,
+      "time": 1752269400,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752273570,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 237,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc469",
+            "frc3663",
+            "frc5712"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 228,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2137",
+            "frc1086",
+            "frc112"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm54",
+      "match_number": 54,
+      "predicted_time": 1752273594,
+      "set_number": 1,
+      "time": 1752269820,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752274232,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 170,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3357",
+            "frc33",
+            "frc118"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 258,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc422",
+            "frc9015"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm55",
+      "match_number": 55,
+      "predicted_time": 1752274011,
+      "set_number": 1,
+      "time": 1752270240,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752274666,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 232,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1024",
+            "frc2832",
+            "frc125"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 251,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1768",
+            "frc2075",
+            "frc4590"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm56",
+      "match_number": 56,
+      "predicted_time": 1752274691,
+      "set_number": 1,
+      "time": 1752270660,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752275243,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 208,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc449",
+            "frc1741",
+            "frc1732"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 239,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1833",
+            "frc694",
+            "frc4655"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm57",
+      "match_number": 57,
+      "predicted_time": 1752275104,
+      "set_number": 1,
+      "time": 1752271080,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752275663,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2491",
+            "frc868",
+            "frc4926"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 266,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2056",
+            "frc3767",
+            "frc180"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm58",
+      "match_number": 58,
+      "predicted_time": 1752275688,
+      "set_number": 1,
+      "time": 1752271500,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752276133,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 252,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9032",
+            "frc302",
+            "frc7457"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 257,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5687",
+            "frc1987",
+            "frc1706"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm59",
+      "match_number": 59,
+      "predicted_time": 1752276135,
+      "set_number": 1,
+      "time": 1752271920,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752245734,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2056",
+            "frc112",
+            "frc341"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 229,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2832",
+            "frc3940",
+            "frc2075"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm6",
+      "match_number": 6,
+      "predicted_time": 1752245657,
+      "set_number": 1,
+      "time": 1752244800,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752276617,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 242,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3494",
+            "frc4145",
+            "frc3663"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc111",
+            "frc1023",
+            "frc67"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm60",
+      "match_number": 60,
+      "predicted_time": 1752276579,
+      "set_number": 1,
+      "time": 1752272340,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752277091,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 261,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4143",
+            "frc3414",
+            "frc2481"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 138,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5907",
+            "frc3357",
+            "frc9015"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm61",
+      "match_number": 61,
+      "predicted_time": 1752277069,
+      "set_number": 1,
+      "time": 1752272760,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752277563,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 264,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9245",
+            "frc4590",
+            "frc118"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 182,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2826",
+            "frc10021",
+            "frc1086"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm62",
+      "match_number": 62,
+      "predicted_time": 1752277529,
+      "set_number": 1,
+      "time": 1752273180,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752278001,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 262,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc341",
+            "frc4028",
+            "frc2137"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 291,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc33",
+            "frc1690",
+            "frc125"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm63",
+      "match_number": 63,
+      "predicted_time": 1752278491,
+      "set_number": 1,
+      "time": 1752273600,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752278503,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 222,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1732",
+            "frc3276",
+            "frc8044"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 229,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc868",
+            "frc2832",
+            "frc1741"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm64",
+      "match_number": 64,
+      "predicted_time": 1752278471,
+      "set_number": 1,
+      "time": 1752274020,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752325542,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 162,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1024",
+            "frc5687",
+            "frc4926"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 285,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc694",
+            "frc2767",
+            "frc3538"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm65",
+      "match_number": 65,
+      "predicted_time": 1752325624,
+      "set_number": 1,
+      "time": 1752325200,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752326036,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 227,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc234",
+            "frc1833",
+            "frc302"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 245,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5712",
+            "frc2056",
+            "frc2075"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm66",
+      "match_number": 66,
+      "predicted_time": 1752325986,
+      "set_number": 1,
+      "time": 1752325680,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752326481,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 285,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4655",
+            "frc1768",
+            "frc180"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 196,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4646",
+            "frc112",
+            "frc9032"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm67",
+      "match_number": 67,
+      "predicted_time": 1752326476,
+      "set_number": 1,
+      "time": 1752326160,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752327067,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 234,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3940",
+            "frc422",
+            "frc449"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 218,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc7457",
+            "frc1987",
+            "frc2491"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm68",
+      "match_number": 68,
+      "predicted_time": 1752326921,
+      "set_number": 1,
+      "time": 1752326640,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752327510,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 199,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc469",
+            "frc1706",
+            "frc45"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 288,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3767",
+            "frc4499",
+            "frc118"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm69",
+      "match_number": 69,
+      "predicted_time": 1752327509,
+      "set_number": 1,
+      "time": 1752327120,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752246298,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 243,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc4143",
+            "frc1024"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 254,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc118",
+            "frc2491",
+            "frc9032"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm7",
+      "match_number": 7,
+      "predicted_time": 1752246151,
+      "set_number": 1,
+      "time": 1752245280,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752328000,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 264,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3663",
+            "frc33",
+            "frc111"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 283,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4590",
+            "frc2481",
+            "frc3276"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm70",
+      "match_number": 70,
+      "predicted_time": 1752327950,
+      "set_number": 1,
+      "time": 1752327600,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752328555,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 259,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc125",
+            "frc67"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 247,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1690",
+            "frc9245",
+            "frc1086"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm71",
+      "match_number": 71,
+      "predicted_time": 1752328442,
+      "set_number": 1,
+      "time": 1752328080,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752329057,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 184,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3538",
+            "frc9015",
+            "frc1024"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 205,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc5712",
+            "frc234"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm72",
+      "match_number": 72,
+      "predicted_time": 1752329146,
+      "set_number": 1,
+      "time": 1752328560,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752329457,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 237,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc180",
+            "frc1833",
+            "frc4646"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 230,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc341",
+            "frc1023",
+            "frc4143"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm73",
+      "match_number": 73,
+      "predicted_time": 1752329507,
+      "set_number": 1,
+      "time": 1752329040,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752330022,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 264,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3494",
+            "frc2826",
+            "frc2056"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 227,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2137",
+            "frc449",
+            "frc5687"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm74",
+      "match_number": 74,
+      "predicted_time": 1752329920,
+      "set_number": 1,
+      "time": 1752329520,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752330475,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 227,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3767",
+            "frc1987",
+            "frc2767"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 240,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4655",
+            "frc7457",
+            "frc2075"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm75",
+      "match_number": 75,
+      "predicted_time": 1752330595,
+      "set_number": 1,
+      "time": 1752330000,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752330919,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 165,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3940",
+            "frc4926",
+            "frc112"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 234,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4145",
+            "frc1706",
+            "frc3414"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm76",
+      "match_number": 76,
+      "predicted_time": 1752330974,
+      "set_number": 1,
+      "time": 1752330480,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752331432,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 215,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc10021",
+            "frc9032",
+            "frc694"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 209,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc45",
+            "frc3357",
+            "frc2832"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm77",
+      "match_number": 77,
+      "predicted_time": 1752331375,
+      "set_number": 1,
+      "time": 1752330960,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752331954,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 235,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4499",
+            "frc5907",
+            "frc2491"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 279,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1768",
+            "frc868",
+            "frc1732"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm78",
+      "match_number": 78,
+      "predicted_time": 1752331874,
+      "set_number": 1,
+      "time": 1752331440,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752332389,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 197,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1741",
+            "frc302",
+            "frc3538"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 260,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc422",
+            "frc469",
+            "frc111"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm79",
+      "match_number": 79,
+      "predicted_time": 1752332443,
+      "set_number": 1,
+      "time": 1752331920,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752246880,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 236,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4646",
+            "frc3767",
+            "frc4145"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 195,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc449",
+            "frc3538",
+            "frc4590"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm8",
+      "match_number": 8,
+      "predicted_time": 1752246748,
+      "set_number": 1,
+      "time": 1752245760,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752332873,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 182,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2481",
+            "frc449",
+            "frc67"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 191,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc5712",
+            "frc180",
+            "frc125"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm80",
+      "match_number": 80,
+      "predicted_time": 1752332846,
+      "set_number": 1,
+      "time": 1752332400,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752333319,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 148,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4646",
+            "frc1086",
+            "frc3276"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 239,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9015",
+            "frc2137",
+            "frc7457"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm81",
+      "match_number": 81,
+      "predicted_time": 1752333320,
+      "set_number": 1,
+      "time": 1752332880,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752333826,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 198,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc234",
+            "frc4655",
+            "frc3940"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 198,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4926",
+            "frc8044",
+            "frc3663"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm82",
+      "match_number": 82,
+      "predicted_time": 1752333800,
+      "set_number": 1,
+      "time": 1752333360,
+      "winning_alliance": ""
+    },
+    {
+      "actual_time": 1752334291,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 216,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1706",
+            "frc341",
+            "frc2826"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 214,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1023",
+            "frc1024",
+            "frc694"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm83",
+      "match_number": 83,
+      "predicted_time": 1752334275,
+      "set_number": 1,
+      "time": 1752333840,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752334784,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 240,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3357",
+            "frc1768",
+            "frc1833"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 295,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc118",
+            "frc1690",
+            "frc1987"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm84",
+      "match_number": 84,
+      "predicted_time": 1752334737,
+      "set_number": 1,
+      "time": 1752334320,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752335268,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 259,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4145",
+            "frc4028",
+            "frc2832"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 260,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3767",
+            "frc422",
+            "frc4143"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm85",
+      "match_number": 85,
+      "predicted_time": 1752335245,
+      "set_number": 1,
+      "time": 1752334800,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752335723,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 238,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9245",
+            "frc2075",
+            "frc4499"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 223,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2491",
+            "frc3414",
+            "frc1741"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm86",
+      "match_number": 86,
+      "predicted_time": 1752335711,
+      "set_number": 1,
+      "time": 1752335280,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752336172,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 251,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc45",
+            "frc302",
+            "frc33"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 240,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3494",
+            "frc868",
+            "frc112"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm87",
+      "match_number": 87,
+      "predicted_time": 1752336164,
+      "set_number": 1,
+      "time": 1752335760,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752336656,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 279,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc2056",
+            "frc4590"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 183,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc9032",
+            "frc469",
+            "frc5907"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm88",
+      "match_number": 88,
+      "predicted_time": 1752336624,
+      "set_number": 1,
+      "time": 1752336240,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752337136,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 216,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1732",
+            "frc111",
+            "frc5712"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 232,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc10021",
+            "frc5687",
+            "frc3940"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm89",
+      "match_number": 89,
+      "predicted_time": 1752337591,
+      "set_number": 1,
+      "time": 1752336720,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752247505,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 253,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc125",
+            "frc111",
+            "frc868"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 236,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc1706",
+            "frc234"
+          ]
+        }
+      },
+      "comp_level": "qm",
+      "event_key": "2025iri",
+      "key": "2025iri_qm9",
+      "match_number": 9,
+      "predicted_time": 1752247179,
+      "set_number": 1,
+      "time": 1752246240,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752348488,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 224,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc33",
+            "frc67",
+            "frc9245"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 261,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc7457",
+            "frc2137"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf10m1",
+      "match_number": 1,
+      "predicted_time": 1752348633,
+      "set_number": 10,
+      "time": 1752348060,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752349223,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 275,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 289,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc1690",
+            "frc2056"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf11m1",
+      "match_number": 1,
+      "predicted_time": 1752349540,
+      "set_number": 11,
+      "time": 1752348780,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752349761,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 242,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1706",
+            "frc3276",
+            "frc180"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 250,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc7457",
+            "frc2137"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf12m1",
+      "match_number": 1,
+      "predicted_time": 1752349893,
+      "set_number": 12,
+      "time": 1752349320,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752351181,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 261,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc7457",
+            "frc2137"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 262,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf13m1",
+      "match_number": 1,
+      "predicted_time": 1752351704,
+      "set_number": 13,
+      "time": 1752350580,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752343540,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 224,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1732",
+            "frc111",
+            "frc2826"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 301,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc1690",
+            "frc2056"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf1m1",
+      "match_number": 1,
+      "predicted_time": 1752343436,
+      "set_number": 1,
+      "time": 1752343200,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752344036,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 253,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc33",
+            "frc67",
+            "frc9245"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 289,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc118",
+            "frc694",
+            "frc3538"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf2m1",
+      "match_number": 1,
+      "predicted_time": 1752344175,
+      "set_number": 2,
+      "time": 1752343740,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752344532,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 278,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 276,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4499",
+            "frc341",
+            "frc2481"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf3m1",
+      "match_number": 1,
+      "predicted_time": 1752344658,
+      "set_number": 3,
+      "time": 1752344280,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752345119,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 259,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1706",
+            "frc3276",
+            "frc180"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 271,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc7457",
+            "frc3767"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf4m1",
+      "match_number": 1,
+      "predicted_time": 1752345158,
+      "set_number": 4,
+      "time": 1752344820,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752345610,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 258,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc33",
+            "frc67",
+            "frc9245"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 233,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc3663",
+            "frc111",
+            "frc1732"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf5m1",
+      "match_number": 1,
+      "predicted_time": 1752345704,
+      "set_number": 5,
+      "time": 1752345360,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752346191,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 291,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc180",
+            "frc3276",
+            "frc1706"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 271,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4499",
+            "frc341",
+            "frc2481"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf6m1",
+      "match_number": 1,
+      "predicted_time": 1752346206,
+      "set_number": 6,
+      "time": 1752345900,
+      "winning_alliance": "blue"
+    },
+    {
+      "actual_time": 1752346807,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 269,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc118",
+            "frc694",
+            "frc3538"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 297,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc4028",
+            "frc1690",
+            "frc2056"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf7m1",
+      "match_number": 1,
+      "predicted_time": 1752346849,
+      "set_number": 7,
+      "time": 1752346440,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752347371,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 262,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc2767",
+            "frc7457",
+            "frc3767"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 277,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc8044",
+            "frc868",
+            "frc422"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf8m1",
+      "match_number": 1,
+      "predicted_time": 1752347432,
+      "set_number": 8,
+      "time": 1752346980,
+      "winning_alliance": "red"
+    },
+    {
+      "actual_time": 1752347984,
+      "alliances": {
+        "blue": {
+          "dq_team_keys": [],
+          "score": 291,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc1706",
+            "frc3276",
+            "frc180"
+          ]
+        },
+        "red": {
+          "dq_team_keys": [],
+          "score": 249,
+          "surrogate_team_keys": [],
+          "team_keys": [
+            "frc118",
+            "frc694",
+            "frc3538"
+          ]
+        }
+      },
+      "comp_level": "sf",
+      "event_key": "2025iri",
+      "key": "2025iri_sf9m1",
+      "match_number": 1,
+      "predicted_time": 1752347966,
+      "set_number": 9,
+      "time": 1752347520,
+      "winning_alliance": "blue"
+    }
+  ]
+}

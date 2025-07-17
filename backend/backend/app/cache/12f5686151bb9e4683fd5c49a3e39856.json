@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600581.379656,
+  "data": {
+    "team_number": 180,
+    "team_name": "S.P.A.M.",
+    "epa_total": 88.64,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

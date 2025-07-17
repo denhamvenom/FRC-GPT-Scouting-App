@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600595.4055836,
+  "data": {
+    "team_number": 3494,
+    "team_name": "The Quadrangles",
+    "epa_total": 64.61,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

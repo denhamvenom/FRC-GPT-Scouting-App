@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600582.992816,
+  "data": {
+    "team_number": 234,
+    "team_name": "Cyber Blue",
+    "epa_total": 49.44,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600584.068367,
+  "data": {
+    "team_number": 2826,
+    "team_name": "Wave Robotics",
+    "epa_total": 55.53,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

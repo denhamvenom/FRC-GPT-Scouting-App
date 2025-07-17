@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600615.6470523,
+  "data": {
+    "team_number": 469,
+    "team_name": "Las Guerrillas",
+    "epa_total": 57.61,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

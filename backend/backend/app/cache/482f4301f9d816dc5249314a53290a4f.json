@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600586.4213247,
+  "data": {
+    "team_number": 3276,
+    "team_name": "TOOLCATS",
+    "epa_total": 84.44,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

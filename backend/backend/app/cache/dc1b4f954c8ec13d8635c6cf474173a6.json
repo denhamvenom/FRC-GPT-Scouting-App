@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600580.833768,
+  "data": {
+    "team_number": 1741,
+    "team_name": "Red Alert",
+    "epa_total": 60.9,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

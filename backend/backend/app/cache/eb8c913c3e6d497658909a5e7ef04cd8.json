@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600585.118381,
+  "data": {
+    "team_number": 302,
+    "team_name": "The Dragons",
+    "epa_total": 67.6,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

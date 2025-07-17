@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600618.2300532,
+  "data": {
+    "team_number": 5687,
+    "team_name": "The Outliers",
+    "epa_total": 84.63,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

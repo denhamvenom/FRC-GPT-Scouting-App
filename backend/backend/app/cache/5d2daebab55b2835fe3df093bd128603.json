@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600589.962088,
+  "data": {
+    "team_number": 3357,
+    "team_name": "COMETS",
+    "epa_total": 51.78,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600584.3425148,
+  "data": {
+    "team_number": 2832,
+    "team_name": "The Livonia Warriors",
+    "epa_total": 72.04,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

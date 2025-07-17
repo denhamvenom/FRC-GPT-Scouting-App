@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600627.4906938,
+  "data": {
+    "team_number": 9032,
+    "team_name": "RoboWhales",
+    "epa_total": 60.67,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

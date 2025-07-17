@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600581.102255,
+  "data": {
+    "team_number": 1768,
+    "team_name": "Nashoba Robotics",
+    "epa_total": 78.45,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

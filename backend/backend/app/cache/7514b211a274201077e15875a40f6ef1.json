@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600619.5192773,
+  "data": {
+    "team_number": 5712,
+    "team_name": "Hemlock's Gray Matter",
+    "epa_total": 73.98,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}

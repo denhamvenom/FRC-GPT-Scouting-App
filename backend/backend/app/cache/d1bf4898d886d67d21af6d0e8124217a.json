@@ -1,0 +1,14 @@
+{
+  "timestamp": 1752600583.5394173,
+  "data": {
+    "team_number": 2491,
+    "team_name": "NoMythic",
+    "epa_total": 66.38,
+    "epa_auto": null,
+    "epa_teleop": null,
+    "epa_endgame": null,
+    "auto_epa": null,
+    "teleop_epa": null,
+    "endgame_epa": null
+  }
+}
