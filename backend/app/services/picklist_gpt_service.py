@@ -9,6 +9,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.config.openai_config import OPENAI_API_KEY, OPENAI_MODEL
+from app.services.compact_data_encoding_service import CompactDataEncodingService
 
 import tiktoken
 from openai import AsyncOpenAI
@@ -39,6 +40,8 @@ class PicklistGPTService:
         self.max_tokens_limit = 100000
         self.game_context = None  # Can be set by external services
         self.scouting_labels = self._load_scouting_labels()  # Load scouting labels for context
+        self.compact_encoder = None  # Initialized when needed for specific event
+        self.use_compact_encoding = True  # Enable compact encoding by default
 
     def _load_scouting_labels(self) -> Dict[str, Dict[str, Any]]:
         """
@@ -121,6 +124,23 @@ class PicklistGPTService:
         except Exception as e:
             logger.error(f"Error loading enhanced scouting labels: {e}")
             return {}
+
+    def initialize_compact_encoder(self, year: int, event_key: str) -> None:
+        """
+        Initialize the compact encoder for a specific year/event.
+        
+        Args:
+            year: Game year
+            event_key: Event key (e.g., "2025iri")
+        """
+        try:
+            self.compact_encoder = CompactDataEncodingService(year, event_key)
+            logger.info(f"Initialized compact encoder for {event_key}")
+        except Exception as e:
+            logger.error(f"Failed to initialize compact encoder: {e}")
+            logger.warning("Falling back to standard encoding")
+            self.use_compact_encoding = False
+            self.compact_encoder = None
 
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
@@ -356,8 +376,9 @@ class PicklistGPTService:
         team_count: int,
         game_context: Optional[str] = None,
         use_ultra_compact: bool = True,
+        lookup_tables: Optional[Dict[str, Any]] = None,
     ) -> str:
-        """ORIGINAL SYSTEM PROMPT - EXACT RESTORATION"""
+        """ORIGINAL SYSTEM PROMPT - EXACT RESTORATION with COMPACT ENCODING SUPPORT"""
 
         position_context = {
             "first": "First pick teams should be overall powerhouse teams that excel in multiple areas.",
@@ -391,8 +412,14 @@ REASONING GUIDELINES:
 • Focus on trade-offs that determine precise ranking order
 • CRITICAL: Reference actual TEAM NUMBERS (from team_number field) NOT indices in explanations"""
 
-            # Add scouting labels context if available
-            if self.scouting_labels:
+            # Add lookup tables for compact encoding
+            if lookup_tables:
+                prompt += f"\n\nMETRIC CODES:\n{json.dumps(lookup_tables.get('METRIC_CODES', {}), separators=(',', ':'))}"
+                prompt += f"\n\nDATA FORMAT: Teams are in compact arrays: [index, team_number, nickname, weighted_score, [metrics...]]"
+                prompt += f"\nMetrics are in this order: {lookup_tables.get('METRIC_ORDER', [])}"
+            
+            # Add scouting labels context if available (only if not using compact encoding)
+            elif self.scouting_labels:
                 labels_context = self._create_labels_context()
                 if labels_context:
                     prompt += f"\n\nSCOUTING METRICS GUIDE:\n{labels_context}"
@@ -454,12 +481,19 @@ CRITICAL: Return only valid JSON. Provide specific reasoning citing actual metri
         teams_data: List[Dict[str, Any]],
         team_numbers: Optional[List[int]] = None,
         force_index_mapping: bool = True,
-    ) -> Tuple[str, Optional[Dict[int, int]]]:
-        """ORIGINAL USER PROMPT WITH FORCED INDEX MAPPING - EXACT RESTORATION"""
+        year: Optional[int] = None,
+        event_key: Optional[str] = None,
+    ) -> Tuple[str, Optional[Dict[int, int]], Optional[Dict[str, Any]]]:
+        """ORIGINAL USER PROMPT WITH FORCED INDEX MAPPING - NOW WITH COMPACT ENCODING"""
 
         # OPTIMIZATION: Store priorities for metric filtering and teams data for percentile calculation
         self._current_priorities = priorities
         self._current_teams_data = teams_data
+        
+        # Initialize compact encoder if needed and not already done
+        if self.use_compact_encoding and year and event_key:
+            if not self.compact_encoder or self.compact_encoder.event_key != event_key:
+                self.initialize_compact_encoder(year, event_key)
         
         # CRITICAL: Always create index mapping for consistency
         team_index_map = None
@@ -474,18 +508,50 @@ CRITICAL: Return only valid JSON. Provide specific reasoning citing actual metri
             None,
         )
 
-        # EXACT RESTORATION OF ORIGINAL WARNING SYSTEM
-        team_index_info = ""
-        if team_index_map:
+        # Check if we should use compact encoding
+        lookup_tables = None
+        if self.use_compact_encoding and self.compact_encoder:
+            # Prepare teams with scores first for consistent processing
+            teams_with_scores = self._prepare_teams_with_scores(teams_data, priorities, team_index_map)
+            
+            # Convert to compact format
+            compact_teams = []
+            for team in teams_with_scores:
+                compact_array = self.compact_encoder.encode_team_to_array(team, team["index"])
+                compact_teams.append(compact_array)
+            
+            # Create lookup tables
+            lookup_tables = self.compact_encoder.create_lookup_tables(teams_with_scores)
+            
+            # Use compact format in prompt
             team_index_info = f"""
 TEAM_INDEX_MAP = {json.dumps(team_index_map)}
 ⚠️ CRITICAL: Use indices 1 through {len(team_index_map)} from TEAM_INDEX_MAP exactly once.
 ⚠️ Your response MUST use indices, NOT team numbers: [[1,score,"reason"],[2,score,"reason"]...]
 ⚠️ Each index from 1 to {len(team_index_map)} must appear EXACTLY ONCE.
 """
+            
+            prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info) if your_team_info else "{}"} 
+PRIORITY_METRICS  = {json.dumps(priorities)}   # include weight field
+GAME_CONTEXT      = {json.dumps(self.game_context) if self.game_context else "null"}
+TEAM_NUMBERS_TO_INCLUDE = {json.dumps(team_numbers)}{team_index_info}
+AVAILABLE_TEAMS = {json.dumps(compact_teams, separators=(',', ':'))}
 
-        # RESTORE ORIGINAL CONDENSED FORMAT
-        prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info) if your_team_info else "{}"} 
+Please produce output following RULES.
+"""
+        else:
+            # EXACT RESTORATION OF ORIGINAL WARNING SYSTEM
+            team_index_info = ""
+            if team_index_map:
+                team_index_info = f"""
+TEAM_INDEX_MAP = {json.dumps(team_index_map)}
+⚠️ CRITICAL: Use indices 1 through {len(team_index_map)} from TEAM_INDEX_MAP exactly once.
+⚠️ Your response MUST use indices, NOT team numbers: [[1,score,"reason"],[2,score,"reason"]...]
+⚠️ Each index from 1 to {len(team_index_map)} must appear EXACTLY ONCE.
+"""
+
+            # RESTORE ORIGINAL CONDENSED FORMAT
+            prompt = f"""YOUR_TEAM_PROFILE = {json.dumps(your_team_info) if your_team_info else "{}"} 
 PRIORITY_METRICS  = {json.dumps(priorities)}   # include weight field
 GAME_CONTEXT      = {json.dumps(self.game_context) if self.game_context else "null"}
 TEAM_NUMBERS_TO_INCLUDE = {json.dumps(team_numbers)}{team_index_info}
@@ -494,7 +560,7 @@ AVAILABLE_TEAMS = {json.dumps(self._prepare_teams_with_scores(teams_data, priori
 Please produce output following RULES.
 """
 
-        return prompt, team_index_map
+        return prompt, team_index_map, lookup_tables
 
     def _prepare_teams_with_scores(
         self,
@@ -634,7 +700,8 @@ Please produce output following RULES.
     
     def _optimize_text_data(self, text_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        PHASE 2 OPTIMIZATION: Reduce text data volume by 60-70% while preserving key insights.
+        SPRINT 2 ENHANCED: Reduce text data volume by 70-80% while preserving key insights.
+        Now uses compact encoding service for additional compression.
         
         Args:
             text_data: Original text data dictionary
@@ -645,6 +712,13 @@ Please produce output following RULES.
         if not isinstance(text_data, dict):
             return {}
         
+        # If compact encoder is available, use its compression
+        if self.use_compact_encoding and self.compact_encoder:
+            compressed_text = self.compact_encoder._compress_text_data(text_data)
+            # Return as a single compressed field for maximum reduction
+            return {"_compressed": compressed_text}
+        
+        # Otherwise use original optimization
         optimized_text = {}
         
         for field_name, field_value in text_data.items():
@@ -653,17 +727,17 @@ Please produce output following RULES.
                     continue
                 
                 # Handle strategy_field - extract key capabilities as tags
-                if "strategy" in field_name.lower():
+                if "strategy" in field_name.lower() or "position" in field_name.lower():
                     optimized_text[field_name] = self._extract_strategy_capabilities(field_value)
                 
-                # Handle scout_comments - limit to key insights only
+                # Handle scout_comments - aggressive compression
                 elif "comment" in field_name.lower() or "notes" in field_name.lower():
                     optimized_text[field_name] = self._extract_key_insights(field_value)
                 
-                # Other text fields - truncate if too long
+                # Other text fields - aggressive truncation
                 else:
-                    if len(field_value) > 100:
-                        optimized_text[field_name] = field_value[:97] + "..."
+                    if len(field_value) > 50:
+                        optimized_text[field_name] = field_value[:47] + "..."
                     else:
                         optimized_text[field_name] = field_value
                         
@@ -714,50 +788,59 @@ Please produce output following RULES.
     
     def _extract_key_insights(self, comments_text: str) -> str:
         """
-        Extract key insights from scout comments, focusing on performance issues and strengths.
-        Reduces typical 300+ char comments to 80-120 chars.
+        SPRINT 2 ENHANCED: Extract key insights from scout comments.
+        Reduces typical 300+ char comments to 60-80 chars max.
         """
         if not comments_text or len(comments_text) < 15:
             return comments_text
         
+        # Use compact encoder compression if available
+        if self.use_compact_encoding and self.compact_encoder:
+            return self.compact_encoder._compress_single_text(comments_text)
+        
         # Split into sentences and prioritize important ones
         sentences = [s.strip() for s in comments_text.replace("|", ".").split(".") if s.strip()]
         
-        # Keywords that indicate important insights
-        priority_keywords = [
-            "error", "mistake", "failed", "broken", "stuck", "missed", "tipped",
-            "fast", "slow", "efficient", "precise", "good", "strong", "weak",
-            "climb", "intake", "score", "defense", "reliable", "consistent"
-        ]
+        # Keywords that indicate critical insights (problems first)
+        critical_keywords = ["broken", "failed", "stuck", "tipped", "disabled", "error"]
+        performance_keywords = ["fast", "slow", "efficient", "reliable", "consistent", "strong"]
         
-        # Score sentences by importance
-        scored_sentences = []
+        # Find critical issues first
+        critical_insights = []
+        performance_insights = []
+        
         for sentence in sentences:
-            score = 0
             sentence_lower = sentence.lower()
-            for keyword in priority_keywords:
-                if keyword in sentence_lower:
-                    score += 1
-            scored_sentences.append((score, sentence))
+            # Shorten sentence to key parts
+            if len(sentence) > 40:
+                # Extract key phrase around important keywords
+                for keyword in critical_keywords:
+                    if keyword in sentence_lower:
+                        critical_insights.append(keyword)
+                        break
+                for keyword in performance_keywords:
+                    if keyword in sentence_lower:
+                        performance_insights.append(keyword)
+                        break
+            else:
+                # Short sentences - check for keywords
+                if any(kw in sentence_lower for kw in critical_keywords):
+                    critical_insights.append(sentence[:30])
+                elif any(kw in sentence_lower for kw in performance_keywords):
+                    performance_insights.append(sentence[:30])
         
-        # Sort by score and take top insights
-        scored_sentences.sort(key=lambda x: x[0], reverse=True)
+        # Combine insights with extreme compression
+        result_parts = []
+        if critical_insights:
+            result_parts.extend(critical_insights[:2])  # Max 2 critical issues
+        if performance_insights:
+            result_parts.extend(performance_insights[:1])  # Max 1 performance note
         
-        # Build optimized comment from top 1-2 insights
-        key_insights = []
-        total_length = 0
-        max_length = 120
-        
-        for score, sentence in scored_sentences:
-            if total_length + len(sentence) <= max_length and len(key_insights) < 2:
-                key_insights.append(sentence)
-                total_length += len(sentence)
-            elif len(key_insights) == 0:
-                # Ensure at least one insight, even if truncated
-                key_insights.append(sentence[:max_length-3] + "...")
-                break
-        
-        return " | ".join(key_insights) if key_insights else comments_text[:60] + "..."
+        if result_parts:
+            return " | ".join(result_parts)[:80]
+        else:
+            # No keywords found - take first 60 chars
+            return comments_text[:60] + "..." if len(comments_text) > 60 else comments_text
 
     def _create_labels_context(self) -> str:
         """
@@ -1171,6 +1254,7 @@ CRITICAL: Return only valid JSON."""
         team_index_map: Optional[Dict[int, int]] = None,
         max_retries: int = 3,
         strategy_interpretation: Optional[str] = None,
+        lookup_tables: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Execute GPT analysis with retry logic.
@@ -1181,6 +1265,8 @@ CRITICAL: Return only valid JSON."""
             teams_data: Team data for response parsing
             team_index_map: Optional index mapping
             max_retries: Maximum retry attempts
+            strategy_interpretation: Optional strategy interpretation
+            lookup_tables: Optional lookup tables for compact encoding
 
         Returns:
             Analysis results with picklist and metadata
