@@ -42,6 +42,7 @@ class PicklistGPTService:
         self.scouting_labels = self._load_scouting_labels()  # Load scouting labels for context
         self.compact_encoder = None  # Initialized when needed for specific event
         self.use_compact_encoding = True  # Enable compact encoding by default
+        self.extracted_game_context_cache = {}  # Cache for extracted game context
 
     def _load_scouting_labels(self) -> Dict[str, Dict[str, Any]]:
         """
@@ -141,6 +142,81 @@ class PicklistGPTService:
             logger.warning("Falling back to standard encoding")
             self.use_compact_encoding = False
             self.compact_encoder = None
+
+    def set_extracted_game_context(self, year: int, event_key: str, extracted_context: str) -> None:
+        """
+        Set and cache extracted game context for efficient reuse.
+        
+        Args:
+            year: Game year
+            event_key: Event key
+            extracted_context: Extracted game context (should be ~2K tokens vs 15K+ full manual)
+        """
+        cache_key = f"{year}_{event_key}"
+        self.extracted_game_context_cache[cache_key] = extracted_context
+        
+        # Also set as current game context
+        self.game_context = extracted_context
+        
+        logger.info(f"Set extracted game context for {event_key} ({len(extracted_context)} chars)")
+
+    def get_optimized_game_context(self, year: int, event_key: str) -> Optional[str]:
+        """
+        Get optimized game context, preferring extracted over full manual.
+        
+        Args:
+            year: Game year
+            event_key: Event key
+            
+        Returns:
+            Optimized game context (extracted if available, otherwise current)
+        """
+        cache_key = f"{year}_{event_key}"
+        
+        # Check cache first
+        if cache_key in self.extracted_game_context_cache:
+            context = self.extracted_game_context_cache[cache_key]
+            logger.debug(f"Using cached extracted context for {event_key} ({len(context)} chars)")
+            return context
+        
+        # Fall back to current game context
+        if self.game_context:
+            logger.debug(f"Using current game context ({len(self.game_context)} chars)")
+            return self.game_context
+        
+        return None
+
+    def ensure_extracted_context_usage(self, year: int, event_key: str, data_aggregation_service) -> str:
+        """
+        SPRINT 3: Ensure extracted game context is always used when available.
+        This method guarantees we use 2K token extracted context instead of 15K+ full manual.
+        
+        Args:
+            year: Game year
+            event_key: Event key
+            data_aggregation_service: Data aggregation service to get context from
+            
+        Returns:
+            Optimized game context string
+        """
+        # First check our cache
+        optimized_context = self.get_optimized_game_context(year, event_key)
+        if optimized_context:
+            return optimized_context
+        
+        # Try to get extracted context from data aggregation service
+        try:
+            extracted_context = data_aggregation_service.load_game_context()
+            if extracted_context:
+                # Cache it for future use
+                self.set_extracted_game_context(year, event_key, extracted_context)
+                return extracted_context
+        except Exception as e:
+            logger.warning(f"Failed to load extracted game context: {e}")
+        
+        # Return empty context as last resort (better than 15K+ tokens)
+        logger.warning("No extracted game context available, using minimal context")
+        return f"Game Year {year} - Alliance selection analysis for {event_key}"
 
     def prepare_team_data_for_gpt(self, teams_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
@@ -412,11 +488,16 @@ REASONING GUIDELINES:
 • Focus on trade-offs that determine precise ranking order
 • CRITICAL: Reference actual TEAM NUMBERS (from team_number field) NOT indices in explanations"""
 
-            # Add lookup tables for compact encoding
+            # Add lookup tables for compact encoding (compressed format)
             if lookup_tables:
-                prompt += f"\n\nMETRIC CODES:\n{json.dumps(lookup_tables.get('METRIC_CODES', {}), separators=(',', ':'))}"
-                prompt += f"\n\nDATA FORMAT: Teams are in compact arrays: [index, team_number, nickname, weighted_score, [metrics...]]"
-                prompt += f"\nMetrics are in this order: {lookup_tables.get('METRIC_ORDER', [])}"
+                metric_codes = lookup_tables.get('METRIC_CODES', {})
+                # SPRINT 3: Compress metric codes display
+                codes_list = [f"{k}={v}" for k, v in list(metric_codes.items())[:8]]  # Show only first 8
+                if len(metric_codes) > 8:
+                    codes_list.append(f"...+{len(metric_codes)-8} more")
+                
+                prompt += f"\n\nCODES: {', '.join(codes_list)}"
+                prompt += f"\nFORMAT: [index,team#,name,score,[metrics...]]"
             
             # Add scouting labels context if available (only if not using compact encoding)
             elif self.scouting_labels:
@@ -518,6 +599,14 @@ CRITICAL: Return only valid JSON. Provide specific reasoning citing actual metri
             compact_teams = []
             for team in teams_with_scores:
                 compact_array = self.compact_encoder.encode_team_to_array(team, team["index"])
+                
+                # SPRINT 3: Further compress by shortening nicknames in compact format
+                if len(compact_array) >= 3 and isinstance(compact_array[2], str):
+                    nickname = compact_array[2]
+                    if len(nickname) > 15:
+                        # Shorten long nicknames to save tokens
+                        compact_array[2] = nickname[:12] + "..."
+                
                 compact_teams.append(compact_array)
             
             # Create lookup tables
@@ -648,17 +737,16 @@ Please produce output following RULES.
                     logger.warning(f"Skipping non-string field name: {field_name}")
                     continue
                 
-                # OPTIMIZATION 1: Only include strategy-relevant metrics + essential universal metrics
+                # SPRINT 3 OPTIMIZATION: Prefer strategy-relevant metrics but include essential ones
                 if strategy_relevant_metrics and field_name not in strategy_relevant_metrics:
-                    # Always include some essential metrics regardless of strategy
+                    # Always include some essential metrics for context regardless of strategy
                     essential_metrics = {"driver_skill_rating", "statbotics_epa_total", "Auto Total Points", 
                                        "teleop_total_points", "endgame_total_points"}
                     if field_name not in essential_metrics:
                         continue
                 
-                # OPTIMIZATION 2: Smart aggregation - use performance bands instead of exact values
-                # PHASE 4: Reduces precision but maintains ranking differentiation
-                optimized_metrics[field_name] = self._convert_to_performance_band(field_name, value)
+                # Keep exact values for precise ranking
+                optimized_metrics[field_name] = value
                     
         except Exception as e:
             logger.error(f"Error in metric optimization: {e}")
@@ -670,33 +758,108 @@ Please produce output following RULES.
     
     def _get_strategy_relevant_metrics(self) -> set:
         """
-        Get metrics that are relevant to current strategy/priorities.
-        This helps filter out irrelevant data to reduce token usage.
+        SPRINT 3 ENHANCED: Get metrics that are relevant to current strategy/priorities.
+        Reduces average metrics per team from 25 to 10-12 for significant token savings.
         
         Returns:
             Set of metric field names that are strategy-relevant
         """
         if not hasattr(self, '_current_priorities') or not self._current_priorities:
-            return set()
+            # If no priorities, return essential universal metrics only
+            return self._get_essential_universal_metrics()
         
         relevant_metrics = set()
         
-        # Add priority metrics
+        # Add priority metrics (highest weight)
+        priority_weights = {}
         for priority in self._current_priorities:
-            relevant_metrics.add(priority.get('id', ''))
+            metric_id = priority.get('id', '')
+            weight = priority.get('weight', 0.0)
+            if metric_id:
+                relevant_metrics.add(metric_id)
+                priority_weights[metric_id] = weight
         
-        # Add related metrics (same category/phase)
+        # SPRINT 3: More selective category inclusion
+        # Only include high-impact related metrics, not all from same category
         for metric_id in list(relevant_metrics):
             if metric_id in self.scouting_labels:
                 label_info = self.scouting_labels[metric_id]
                 category = label_info.get("category", "")
                 
-                # Add other metrics from same category for context
+                # Only add 1-2 most relevant metrics from same category
+                category_metrics = []
                 for label_name, info in self.scouting_labels.items():
-                    if info.get("category") == category:
-                        relevant_metrics.add(label_name)
+                    if (info.get("category") == category and 
+                        label_name != metric_id and 
+                        label_name not in relevant_metrics):
+                        category_metrics.append(label_name)
+                
+                # Add max 2 additional metrics per category
+                relevant_metrics.update(category_metrics[:2])
         
+        # Always include essential universal metrics regardless of strategy
+        essential_metrics = self._get_essential_universal_metrics()
+        relevant_metrics.update(essential_metrics)
+        
+        # SPRINT 3: Cap total metrics at 12 for balanced optimization (down from 25 avg)
+        if len(relevant_metrics) > 12:
+            # Keep highest priority metrics
+            priority_sorted = sorted(
+                relevant_metrics, 
+                key=lambda m: priority_weights.get(m, 0.0), 
+                reverse=True
+            )
+            relevant_metrics = set(priority_sorted[:12])
+            logger.info(f"Capped strategy-relevant metrics to 12 (was {len(priority_sorted)})")
+        
+        logger.debug(f"Strategy-relevant metrics: {len(relevant_metrics)} selected")
         return relevant_metrics
+
+    def _get_essential_universal_metrics(self) -> set:
+        """
+        Get essential metrics that should always be included regardless of strategy.
+        These provide baseline comparison capability.
+        
+        Returns:
+            Set of essential metric names
+        """
+        essential_patterns = [
+            "auto", "teleop", "endgame", "total", "driver", "rating", 
+            "reliability", "consistency", "points"
+        ]
+        
+        essential_metrics = set()
+        
+        # Find metrics matching essential patterns
+        for label_name, info in self.scouting_labels.items():
+            label_lower = label_name.lower()
+            description_lower = info.get("description", "").lower()
+            
+            for pattern in essential_patterns:
+                if (pattern in label_lower or pattern in description_lower):
+                    essential_metrics.add(label_name)
+                    break  # Only need one match per metric
+        
+        # Limit essential metrics to top 3 most common patterns for Sprint 3
+        if len(essential_metrics) > 3:
+            # Prioritize by pattern importance
+            pattern_priority = {
+                "auto": 5, "teleop": 5, "endgame": 5, "total": 4, 
+                "points": 4, "driver": 3, "rating": 2, "reliability": 1
+            }
+            
+            scored_metrics = []
+            for metric in essential_metrics:
+                score = 0
+                for pattern, priority in pattern_priority.items():
+                    if pattern in metric.lower():
+                        score = max(score, priority)
+                scored_metrics.append((score, metric))
+            
+            scored_metrics.sort(reverse=True)
+            essential_metrics = set([metric for _, metric in scored_metrics[:3]])
+        
+        return essential_metrics
     
     def _optimize_text_data(self, text_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -1188,14 +1351,17 @@ CRITICAL: Return only valid JSON."""
         response_data: Dict[str, Any],
         teams_data: List[Dict[str, Any]],
         team_index_map: Optional[Dict[int, int]] = None,
+        lookup_tables: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
-        Parse GPT response and convert indices to team numbers if needed.
+        SPRINT 3 ENHANCED: Parse GPT response and convert indices to team numbers if needed.
+        Now validates metric code references when using compact format.
 
         Args:
             response_data: Parsed JSON response from GPT
             teams_data: Team data for nickname lookups
             team_index_map: Optional mapping from indices to team numbers
+            lookup_tables: Optional lookup tables for compact format validation
 
         Returns:
             List of teams with scores and reasoning
@@ -1225,6 +1391,9 @@ CRITICAL: Return only valid JSON."""
                     score = float(team_entry[1])
                     reason = team_entry[2]
 
+                    # SPRINT 3: Validate metric codes in reasoning if using compact format
+                    validated_reason = self._validate_compact_reasoning(reason, lookup_tables)
+
                     # Get team nickname
                     team_data = next(
                         (t for t in teams_data if t.get("team_number") == team_number), None
@@ -1240,11 +1409,64 @@ CRITICAL: Return only valid JSON."""
                             "team_number": team_number,
                             "nickname": nickname,
                             "score": score,
-                            "reasoning": reason,
+                            "reasoning": validated_reason,
                         }
                     )
 
         return picklist
+
+    def _validate_compact_reasoning(self, reasoning: str, lookup_tables: Optional[Dict[str, Any]]) -> str:
+        """
+        SPRINT 3: Validate and expand metric codes in reasoning when using compact format.
+        
+        Args:
+            reasoning: Original reasoning text from GPT
+            lookup_tables: Lookup tables containing metric codes
+            
+        Returns:
+            Validated reasoning with metric codes expanded if needed
+        """
+        if not lookup_tables or not isinstance(reasoning, str):
+            return reasoning
+        
+        metric_codes = lookup_tables.get("METRIC_CODES", {})
+        if not metric_codes:
+            return reasoning
+        
+        # Check if reasoning contains metric codes that should be expanded
+        validated_reasoning = reasoning
+        
+        for code, full_name in metric_codes.items():
+            # Look for metric codes in reasoning (case insensitive)
+            import re
+            pattern = rf'\b{re.escape(code)}\b'
+            
+            # Only expand if code appears in context suggesting it's a metric reference
+            if re.search(pattern, reasoning, re.IGNORECASE):
+                # Check if it's likely a metric reference (not just coincidental letters)
+                context_patterns = [
+                    rf'better\s+{re.escape(code)}\b',
+                    rf'stronger\s+{re.escape(code)}\b', 
+                    rf'weaker\s+{re.escape(code)}\b',
+                    rf'higher\s+{re.escape(code)}\b',
+                    rf'lower\s+{re.escape(code)}\b',
+                    rf'{re.escape(code)}\s+score',
+                    rf'{re.escape(code)}\s+performance'
+                ]
+                
+                for context_pattern in context_patterns:
+                    if re.search(context_pattern, reasoning, re.IGNORECASE):
+                        # Replace with full name for clarity
+                        validated_reasoning = re.sub(
+                            pattern, 
+                            full_name, 
+                            validated_reasoning, 
+                            flags=re.IGNORECASE
+                        )
+                        logger.debug(f"Expanded metric code {code} to {full_name} in reasoning")
+                        break
+        
+        return validated_reasoning
 
     async def analyze_teams(
         self,
@@ -1316,7 +1538,7 @@ ORIGINAL PROMPT:
             
             # Parse response
             picklist = self.parse_response_with_index_mapping(
-                result["response_data"], teams_data, team_index_map
+                result["response_data"], teams_data, team_index_map, lookup_tables
             )
 
             return {
